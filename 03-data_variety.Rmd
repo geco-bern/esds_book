@@ -1,3 +1,517 @@
 # Data variety
 
-TBC
+## Introduction
+
+### Overview
+
+In this practical we look at data variety in environmental sciences. We start with the data from one eddy covariance measurement site in Switzerland which we had already encountered in Chapter 1, and complement it with a different type of data (remote sensing data). Specifically, we download remote sensing data that measures vegetation greenness data, quantified by the normalised difference vegetation index, NDVI. We are interested in this data for example, because we expect ecosystem photosynthesis (gross primary production), measured at the eddy covariance tower, to covary with NDVI. Such covariation can provide powerful information for modelling. For example, we can train a machine learning model with the observed covariation between measured GPP and NDVI at eddy covariance sites and use that model to scale GPP up in space (NDVI is available for the whole globe, while GPP can only be measured locally.) You will actually be doing this kind of modelling in session 13. For now, we focus on working with the spatial aspects of the data (since remote sensing data is inherently spatial) and introduce you to the toolset to work with spatial, in particular, geo-spatial data. 
+
+To get you familiar with spatial data types we will use a variety of data from freely accessible sites. We can investigate abiotic and biotic conditions in these locations. We'll be plotting the Eddy towers you have already encountered in the first two chapters and extracting values for these locations from other data. By doing this we can show that the climate at these sites spans a gradient temperature and landcover. There are also biotic components that could explain variation in productivity among sites, including species composition and functional traits of plants. 
+
+### Learning objectives
+
+After this learning unit, you will be able to ...
+
+* explain the possible sources of data in environmental sciences;
+* understand the range of operations applied to data from basic to complex;
+* read various types of data in R and apply basic operations;
+* understand the structure of spatial data, including rasters and shapefiles;
+* apply a range of operations to prepare data for analyses.
+
+### Key points of the lecture
+
+Data operations range in complexity, here they are listed from simplest to extremely complex:  
+
+* Statistical operations 
+* Similarity metrics
+* Ordinations
+* Clustering 
+* Classifications
+* Regressions
+* Neural network deep learning
+
+Examples of methods for the computing differences between datasets:
+
+* _Euclidean distance_ is used for the simple quantification of variation
+* _PCA_ is a valuable tool to explore variation and reduce dimension
+* _Hamming distance_ helps measure the difference between strings
+* _Jaccard index_ describes the similarity between two or more binary data sets
+
+Machine learning is loosely defined as any learning done by a computer. It can be divided into…
+
+* _Unsupervised learning_: without explanatory data, which uses clustering to obtain a categorical output
+* _Supervised learning_: with explanatory data, which uses either classification also resulting in a categorical output, or regression when a numerical output is required
+
+Data errors are divided into errors of accuracy and precision. If data is inaccurate, it strays from the true value. If data is imprecise, individual data points are variable under the same conditions. Systematic errors and inaccurate data is much harder to correct! 
+
+Errors can arise throughout the data science workflow.
+
+* _Inherent error_ refers to the error present in the source documents and data.
+* _Operational error_ is created after data collection.
+
+Data can be cleaned from errors by looking for:
+
+* Non-uniform data
+* Missing data
+* Duplicated data
+* Outliers
+* Measurement errors
+
+Quantifying uncertainty is extremely important, as undetectable errors will persist even after data cleaning. Examples of uncertainty quantification include…
+
+* Confidence interval (CI)
+* Prediction interval
+
+Error propagation is used for datasets containing different uncertainties to determine the overall uncertainty.
+
+## Tutorial
+
+### Overview
+
+In this practical, you will be downloading and getting to know spatial data. There are three types of spatial data:
+
+* points;
+* shapefiles;
+* rasters.
+
+The first part of this practical is mandatory and will start with a little introduction on downloading remote sensing data for our tower sites and seeing what kinds of information we can gather from this. Then we will get into the nitty-gritty aspects of the afore mentioned spatial data types. 
+
+The second part is the bonus part, there we will discuss trait data and the principal component analysis (PCA), which is a method to reduce the dimensions of datasets.
+
+### MODIS remote download
+
+We'll be starting off this tutorial with an example on using remote sensing data. We'll focus on a Fluxnet site already familiar to you: CH-Lae. The Lägern site is located on a mountain in the Swiss Plateau NW of Zürich and is surrounded by managed mixed deciduous mountain forests. The forest is highly diverse and dominated by beech. In the following figures, you can get an impression of the tower and its surroundings. 
+
+![](./figures/site1.jpg)
+![](./figures/site2.jpg)
+![](./figures/site3.jpg)
+
+As always we start by loading `tidyverse`and our fluxnet site data.
+
+```{r warning=F, message=F}
+library(tidyverse)
+df_sites <- read_csv("./data/fluxnet_site_info_reduced.csv")
+```
+
+Since for this section we will only be working with the Lägern site we can directly extract its latitude and longitude.
+
+```{r}
+lon_lae <- df_sites %>% 
+  filter(site == "CH-Lae") %>% 
+  pull(lon)
+
+lat_lae <- df_sites %>% 
+  filter(site == "CH-Lae") %>% 
+  pull(lat)
+```
+
+In this first analysis, we want to complement temporal data measured by the Fluxnet tower with remote sensing data. _Remote sensing_ is the detection or monitoring of physical characteristics of the Earth’s surface by measuring reflected and emitted radiation at a distance. Data is collected in the form of images by special cameras typically from aircrafts or satellites. With this method, a huge amount of global data at large spatial scales gets easily accessible and therefore represents a useful method for the monitoring of ecosystems. However, this remotely acquired data requires validation from ground measurements, which can be done for example using the Eddy towers from the previous practicals.
+
+One of these satellite remote sensing instruments is MODIS (Moderate Resolution Imaging Spectroradiometer). Terra MODIS and Aqua MODIS are viewing the entire Earth's surface every 1 to 2 days, acquiring data in 36 spectral bands, or groups of wavelengths. 
+
+You used to have to visit an website to be able to download the data file by file, which was a long and tedious process. Luckily, now we have access to tools that make it much more straightforward to download remote sensing data from satellites. It provides Atmosphere, Ocean, Cryosphere and Land data series. The `MODISTools` package provides a programmatic interface to the [MODIS Land Products Subsets web services](https://modis.gsfc.nasa.gov/) allows for easy downloads of "MODIS" time series (of single pixels or small regions of interest) directly to your R workspace or your computer. 
+
+* Using the `mt_...()` functions of the MODISTools we can check which products are available in MODIS, how the product we are searching for is called, and what temporal and spatial resolutions are available. 
+* `t_products()` lists all available products from MODIS with their temporal and spatial resolution. Products are parent categories of variables measured by the satellites, such as vegetation indices. 
+* `mt_bands()` requires the entry of a product chosen from "products" and list the available data variables that are represented by the different actually measured wavelengths. 
+* Finally, `mt_dates()` lists all dates of which data from the chosen product and band are available.
+
+We will make use of this by loading NDVI data around our towers directly from MODIS.
+
+```{r}
+library(MODISTools)
+products <- mt_products() %>% as_tibble()
+bands <- mt_bands(product = "MOD13Q1") %>% as_tibble()
+dates <- mt_dates(product = "MOD13Q1", lat = lat_lae, lon = lon_lae) %>% as_tibble()
+```
+
+Now, we'll get the NDVI data for 6 years for a square of 2km x 2km around the tower site. We use the function `mt_subset()` for this. The parameters of this function download a subset of data within the chosen product (here 'MOD13Q1'). We specify the location as latitude and longitude, and the band we chose, which is at 250m spatial resolution and 16-day temporal resolution. The time period can be chosen as a subset of “dates” and must be provided in the form of start and end date. We will be looking at the beginning of 2009 to the end of 2014. `km_lr` and `km_ab` define the kilometers to the left and right of the location and kilometers above and below respectively. Since these values are being rounded to the nearest integer, we chose this minimum of 1, corresponding to 2km<sup>2</sup>. Sitename is used in writing data to file, internal gives the command whether the data should be returned as an internal structure. The progress setting defines whether the download progress should be shown or not.
+
+```{r eval = F}
+df_ndvi <- mt_subset(product = "MOD13Q1",            # the chosen product
+                  lat = lat_lae,                     # desired lat/lon
+                  lon = lon_lae,
+                  band = "250m_16_days_NDVI",        # chosen band defining spatial and temporal scale
+                  start = "2009-01-01",              # start date: 1st Jan 2009
+                  end = "2014-12-19",                # end date: 19th Dec 2014
+                  km_lr = 1,                         # kilometers left & right of the chosen location (lat/lon above)
+                  km_ab = 1,                         # kilometers above and below the location
+                  site_name = "CH-Lae",              # the site name we want to give the data
+                  internal = TRUE,
+                  progress = FALSE
+                  ) %>% 
+  as_tibble()
+```
+
+```{r echo=F}
+load("./data/df_ndvi.RData")
+```
+
+```{r}
+head(df_ndvi)
+```
+
+This dataframe takes some effort to make sense of. Let's make our lives a little easier and put this data into a useful spatial context. For that it needs to be converted to a raster. This is a key spatial data type and will be described in more detail in the section Raster below. 
+MODISTools provides a handy integrated function for converting the data to a raster `mt_to_raster()`.
+
+```{r echo=F, message=F}
+library(sf)
+library(rgdal)
+```
+
+```{r message=F, warning=F}
+library(raster)
+raster_ndvi <- mt_to_raster(df_ndvi, reproject=TRUE)
+```
+
+By plotting the data we can verify that we loaded a square of NDVI data around our tower for every 16-day time step. 
+We plot four images in the winter season.
+
+```{r}
+plot(raster_ndvi[[1:4]], zlim=c(-0.1, 0.95))
+```
+
+Just out of interest let's calculate the minimum and maximum of these plots.
+
+```{r}
+min_winter <- min(minValue(raster_ndvi[[1:4]]))
+max_winter <- max(maxValue(raster_ndvi[[1:4]]))
+paste0("Minimum Winter:", sep=" ", min_winter)
+paste0("Maximum Winter:", sep=" ", max_winter)
+```
+
+We do the same for the summer season.
+
+```{r}
+plot(raster_ndvi[[13:16]], zlim=c(-0.1, 0.95))
+```
+
+We compute minimum and maximum.
+
+```{r}
+min_summer <- min(minValue(raster_ndvi[[13:16]]))
+max_summer <- max(maxValue(raster_ndvi[[13:16]]))
+paste0("Minimum Summer:", sep=" ", min_summer)
+paste0("Maximum Summer:", sep=" ", max_summer)
+```
+
+From the two plots, we can clearly distinguish summer and winter time steps due to the differences in NDVI. Summer NDVI is much higher since our tower site is located in the Northern hemisphere where leaves get lost during winter for many vegetation types. Heterogeneity in winter is higher which might be due to conifers that don't lose their leaves.
+
+However, we are also interested in the mean across all (spatial) pixels for each date. To clarify this means we collapse the pixel dimension into a single mean value for each date. This is can done using `group_by()` in combination with `summarise()`, which were explained in chapter 2. 
+
+```{r, warning=F, message=F}
+library(lubridate) # lubridate is loaded to work with dates
+
+## first determine the scaling factor that is to be applied to the NDVI values. This has practical reasons: reduces disk space
+scale_factor <- bands %>% 
+  filter(band == "250m_16_days_NDVI") %>% 
+  pull(scale_factor) %>% 
+  as.numeric()
+  
+df_ndvi_spatialmean <- df_ndvi %>% 
+  mutate(calendar_date = ymd(calendar_date)) %>%  # make the dates into comprehensible values not X.yyyy.mm.dd
+  group_by(calendar_date) %>%                     # group the data by day 
+  summarise(mean = mean(value), min = min(value), max = max(value)) %>%   # calculate mean, min and max across pixels
+  mutate(mean = mean * scale_factor, min = min * scale_factor, max = max * scale_factor)  # apply scale_factor (see )
+```
+
+We can now plot our NDVI time series across our years (2009 to 2014) using the means we calculated above.
+
+```{r}
+df_ndvi_spatialmean %>% 
+  ggplot(aes(x = calendar_date)) +
+  geom_ribbon(aes(ymin = min, ymax = max), fill = "grey70") +
+  geom_line(aes(y = mean))
+```
+
+After having aggregated the data to the mean NDVI across all 81 pixels for each date, we have reduced the dimensions of the data frame to only one (time). It now has a structure that can easily be combined with the time series data from the eddy covariance tower (each site is a point in space).
+
+```{r message=F}
+# this can now be combined to the data frame with flux data that also has dates along rows
+ddf_ch_lae <- read_csv("./data/ddf_ch_lae.csv")
+```
+
+```{r, message=F}
+# now we can combine the two data frames along dates. 
+ddf_ch_lae_ndvi <- ddf_ch_lae %>%
+  dplyr::rename(date = TIMESTAMP) %>% 
+  dplyr::mutate(year = year(date)) %>% 
+  dplyr::filter(year %in% 2009:2014) %>%  # NDVI data was downloaded only for these years
+  left_join(df_ndvi_spatialmean %>% rename(date = calendar_date), by = "date") %>% 
+  dplyr::select(-year)
+```
+
+NDVI data is provided every 16 days. In order to predict values at other time steps, we can fit a cubic smoothing spline to our daily values. (Cubic smoothing splines embody a curve fitting technique that blends the ideas of cubic splines and curvature minimization to create an effective data modeling tool for noisy data. Traditional interpolating cubic splines represent the tabulated data as a piece-wise continuous curve which passes through each value in the data table. The curve spanning each data interval is represented by a cubic polynomial, with the requirement that the endpoints of adjacent cubic polynomials match in location and in their first and second derivatives). 
+
+```{r}
+ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>% 
+  mutate(date_dec = decimal_date(date))
+
+df_nona <- ddf_ch_lae_ndvi %>% 
+  drop_na()
+
+out_spline <- smooth.spline( df_nona$date_dec, df_nona$mean, spar=0.1 )
+vals_spline <- predict( out_spline, ddf_ch_lae_ndvi$date_dec )$y
+
+ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>% 
+  mutate(ndvi_splined = vals_spline)
+```
+
+Let's take a look...
+
+```{r warning=F}
+ddf_ch_lae_ndvi %>% 
+  ggplot() +
+  geom_point(aes(x = date, y = mean)) +
+  geom_line(aes(x = date, y = ndvi_splined), color = "red")
+```
+
+To see how well this data correlates with measurements from the fluxnet tower, we look at the relationship of GPP vs. NDVI*PPFD.
+
+```{r}
+ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>% 
+  mutate(ppfd_abs = ndvi_splined * PPFD_IN)
+```
+
+Does NDVI affect the relationship between GPP and PPFD?
+
+```{r}
+linmod1 <- lm(GPP_NT_VUT_REF ~ PPFD_IN, data = ddf_ch_lae_ndvi)
+summary(linmod1)
+```
+
+```{r}
+linmod2 <- lm(GPP_NT_VUT_REF ~ ppfd_abs, data = ddf_ch_lae_ndvi)
+summary(linmod2)
+```
+
+Indeed, R<sup>2</sup> increased from 0.5229 to 0.603 when including considering NDVI * PPFD, instead of just PPFD. In other words, it also matters whether leaves are actually out and green for modelling the relationship between GPP and PPFD. NDVI * PPFD approximates the amount of *absorbed* incoming light (not just the incoming light) and is therefore closer to being a physiologically relevant quantity. 
+
+### Points on the globe
+
+Documenting the coordinates of data as it is collected allows us to assign a precise location to that data, which can be important in further analysis when, for example, comparing location. As you all undoubtedly know coordinates come with a latitude (defining the position N or S of the equator) and longitude (defining the position E or W of the meridian). With the coordinates we can already plot our data points, remembering that the latitude is equivalent to the y-axis and longitude to the x-axis.
+
+In this section, we look at the position of the Fluxnet sites. The Fluxnet network measures land-atmosphere exchanges of greenhouse gases and energy for sites across the globe using the eddy covariance technique. High-frequency measurements of vertical wind velocity and a scalar mixing ratio (CO2, H2O, temperature, etc.) provides estimates of the net exchange of the scalar. Eddy covariance is currently the standard method to measure fluxes of trace gases between ecosystems and the atmosphere (sources:
+https://fluxnet.org/about/, https://www.nature.com/articles/s41597-020-0534-3.pdf).
+
+Right at the beginning of this tutorial we loaded the dataset containing information on sites in Europe. We treat site locations as a geographical position. So we will extract the name, longitude and latitude of our sites.
+
+```{r}
+head(df_sites)
+```
+
+Our dataset _'df_sites'_ contains two sites in Greenland and Siberia. We'll focus on a smaller spatial domain, restricted to "mainland" Europe, therefore, we exclude sites RU-Cok and DK-ZaH.
+
+```{r}
+df_sites <- df_sites %>% 
+  filter(!(site %in% c("RU-Cok", "DK-ZaH")))
+```
+
+Already now we can plot our data points without any further adjustments.
+
+```{r}
+ggplot() +
+  geom_point(data = df_sites, aes(x = lon, y = lat), color = "red") +
+  labs(title = "Selected FLUXNET sites", x = "Longitude", y = "Latitude")+
+  theme_bw()
+```
+
+We can make an educated guess where the points are but this plot doesn't tell us much by itself without a map as a reference.
+
+So to visualize the location of our points we plot them on a map. We use the package `SpData` to get the world map and crop it to Europe.
+
+```{r messages=F, warning=F}
+library(sf)
+library(spData)
+
+ggplot() +
+  geom_sf(data = world) +
+  geom_point(data = df_sites, aes(x = lon, y = lat), color = "red") +
+  labs(x = "Longitude", y = "Latitude") +
+  coord_sf(xlim = c(-30,40), ylim = c(35,80), expand = FALSE) +
+  theme_bw()
+  # coord_sf(crs = "+proj=robin")
+```
+
+Of course, we can carry on using the data points as they are (for plotting or analysis) but for more detailed spatial analysis we will turn them into _SpatialPoints_. 
+
+_SpatialPoints_ consist of a matrix with _n_ rows and 2 columns, one for each coordinate (latitude & longitude). _n_ is the number of points in the data. These points also have a so-called _'projection string'_ or _'crs'_ indicating the coordinate reference system in which coordinates of points are expressed. 
+There are different ways (formulas) to project the earth (an ellipsoid) onto a 2-dimensional map. You can only perform calculations, if the same method (projection, coordinate reference system (crs)) is used. Having points in different coordinate reference systems can cause data to look very skewed. It's good to know which coordinate reference system your data is in, the most commonly used one is **WGS84 (EPSG: 4326)**. There are some useful resources to convert help you find the correct [spatial reference](https://spatialreference.org/ref/epsg/4326/).
+
+To transform points into _SpatialPoints_ we use the function `SpatialPoints` in the r package `sp`.
+
+```{r}
+library(sp)
+sp_sites <- SpatialPoints(dplyr::select(df_sites, -site)) # remove character column
+```
+
+Below you can see how with the R-base call `plot()` you can plot the _SpatialPoints_ directly. But we'll have to also provide a map to plot them onto. The loaded shapefile of europe will also be used in the next part called Shapefiles.
+
+```{r warning=F, message=F}
+library(rgdal)
+europe_shape <- readOGR(dsn="./data/shapefiles", layer="europe_map")
+
+plot(europe_shape, col="grey")
+plot(sp_sites, col = "red", add = TRUE, pch = 16)
+```
+
+### Shapefiles
+
+Above we looked at points on the globe and transformed our data to _SpatialPoints_. This was already the first example of what forms a shapefile can come in. Shapefiles basically store geographic information, meaning location and any additional information, in shape objects. Shape objects in R are defined by _SpatialPoints_, _SpatialLines_, and _SpatialPolygons_ classes of the `sp` package. The corresponding _SpatialPointsDataFrame_, _SpatialLinesDataFrame_, and _SpatialPolygonsDataFrame_ classes allow storing shape objects together with a dataframe. The number of rows in the dataframe corresponds to the number of points (number of rows in coordinate matrix), lines (size of the list of Lines), or polygons (size of the list of Polygons). This allows us to associate a vector of variables (a row of the dataframe) to each shape object.
+In the next step, we load a shapefile containing the countries of the world provided by [Natural Earth](www.naturalearthdata.com), as a reference with which we can contextualize our spatial data. Since we only are looking at towers in Europe, we have cropped the raster to Europe for you.
+
+```{r warning=F, message=F}
+library(rgdal)
+europe_shape <- readOGR(dsn="./data/shapefiles", layer="europe_map")
+```
+
+Let's see what class _europe_shape_ is:
+
+```{r}
+class(europe_shape)
+```
+
+Above we mentioned that _SpatialPolygonsDataFrame_ contains both a list of _SpatialPolygons_ and a dataframe with information on each polygon. Here's how you can access the information in the dataframe. We'll just display the header for now.
+
+```{r}
+head(europe_shape@data)
+```
+
+Let's first plot our towers on this map of Europe. Remember, how when you transformed the tower locations we mentioned each point has a designated coordinate reference system? Here, we need to extract this projection from _europe_shape_ using `proj4string()` and add it to our _SpatialPoints_. This way we can make sure they are in the same reference system for plotting them together.
+
+```{r message=F}
+geo.proj <- sp::proj4string(europe_shape)
+pts <- sp::SpatialPoints(sp_sites, proj4string = sp::CRS(geo.proj))
+```
+
+Then we can take the _SpatialPoints_, now in the correct coordinate reference system, the data from _europe_shape_ and bind them to our tower sites in the dataframe _df_sites_.
+
+```{r}
+df_sites_country_info <- sp::over(pts, europe_shape) %>% 
+    as_tibble() %>% 
+    bind_cols(df_sites, .)
+
+head(df_sites_country_info)
+```
+
+For the next part we will be using a map European with country boarders. For this, we'll make an object called _shp_df_, this we do using the column _SOVEREIGNT_, which we saw when looking at `europe_shape@data`. This preserves only the data we need for further analysis and plotting. 
+
+```{r message=F}
+library(maptools)
+
+shp_df <- broom::tidy(europe_shape, region = "SOVEREIGNT")
+head(shp_df)
+
+ggplot() + 
+  geom_polygon(data = shp_df, aes(x = long, y = lat, group = group, fill = id), colour = "black") +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+As we saw in the earlier plot of the tower locations only some countries in Europe contain towers. Therefore, we want to crop our map to include only those countries.
+
+To do this we first make a vector which is a list of the country each tower is located in. We get this from _df_site_country_info_. 
+Then we filter out only those countries with a tower in them and voilà, plot the countries and tower locations as a result.
+
+```{r}
+countries_with_site <- df_sites_country_info %>% pull(SOVEREIGNT) %>% as.character()
+
+# resulting character vector (without NAs)
+countries_with_site %>% na.omit()
+
+# country with towers filtered
+shp_df_sub <- shp_df %>% 
+  filter(id %in% countries_with_site)
+
+# plot result
+ggplot() + 
+  geom_polygon(data = shp_df_sub, aes(x = long, y = lat, group = group, fill = id), colour = "black") +
+  geom_point(data = df_sites, aes(x = lon, y = lat)) +
+  theme_bw()
+```
+
+##### Here goes a checkpoint
+
+### Rasters
+ 
+Next up are rasters. A raster is a matrix or grid of cells each of which contains information in the form of a value.
+
+A <b>raster</b> object consists primarily of:
+
+* A grid of <b>cells</b>;  
+* A <b>coordinate reference system (CRS)</b> for the grid and its cells so that we know the location to which the grid refers;
+* A <b>variable of interest</b> for which each cell in the grid has a value, and;
+* Other information relating to the CRS, projection, resolution, etc.
+
+Let's take a look at some rasters and get familiar with some functions to analyse them.
+
+Since our goal ultimate goal is to predict productivity, we will consider different factors that might explain productivity, for example, landcover and temperature. 
+To start off we'll look at some landcover data. With this data, we can investigate the surroundings of the Fluxnet towers. This data gives us the different classes of physical coverage of the Earth’s surface, such as forests, grasslands, croplands, lakes, etc. Landcover types affect fluxes measured by the tower through the vegetation that characterizes them, or by influencing the radiation budget through albedo, or water availability. Although we have some information from the overview file of the towers, we can still check whether we can confirm this information. We will load landcover data from GlobCover provided by the [European space agency (ESA)](http://due.esrin.esa.int/page_globcover.php). This project provides landcover maps observations of surface reflectance from the 300m MERIS sensor on board the ENVISAT satellite mission as their input.
+
+```{r}
+# library(raster) -> we have already done this but remember you need this to load rasters!
+
+raster_landcover <- raster("./data/Globcover_EU.tif")
+```
+
+This landcover data consists of different categories, these GlobCover categories are based on the Land Cover Classification System (LCCS) which was
+developed by the Food and Agricultural Organization of the United Nations (FAO) to provide a consistent framework for the classification of mapping land cover. They include various types of forest, shrub- and grasslands, cropland and artificial surfaces.
+
+Before we look at the data, we first reduce the spatial extent that the raster covers. We crop it to a rectangle around the site location of CH-Lae (+/- 2 degrees in longitudinal direction, +/- 1 degree in latitudinal direction).
+
+```{r}
+bounding_box <- extent(lon_lae-2, lon_lae+2, lat_lae-1, lat_lae+1)
+raster_landcover_crop <- crop(raster_landcover, bounding_box)
+```
+
+We can plot our raster as the region around our tower. To indicate the position of our tower, we add a red dot.
+
+```{r}
+plot(raster_landcover_crop, legend=FALSE, xlab="longitude", ylab="latitude")
+points(lon_lae, lat_lae, pch = 16, col = "red")
+```
+
+If we want to conduct analysis using two different rasters, we have to make sure they have the same resolution and are aligned on the same grid. Let's read a second raster and compare the grids. We load spatio-temporal temperature rasters available from [CHELSA](https://chelsa-climate.org) to complement our flux tower measurements for further analysis.
+The temperature raster data from CHELSA provides free high-resolution climate data (temperature and precipitation) for the past and the future. The past data we use here are downscaled model output temperature and precipitation estimates of the ERA-Interim climatic reanalysis (forecast models and data assimilation systems reanalysing archived observations). While the temperature algorithm is based on statistical downscaling of atmospheric temperatures, the precipitation algorithm incorporates orographic predictors including wind fields, valley exposition, and boundary layer height, with subsequent bias correction. The data we use consists of a monthly temperature and precipitation time series over the area of Europe from 2006 to 2012 in January. To compare this new raster with the previous one we need to crop it to the same region as the tower.
+
+```{r}
+raster_chelsa <- raster("./data/Chelsa_t_mean_2006-2012.tif")
+raster_chelsa_crop <- crop(raster_chelsa, bounding_box)
+```
+
+We now plot our raster.
+
+```{r}
+pal <- colorRampPalette(c("purple","blue","cyan","green","yellow","red"))
+plot(raster_chelsa_crop, col = pal(20), xlab="longitude", ylab="latitude")
+points(lon_lae, lat_lae, pch = 16, col = "red")
+```
+
+We see that the temperature units are not in a comprehensive format. To change the unit from Kelvin x10 to degree Celsius we have to divide the data by 10 and subtract 273.15. 
+
+```{r}
+raster_chelsa_crop <- raster_chelsa_crop/10-273.15
+```
+
+We plot our raster again.
+
+```{r}
+pal <- colorRampPalette(c("purple","blue","cyan","green","yellow","red"))
+plot(raster_chelsa_crop, col = pal(20), xlab="longitude", ylab="latitude")
+points(lon_lae, lat_lae, pch = 16, col = "red")
+```
+
+We have seen some of the basic functions in the package `raster`. Now we will load one more package to work with raster files. We use the package `rasterVis`. This package contains methods for enhanced visualization and interaction with raster data. It implements visualization methods for quantitative data and categorical data, both for univariate and multivariate rasters. It also provides methods to display spatiotemporal rasters, and vector fields. 
+
+```{r message=F}
+library(rasterVis)
+library(RColorBrewer)
+
+mapTheme <- rasterTheme(region = rev(brewer.pal(8,"RdYlBu")))
+plt <- levelplot(raster_chelsa_crop, margin=FALSE, par.settings = mapTheme)
+plt
+```
+
+##### Here goes a checkpoint
+
+
