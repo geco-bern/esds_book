@@ -703,7 +703,7 @@ GPP <- GPP[-c(14, 16, 34), ]
 
 We then extract landcover data at the tower sites.
 
-```{r message=F}
+```{r message=F, warning=F}
 df_sites_landcover <- extract(raster_landcover, sp_sites, sp = TRUE)
 df_sites_landcover <- as.tibble(df_sites_landcover)
 
@@ -867,7 +867,7 @@ head(occ_CHlae)
 ```
 
 ```{r echo=F}
-load("./data/occ_CHLae.RData")
+load("./data/occ_CHlae.RData")
 ```
 
 Let's have a quick look at the orders of the species in the polygon around our tower.
@@ -931,7 +931,7 @@ dim(species_list_full)
 
 Next, we can use this information to build a presence-absence matrix for all locations and species, this will allow us to see where each species is found. This can be the basis for many community ecology calculations or species distribution models linking the environmental variables to species' occurrences to see which are most correlated with certain factors.
 
-```{r message=F, warning=F}
+```{r message=F, warning=F, eval=F}
 # select all files with resolved in their name
 paths <- list.files(file.path("./data/", "species_occurrences"), pattern='resolved_*', recursive = F, full.names = T)
 
@@ -953,7 +953,13 @@ species_occ_mat <- species_occ_df %>%
   mutate(present = 1) %>%                                                             # create a column where all the species get a 1 (for presence)
   pivot_wider(names_from = names.accepted.autocorrected, values_from = present) %>%   # turn (spread) the column of species names to the column names
   mutate_all(funs(ifelse(is.na(.), 0, .)))                                            # replace the missing values with 0
+```
 
+```{r echo=F}
+load("./data/species_occ_mat.RData")
+```
+
+```{r}
 head(species_occ_mat)
 ```
 
@@ -1009,3 +1015,161 @@ Let's load the data.
 trait_df <- read.csv("./data/Trait_df.csv")
 head(trait_df)
 ```
+
+Some examples of traits are are leaf texture, leaf thickness, eaf chlorophyll content per leaf area, specific leaf area, etc.
+
+As a next step, we can combine the species occurrence data with the trait data. The presence/absence matrix (_species_occ_mat_) we made earlier, gives us the species present at each site. From that we can then extract these species and their respective trait values from the trait dataframe (_trait_df_). Then we go on to summarise this data by calculating the mean value for each trait across all the species at the tower sites. 
+
+We start by doing this for one site.
+
+```{r}
+ba <- trait_df
+
+# select all the species (species names= column names) which are present (so ==1)
+species_present <- colnames(species_occ_mat)[which(species_occ_mat[1, ] == 1)]
+
+# filter out the trait data for the species present at that site
+trait_subset <- ba[ba$SpeciesName %in% species_present,]
+
+# calculate the mean of each trait across all species present
+bac <- aggregate(trait_subset$OrigValueStr, list(trait_subset$TraitID), mean, na.rm=T)
+```
+
+To finish preparing the data for the PCA, we do the above steps for all the remaining sites by using a _'for loop'_.
+
+```{r}
+df_pca <- bac$x
+for(i in c(2:28)){
+    species_present <- colnames(species_occ_mat)[which(species_occ_mat[i, ] == 1)]
+    trait_subset <- ba[ba$SpeciesName %in% species_present,]
+    bac <- aggregate(trait_subset$OrigValueStr, list(trait_subset$TraitID), mean, na.rm=T)
+    df_pca <- rbind(df_pca, bac$x)
+}
+```
+
+For the PCA we use only the traits with traitIDs: 46, 47, 3106 and 3117. This is because the other traits are just slightly modified versions of these four traits. These four traitIDs correspond to the traits: _leaf thickness_, _leaf dry matter content (LDMC)_, _plant height_ and _specific leaf area (SLA)_. _Leaf dry matter content_ is calculated as leaf dry mass per leaf fresh mass and _specific leaf area_ is defined as leaf area per leaf dry mass.
+
+```{r}
+# we select the columns corresponding to our desired traits
+df_pca <- cbind(df_pca[,2],df_pca[,3],df_pca[,5],df_pca[,9])
+
+# to make the data easier to understand we name the columns after the trait
+colnames(df_pca) <- c("leaf thickness", "leaf dry matter content (LDMC)", "plant height vegetative", "specific leaf area (SLA)")
+
+head(df_pca)
+```
+
+Principal Component Analysis (PCA) is one of famous techniques for dimension reduction, feature extraction, and data visualization. In general, PCA is defined as the transformation of a high dimensional vector space to a low dimensional space. Just imagine having to visualise data with 10 dimensions... we often stuggle already with three. It's almost impossible to effectively show the shape of such a high dimensional data distribution. PCA provides an efficient way to reduce the dimensionalty (i.e. from 10 to 2), so it is much easier to visualize the shape of data distribution. In a nutshell, this reduction happens by the PCA taking the two axes that best explain the variation in the data.
+
+PCA is also useful in the modeling a robust classifier where considerably small number of high dimensional training data is provided. By reducing the dimensions of learning data sets, PCA provides an effective and efficient method for data description and classification.
+For a more mathematical description of PCA you can check https://www.projectrhea.org/rhea/index.php/PCA_Theory_Examples.
+
+So now let's reduce the dimensions of our trait data as an example... For this we use the function `prcomp()`.
+
+```{r}
+traits_pca <- prcomp(df_pca, center = TRUE, scale = TRUE)
+summary(traits_pca)
+```
+
+From the information above we can see how much of the variation in the data is explained by each axis or dimensionality. Ideally, you want the first to axes to explain the vast majority of the variation, while the subsequent ones are much less important. 
+But what do all these numbers mean and how does the data look. It's time to visualise the PCA.
+
+```{r}
+library(ggfortify)
+autoplot(traits_pca, data = df_pca, col ="#138D37", loadings = TRUE, loadings.colour = 'blue', loadings.label = TRUE, loadings.label.size = 3) + theme_classic()
+```
+
+We have successfully reduced the dimensionality of our data! We started with four traits and now we have reduced the variation to two main axes. We see that PC1 is mainly associated to leaf dry matter content, and plant height, while PC2 is associated with specific leaf area and leaf thickness.
+
+It can be interesting to see how the points relate spatially, this could, for example, allow us to identify clusters. Therefore, we will visualise our tower sites coloured by the corresponding position (positive or negative) on the PC1 axes.
+
+```{r}
+# start by designating trait and axis values to vector objects
+tr1 <- df_pca[,1] # these are the traits
+tr2 <- df_pca[,2] # these are the traits
+
+pc1 <- traits_pca$x[,1] # these are the axis values
+pc2 <- traits_pca$x[,2] # these are the axis values
+```
+
+```{r}
+# specify the colour palettes for positive and negative values
+pospal <- colorRampPalette(c("#E9E15C", "#CF2B1E"))
+negpal <- colorRampPalette(c("#1E3498", "#95D7DB"))
+
+# we separate positive from negative values for visualization
+neg_pc1 <- pc1 
+neg_pc1[neg_pc1 > 0 ] <- NA
+pos_pc1 <- pc1 
+pos_pc1[pos_pc1 < 0 ] <- NA
+
+datColpos <- pospal(100)[as.numeric(cut(pos_pc1,breaks = 100))] 
+datColneg <- negpal(100)[as.numeric(cut(neg_pc1,breaks = 100))]
+```
+
+Once the colours are defined, we can plot PC1.
+
+```{r}
+#PC1 
+plot(europe_shape)
+points(df_sp_sites$lon, df_sp_sites$lat, col=datColpos,cex=1, pch = 19) 
+points(df_sp_sites$lon, df_sp_sites$lat, col=datColneg,cex=1, pch = 19)
+```
+
+And then repeat the process for PC2:
+
+```{r}
+# PC2
+neg_pc2 <- pc2 
+neg_pc2[neg_pc2 > 0 ] <- NA
+pos_pc2 <- pc2 
+pos_pc2[pos_pc2 < 0 ] <- NA
+
+datColpos <- pospal(100)[as.numeric(cut(pos_pc2,breaks = 100))] 
+datColneg <- negpal(100)[as.numeric(cut(neg_pc2,breaks = 100))]
+
+# and plot it on the map
+plot(europe_shape)
+points(df_sp_sites$lon, df_sp_sites$lat, col=datColpos,cex=1, pch = 19)
+points(df_sp_sites$lon, df_sp_sites$lat, col=datColneg,cex=1, pch = 19)
+```
+
+The last step in our trait data PCA is to compare the results with GPP. Since GPP has more sites than we used for this analysis we start by removing these sites.
+
+```{r}
+GPP_pca <- GPP %>% 
+  filter(!(siteid %in% c("CH-Oe1", "DE-Obe", "FR-LBr", "IT-Cpz", "IT-Ro1")))
+```
+
+Then we make a linear model for PC1 and GPP and plot it.
+
+```{r message=F, warning=F}
+reg_gpp_pc1 <- lm(gpp_meanann~pc1, data = GPP_pca)
+
+GPP_pca %>% 
+  ggplot(aes(x = pc1, y = gpp_meanann)) +
+  geom_point() +
+  geom_smooth(method='lm', color="red", size=0.5, se=FALSE) +
+  xlab("PC1") +
+  ylab("GPP mean [µmolCO2 m-2 s-1]") +
+  theme_classic()
+```
+
+We repeat this for GPP and PC2.
+
+```{r message=F, warning=F}
+reg_gpp_pc2 <- lm(gpp_meanann~pc2, data = GPP_pca)
+
+GPP_pca %>% 
+  ggplot(aes(x = pc2, y = gpp_meanann)) +
+  geom_point() +
+  geom_smooth(method='lm', color="red", size=0.5, se=FALSE) +
+  xlab("PC2") +
+  ylab("GPP mean [µmolCO2 m-2 s-1]") +
+  theme_classic() 
+```
+
+Once again we see weak correlations with GPP. Therefore, we can conclude that this further search for predictors that explain the variation in GPP has not yielded any good results. We will have to continue looking for better predictors, which explain this variation in GPP between the sites.
+
+##### Here goes a checkpoint
+
