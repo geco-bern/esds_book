@@ -430,7 +430,28 @@ ggplot() +
   theme_bw()
 ```
 
-##### Here goes a checkpoint
+
+**Checkpoint**
+
+You just learnt how to plot _europe_shape_ coloured by country ("SOVREIGNT"), now plot it coloured by region in europe.
+Start by finding the column that gives you this information in `europe_shape@data`.
+
+**Solution**
+
+```{r message=F, warning=F}
+# take a look at the column names
+names(europe_shape@data)
+
+# make a df of the data needed from europe_shape
+shp_df_region <- broom::tidy(europe_shape, region = "SUBREGION")
+head(shp_df_region)
+
+# plot europe coloured by region
+ggplot() + 
+  geom_polygon(data = shp_df_region, aes(x = long, y = lat, group = group, fill = id), colour = "black") +
+  geom_point(data = df_sites, aes(x = lon, y = lat)) +
+  theme_bw()
+```
 
 ### Rasters
  
@@ -512,7 +533,37 @@ plt <- levelplot(raster_chelsa_crop, margin=FALSE, par.settings = mapTheme)
 plt
 ```
 
-##### Here goes a checkpoint
+**Checkpoint**
+
+Create your own small raster with 100 grid cells. Give it values, a projection (e.g. '+proj=utm +zone=48 +datum=WGS84') and plot it.
+    
+_Bonus_: If you chose the example projection provided, add _europe_shape_ to your plot.
+
+**Solution**
+
+```{r message=F, warning=F}
+# create a raster
+# short compact version
+myraster <- raster(ncol=10, nrow=10)
+# OR 
+# longer version
+myraster <- raster()
+ncol(myraster) <- 10
+nrow(myraster) <- 10
+
+# add values to the raster, this can be done in many ways here are two examples:
+values(myraster) <- 1:ncell(myraster)
+# OR 
+values(myraster) <- runif(ncell(myraster))
+
+# add a projection
+projection(myraster) <- "+proj=utm +zone=48 +datum=WGS84"
+
+# plot it
+plot(myraster)
+# for fun let's see where europe would be on our raster, since it has a projection...
+plot(europe_shape, add=TRUE)
+```
 
 #### Aggregating
 
@@ -676,7 +727,38 @@ mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_wc)
 
 We see that Chelsa correlates better (because the mean squared error is smaller) with the temperature values at the towers. We also see that Worldclim compared to CHELSA tends to predict colder temperatures.
 
-##### Here goes a checkpoint
+**Checkpoint**
+
+Above, we compared the CHELSA temperatures with the tower temperatures. Now we want to visually see which of the two data had the higher mean for each tower location.
+Plot the map of europe and add the tower locations as points. Colour the points so that for a higher CHESLA mean they are one colour and a higher tower temperature another.
+
+**Solution**
+
+```{r message=F, warning=F}
+# There are more way to do this but we used the function ifelse(). 
+# It takes 3 components: a condition, what to do if the condition applies and what to do if it doesn't apply.
+
+# So here if chelsa temperatures are higher we want the point to be purple otherwise orange:
+cols_chelsa_flux <- ifelse(df_sites_temp$temp_chelsa > df_sites_temp$temp_fluxnet,"purple","orange")
+
+# We could also do different shapes if we wanted...
+pch_chelsa_flux <- ifelse(df_sites_temp$temp_chelsa > df_sites_temp$temp_fluxnet, 19 ,17)
+
+# Plot the result:
+
+# plot(europe_shape)
+# points(df_sites_temp$lon,df_sites_temp$lat, pch=pch_diff, col = col_checkpoint)
+
+# OR with ggplot
+
+ggplot() +
+  geom_polygon(data = europe_shape, aes(x = long, y = lat, group = group), fill=NA, colour = "black") +
+  geom_point(data = df_sites_temp, aes(x = lon, y = lat), color = cols_chelsa_flux, shape = pch_chelsa_flux, size=2) +
+  labs(x = "Longitude", y = "Latitude") +
+  theme_classic()+ 
+  coord_quickmap()
+```
+
 
 #### Correlations with GPP
 
@@ -1002,8 +1084,6 @@ ggplot() +
   theme_classic() + xlab("Longitude") + ylab("Latitude") + coord_quickmap()
 ```
 
-##### Here goes a checkpoint
-
 #### Species Traits
 
 In the next step, we will study the relationship between plant traits, GPP, and climatic variables for our fluxnet towers. We obtained data from the TRY database, which is a database containing plant trait data. You can make data requests on [their website](www.https://www.try-db.org). You can select the traits that you are interested in and the species for which you would like to look at the traits. 
@@ -1171,5 +1251,21 @@ GPP_pca %>%
 
 Once again we see weak correlations with GPP. Therefore, we can conclude that this further search for predictors that explain the variation in GPP has not yielded any good results. We will have to continue looking for better predictors, which explain this variation in GPP between the sites.
 
-##### Here goes a checkpoint
+**Checkpoint**
 
+Plot the spatial distribution of the trait 'leaf thickness', make the colour or size related to the leaf thickness values. Describe what you can gather from this plot.
+
+**Solution**
+
+```{r message=F, warning=F}
+leaf_t <- df_pca[,1]
+
+leavepal <- colorRampPalette(c("#E2C151","#138D37"))
+
+datColleaves <- leavepal(10)[as.numeric(cut(leaf_t,breaks = 10))]
+
+plot(europe_shape)
+points(df_sp_sites$lon, df_sp_sites$lat, col=datColleaves,cex=leaf_t/18, pch = 19) 
+```
+
+The distribution of leaf thickness seems to depend on latitude. In Southern regions, leaves are generally thinner than in Northern regions. To confirm this we would have to make a model and test our observation.
