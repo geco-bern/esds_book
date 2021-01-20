@@ -1,4 +1,4 @@
-# 04_Data_Scraping
+# 04_Data_Scraping [in progress]
 
 ---
 
@@ -80,7 +80,7 @@ Arguments:
 **For example :** A simple example is to change the string value of a matrix to lower case with tolower function. We construct a matrix fish. The name is in upper case format.
 
 
-```R
+```{r}
 fish <- c("FAMILY","SPECIES")
 fish_lower <-lapply(fish, tolower)
 str(fish_lower)
@@ -99,7 +99,7 @@ str(fish_lower)
 In the next two lines we load the packages and save them in the vector 'lib_vec'.
 
 
-```R
+```{r}
 lib_vec <- c("RCurl", "XML", "raster", "rgdal", "rfishbase", "tidyverse", "sf")
 sapply(lib_vec, library, character.only = TRUE)
 ```
@@ -142,220 +142,9 @@ sapply(lib_vec, library, character.only = TRUE)
 To get information about the packages we can type the following command in the console.
 
 
-```R
+```{r}
 help(package = "XML")
 ```
-
-
-    Documentation for package ‘XML’
-    
-    
-    		Information on package ‘XML’
-    
-    Description:
-    
-    Package:              XML
-    Version:              3.99-0.5
-    Authors@R:            c(person("CRAN Team", role = c('ctb', 'cre'),
-                          email = "CRAN@r-project.org", comment = "de facto
-                          maintainer since 2013"), person("Duncan", "Temple
-                          Lang", role = c("aut"), email =
-                          "duncan@r-project.org", comment = c(ORCID =
-                          "0000-0003-0159-1546")), person("Tomas",
-                          "Kalibera", role = "ctb"))
-    Title:                Tools for Parsing and Generating XML Within R and
-                          S-Plus
-    Depends:              R (>= 4.0.0), methods, utils
-    Suggests:             bitops, RCurl
-    SystemRequirements:   libxml2 (>= 2.6.3)
-    Description:          Many approaches for both reading and creating XML
-                          (and HTML) documents (including DTDs), both local
-                          and accessible via HTTP or FTP.  Also offers
-                          access to an 'XPath' "interpreter".
-    URL:                  http://www.omegahat.net/RSXML
-    License:              BSD_3_clause + file LICENSE
-    Collate:              AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.R
-                          XMLClasses.R applyDOM.R assignChild.R catalog.R
-                          createNode.R dynSupports.R error.R flatTree.R
-                          nodeAccessors.R parseDTD.R schema.R summary.R
-                          tangle.R toString.R tree.R version.R
-                          xmlErrorEnums.R xmlEventHandler.R xmlEventParse.R
-                          xmlHandler.R xmlInternalSource.R xmlOutputDOM.R
-                          xmlNodes.R xmlOutputBuffer.R xmlTree.R
-                          xmlTreeParse.R htmlParse.R hashTree.R zzz.R
-                          supports.R parser.R libxmlFeatures.R xmlString.R
-                          saveXML.R namespaces.R readHTMLTable.R
-                          reflection.R xmlToDataFrame.R bitList.R compare.R
-                          encoding.R fixNS.R xmlRoot.R serialize.R
-                          xmlMemoryMgmt.R keyValueDB.R solrDocs.R
-                          XMLRErrorInfo.R xincludes.R namespaceHandlers.R
-                          tangle1.R htmlLinks.R htmlLists.R
-                          getDependencies.R getRelativeURL.R xmlIncludes.R
-                          simplifyPath.R
-    NeedsCompilation:     yes
-    Packaged:             2020-07-23 13:36:18 UTC; ripley
-    Author:               CRAN Team [ctb, cre] (de facto maintainer since
-                          2013), Duncan Temple Lang [aut]
-                          (<https://orcid.org/0000-0003-0159-1546>), Tomas
-                          Kalibera [ctb]
-    Maintainer:           CRAN Team <CRAN@r-project.org>
-    Repository:           RSPM
-    Date/Publication:     2020-07-23 13:37:06 UTC
-    Encoding:             UTF-8
-    Built:                R 4.0.0; x86_64-pc-linux-gnu; 2020-10-03 10:19:39
-                          UTC; unix
-    
-    Index:
-    
-    [.XMLNode               Convenience accessors for the children of
-                            XMLNode objects.
-    [<-.XMLNode             Assign sub-nodes to an XML node
-    addChildren             Add child nodes to an XML node
-    addNode                 Add a node to a tree
-    append.xmlNode          Add children to an XML node
-    asXMLNode               Converts non-XML node objects to XMLTextNode
-                            objects
-    asXMLTreeNode           Convert a regular XML node to one for use in a
-                            "flat" tree
-    catalogLoad             Manipulate XML catalog contents
-    catalogResolve          Look up an element via the XML catalog
-                            mechanism
-    coerce,XMLHashTreeNode,XMLHashTree-method
-                            Transform between XML representations
-    compareXMLDocs          Indicate differences between two XML documents
-    docName                 Accessors for name of XML document
-    Doctype                 Constructor for DTD reference
-    Doctype-class           Class to describe a reference to an XML DTD
-    dtdElement              Gets the definition of an element or entity
-                            from a DTD.
-    dtdElementValidEntry    Determines whether an XML element allows a
-                            particular type of sub-element.
-    dtdIsAttribute          Query if a name is a valid attribute of a DTD
-                            element.
-    dtdValidElement         Determines whether an XML tag is valid within
-                            another.
-    ensureNamespace         Ensure that the node has a definition for
-                            particular XML namespaces
-    ExternalReference-class
-                            Classes for working with XML Schema
-    findXInclude            Find the XInclude node associated with an XML
-                            node
-    free                    Release the specified object and clean up its
-                            memory usage
-    genericSAXHandlers      SAX generic callback handler list
-    getChildrenStrings      Get the individual
-    getEncoding             Determines the encoding for an XML document or
-                            node
-    getHTMLLinks            Get links or names of external files in HTML
-                            document
-    getLineNumber           Determine the location - file & line number of
-                            an (internal) XML node
-    getNodeSet              Find matching nodes in an internal XML tree/DOM
-    getRelativeURL          Compute name of URL relative to a base URL
-    getSibling              Manipulate sibling XML nodes
-    getXIncludes            Find the documents that are XInclude'd in an
-                            XML document
-    getXMLErrors            Get XML/HTML document parse errors
-    isXMLString             Facilities for working with XML strings
-    length.XMLNode          Determine the number of children in an XMLNode
-                            object.
-    libxmlVersion           Query the version and available features of the
-                            libxml library.
-    makeClassTemplate       Create S4 class definition based on XML node(s)
-    names.XMLNode           Get the names of an XML nodes children.
-    newXMLDoc               Create internal XML node or document object
-    newXMLNamespace         Add a namespace definition to an XML node
-    parseDTD                Read a Document Type Definition (DTD)
-    parseURI                Parse a URI string into its elements
-    parseXMLAndAdd          Parse XML content and add it to a node
-    print.XMLAttributeDef   Methods for displaying XML objects
-    processXInclude         Perform the XInclude substitutions
-    readHTMLList            Read data in an HTML list or all lists in a
-                            document
-    readHTMLTable           Read data from one or more HTML tables
-    readKeyValueDB          Read an XML property-list style document
-    readSolrDoc             Read the data from a Solr document
-    removeXMLNamespaces     Remove namespace definitions from a XML node or
-                            document
-    replaceNodeWithChildren
-                            Replace an XML node with it child nodes
-    saveXML                 Output internal XML Tree
-    SAXState-class          A virtual base class defining methods for SAX
-                            parsing
-    setXMLNamespace         Set the name space on a node
-    startElement.SAX        Generic Methods for SAX callbacks
-    supportsExpat           Determines which native XML parsers are being
-                            used.
-    toHTML                  Create an HTML representation of the given R
-                            object, using internal C-level nodes
-    toString.XMLNode        Creates string representation of XML node
-    xmlApply                Applies a function to each of the children of
-                            an XMLNode
-    XMLAttributes-class     Class '"XMLAttributes"'
-    xmlAttributeType        The type of an XML attribute for element from
-                            the DTD
-    xmlAttrs                Get the list of attributes of an XML node.
-    xmlChildren             Gets the sub-nodes within an XMLNode object.
-    xmlCleanNamespaces      Remove redundant namespaces on an XML document
-    xmlClone                Create a copy of an internal XML document or
-                            node
-    XMLCodeFile-class       Simple classes for identifying an XML document
-                            containing R code
-    xmlContainsEntity       Checks if an entity is defined within a DTD.
-    xmlDOMApply             Apply function to nodes in an XML tree/DOM.
-    xmlElementsByTagName    Retrieve the children of an XML node with a
-                            specific tag name
-    xmlElementSummary       Frequency table of names of elements and
-                            attributes in XML content
-    xmlEventHandler         Default handlers for the SAX-style event XML
-                            parser
-    xmlEventParse           XML Event/Callback element-wise Parser
-    xmlGetAttr              Get the value of an attribute in an XML node
-    xmlHandler              Example XML Event Parser Handler Functions
-    xmlHashTree             Constructors for trees stored as flat list of
-                            nodes with information about parents and
-                            children.
-    XMLInternalDocument-class
-                            Class to represent reference to C-level data
-                            structure for an XML document
-    xmlName                 Extraces the tag name of an XMLNode object.
-    xmlNamespace            Retrieve the namespace value of an XML node.
-    xmlNamespaceDefinitions
-                            Get definitions of any namespaces defined in
-                            this XML node
-    xmlNode                 Create an XML node
-    XMLNode-class           Classes to describe an XML node object.
-    xmlOutputBuffer         XML output streams
-    xmlParent               Get parent node of XMLInternalNode or ancestor
-                            nodes
-    xmlParseDoc             Parse an XML document with options controlling
-                            the parser.
-    xmlParserContextFunction
-                            Identifies function as expecting an
-                            xmlParserContext argument
-    xmlRoot                 Get the top-level XML node.
-    xmlSchemaValidate       Validate an XML document relative to an XML
-                            schema
-    xmlSearchNs             Find a namespace definition object by searching
-                            ancestor nodes
-    xmlSerializeHook        Functions that help serialize and deserialize
-                            XML internal objects
-    xmlSize                 The number of sub-elements within an XML node.
-    xmlSource               Source the R code, examples, etc. from an XML
-                            document
-    xmlStopParser           Terminate an XML parser
-    xmlStructuredStop       Condition/error handler functions for XML
-                            parsing
-    xmlToDataFrame          Extract data from a simple XML document
-    xmlToList               Convert an XML node/document to a more R-like
-                            list
-    xmlToS4                 General mechanism for mapping an XML node to an
-                            S4 object
-    xmlTree                 An internal, updatable DOM object for building
-                            XML trees
-    xmlTreeParse            XML Parser
-    xmlValue                Extract or set the contents of a leaf XML node
-
 
 For data scraping in R one can also use 'rjson' to convert R objects into JSON objects and vice-versa. Another option as we will see later is to use APIs.
 
@@ -366,14 +155,14 @@ For data scraping in R one can also use 'rjson' to convert R objects into JSON o
 We are now ready to extract data from https://www.fishbase.de. We want to get data about the *Coregonus lavaretus*. We can create the object x and assign the value same as the species to keep the flexibility. If we want to get data about other species we can generate a new object or can also assign new value to the object _x_ with the desired species name. 
 
 
-```R
+```{r}
 x <- "Coregonus-lavaretus"
 ```
 
 Next, we use the function `paste()` to convert its arguments to character strings and concatenate them to get the link of the webpage from which we are going to extract the data. We concatenate the URL in order to get the webpage with the summary of the species *Coregonus-lavaretus*. We do not put any separation between the arguments, so we use `sep = ""`.
 
 
-```R
+```{r}
 # to keep the code 'flexible', you can see here that x is used to define the species
 # this way we can easily change the species without having to always and the latin name to the code
 
@@ -390,12 +179,12 @@ For url1 we could also directly use http://www.fishbase.de/summary/Coregonus-lav
 
 
 
-```R
+```{r}
 # your code 
 ```
 
 
-```R
+```{r}
 ### Solution
 
 # set the object x1 with the species name
@@ -426,7 +215,7 @@ The next step is to use the `htmlParse()` function to read the html document int
 To get help on functions we can type the following command in the console, remember how you also used this for getting information on the packages.
 
 
-```R
+```{r}
 help("htmlParse")
 ```
 
@@ -1179,7 +968,7 @@ m &lt;- xmlTreeParse(fileName,
 We can now use the function `getURLContent()` to retrieve the source of a webpage, which is especially useful for retrieving pages for data processing (i.e. scraping). We will apply the function `htmlParse()` to obtain an R object.
 
 
-```R
+```{r}
 fishbase <- htmlParse(getURLContent(url1, followlocation=TRUE)) 
 ```
 
@@ -1196,7 +985,7 @@ In order to extract the information inside these two blocks, we are going to use
 
 
 
-```R
+```{r}
 fishbase_div <-getNodeSet(fishbase, "//div ") 
 fishbase_span <- getNodeSet(fishbase, "//span ") 
 ```
@@ -1225,13 +1014,13 @@ Now let us briefly discuss _regular expressions_. A _regular expression_ is a pa
 ![Maximal length.](../data/images/length.png)
 
 
-```R
+```{r}
 fish_length <- xmlValue(fishbase_span[[which.max(sapply(lapply(fishbase_span,xmlValue) 
 , function(x){regexec(pattern="Max length", x)[[1]][1]}))]])
 ```
 
 
-```R
+```{r}
 fish_length
 ```
 
@@ -1242,7 +1031,7 @@ fish_length
 We then use the function `substr()`, which you already encountered in previous chapters, to extract a part (the length we are looking for) of the character vector. We need to find the interval (section) we want to extract. With `regexec()` we are looking for the pattern _Max length_. To get the fish length we will extract the letters from position 13 (which is a 7) to position 16 (which is a 0). You can also count these positions from the image above starting from 'M' in Max length. Keep in mind that every blank space is also counted. Another way to do that is based on a trial and error basis. 
 
 
-```R
+```{r}
 max_length <- substr(fish_length, regexec(pattern="Max length", fish_length)[[1]][1]+13
 , regexec(pattern="Max length", fish_length)[[1]][1]+16)
 max_length
@@ -1255,7 +1044,7 @@ max_length
 Now we should convert the value of the maximal length (which is a character) into a number with the function `as.double()`. We convert it into a double format in order to simplify things and make it machine readable. For example, if an integer value is followed by any character let's say 'R', we would be able to read that value without an error if it is in double format. It increases the flexibility in data reading.
 
 
-```R
+```{r}
 max_length <- as.double(max_length, base = 0L)
 max_length
 ```
@@ -1287,7 +1076,7 @@ IUCN Red List is one of the most well-known objective assessment systems for cla
 In this part, we are going to get the IUCN Status of *Coregonus lavaretus*. We are going to use the function `which()` to find the position of the elements we are looking for. We use `regexec()` to search for matches to the argument pattern within each element of a character vector. In this case, the pattern is IUCN. The pattern can be found, as for the maximal length, on the webpage from which we are getting the data.
 
 
-```R
+```{r}
 w_IUCN  <-which(sapply(lapply(fishbase_div,xmlValue),function(x)
   {regexec(pattern="IUCN", x)[[1]][1]})>0)
 ```
@@ -1295,7 +1084,7 @@ w_IUCN  <-which(sapply(lapply(fishbase_div,xmlValue),function(x)
 Now if w_IUCN is empty, we set it as NA. Otherwise we use the function `xmlValue()` to get the value at the node.
 
 
-```R
+```{r}
 if(length(w_IUCN)==0){ 
   IUCN_status="NA"
 } else {
@@ -1306,7 +1095,7 @@ if(length(w_IUCN)==0){
 In the next  we can see the output of *d1_IUCN*.
 
 
-```R
+```{r}
 d1_IUCN 
 ```
 
@@ -1317,7 +1106,7 @@ d1_IUCN
 This all looks a little confusing and we only really need a tiny part, namely _VU_, of the above information. So we are going to use `unlist()` to produce a vector which contains all the atomic components that occurs in the pattern (the pattern `[[:alpha:]]+` is used to get the alphabetic characters) and `regmatches()` is used to extract or replace matched substrings from  data obtained by `gregexpr()`. The function `gregexpr()`does the same thing as `regexec()`, except that its returned object is a list rather than a vector.
 
 
-```R
+```{r}
 IUCN <- unlist(regmatches(d1_IUCN,gregexpr(pattern= "[[:alpha:]]+)",   d1_IUCN)))
 IUCN
 ```
@@ -1329,7 +1118,7 @@ IUCN
 As you see to get to IUCN Status we need to remove the _")"_. So we will use the function `str_replace()`. The `pattern="[[:punct:]]"` is used to remove punctuation.
 
 
-```R
+```{r}
 IUCN_status <- str_replace(IUCN,pattern="[[:punct:]]","" )
 IUCN_status
 ```
@@ -1348,7 +1137,7 @@ The next step is to read a table from a website. We are going to get information
 We will use the function `getHTMLLinks()` to retrieve either the links within an HTML document or the collection of names of external files referenced in an HTML document.
 
 
-```R
+```{r}
 link_list <- getHTMLLinks(fishbase, externalOnly = TRUE, xpQuery = "//a/@href"
 , baseURL = docName(fishbase))
 ```
@@ -1360,7 +1149,7 @@ In the next figure we can see an extract of _link_list_.
 As highlighted, we need to look for the pattern _FishEggInfoSummary_ and to do that we use the function `grep()` (similar to what we did before with `gregexpr()`).
 
 
-```R
+```{r}
 eggs_link <- link_list[grep("FishEggInfoSummary",link_list)]
 ```
 
@@ -1369,7 +1158,7 @@ eggs_link <- link_list[grep("FishEggInfoSummary",link_list)]
 The two extracts above look like they are the same object. To check if two objects are identical we use the logic operator `==`.
 
 
-```R
+```{r}
 eggs_link[1]==eggs_link[2]
 ```
 
@@ -1380,7 +1169,7 @@ TRUE
 Since, the output is TRUE. This indicates that the two objects are identical, now we can arbitrarily select the first or second object.
 
 
-```R
+```{r}
 eggs_link <-eggs_link[1]
 ```
 
@@ -1395,12 +1184,12 @@ _Hint:_ make use of function 'str_replace()'.
 </div>
 
 
-```R
+```{r}
 # your code
 ```
 
 
-```R
+```{r}
 ### Solution
 
 # replace '..' or here effectively remove '..'
@@ -1416,7 +1205,7 @@ eggs_link
 Similarly to what we did previously, we can get the content of the webpage with the function `getURLContent()`.
 
 
-```R
+```{r}
 url_egg <- paste ("http://www.fishbase.org/",eggs_link,sep="")
 egg_content <- getURLContent(url_egg, followlocation=TRUE, .encoding="CE_UTF8")
 ```
@@ -1428,7 +1217,7 @@ In the next figure we can see an extract of _egg_content_.
 We will use `readHTMLTable()` to read in the table in the document.
 
 
-```R
+```{r}
 egg_table <- readHTMLTable(egg_content,header=TRUE,colClasses=NULL,skip.rows=integer(),
                        stringsAsFactors=FALSE,trim=TRUE,elFun=xmlValue,
                        as.data.frame=TRUE,which=integer())[[1]]
@@ -1458,7 +1247,7 @@ egg_table
 Now we can extract information from the table. By using the function `which()` to find the information we are looking for. As we are looking for the shape of the egg, we will pass this value.
 
 
-```R
+```{r}
 egg_shape = egg_table[which(egg_table[,1] == "Shape of Egg"),2] # Shape of Egg
 
 egg_shape
@@ -1471,14 +1260,14 @@ egg_shape
 In case there is no information about a feature (hence the character is empty). We set the feature as NA.
 
 
-```R
+```{r}
 if(egg_shape == "") {egg_shape = "NA"}
 ```
 
 By calling the variable _egg_shape_ again we see NA as output which indicates that the field that provides the data about the shape of an egg is empty.
 
 
-```R
+```{r}
 egg_shape
 ```
 
@@ -1491,7 +1280,7 @@ We have no informations about the shape of the eggs of the <i>Coregonus lavaretu
 Now we can put all the information into a data structure for the <b>Coregonus lavaretus</b>. In order to do that we will use the function `tibble()`.
 
 
-```R
+```{r}
 data_species <- tibble("Coregonus-lavaretus", max_length, IUCN_status, egg_shape)
 data_species
 ```
@@ -1511,7 +1300,7 @@ data_species
 
 
 
-```R
+```{r}
 names(data_species)[1] <- "Species"
 data_species
 ```
@@ -1539,12 +1328,12 @@ Now your task is to create a new variable _'egg_color'_ and fetch its data and a
 </div>
 
 
-```R
+```{r}
 # your code 
 ```
 
 
-```R
+```{r}
 ### Solution
 
 # extract the info
@@ -1580,7 +1369,7 @@ In this subsection, we want to get data using an API. We use the R package `rfis
 Now we can get information on *Coregonus lavaretus* with this new package. 
 
 
-```R
+```{r}
 suppressWarnings(suppressMessages(
 data_CL<- species("Coregonus lavaretus") 
 ))  
@@ -1604,7 +1393,7 @@ data_CL
 We will start by getting the maximal length of the species. We'll use the function `species()` to do this. In order to do that we look for the column _'Length'_ in the data.
 
 
-```R
+```{r}
 length_max_CL <- species("Coregonus lavaretus", fields=c("Length"))
 length_max_CL <- length_max_CL$Length
 length_max_CL
@@ -1619,7 +1408,7 @@ As you might recall, this is the same value we got in section 3.4.
 In the next step we are interested to get the information about the diet of *Coregonus lavaretus*. To get the diet information, we will use the function `diet_items()`. The function `diet_items()` allows us to access the table on the food items of the chosen species.
 
 
-```R
+```{r}
 food <- diet_items("Coregonus lavaretus")
 head(food)
 ```
@@ -1647,14 +1436,14 @@ From the table food we can exract the column named _'FoodII'_. As you already kn
 
 
 
-```R
+```{r}
 food_II <- food$FoodII
 ```
 
 We can now extract the first and second elements of the column _'food_II'_ to get a short overview of the diet of *Coregonus lavaretus*.
 
 
-```R
+```{r}
 food_II[1]
 food_II[2]
 ```
@@ -1677,12 +1466,12 @@ In the same way, can get the information about the predators.
 </div>
 
 
-```R
+```{r}
 # your code
 ```
 
 
-```R
+```{r}
 ### Solution
 
 # use function 'predators()' for Coregonus lavaretus
@@ -1737,7 +1526,7 @@ To proceed with the case study we need to prepare our dataset. First, we need to
 In this section, we want to get all the species of the family of **Salmonidae**. As before for flexibility reasons, we will create an object _y_ with the name of the family and use `paste()` to get the link.
 
 
-```R
+```{r}
 y <- "Salmonidae"
   
 url2<-paste("http://www.fishbase.org/Nomenclature/FamilySearchList.php?Family=", y,sep="") 
@@ -1746,7 +1535,7 @@ url2<-paste("http://www.fishbase.org/Nomenclature/FamilySearchList.php?Family=",
 We then use `getURLContent()` to get the content of the link _url2_ and save it in the variable _Content_Sal_.
 
 
-```R
+```{r}
 Content_Sal <- getURLContent(url2, followlocation=TRUE) 
 ```
 
@@ -1754,21 +1543,21 @@ Next we create a dataframe using `data.frame()` and get a list of variables. We 
 
 
 
-```R
+```{r}
 z <- data.frame(readHTMLTable(Content_Sal))
 ```
 
 Then we can extract the species from the given family with `as.character()`. We use `z[,1]` to get the first column which is the column with the scientific names of species. 
 
 
-```R
+```{r}
 sp_per_family <- as.character(z[,1])
 ```
 
 Now we can print the first element of the column with the scientific names.
 
 
-```R
+```{r}
 sp_per_family[1]
 ```
 
@@ -1779,14 +1568,14 @@ sp_per_family[1]
 Using `str_replace()` function we can substitute the empty space between the Genus and the Species with a `"-"`.
 
 
-```R
+```{r}
 sp_per_family <- str_replace(sp_per_family, " ", "-")
 ```
 
 Finally we can print the first element of _sp_per_family_ again.
 
 
-```R
+```{r}
 sp_per_family[1]
 ```
 
@@ -1802,7 +1591,7 @@ In this section, we are going to get the IUCN Status for a given List of species
 First, we are going to upload the dataset containing the list of the species and some other data that is going to be useful for the next sections. We will do that by using the function `read_csv()`. This data came from https://www.nature.com/articles/sdata2017141 by cropping it to Western Europe.
 
 
-```R
+```{r}
 suppressWarnings(suppressMessages(
 dataset <- read_csv("../data/dataset2.csv")))
 ```
@@ -1810,7 +1599,7 @@ dataset <- read_csv("../data/dataset2.csv")))
 As we only need data related to Netherlands, we will use the function `grep()` and pass _Netherlands_ as an argument.
 
 
-```R
+```{r}
 subset <- dataset[grep("Netherlands", dataset$Country),]
 
 ```
@@ -1818,7 +1607,7 @@ subset <- dataset[grep("Netherlands", dataset$Country),]
 Let's first briefly discuss how to construct a 'for loop', since it's been a while since you used it in previous chapters. To get the IUCN Status of a list of species we always change the value of _x_ (the species) and run the code, but if we have to do that for many species it will be very long and tedious. In this case 'for loops' come in handy. In a 'for loop' the variable _x_ runs over the vector (here each species) and returns the IUCN Status. Before getting the IUCN status let's just go over an easy example, such as printing the integers from 1 to 10 using a 'for loop'. In this case, we iterate over the vector 1:10. 
 
 
-```R
+```{r}
 for(j in 1:10) {
 print(j) # this prints the value of j for that given loop
 }
@@ -1839,7 +1628,7 @@ print(j) # this prints the value of j for that given loop
 Now we can make a 'for loop' in order to get the IUCN status of all the species in the above subset (Netherlands) of the initial dataset. We are going to iterate over the column of the dataset with the valid FishBase species names. The code lines inside the loop are exactly a copy-paste of what we had for the *Coregonus lavaretus*, but in this case, we have to look for other species. In the last line of the code below, we created a new column in the data frame _subset_ in order to save the IUCN Status. The 'i' in `subset$IUCN[i]` is used to save the IUCN status of the species we are iterating over in the 'for loop'. It will save the results of the species one by one. 
 
 
-```R
+```{r}
 i <- 0
 for (x in subset$X6.Fishbase.Valid.Species.Name) {
 i <- i + 1
@@ -1882,7 +1671,7 @@ subset$IUCN[i] <- IUCN_status # make a new column in 'subset' containing the IUC
 We can see which IUCN statuses are present in Netherlands by using the `unique()` function.
 
 
-```R
+```{r}
 unique(subset$IUCN)
 ```
 
@@ -1903,7 +1692,7 @@ unique(subset$IUCN)
 We will now plot the proportion of species in each category for the Netherlands. So let us calculate the number of species in each category (from above we just have 2 outputs, _LC_ & _NT_). In general in other countries, we also have other IUCN Status, for example, VU. In this section, we will focus only on the two listed statuses. Using the function `length()` we can obtain the number of species in each category.
 
 
-```R
+```{r}
 number_lc <- length(which(subset$IUCN == "LC"))
 number_nt <- length(which(subset$IUCN == "NT"))
 
@@ -1925,7 +1714,7 @@ paste0("NT:", " ", number_nt)
 We are ready to plot this as pie chart.
 
 
-```R
+```{r}
 slices <- c(number_lc, number_nt)
 lbls <- c("LC","NT")
 pie(slices, labels = lbls,font.main = 1, 
@@ -1941,7 +1730,7 @@ main = "Proportion of species per IUCN Status in Netherlands", col=c("red", "yel
 In this part of the tutorial, we have to clean the data that we will use for the correlations. We have provided the dataset already with the IUCN status since the code needs a lot of time to run, but the procedure is exactly the same as we did in the previous sections. So, let's load the dataset, it's called _datasetIUCN_.
 
 
-```R
+```{r}
 suppressWarnings(suppressMessages(
 dataset_IUCN <- read_csv("../data/datasetIUCN.csv")
 ))
@@ -1950,7 +1739,7 @@ dataset_IUCN <- read_csv("../data/datasetIUCN.csv")
 In the previous sections, we saw that for some species we did not have information on the IUCN status. In these cases, we set the IUCN status as NA. We can check for possible NA values by calling the `unique()` function. 
 
 
-```R
+```{r}
 unique(dataset_IUCN$IUCN)
 ```
 
@@ -1972,12 +1761,12 @@ unique(dataset_IUCN$IUCN)
 
 
 
-```R
+```{r}
 # your code
 ```
 
 
-```R
+```{r}
 ### Solution
 
 # subset the data without NAs (!=NA; not equal to NA), so this effectively removes the NAs
@@ -2000,7 +1789,7 @@ unique(dataset_IUCN_NA$IUCN)
 Next, we will load the shapefile of glacial basins using the package <b>rgdal</b> and the function `readOGR()`. We fetch the data from different fish basins across Europe in the _basin_shapefile_ from the data stored in the basins folder. 
 
 
-```R
+```{r}
 basin_shapefile <- readOGR("../data/basins")
 ```
 
@@ -2013,7 +1802,7 @@ basin_shapefile <- readOGR("../data/basins")
 In order to plot the basins on the map we will use `fortify()` function on the _basin_shapefile_. This function helps to convert a lines and points object to a data frame for ggplot. We will store this dataframe as _fort_basin_.
 
 
-```R
+```{r}
 fort_basin <- fortify(basin_shapefile)
 head(fort_basin)
 ```
@@ -2044,7 +1833,7 @@ head(fort_basin)
 We can visualise our _basin_shapefile_ using `ggplot()`.
 
 
-```R
+```{r}
 ggplot() + geom_polygon(data = fort_basin, aes(x = long, y = lat, group = group), colour = "black", fill = NA)
 
 ```
@@ -2059,7 +1848,7 @@ We now want to map the species richness and Red List species proportions.
 Let us first calculate the species richness and proportion of Red List species per basin. Species richness is the number of species pro basin and the proportion of red list species is the ratio between the number of species in the red list and the number of species pro basin. We will iterate over the vector with the basin names and we will use the function `nrow()` to find the number of occurrences.  
 
 
-```R
+```{r}
 for (x in as.character(basin_shapefile$BasinName)) {
     
   # we now restrict to dataset to the basin x
@@ -2083,7 +1872,7 @@ for (x in as.character(basin_shapefile$BasinName)) {
 We can see the newly computed data for the columns _'proportion'_ and _'richness'_ with respect to each basin in the _basin_shapefile_. 
 
 
-```R
+```{r}
 head(basin_shapefile@data)
 ```
 
@@ -2109,7 +1898,7 @@ head(basin_shapefile@data)
 Next we get the map of Europe. We will read the data in the _continent_shapefile_ and then will extract the continent 'Europe' map. If you call the variable _europe_, you will see that the dataframe is empty. This is because it extracts only the map data which we can simply plot by passing the europe as an argument in `plot()` function. We will do it in the upcoming code cells.
 
 
-```R
+```{r}
 continents <- readOGR('../data/continent_shapefile')
 europe <- continents[continents$CONTINENT=='Europe',]
 ```
@@ -2130,14 +1919,14 @@ europe <- continents[continents$CONTINENT=='Europe',]
 First, we will create a new column _'proportion_colour'_ and in this column, we will store the colours. Then we will break the proportions into 10 different parts by grouping the values in the proportion column into 10 using the `cut()` function. Then we get rid of the index vector using `as.numeric()` and get all the values as numeric values. We used the `rev()` function to reverse the colours, red colour indicates the species that are getting distinct and have very less proportion pro basin and yellow indicates the species with comparatively more proportion in the basin. Finally, we store these colours to the column proportion_colour. The colour indicates the proportion of Red List species occurring in the corresponding basin. We do the same for the species richness.
 
 
-```R
+```{r}
 basin_shapefile$proportion_colour <- rev(heat.colors(11))[as.numeric(cut(basin_shapefile$proportion, breaks = 10))]
 ```
 
 Now we create a new column in the _fort_basin_ dataframe and map the values of _'proportion_colour'_ into the new color column. We are doing this to have the colour (species proportion divided into 10 parts) and lat-long values in one datframe which helps to plot the graph using `ggplot()`. 
 
 
-```R
+```{r}
 fort_basin$color <- fort_basin$id    # create a new column color
 
 for (i in as.numeric(unique(fort_basin$id))) # map the values into color column by id
@@ -2149,7 +1938,7 @@ for (i in as.numeric(unique(fort_basin$id))) # map the values into color column 
 Remember above we extracted the continent _'europe'_ from the _continent_shapefile_, here we will use `fortiy()` on the europe dataset to plot it using ggplot also.
 
 
-```R
+```{r}
 fort_europe <- fortify(europe)
 ```
 
@@ -2160,7 +1949,7 @@ fort_europe <- fortify(europe)
 We will plot the _fort_europe_ and _fort_basin_ data on the map.
 
 
-```R
+```{r}
 ggplot(fort_basin, aes(x = long, y = lat, group = group)) +
   geom_polygon(data = fort_europe, aes(x = long, y = lat, group = group), colour = 'white') +
   geom_polygon(fill = fort_basin$color, colour = "black")+
@@ -2176,7 +1965,7 @@ From the graph, we see that the proportion of Red List species is highest in Sou
 **We will repeat the above steps all together for plotting the species richness on map.**
 
 
-```R
+```{r}
 # break the richness  of the species into 10 parts and then we assign colours to each part 
 basin_shapefile$richness_colour <- rev(heat.colors(11))[as.numeric(cut(basin_shapefile$richness, breaks = 10))]
 
@@ -2206,14 +1995,14 @@ ggplot(fort_basin, aes(x = long, y = lat, group = group)) +
 In the previous section, you observed the spatial patterns of fish diversity across Europe. In this section, we will try to explain these patterns. To achieve this, we will correlate the fish species richness of each basin to the surface area of the corresponding area to see how the species richness varies with respect to the surface area of the basin. We begin with plotting a simple scatterplot. We will log transform the data we have on surface area as it helps to make data conform to normality and also helps to deal with the outliers and skeweness in the data. Then we will plot this data against species richness. Since the data-deficient basins show zero observations in the dataframe, we will remove those first. 
 
 
-```R
+```{r}
 basin_shapefile <- basin_shapefile[basin_shapefile$richness!=0,]
 ```
 
 Now we will create a new dataframe with the _surface area_ and _richness_. We'll the columns as _'Basin_area'_ and _'Species_richness'_ respectively.
 
 
-```R
+```{r}
 bs_sr <- tibble(basin_shapefile@data$Surf_area, basin_shapefile@data$richness )
 names(bs_sr)[1]<- 'Basin_area'
 names(bs_sr)[2]<- 'Species_richness'
@@ -2224,7 +2013,7 @@ names(bs_sr)[2]<- 'Species_richness'
 We make a simple scratterplot with a regression line to visualise the relationship.
 
 
-```R
+```{r}
 ggplot(bs_sr, aes(x = log(Basin_area), y = Species_richness)) +
 geom_point() +
 geom_smooth(method='lm', color="red", size=0.5, se=FALSE)+
@@ -2246,7 +2035,7 @@ The plot shows a positive correlation between basin area and fish richness, mean
 As a next step, we will create a simple model of this relationship. This allows us to make predictions on the richness of fish species in other basins based on the basin area.
 
 
-```R
+```{r}
 #create a linear model
 richness_model <- lm(richness~log(Surf_area), data=basin_shapefile@data)
 ```
@@ -2254,7 +2043,7 @@ richness_model <- lm(richness~log(Surf_area), data=basin_shapefile@data)
 We now want to calculate the confidence intervals of the model to have a better idea of the uncertainty of the model. We will then coerce the basin surface, the model fit and the confidence interval into a new data frame called *model_df*.
 
 
-```R
+```{r}
 #calculate the confidence intervals
 model_df <- as.data.frame(cbind(log(basin_shapefile$Surf_area), predict(richness_model, interval='confidence')))
 names(model_df)[1] <- 'log_area'
@@ -2283,7 +2072,7 @@ head(model_df)
 The final step is  to plot the model fit and prediction intervals over the data. To get nice lines in the plot, the *model_df* dataframe needs to be ordered by the basin area first.
 
 
-```R
+```{r}
 ggplot(bs_sr, aes(x = log(Basin_area), y = Species_richness)) +
 geom_point() +
 geom_line(aes(x = model_df$log_area, y= model_df$fit ), color = "red")+
@@ -2306,12 +2095,12 @@ theme_classic()
 
 
 
-```R
+```{r}
 # your code
 ```
 
 
-```R
+```{r}
 ### Solution
 
 #prediction intervals
