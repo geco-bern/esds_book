@@ -10,3 +10,17 @@ This is the source for the text book. For instructions on how to use **bookdown*
 - If RMarkdowns contain code that takes long (anything above a few seconds) to run, avoid running respective chunk by setting `eval=FALSE` in the chunk options. This still displays the code in the knitted output - which we want. If outputs from compute-intensive code is required for knitting the RMarkdown file, try to come up with a better solution. For example, figures can be created first as PNG, figure files added to the repo and included in the RMarkdown as an image (`![](./dir_of_image/image.png)`).
 - Please adopt tidyverse grammar wherever possible (see `02-data_wrangling.Rmd`).
 - Avoid html code in the RMarkdown files.
+- Avoid manual numbering of sections (numbers are automatically rendered).
+
+
+## Book structure
+
+
+## Formatting
+
+- Avoid horizontal lines (`---`)
+
+
+## Tidyverse
+
+- 

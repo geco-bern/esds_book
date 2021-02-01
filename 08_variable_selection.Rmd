@@ -638,7 +638,7 @@ for (k_index in 1:length(preds)){
   forml  <- as.formula(paste( target, '~', paste(preds_retained, collapse = '+')))
   control <- trainControl(method = "cv", number = 5)
   set.seed(123)
-  cv_modl <- train(forml, data = df, method = "lm", , metric = "Rsquared", trControl = control)
+  cv_modl <- train(forml, data = df, method = "lm", metric = "Rsquared", trControl = control)
   # record AIC and BIC and adjusted-R2 of the respective model
   df_metrics <- df_metrics %>% 
     bind_rows(
