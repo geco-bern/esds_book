@@ -225,7 +225,7 @@ After having aggregated the data to the mean NDVI across all 81 pixels for each 
 
 ```{r message=F}
 # this can now be combined to the data frame with flux data that also has dates along rows
-load("./data/ddf_ch_lae.RData")
+ddf_ch_lae <- read_csv("./data/ddf_ch_lae.csv")
 ```
 
 ```{r, message=F}
@@ -942,11 +942,11 @@ occ_CHlae <- occ_data(taxonKey = 7707728, hasCoordinate = T,
 # The output is a list so we extract the actual data since this is of interest
 occ_CHlae <- as.data.frame(occ_CHlae$data)
 
-head(occ_CHlae)
 ```
 
 ```{r echo=F}
-load("./data/occ_CHlae.RData")
+occ_CHlae <- readRDS("./data/occ_CHlae.RDS")
+head(occ_CHlae)
 ```
 
 Let's have a quick look at the orders of the species in the polygon around our tower.
@@ -1035,7 +1035,7 @@ species_occ_mat <- species_occ_df %>%
 ```
 
 ```{r echo=F}
-#load("./data/species_occ_mat.RData") -> where is this file?
+load("./data/species_occ_mat.RData")
 ```
 
 ```{r}

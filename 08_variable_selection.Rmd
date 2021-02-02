@@ -113,7 +113,7 @@ target <- 'GPP_NT_VUT_REF'
 
 ## determine predictors as all except site ID, timestamp, and the target (should be 14)
 preds <- df %>% 
-  select(-siteid, -TIMESTAMP, -GPP_NT_VUT_REF) %>% 
+  dplyr::select(-siteid, -TIMESTAMP, -GPP_NT_VUT_REF) %>% 
   names()
 
 ## initialise an empty data frame (necessary, because otherwise we cannot use bind_rows() below)
@@ -223,7 +223,7 @@ target <- 'GPP_NT_VUT_REF'
 
 ## determine predictors as all except site ID, timestamp, and the target (should be 14)  (as above)
 preds <- df %>% 
-  select(-siteid, -TIMESTAMP, -GPP_NT_VUT_REF) %>% 
+  dplyr::select(-siteid, -TIMESTAMP, -GPP_NT_VUT_REF) %>% 
   names()
 
 # This is the vector of candidate predictors to be added in the model. To begin with, consider all as candidates.
@@ -472,7 +472,7 @@ target <- 'GPP_NT_VUT_REF'
 
 ## determine predictors as all except site ID, timestamp, and the target (should be 14)
 preds <- df %>% 
-  select(-siteid, -TIMESTAMP, -GPP_NT_VUT_REF) %>% 
+  dplyr::select(-siteid, -TIMESTAMP, -GPP_NT_VUT_REF) %>% 
   names()
 
 ## initialise an empty data frame (necessary, because otherwise we cannot use bind_rows() below)
@@ -581,7 +581,7 @@ target <- 'GPP_NT_VUT_REF'
 
 ## determine predictors as all except site ID, timestamp, and the target (should be 14)  (as above)
 preds <- df %>% 
-  select(-siteid, -TIMESTAMP, -GPP_NT_VUT_REF) %>% 
+  dplyr::select(-siteid, -TIMESTAMP, -GPP_NT_VUT_REF) %>% 
   names()
 
 # This is the vector of candidate predictors to be added in the model. To begin with, consider all as candidates.

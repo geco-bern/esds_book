@@ -35,7 +35,7 @@ key-points-of-the-tutorial
 bonus-species-occurrence-trait-data-and-pcas
 species-occurrences
 species-traits
-data-scraping-in-progress
+data-scraping
 introduction-1
 theory
 web-scraping-applied
@@ -87,6 +87,3 @@ xxx-2
 xxx-3
 xxx-4
 xxx-5
-data-scraping
-accessing-fishbase
-cleaning-data-with-iucn-status

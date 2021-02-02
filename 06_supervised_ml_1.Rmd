@@ -128,7 +128,7 @@ To fit a univariate linear regression model in R, we can use the `lm()` function
 ddf_ch_lae <- read_csv("./data/ddf_ch_lae.csv") # loads 'ddf_ch_lae'
 
 df <- ddf_ch_lae %>% 
-  select(-NEE_VUT_REF_QC, -TIMESTAMP) %>%  # not numeric features
+  dplyr::select(-NEE_VUT_REF_QC, -TIMESTAMP) %>%  # not numeric features
   drop_na() 
 ```
 
@@ -284,7 +284,7 @@ Another common way of model formulation is not to use the formula notation, but 
 
 ```{r eval=F}
 train(
-  x = select(df, PPFD_IN, VPD_F, TA_F),
+  x = dplyr::select(df, PPFD_IN, VPD_F, TA_F),
   y = df$GPP_NT_VUT_REF,
   method = "knn"
   )
@@ -450,7 +450,7 @@ recipe(WS_F ~ ., data = df) %>%
 
 Several algorithms explicitly require data to be standardized. That is, values of all predictors vary within a comparable range. The necessity of this step becomes obvious when considering KNN, where the magnitude of the distance is strongly influenced by the order of magnitude of the predictor values. To get a quick overview of the distribution of all variables (columns) in our data frame, we can use the skimr package.
 
-```{r}
+```{r eval=FALSE}
 library(skimr)
 skim(df)
 ```

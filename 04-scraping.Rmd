@@ -359,8 +359,8 @@ CL$Length
 In the next step we are interested to get information about the diet of *Coregonus lavaretus* by using the function `diet_items()`. It allows us to access the table on the food items of the chosen species. To extract information on food, we can save the diet items in a table and use the tidyverse notation plus the respective variables *FoodI*, *FoodII*:
 
 ```{r}
-food <- diet_items("Coregonus lavaretus")
-food %>% select(FoodI, FoodII) %>% head()
+food <- diet_items("Coregonus lavaretus") %>% as_tibble
+food %>% dplyr::select(FoodI, FoodII) %>% head() # We're using dplyr:: here to avoid package conflicts
 ```
 ***
 **Checkpoint**
@@ -374,7 +374,7 @@ Now your next task is to get information on predators (hint: the function is exa
 ```{r, eval}
 # use function 'predators()' for Coregonus lavaretus
 pre <- predators("Coregonus lavaretus")
-pre %>% select(PredatorName) %>% head()
+pre %>% dplyr::select(PredatorName) %>% head()
 ```
 
 ***
