@@ -1,2138 +1,752 @@
-# 04_Data_Scraping [in progress]
+---
+title: 04 Data Scraping
+author: Pascal Schneider
+output:
+  bookdown::html_document2: default
 
 ---
 
-## 1. Introduction and learning objectives
+# Data Scraping [in progress]
 
-This exercise covers _data scraping_ in R and yes, this is not a typo it is indeed spelt _scraping_ (to gather or extract) not _scrapping_ (to get rid of). The goal is to download and convert online data into a structured format that can be easily accessed and modified in R. As a case study, we will scrape data from a website containing various kinds of information about fish species, called [FishBase](https://www.fishbase.in/search.php). We will first extract the useful information about fish species and their families from the scrapped data. Then, we will learn how to read a table in HTML document and how to generate a new table with the extracted information. Later, we will clean our data and plot the relationship among different species with respect to its proportion and surface area. At the end we will run the model and make the predictions about fish richness.  
+***
+## Introduction
+This chapter covers _data scraping_ in R and yes, this is not a typo. _Scraping_ means to gather or to extract whereas _scrapping_ means to get rid of something. The goal of the sections below is to gather and convert online data into a structured format that can be easily accessed and modified in R. As a case study, we will scrape data from a website containing various information about fish species, called [FishBase](https://www.fishbase.in/search.php).
 
+We will first learn how to access the website and how to extract useful useful information from plain text. Then, we will look at how to access a table that is embedded in the website and how to generate a new table in R which holds all information we want to extract. Next up is cleaning up the scraped data for visualization and analysis. At the end we will conduct a case study where we create a model to make predictions about fish species richness.  
 
----
+***
+## Theory
 
-## 2. Summary of the theory
+Let us first have a brief review of the main concept of the lecture. The web is the largest source of information and often free to access. In some cases the information is already presented in a nice format and can be easily copied into an excel spreadsheet. However, this is often not the case and data-sets are only presented in a format that is not easy to download or modify. Manually copying data from different sub pages and sections is a tedious, slow and error prone approach. We therefore need a more automated and efficient technique to access such data.
 
-Let us first have a brief review of the main concept of the lecture.
+Web scraping is a popular technique to extract information directly from a website by accessing its underlying HTML code. Scraping allows us to gather this unstructured data from many websites and put it all together in a ready-to-use data format. This structured data can then be further used as training, validation or test data sets for our machine learning algorithms. 
 
-The web is the largest source of information and often free to access. In some cases the information is already presented in a nice format and can be easily copied into an excel spreadsheet. 
-However, this is often not the case and data-sets are only present in a format that are not easy to download or modify. Copying data from different sub pages and blocks manually is a tedious, slow and error prone approach. We therefore need a different technique to access such data in a more automated and efficient way. 
-Web scraping is a popular technique to extract information from the web. It allows us to get unstructured data from the web and convert it into readable and structured formats. This structured data can then be further used as training, validation or test data sets for our machine learning algorithms. 
+**Important Concepts of Websites**
 
-<div style="border: 2px black solid; border-radius: 7px; padding:10px">
-We will now review some of the most important concepts and protocols used on websites.
+- **HTTP**: The  **H**yper**t**ext **T**ransfer **P**rotocol is a widely used protocol for information systems. Hypertext documents include hyperlinks that can be clicked to access other resources. Put simply, HTTP is the foundation of how information, i.e., data, is communicated in the world wide web. 
 
-- HTTP: The  <b>H</b>yper<b>t</b>ext <b>T</b>ransfer <b>P</b>rotocol is widely used protocol in information systems. Hypertext documents include hyperlinks to other resources that a user can easily access just by a mouse click or by tapping the screen in a web browser.
+- **HTML**: **H**yper**t**ext **M**arkup **L**anguage is the coding language in which most websites are written. This includes elements like formatting or structuring and is often combined using CSS or JavaScript. HTML is organized using tags, which are surrounded by `< >`. Each HTML document is made of elements that are specified using tags. HTML elements and HTML tags are often confused. Tags are used to open and close the object, whereas elements include both tags and its content.
 
-- HTML: The <b>H</b>yper<b>t</b>ext <b>M</b>arkup <b>L</b>anguage is markup language as the name suggests and is often used to build websites and describes their content and structure. HTML is organized using tags, which are surrounded by < > symbols. One problem when scraping HTML based websites is that not all the websites have the same html structure, different sites vary in their structure, request tags and HTML tags.
+  Let’s consider an example with the `<h1>` tag: `<h1> Title of the document </h1>` is an element, and `<h1>`, `</h1>` - are the tags enclosing it. The `<>` symbol is used to open a tag or an element and `</>` is used to close it. HTML documents have a hierarchical or tree like structure with different types of nodes as described in \@ref(fig:node-tree). The rectangular boxes are referred to as nodes. The *Text* node is also called as a child node of the *Element* node and also a leaf node as it only contains text and no links to further nodes. Both of the *Element* nodes that are attached to the *Root Element* node are called sibling nodes of the *Root Element* node. When we do web scraping we go through such a hierarchical structure to get the content (here text in the *Test* node). Keep in mind that every HTML document can vary with respect to its structure. This example is to just to provide you some knowledge about HTML document and its structure.
 
-- XML: The e<b>X</b>tensible <b>M</b>arkup <b>L</b>anguage has certain similarities to HTML but the format is generally easier to read for machines. While HTML has a number of pre-defined tags, those are extensible in XML. This means that it allows to define and control the meaning of the elements contained in a document or text.
+```{r node-tree,echo=FALSE, fig.cap='Visualization of the structure of an HTML document.'}
+knitr::include_graphics(rep("./figures/node-tree.png"))
+```
 
-- API: An <b>A</b>pplication <b>P</b>rogramming <b>I</b>nterface is a set of procedures and communication protocols that provide access to the data of an application, operating system or other services. Both APIs and web scraping are used to retrieve data from websites, but their methodology differs substantially. APIs give us direct access to the data we would want, but they are limited to the corresponding website. As a result, we might find us in a scenario where there might not be an API to access the data we want. In these scenarios, web scrapping would allow us to access the data as long as it is available on a website. Hence APIs are very source/website specific and we can only do what is already implemented but in a clean fashion, while scrapping is more flexible and can be applied (nearly) everywhere but we have to handle all the formatting, inconsistencies, extraction, etc. by ourself.
-</div>
+- **XML**: The E**x**tensible **M**arkup **L**anguage has some similarities to HTML but the format is generally easier to read for machines. While HTML has a number of pre-defined tags, one can create ("extend") new tags as needed . This allows to define and control the meaning of the elements contained in a document or text.
 
----
+- **API**: An **A**pplication **P**rogramming **I**nterface is a set of procedures and communication protocols that provide access to the data of an application, operating system or other services. Both APIs and web scraping are used to retrieve data from websites, but their methodology differs substantially. APIs give us direct access to the data we would want, but they are limited to the corresponding website. As a result, we might find us in a scenario where there might not be an API to access the data we want. In these scenarios, web scrapping would allow us to access the data as long as it is available on a website. Hence APIs are very source/website specific and we can only do what is already implemented but in a clean fashion, while scrapping is more flexible and can be applied (nearly) everywhere but we have to handle all the formatting, inconsistencies, extraction, etc. by yourself.
 
-## 3. Case Study - Web Scraping on FishBase
+Next, we will demonstrate the principles of web scraping using a simple case study. We will extract fish occurrence data from an online database and perform some basic correlations with the obtained data. 
 
-We will now demonstrate the principles of web scraping using a simple case study. We will extract fish occurrence data from an online database and perform some basic correlations with the obtained data. We will quickly introduce our data source, the FishBase database.
+***
+## Web Scraping Applied
+### R-Packages and Functions
 
-### 3.1 The FishBase website
+We will now load all packages necessary to perform web scraping on FishBase, namely `RCurl` and `XML`. `RCurl` provides functions to allow us to compose general HTTP requests and provides convenient functions to fetch URLs via get and post requests and process the results returned by the web server.
+`XML` give us approaches for both reading (get request) and creating (post request) XML and HTML documents, both locally and on the web via HTTP. Later in this tutorial, we will create some spatial visualization and load the packages `raster`, `sf` and `rgdal` to do so. Before we proceed further to accessing FishBase, we will have a quick look at the useful functions `lapply()` and `sapply()`.
 
-[FishBase](https://www.fishbase.in/search.php) is a global species database of fish species. It provides data of various fish species, including information on taxonomy, geographical distribution, biometrics and morphology, behaviour and habitats, ecology and population dynamics as well as reproductive, metabolic and genetic data. Different tools, such as trophic pyramids, identification keys, biogeographical modelling and fishery statistics can be accessed on the website. Furthermore, direct species level links to information in other databases such as LarvalBase, GenBank, the IUCN Red List and the Catalog of Fishes exist. As of November 2018, FishBase included descriptions of 34,000 species and subspecies.
-![Screenshot of the FishBase webpage for the species *Coregonus lavaretus*, a member of the family Salmonidae. It is widespread in freshwater systems from central and northwest Europe to Siberia.](../data/images/screen.png)
-<b>Figure1.</b> Screenshot of the FishBase webpage for the species  *Coregonus lavaretus*, a member of the family Salmonidae. It is widespread in freshwater systems from central and northwest Europe to Siberia.
+```{r eval=TRUE, message=FALSE, results='hide'}
+lib_vec <- c("RCurl", "XML", "raster", "rgdal", "rfishbase", "tidyverse", "sf")
+sapply(lib_vec, library, character.only = TRUE) # See below for how sapply() works
+help(package = "XML") # Use this code line in the RStudio console to learn more about loaded packages
+```
 
-As shown in figure 1, the website contains lots of information for each species. This information is stored in various different data types, such as: 
-- numbers in different formats and units (temperature ranges, latitudinal distribution)
-- text blocks (description of the distribution)
-- tables (fecundity, larvae information)
-- pictures and videos (of the species, embedded into HTML code)
-
-For a better understanding of the following R code, you are strongly encouraged to have a look at the [FishBase](https://fishbase.org) website in your browser.
-
-In the next sections you will learn how to deal with the complex data types. A careful approach is required when extracting and downloading information from such datasets. It is an imporant first step as it will save you time looking for the important (or relevant) information and will make the application of machine learning algorithms more straight forward.
-
-
----
-
-## Hands on
-
-### 3.2 Preliminaries (Packages)
-
-We will now load the packages necessary to perform the web scraping on FishBase, namely <b>RCurl</b> and <b>XML</b>. Since we will also use the <b>raster</b> and <b>rgdal</b> packages for spatial visualisation later in this tutorial, we will load them here in the beginning.
-
-The package RCurl provides functions to allow us to compose general HTTP requests and provides convenient functions to fetch URLs via get and post requests and process the results returned by the web server. The package XML give us approaches for both <b>reading</b> (get request) and <b>creating</b> (post request) XML (and HTML) documents, both locally and on the web via HTTP. 
+```{r}
+help(package = "XML") # Use this code line in the RStudio console to learn more about loaded packages
+```
 
 
----
+Sidenote: For data scraping in R one can also use 'rjson' to convert R objects into JSON objects and vice-versa. Another option we will use later are APIs. To get information about the loaded packages we can type the following command in the console:
 
-Before we proceed further, we would like to introduce function **lapply()** and **sapply()**.
+#### lapply() {-}
 
-**lapply()** : lapply returns a list of the same length as X, each element of which is the result of applying FUN (Function applied to each element of x) to the corresponding element of X. X is a vector (atomic or list) or an expression object. `lapply()` takes vector or data frame as input and gives output in list. The _**l**_ in `lapply()` stands for list.  
+`lapply()` allows us to apply the same function to a vector of objects. The respective arguments are `X` (the vector or object we give as input) and `FUN` (the function which is applied to each element of `X`). The output of `lapply()` is a list of the same length as `X` where each element of `X` is the result of applying `FUN` to the corresponding element of `X`. `X` is a vector (atomic, list or data frame) or an expression object. The `l` in `lapply()` thus stands for list.  
 
-`lapply(X, FUN)`
-
-Arguments:
-
--`X`: A vector or an object
-
--`FUN`: Function applied to each element of x
-
-**For example :** A simple example is to change the string value of a matrix to lower case with tolower function. We construct a matrix fish. The name is in upper case format.
-
+A simple example is to change the string value of a matrix to lower case with the R-function `tolower()` function. First, we set up a vector with string objects that we want to apply the function on. Then we create a pipe that feeds this vector into `lapply()` which applies `tolower`. The output is a list of the original two string objects but now written in lower case.
 
 ```{r}
 fish <- c("FAMILY","SPECIES")
-fish_lower <-lapply(fish, tolower)
-str(fish_lower)
+fish %>% lapply(tolower) # Note that tolower() must not be written with brackets
 ```
 
-    List of 2
-     $ : chr "family"
-     $ : chr "species"
+#### sapply() {-}
 
+`sapply()` takes a list, vector or data frame as input and gives a vector or matrix as output. This is very useful if we have to use another function which only accepts a vector as input but does not accept a list. Note that we can apply the same function using `lapply()` or `sapply` but their outputs are not the same.
 
-**sapply()** : sapply() function takes list, vector or data frame as input and gives output in vector or matrix. It is useful for operations on list objects and returns a list object of the same length as the original set. `sapply()` function does the same job as `lapply()` function but returns a vector.
-
----
-
-
-In the next two lines we load the packages and save them in the vector 'lib_vec'.
-
+As an example we can have a look at the cars data where the speed and respective stopping distance are saved. We can apply the `min()` function to both features of the data set to get their minimal values. If we are using `lapply()`, we get a list that is accessible using `$`. With `sapply()` we get a named vector which can be seen at the headings `speed` and `dist` in the output below (those headings are of course the same as the variable names in the outputted list of `lapply()`).
 
 ```{r}
-lib_vec <- c("RCurl", "XML", "raster", "rgdal", "rfishbase", "tidyverse", "sf")
-sapply(lib_vec, library, character.only = TRUE)
+(df <- head(cars))
+df %>% sapply(min)
+df %>% lapply(min)
+```
+***
+### The FishBase website
+
+[FishBase](https://www.fishbase.in/search.php) is a global species database of fish species. It provides data of various fish species, including information on taxonomy, geographical distribution, biometrics and morphology, behaviour and habitats, ecology and population dynamics as well as reproductive, metabolic and genetic data. Different tools, such as trophic pyramids, identification keys, biogeographical modelling and fishery statistics can be accessed on the website. Furthermore, direct species level links to information in other databases such as LarvalBase, GenBank, the IUCN Red List and the Catalog of Fishes exist. As of November 2018, FishBase included descriptions of 34,000 species and subspecies.
+
+```{r screen,echo=FALSE, fig.cap='Screenshot of the FishBase webpage for the species *Coregonus lavaretus*, a member of the family Salmonidae. As can be read in the distribution paragraph, it is widespread in freshwater systems from central and northwest Europe to Siberia.'}
+knitr::include_graphics(rep("./figures/screen.png"))
 ```
 
+As shown in Figure \@ref(fig:screen), the website contains lots of information for all the different species and this information is stored in various different data types. A few examples of these data types are:
 
-<table>
-<caption>A matrix: 23 × 7 of type chr</caption>
-<thead>
-	<tr><th scope=col>RCurl</th><th scope=col>XML</th><th scope=col>raster</th><th scope=col>rgdal</th><th scope=col>rfishbase</th><th scope=col>tidyverse</th><th scope=col>sf</th></tr>
-</thead>
-<tbody>
-	<tr><td>sf       </td><td>sf       </td><td>sf       </td><td>sf       </td><td>sf       </td><td>sf       </td><td>sf       </td></tr>
-	<tr><td>forcats  </td><td>forcats  </td><td>forcats  </td><td>forcats  </td><td>forcats  </td><td>forcats  </td><td>forcats  </td></tr>
-	<tr><td>stringr  </td><td>stringr  </td><td>stringr  </td><td>stringr  </td><td>stringr  </td><td>stringr  </td><td>stringr  </td></tr>
-	<tr><td>dplyr    </td><td>dplyr    </td><td>dplyr    </td><td>dplyr    </td><td>dplyr    </td><td>dplyr    </td><td>dplyr    </td></tr>
-	<tr><td>purrr    </td><td>purrr    </td><td>purrr    </td><td>purrr    </td><td>purrr    </td><td>purrr    </td><td>purrr    </td></tr>
-	<tr><td>readr    </td><td>readr    </td><td>readr    </td><td>readr    </td><td>readr    </td><td>readr    </td><td>readr    </td></tr>
-	<tr><td>tidyr    </td><td>tidyr    </td><td>tidyr    </td><td>tidyr    </td><td>tidyr    </td><td>tidyr    </td><td>tidyr    </td></tr>
-	<tr><td>tibble   </td><td>tibble   </td><td>tibble   </td><td>tibble   </td><td>tibble   </td><td>tibble   </td><td>tibble   </td></tr>
-	<tr><td>ggplot2  </td><td>ggplot2  </td><td>ggplot2  </td><td>ggplot2  </td><td>ggplot2  </td><td>ggplot2  </td><td>ggplot2  </td></tr>
-	<tr><td>tidyverse</td><td>tidyverse</td><td>tidyverse</td><td>tidyverse</td><td>tidyverse</td><td>tidyverse</td><td>tidyverse</td></tr>
-	<tr><td>rfishbase</td><td>rfishbase</td><td>rfishbase</td><td>rfishbase</td><td>rfishbase</td><td>rfishbase</td><td>rfishbase</td></tr>
-	<tr><td>rgdal    </td><td>rgdal    </td><td>rgdal    </td><td>rgdal    </td><td>rgdal    </td><td>rgdal    </td><td>rgdal    </td></tr>
-	<tr><td>raster   </td><td>raster   </td><td>raster   </td><td>raster   </td><td>raster   </td><td>raster   </td><td>raster   </td></tr>
-	<tr><td>sp       </td><td>sp       </td><td>sp       </td><td>sp       </td><td>sp       </td><td>sp       </td><td>sp       </td></tr>
-	<tr><td>XML      </td><td>XML      </td><td>XML      </td><td>XML      </td><td>XML      </td><td>XML      </td><td>XML      </td></tr>
-	<tr><td>RCurl    </td><td>RCurl    </td><td>RCurl    </td><td>RCurl    </td><td>RCurl    </td><td>RCurl    </td><td>RCurl    </td></tr>
-	<tr><td>stats    </td><td>stats    </td><td>stats    </td><td>stats    </td><td>stats    </td><td>stats    </td><td>stats    </td></tr>
-	<tr><td>graphics </td><td>graphics </td><td>graphics </td><td>graphics </td><td>graphics </td><td>graphics </td><td>graphics </td></tr>
-	<tr><td>grDevices</td><td>grDevices</td><td>grDevices</td><td>grDevices</td><td>grDevices</td><td>grDevices</td><td>grDevices</td></tr>
-	<tr><td>utils    </td><td>utils    </td><td>utils    </td><td>utils    </td><td>utils    </td><td>utils    </td><td>utils    </td></tr>
-	<tr><td>datasets </td><td>datasets </td><td>datasets </td><td>datasets </td><td>datasets </td><td>datasets </td><td>datasets </td></tr>
-	<tr><td>methods  </td><td>methods  </td><td>methods  </td><td>methods  </td><td>methods  </td><td>methods  </td><td>methods  </td></tr>
-	<tr><td>base     </td><td>base     </td><td>base     </td><td>base     </td><td>base     </td><td>base     </td><td>base     </td></tr>
-</tbody>
-</table>
+- Numbers in different formats and units (temperature ranges, latitudinal distribution)
+- Text blocks (description of the distribution)
+- Tables (fecundity, larvae information)
+- Pictures and videos (of the species, embedded into HTML code)
 
+For a better understanding of the following R code, you are strongly encouraged to have a look at the [FishBase](https://fishbase.de) website in your browser. In the next sections you will learn how to deal with these different complex data types. A careful approach is required when extracting and downloading such information. Understanding the structure of the website is an important first step and it will save you coding time. So, always identify the relevant information you want to extract first and then write a suitable extraction code which fits the needs of your machine learning algorithm.
+***
+### Accessing FishBase
 
-
-To get information about the packages we can type the following command in the console.
-
-
-```{r}
-help(package = "XML")
-```
-
-For data scraping in R one can also use 'rjson' to convert R objects into JSON objects and vice-versa. Another option as we will see later is to use APIs.
-
----
-
-### 3.3 Reading the content of FishBase
-
-We are now ready to extract data from https://www.fishbase.de. We want to get data about the *Coregonus lavaretus*. We can create the object x and assign the value same as the species to keep the flexibility. If we want to get data about other species we can generate a new object or can also assign new value to the object _x_ with the desired species name. 
-
+We are now ready to extract data from the *Coregonus lavaretus* website on [FishBase](https://fishbase.de). For this we first create a string object which holds the name of the fish profile we want to access. Using a variable to do this, adds flexibility in functions as will be shown below. If we want to get data about other species we can simply assign a new value to the object `x`with the desired species name. 
 
 ```{r}
 x <- "Coregonus-lavaretus"
+x
 ```
 
-Next, we use the function `paste()` to convert its arguments to character strings and concatenate them to get the link of the webpage from which we are going to extract the data. We concatenate the URL in order to get the webpage with the summary of the species *Coregonus-lavaretus*. We do not put any separation between the arguments, so we use `sep = ""`.
+Next, we use the function `paste()` to create an object holding the URL to the fish profile. Attaching strings like this is called concatenate and will be used quite often in later tutorials, so remember this wording. To create the URL we do not have to add any separation between the arguments, so we use `sep = ""`. Using the flexibility of using `x` allows us here to add any species name directly into `paste()` instead of deleting and adding another Latin name every time. 
 
 
 ```{r}
-# to keep the code 'flexible', you can see here that x is used to define the species
-# this way we can easily change the species without having to always and the latin name to the code
-
-url1 <- paste("http://www.fishbase.de/summary/", x ,".html",sep="")
+url <- paste("http://www.fishbase.de/summary/", x ,".html",sep="")
+url
 ```
 
-For url1 we could also directly use http://www.fishbase.de/summary/Coregonus-lavaretus, but then we would loose flexibility if we want to look for information about other species.
+For `url` we could also directly use *http://www.fishbase.de/summary/Coregonus-lavaretus* but then we would loose flexibility if we want to look for information about other species.
 
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-    <b>Checkpoint</b><br/>
-    You can try to do the same for different species by changing the value of object x or by directly providing the address of any other species into the url. 
-</div>
+***
+**Checkpoint**
+Try to do the same for the URL of other species by changing the code above.
 
+**Solution**
+```{r, eval = FALSE}
+# Change the object x_end to desired species name
+x_ex<- "Salvelinus alpinus"
 
+# Concatenate the URK
+url_ex <- paste("http://www.fishbase.de/summary/",x_ex,".html",sep="")
+```
+***
 
+To access the URL and its HTML documents, we will use various functions from the `XML` package. First, we want to get the URL content using `getURLContent()` which takes a URL as input argument. Then, we use `htmlParse()` to read the HTML document from the URL content into an R object. To get help on functions we can always use `help("htmlParse")`.
 
 ```{r}
-# your code 
+fishbase <- url %>% getURLContent(followlocation = TRUE) %>% htmlParse() 
 ```
 
+The HTML document saved in `fishbase` is quite long to show it entirely but a snapshot is displayed in Figure \@ref(fig:fishbase). 
 
-```{r}
-### Solution
-
-# set the object x1 with the species name
-x1<- "Salvelinus alpinus"
-
-# concatenate the url
-url11 <- paste("http://www.fishbase.de/summary/",x1,".html",sep="")
+```{r fishbase, echo=FALSE, fig.cap='Extract from the HTML document saved in the variable `fishbase*`.'}
+knitr::include_graphics(rep("./figures/fishbase.png"))
 ```
 
----
+Somewhere in this gigantic object we can find the relevant information we are looking for. For example, Figure \@ref(fig:maxle) below shows the extract where the maximal lenght of the fish is documented. Check out the online profile to double check whether the value is correct.
 
-Before we continue with the tutorial let's give a brief introduction to HTML (HyperText Markup Language).
-
-**HTML** : HTML is a primary markup language for creating websites. It consists of a series of codes used to structure texts, images, and other content to be displayed in the browser. Each HTML document is made of elements that are specified using tags. HTML elements and HTML tags are often confused. The _tags_ are used to open and close the object, whereas the _element_ includes both tags and its content. 
-   
-Let’s consider an example with the <h1> tag: 
-
-<h1> Title of the document </h1> - is an element, and <h1>, </h1> - are tags. 
-
-<> symbol is used to open a tag or an element and </> is used to close it. 
-HTML document has a hierarchical or tree like structure with different types of nodes as discribed in the figure. The rectangular boxes are referred as nodes. The Text node is also called as a child node of Element Node and also a leaf node as it only contains the text and no links to further nodes. Both of the Element nodes that are attached to Root Element node are called Sibling nodes of Root Element node. When we do scrapping we go through such hierarchical structure to get the content (here text). Keep in mind that every html document can vary with respect to its structure. This example is to just to provide you some knowledge about HTML document and its structure.
-
-![alt](../data/images/node-tree.png)
-
----
-
-The next step is to use the `htmlParse()` function to read the html document into an R object.
-To get help on functions we can type the following command in the console, remember how you also used this for getting information on the packages.
-
-
-```{r}
-help("htmlParse")
+```{r maxle, echo=FALSE, fig.cap='Extract of `fishbase*` documenting maximal length of *Coregonus lavaretus*.'}
+knitr::include_graphics(rep("./figures/fishbase_maxle.png"))
 ```
 
-
-
-<table width="100%" summary="page for xmlTreeParse {XML}"><tr><td>xmlTreeParse {XML}</td><td style="text-align: right;">R Documentation</td></tr></table>
-
-<h2>XML Parser</h2>
-
-<h3>Description</h3>
-
-<p>Parses an XML or HTML file or string containing XML/HTML content, and generates an R 
-structure representing the XML/HTML tree.  Use <code>htmlTreeParse</code> when the content is known
-to be (potentially malformed) HTML.
-This function has numerous parameters/options and operates quite differently
-based on  their values.
-It can create trees in R or using internal C-level nodes, both of
-which are useful in different contexts.
-It can perform conversion of the nodes into R objects using
-caller-specified  handler functions and this can be used to 
-map the XML document directly into R data structures,
-by-passing the conversion to an R-level tree which would then
-be processed recursively or with multiple descents to extract the
-information of interest.
-</p>
-<p><code>xmlParse</code> and <code>htmlParse</code> are equivalent to the
-<code>xmlTreeParse</code> and <code>htmlTreeParse</code> respectively,
-except they both use a default value for the <code>useInternalNodes</code> parameter 
-of <code>TRUE</code>, i.e. they working with and return internal
-nodes/C-level nodes.  These can then be searched using
-XPath expressions via <code>xpathApply</code> and 
-<code>getNodeSet</code>.
-</p>
-<p><code>xmlSchemaParse</code> is a convenience function for parsing an XML schema.
-</p>
-
-
-<h3>Usage</h3>
-
-<pre>
-xmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
-             asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
-             isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
-             useInternalNodes = FALSE, isSchema = FALSE,
-             fullNamespaceInfo = FALSE, encoding = character(),
-             useDotNames = length(grep("^\\.", names(handlers))) &gt; 0,
-             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator(),
-             isHTML = FALSE, options = integer(), parentFirst = FALSE)
-
-xmlInternalTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
-             asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
-             isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
-             useInternalNodes = TRUE, isSchema = FALSE,
-             fullNamespaceInfo = FALSE, encoding = character(),
-             useDotNames = length(grep("^\\.", names(handlers))) &gt; 0,
-             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator(),
-             isHTML = FALSE, options = integer(), parentFirst = FALSE)
-
-xmlNativeTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
-             asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
-             isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
-             useInternalNodes = TRUE, isSchema = FALSE,
-             fullNamespaceInfo = FALSE, encoding = character(),
-             useDotNames = length(grep("^\\.", names(handlers))) &gt; 0,
-             xinclude = TRUE, addFinalizer = TRUE, error = xmlErrorCumulator(),
-             isHTML = FALSE, options = integer(), parentFirst = FALSE)
-
-
-htmlTreeParse(file, ignoreBlanks=TRUE, handlers=NULL, replaceEntities=FALSE,
-             asText=FALSE, trim=TRUE, validate=FALSE, getDTD=TRUE,
-             isURL=FALSE, asTree = FALSE, addAttributeNamespaces = FALSE,
-             useInternalNodes = FALSE, isSchema = FALSE,
-             fullNamespaceInfo = FALSE, encoding = character(),
-             useDotNames = length(grep("^\\.", names(handlers))) &gt; 0,
-             xinclude = TRUE, addFinalizer = TRUE, error = htmlErrorHandler,
-             isHTML = TRUE, options = integer(), parentFirst = FALSE)
-
-htmlParse(file, ignoreBlanks = TRUE, handlers = NULL, replaceEntities = FALSE, 
-          asText = FALSE, trim = TRUE, validate = FALSE, getDTD = TRUE, 
-           isURL = FALSE, asTree = FALSE, addAttributeNamespaces = FALSE, 
-            useInternalNodes = TRUE, isSchema = FALSE, fullNamespaceInfo = FALSE, 
-             encoding = character(), 
-             useDotNames = length(grep("^\\.", names(handlers))) &gt; 0, 
-              xinclude = TRUE, addFinalizer = TRUE, 
-               error = htmlErrorHandler, isHTML = TRUE,
-                options = integer(), parentFirst = FALSE) 
-
-xmlSchemaParse(file, asText = FALSE, xinclude = TRUE, error = xmlErrorCumulator())
-</pre>
-
-
-<h3>Arguments</h3>
-
-<table summary="R argblock">
-<tr valign="top"><td><code>file</code></td>
-<td>
-<p> The name of the file containing the XML contents.
-This can contain \~ which is expanded to the user's
-home directory.
-It can also be a URL. See <code>isURL</code>.
-Additionally, the file can be compressed (gzip)
-and is read directly without the user having
-to de-compress (gunzip) it.</p>
-</td></tr>
-<tr valign="top"><td><code>ignoreBlanks</code></td>
-<td>
-<p> logical value indicating whether
-text elements made up entirely of white space should be included
-in the resulting &lsquo;tree&rsquo;. </p>
-</td></tr>
-<tr valign="top"><td><code>handlers</code></td>
-<td>
-<p>Optional collection of functions
-used to map the different XML nodes to R
-objects. Typically, this is a named list of functions,
-and a closure can be used to provide local data.
-This provides a way of filtering the tree as it is being
-created in R, adding or removing nodes, and generally processing
-them as they are constructed in the C code.
-</p>
-<p>In a recent addition to the package (version 0.99-8),
-if this is specified as a single function object,
-we call that function for each node (of any type) in the underlying DOM tree.
-It is invoked with the new node and its parent node.
-This applies to regular nodes and also comments, processing
-instructions, CDATA nodes, etc.  So this function must be
-sufficiently general to handle them all.
-</p>
-</td></tr>
-<tr valign="top"><td><code>replaceEntities</code></td>
-<td>
-
-<p>logical value indicating whether to substitute entity references
-with their text directly. This should be left as False.
-The text still appears as the value of the node, but there
-is more information about its source, allowing the parse to be reversed
-with full reference information.
-</p>
-</td></tr>
-<tr valign="top"><td><code>asText</code></td>
-<td>
-<p>logical value indicating that the first argument,
-&lsquo;file&rsquo;, 
-should be treated as the XML text to parse, not the name of 
-a file. This allows the contents of documents to be retrieved 
-from different sources (e.g. HTTP servers, XML-RPC, etc.) and still
-use this parser.</p>
-</td></tr>
-<tr valign="top"><td><code>trim</code></td>
-<td>
-
-<p>whether to strip white space from the beginning and end of text strings.
-</p>
-</td></tr>
-<tr valign="top"><td><code>validate</code></td>
-<td>
-
-<p>logical indicating whether to use a validating parser or not, or in other words
-check the contents against the DTD specification. If this is true, warning
-messages will be displayed about errors in the DTD and/or document, but the parsing 
-will proceed except for the presence of terminal errors.
-This is ignored when parsing an HTML document.
-</p>
-</td></tr>
-<tr valign="top"><td><code>getDTD</code></td>
-<td>
-
-<p>logical flag indicating whether the DTD (both internal and external)
-should be returned along with the document nodes. This changes the 
-return type.
-This is ignored when parsing an HTML document.
-</p>
-</td></tr>
-<tr valign="top"><td><code>isURL</code></td>
-<td>
-
-<p>indicates whether the <code>file</code>  argument refers to a URL
-(accessible via ftp or http) or a regular file on the system.
-If <code>asText</code> is TRUE, this should not be specified.
-The function attempts to determine whether the 
-data source is a URL by using <code>grep</code>
-to look for http or ftp at the start of the string.
-The libxml parser handles the connection to servers,
-not the R facilities (e.g. <code>scan</code>).
-</p>
-</td></tr>
-<tr valign="top"><td><code>asTree</code></td>
-<td>
-<p>this only applies when on passes a value for
-the  <code>handlers</code> argument and is used then to determine
-whether the DOM tree should be returned or the <code>handlers</code>
-object.
-</p>
-</td></tr>
-<tr valign="top"><td><code>addAttributeNamespaces</code></td>
-<td>
-<p>a logical value indicating whether to
-return the namespace in the names of the attributes within a node
-or to omit them. If this is <code>TRUE</code>, an attribute such as
-<code>xsi:type="xsd:string"</code> is reported with the name
-<code>xsi:type</code>.
-If it is <code>FALSE</code>, the name of the attribute is <code>type</code>.</p>
-</td></tr>
-<tr valign="top"><td><code>useInternalNodes</code></td>
-<td>
-<p>a logical value indicating whether 
-to call the converter functions with objects of class
-<code>XMLInternalNode</code> rather than <code>XMLNode</code>.
-This should make things faster as we do not convert  the 
-contents of the internal nodes to R explicit objects.
-Also, it allows one to access the parent and ancestor nodes.
-However, since the objects refer to volatile C-level objects,
-one cannot store these nodes for use in further computations within R.
-They &ldquo;disappear&rdquo; after the processing the XML document is completed.
-</p>
-<p>If this argument is <code>TRUE</code> and no handlers are provided, the
-return value is a reference to the internal C-level document pointer.
-This can be used to do post-processing via XPath expressions using
-<code>getNodeSet</code>.
-</p>
-<p>This is ignored when parsing an HTML document.
-</p>
-</td></tr>
-<tr valign="top"><td><code>isSchema</code></td>
-<td>
-<p>a logical value indicating whether the document
-is an XML schema (<code>TRUE</code>) and should be parsed as such using
-the built-in schema parser in libxml.</p>
-</td></tr>
-<tr valign="top"><td><code>fullNamespaceInfo</code></td>
-<td>
-<p>a logical value indicating whether
-to provide the namespace URI and prefix on each node
-or just the prefix.  The latter (<code>FALSE</code>) is
-currently the default as that was the original way the
-package behaved.   However, using
-<code>TRUE</code> is more informative and we will make this
-the default in the future.
-</p>
-<p>This is ignored when parsing an HTML document.
-</p>
-</td></tr>
-<tr valign="top"><td><code>encoding</code></td>
-<td>
-<p> a character string (scalar) giving the encoding for the
-document.  This is optional as the document should contain its own
-encoding information. However, if it doesn't, the caller can specify
-this for the parser.  If the XML/HTML document does specify its own
-encoding that value is used regardless of any value specified by the
-caller. (That's just the way it goes!) So this is to be used
-as a safety net in case the document does not have an encoding and
-the caller happens to know theactual encoding.
-</p>
-</td></tr>
-<tr valign="top"><td><code>useDotNames</code></td>
-<td>
-<p>a logical value
-indicating whether to use the
-newer format for identifying general element function handlers
-with the '.' prefix, e.g. .text, .comment, .startElement.
-If this is <code>FALSE</code>, then the older format
-text, comment, startElement, ...
-are used. This causes problems when there are indeed nodes
-named text or comment or startElement as a
-node-specific handler are confused with the corresponding
-general handler of the same name. Using <code>TRUE</code>
-means that your list of handlers should have names that use
-the '.' prefix for these general element handlers.
-This is the preferred way to write new code.
-</p>
-</td></tr>
-<tr valign="top"><td><code>xinclude</code></td>
-<td>
-<p>a logical value indicating whether
-to process nodes of the form <code>&lt;xi:include xmlns:xi="http://www.w3.org/2001/XInclude"&gt;</code>
-to insert content from other parts of (potentially different)
-documents. <code>TRUE</code> means resolve the external references;
-<code>FALSE</code> means leave the node as is.
-Of course, one can process these nodes oneself after document has
-been parse using handler functions or working on the DOM.
-Please note that the syntax for inclusion using XPointer
-is not the same as XPath and the results can be a little
-unexpected and confusing. See the libxml2 documentation for more details.
-</p>
-</td></tr>
-<tr valign="top"><td><code>addFinalizer</code></td>
-<td>
-<p>a logical value indicating whether the
-default finalizer routine should be registered to
-free the internal xmlDoc when R no longer has a reference to this
-external pointer object. This is only relevant when
-<code>useInternalNodes</code> is <code>TRUE</code>.
-</p>
-</td></tr>
-<tr valign="top"><td><code>error</code></td>
-<td>
-<p>a function that is invoked when the XML parser reports
-an error.
-When an error is encountered, this is called with 7 arguments.
-See <code>xmlStructuredStop</code> for information about these
-</p>
-<p>If parsing completes and no document is generated, this function is
-called again with only argument which is a character vector of
-length 0.  This gives the function an opportunity to report all the 
-errors and raise an exception rather than doing this when it sees
-th first one.
-</p>
-<p>This function can do what it likes with the information.
-It can raise an R error or let parser continue and potentially
-find further errors.
-</p>
-<p>The default value of this argument supplies a function that 
-cumulates the errors
-</p>
-<p>If this is <code>NULL</code>, the default error handler function in the
-package  <code>xmlStructuredStop</code> is invoked and this will 
-raise an error in R at that time in R.
-</p>
-</td></tr>
-<tr valign="top"><td><code>isHTML</code></td>
-<td>
-<p>a logical value that allows this function to be used for parsing HTML documents.
-This causes validation and processing of a DTD to be turned off.
-This is currently experimental so that we can implement
-<code>htmlParse</code> with this same function.</p>
-</td></tr>
-<tr valign="top"><td><code>options</code></td>
-<td>
-<p>an integer value or vector of values that are combined
-(OR'ed) together
-to specify options for the XML parser. This is the same as the
-<code>options</code> parameter for <code>xmlParseDoc</code>.
-</p>
-</td></tr>
-<tr valign="top"><td><code>parentFirst</code></td>
-<td>
-<p>a logical value for use when we have handler
-functions and are traversing the tree.
-This controls whether we process
-the node before processing its children, or process the children
-before their parent node.</p>
-</td></tr>
-</table>
-
-
-<h3>Details</h3>
-
-<p>The <code>handlers</code> argument is used similarly
-to those specified in xmlEventParse.
-When an XML tag (element) is processed,
-we look for a function in this collection 
-with the same name as the tag's name. 
-If this is not found, we look for one named
-<code>startElement</code>. If this is not found, we use the default
-built in converter.
-The same works for comments, entity references, cdata, processing instructions,
-etc.
-The default entries should be named
-<code>comment</code>, <code>startElement</code>,
-<code>externalEntity</code>,
-<code>processingInstruction</code>,
-<code>text</code>, <code>cdata</code> and <code>namespace</code>.
-All but the last should take the XMLnode as their first argument.
-In the future, other information may be passed via ...,
-for example, the depth in the tree, etc.
-Specifically, the second argument will be the parent node into which they
-are being added, but this is not currently implemented,
-so should have a default value (<code>NULL</code>).
-</p>
-<p>The <code>namespace</code> function is called with a single argument which
-is an object of class <code>XMLNameSpace</code>.  This contains
-</p>
-
-<dl>
-<dt>id</dt><dd><p>the namespace identifier as used to
-qualify tag names;</p>
-</dd> 
-<dt>uri</dt><dd><p>the value of the namespace identifier,
-i.e. the URI
-identifying the namespace.</p>
-</dd>
-<dt>local</dt><dd><p>a logical value indicating whether the definition
-is local to the document being parsed.</p>
-</dd>
-</dl>
-
-<p>One should note that the <code>namespace</code> handler is called before the
-node in which the namespace definition occurs and its children are
-processed.  This is different than the other handlers which are called
-after the child nodes have been processed.
-</p>
-<p>Each of these functions can return arbitrary values that are then
-entered into the tree in place of the default node passed to the
-function as the first argument.  This allows the caller to generate
-the nodes of the resulting document tree exactly as they wish.  If the
-function returns <code>NULL</code>, the node is dropped from the resulting
-tree. This is a convenient way to discard nodes having processed their
-contents.
-</p>
-
-
-<h3>Value</h3>
-
-<p>By default ( when <code>useInternalNodes</code> is <code>FALSE</code>, 
-<code>getDTD</code> is <code>TRUE</code>,  and no
-handler functions are provided), the return value is, an object of
-(S3) class <code>XMLDocument</code>.
-This has two fields named <code>doc</code> and <code>dtd</code>
-and are of class <code>DTDList</code> and <code>XMLDocumentContent</code> respectively.
-</p>
-<p>If <code>getDTD</code> is <code>FALSE</code>,  only the <code>doc</code> object is returned.
-</p>
-<p>The <code>doc</code> object has three fields of its own:
-<code>file</code>, <code>version</code> and <code>children</code>.
-</p>
-<table summary="R valueblock">
-<tr valign="top"><td><code><code>file</code></code></td>
-<td>
-<p>The (expanded) name of the file  containing the XML.</p>
-</td></tr>
-<tr valign="top"><td><code><code>version</code></code></td>
-<td>
-<p>A string identifying the  version of XML used by the document.</p>
-</td></tr>
-<tr valign="top"><td><code><code>children</code></code></td>
-<td>
-
-<p>A list of the XML nodes at the top of the document.
-Each of these is of class <code>XMLNode</code>.
-These are made up of 4 fields.
-</p>
-
-<ul>
-<li><p><code>name</code>The name of the element.
-</p>
-</li>
-<li><p><code>attributes</code>For regular elements, a named list
-of XML attributes converted from the 
-&lt;tag x=&quot;1&quot; y=&quot;abc&quot;&gt;
-</p>
-</li>
-<li><p><code>children</code>List of sub-nodes.
-</p>
-</li>
-<li><p><code>value</code>Used only for text entries.
-</p>
-</li></ul>
-
-<p>Some nodes specializations of <code>XMLNode</code>, such as 
-<code>XMLComment</code>, <code>XMLProcessingInstruction</code>,
-<code>XMLEntityRef</code> are used.
-</p>
-<p>If the value of the argument getDTD is TRUE and the document refers
-to a DTD via a top-level DOCTYPE element, the DTD and its information
-will be available in the <code>dtd</code> field.  The second element is a
-list containing the external and internal DTDs. Each of these
-contains 2 lists - one for element definitions and another for entities. See
-<code>parseDTD</code>. 
-</p>
-<p>If a list of functions is given via <code>handlers</code>, 
-this list is returned. Typically, these handler functions
-share state via a closure and the resulting updated data structures
-which contain the extracted and processed values from the XML
-document can be retrieved via a function in this handler list.
-</p>
-<p>If <code>asTree</code> is <code>TRUE</code>, then the converted tree is returned.
-What form this takes depends on what the handler functions have
-done to process the XML tree.
-</p>
-<p>If <code>useInternalNodes</code> is <code>TRUE</code> and no handlers are
-specified, an object of S3 class <code>XMLInternalDocument</code> is
-returned. This can be used in much the same ways as an
-<code>XMLDocument</code>, e.g. with <code>xmlRoot</code>,
-<code>docName</code> and so on to traverse the tree.
-It can also be used with XPath queries via <code>getNodeSet</code>,
-<code>xpathApply</code> and <code>doc["xpath-expression"]</code>.
-</p>
-<p>If internal nodes are used and the internal tree returned directly,
-all the nodes are returned as-is and no attempt to 
-trim white space, remove &ldquo;empty&rdquo; nodes (i.e. containing only white
-space), etc. is done. This is potentially quite expensive and so is
-not done generally, but should  be done during the processing
-of the nodes.  When using XPath queries, such nodes are easily
-identified and/or ignored and so do not cause any difficulties.
-They do become an issue when dealing with a node's chidren
-directly and so one can use simple filtering techniques such as
-<code> xmlChildren(node)[ ! xmlSApply(node, inherits,  "XMLInternalTextNode")]</code>
-and even check the <code>xmlValue</code> to determine if it contains only
-white space.
-<code> xmlChildren(node)[ ! xmlSApply(node, function(x) inherit(x,
-              "XMLInternalTextNode")] &amp;&amp; trim(xmlValue(x)) == "")</code>
-</p>
-</td></tr> </table>
-
-
-<h3>Note</h3>
-
-<p>Make sure  that the necessary 3rd party libraries are available.</p>
-
-
-<h3>Author(s)</h3>
-
-<p>Duncan Temple Lang &lt;duncan@wald.ucdavis.edu&gt;</p>
-
-
-<h3>References</h3>
-
-<p><a href="http://xmlsoft.org">http://xmlsoft.org</a>, <a href="http://www.w3.org/xml">http://www.w3.org/xml</a></p>
-
-
-<h3>See Also</h3>
-
- <p>xmlEventParse,
-<code>free</code> for releasing the memory when
-an <code>XMLInternalDocument</code> object is returned.
-</p>
-
-
-<h3>Examples</h3>
-
-<pre>
- fileName &lt;- system.file("exampleData", "test.xml", package="XML")
-   # parse the document and return it in its standard format.
-
- xmlTreeParse(fileName)
-
-   # parse the document, discarding comments.
-
- xmlTreeParse(fileName, handlers=list("comment"=function(x,...){NULL}), asTree = TRUE)
-
-   # print the entities
- invisible(xmlTreeParse(fileName,
-            handlers=list(entity=function(x) {
-                                    cat("In entity",x$name, x$value,"\n")
-                                    x}
-                                  ), asTree = TRUE
-                          )
-          )
-
- # Parse some XML text.
- # Read the text from the file
- xmlText &lt;- paste(readLines(fileName), "\n", collapse="")
-
- print(xmlText)
- xmlTreeParse(xmlText, asText=TRUE)
-
-
-    # with version 1.4.2 we can pass the contents of an XML
-    # stream without pasting them.
- xmlTreeParse(readLines(fileName), asText=TRUE)
-
-
- # Read a MathML document and convert each node
- # so that the primary class is 
- #   &lt;name of tag&gt;MathML
- # so that we can use method  dispatching when processing
- # it rather than conditional statements on the tag name.
- # See plotMathML() in examples/.
- fileName &lt;- system.file("exampleData", "mathml.xml",package="XML")
-m &lt;- xmlTreeParse(fileName, 
-                  handlers=list(
-                   startElement = function(node){
-                   cname &lt;- paste(xmlName(node),"MathML", sep="",collapse="")
-                   class(node) &lt;- c(cname, class(node)); 
-                   node
-                }))
-
-
-
-  # In this example, we extract _just_ the names of the
-  # variables in the mtcars.xml file. 
-  # The names are the contents of the &lt;variable&gt;
-  # tags. We discard all other tags by returning NULL
-  # from the startElement handler.
-  #
-  # We cumulate the names of variables in a character
-  # vector named `vars'.
-  # We define this within a closure and define the 
-  # variable function within that closure so that it
-  # will be invoked when the parser encounters a &lt;variable&gt;
-  # tag.
-  # This is called with 2 arguments: the XMLNode object (containing
-  # its children) and the list of attributes.
-  # We get the variable name via call to xmlValue().
-
-  # Note that we define the closure function in the call and then 
-  # create an instance of it by calling it directly as
-  #   (function() {...})()
-
-  # Note that we can get the names by parsing
-  # in the usual manner and the entire document and then executing
-  # xmlSApply(xmlRoot(doc)[[1]], function(x) xmlValue(x[[1]]))
-  # which is simpler but is more costly in terms of memory.
- fileName &lt;- system.file("exampleData", "mtcars.xml", package="XML")
- doc &lt;- xmlTreeParse(fileName,  handlers = (function() { 
-                                 vars &lt;- character(0) ;
-                                list(variable=function(x, attrs) { 
-                                                vars &lt;&lt;- c(vars, xmlValue(x[[1]])); 
-                                                NULL}, 
-                                     startElement=function(x,attr){
-                                                   NULL
-                                                  }, 
-                                     names = function() {
-                                                 vars
-                                             }
-                                    )
-                               })()
-                     )
-
-  # Here we just print the variable names to the console
-  # with a special handler.
- doc &lt;- xmlTreeParse(fileName, handlers = list(
-                                  variable=function(x, attrs) {
-                                             print(xmlValue(x[[1]])); TRUE
-                                           }), asTree=TRUE)
-
-
-  # This should raise an error.
-  try(xmlTreeParse(
-            system.file("exampleData", "TestInvalid.xml", package="XML"),
-            validate=TRUE))
-
-## Not run: 
- # Parse an XML document directly from a URL.
- # Requires Internet access.
- xmlTreeParse("http://www.omegahat.net/Scripts/Data/mtcars.xml", asText=TRUE)
-
-## End(Not run)
-
-  counter = function() {
-              counts = integer(0)
-              list(startElement = function(node) {
-                                     name = xmlName(node)
-                                     if(name %in% names(counts))
-                                          counts[name] &lt;&lt;- counts[name] + 1
-                                     else
-                                          counts[name] &lt;&lt;- 1
-                                  },
-                    counts = function() counts)
-            }
-
-   h = counter()
-   xmlParse(system.file("exampleData", "mtcars.xml", package="XML"),  handlers = h)
-   h$counts()
-
-
-
- f = system.file("examples", "index.html", package = "XML")
- htmlTreeParse(readLines(f), asText = TRUE)
- htmlTreeParse(readLines(f))
-
-  # Same as 
- htmlTreeParse(paste(readLines(f), collapse = "\n"), asText = TRUE)
-
-
- getLinks = function() { 
-       links = character() 
-       list(a = function(node, ...) { 
-                   links &lt;&lt;- c(links, xmlGetAttr(node, "href"))
-                   node 
-                }, 
-            links = function()links)
-     }
-
- h1 = getLinks()
- htmlTreeParse(system.file("examples", "index.html", package = "XML"),
-               handlers = h1)
- h1$links()
-
- h2 = getLinks()
- htmlTreeParse(system.file("examples", "index.html", package = "XML"),
-              handlers = h2, useInternalNodes = TRUE)
- all(h1$links() == h2$links())
-
-  # Using flat trees
- tt = xmlHashTree()
- f = system.file("exampleData", "mtcars.xml", package="XML")
- xmlTreeParse(f, handlers = list(.startElement = tt[[".addNode"]]))
- xmlRoot(tt)
-
-
-
- doc = xmlTreeParse(f, useInternalNodes = TRUE)
-
- sapply(getNodeSet(doc, "//variable"), xmlValue)
-
- #free(doc) 
-
-
-  # character set encoding for HTML
- f = system.file("exampleData", "9003.html", package = "XML")
-   # we specify the encoding
- d = htmlTreeParse(f, encoding = "UTF-8")
-   # get a different result if we do not specify any encoding
- d.no = htmlTreeParse(f)
-   # document with its encoding in the HEAD of the document.
- d.self = htmlTreeParse(system.file("exampleData", "9003-en.html",package = "XML"))
-   # XXX want to do a test here to see the similarities between d and
-   # d.self and differences between d.no
-
-
-  # include
- f = system.file("exampleData", "nodes1.xml", package = "XML")
- xmlRoot(xmlTreeParse(f, xinclude = FALSE))
- xmlRoot(xmlTreeParse(f, xinclude = TRUE))
-
- f = system.file("exampleData", "nodes2.xml", package = "XML")
- xmlRoot(xmlTreeParse(f, xinclude = TRUE))
-
-  # Errors
-  try(xmlTreeParse("&lt;doc&gt;&lt;a&gt; &amp; &lt; &lt;?pi &gt; &lt;/doc&gt;"))
-
-    # catch the error by type.
- tryCatch(xmlTreeParse("&lt;doc&gt;&lt;a&gt; &amp; &lt; &lt;?pi &gt; &lt;/doc&gt;"),
-                "XMLParserErrorList" = function(e) {
-                     cat("Errors in XML document\n", e$message, "\n")
-                                                    })
-
-    #  terminate on first error            
-  try(xmlTreeParse("&lt;doc&gt;&lt;a&gt; &amp; &lt; &lt;?pi &gt; &lt;/doc&gt;", error = NULL))
-
-    #  see xmlErrorCumulator in the XML package 
-
-
-  f = system.file("exampleData", "book.xml", package = "XML")
-  doc.trim = xmlInternalTreeParse(f, trim = TRUE)
-  doc = xmlInternalTreeParse(f, trim = FALSE)
-  xmlSApply(xmlRoot(doc.trim), class)
-      # note the additional XMLInternalTextNode objects
-  xmlSApply(xmlRoot(doc), class)
-
-
-  top = xmlRoot(doc)
-  textNodes = xmlSApply(top, inherits, "XMLInternalTextNode")
-  sapply(xmlChildren(top)[textNodes], xmlValue)
-
-
-     # Storing nodes
-   f = system.file("exampleData", "book.xml", package = "XML")
-   titles = list()
-   xmlTreeParse(f, handlers = list(title = function(x)
-                                  titles[[length(titles) + 1]] &lt;&lt;- x))
-   sapply(titles, xmlValue)
-   rm(titles)
-</pre>
-
-<hr /><div style="text-align: center;">[Package <em>XML</em> version 3.99-0.5 ]</div>
-
-
-We can now use the function `getURLContent()` to retrieve the source of a webpage, which is especially useful for retrieving pages for data processing (i.e. scraping). We will apply the function `htmlParse()` to obtain an R object.
-
+Highlighted in red are the opening and closing tags of the element where the information on the maximal length is stored. Knowing these tags, we can identify where our information is stored and how to extract it. In this example, we need to target either the `span` or `\div` tags. In order to extract the information inside these two tags, we use the function `getNodeSet()`. This function finds XML nodes that match a particular criterion. `span` is used for a small chunk of HTML inside a line whereas `div` is used to group larger chunks of code.
 
 ```{r}
-fishbase <- htmlParse(getURLContent(url1, followlocation=TRUE)) 
+fishbase_div <- fishbase %>% getNodeSet("//div ") 
+fishbase_span <- fishbase %>% getNodeSet("//span ") 
 ```
 
-Below we can see a print screen of part of the object _fishbase_. ![alt](../data/images/fishbase.png) 
+In the next two Figures \@ref(fig:before) and \@ref(fig:after) we can see the differences of what is stored in variable `fishbase` and `fishbase_div`. The difference to `fishbase_span` is similar. We see that instead of having this one long unstructured extract in Figure \@ref(fig:before), we have now a list of objects that we easily access. In Figure \@ref(fig:after), the list can be identified by the `[[22]]` in the top left corner which marks the position of the object within the list. In short, `getNodeSet()` identifies all the sections for a given tag (i.e., nodes), separates them and gathers them in a list.
 
-
-In the next figure we can see another extract. 
-This printscreen of part of the object fishbase is related to the maximal length.![alt](../data/images/fishbase_maxle.png)
-
-Highlighted in <font color=red> red </font> we can see the opening and closing tags in the HTML extract, these tag block are used to identify points of interest in this example.
-So we need to extract the <b>span/div</b>  blocks.
-
-In order to extract the information inside these two blocks, we are going to use the function `getNodeSet()` to find XML nodes that match a particular criterion. <b>Span</b> is used for a small chunk of HTML inside a line and **div** to group larger chunks of code. This will make finding and extracting information easier.
-
-
-
-```{r}
-fishbase_div <-getNodeSet(fishbase, "//div ") 
-fishbase_span <- getNodeSet(fishbase, "//span ") 
+```{r before, echo=FALSE, fig.cap='`Fishbase` before the command `getNodeSet()`'}
+knitr::include_graphics(rep("./figures/before.png"))
 ```
 
-In the next two figures we can see the differences after executing the command `getNodeSet(fishbase, "//div ")`. A similar result is obtained for `getNodeSet(fishbase, "//span ")`. 
+```{r after, echo=FALSE, fig.cap='`Fishbase` after the command `getNodeSet()`'}
+knitr::include_graphics(rep("./figures/after.png"))
+```
+***
+### Scraping Numbers
 
+Next, we now want to extract the maximal body length of *Coregonus lavaretus* out of the list of nodes we created in the previous section. For this, we will use the function `xmlValue()` which allows us to access the text in the nodes by converting them into strings. To proceed further, we briefly have a look at regular expressions.
 
+A *regular expression* is basically a sequence of characters (think of a certain word or a number) that can be searched for in a string (which is nothing else but a sequence of characters). The `regexec()` (for **reg**ular **ex**pression) function allows us to search for a pattern within a string. The output of `regexec()` gives you different information. For now it enough to know that it returns a list where the first object holds the position of the pattern in the string or simply a `-1` if the pattern is not found. In our case, we are going to look for the pattern "Max length" because after this pattern, the value we are looking for is saved (see Figure \@ref(fig:length)).
 
-Extract before the command `getNodeSet()`.
-![](../data/images/before.png)
-
-Extract after the command `getNodeSet()`.
-![](../data/images/after.png)
-
-
-Hence, `getNodeSet()` will identify all the sections for a given tag and separate them out into a list.
-
----
-
-### 3.4 Getting a numerical value from FishBase
-
-We now want to get the maximal length of the *Coregonus lavaretus*. Some types of XML nodes have no children nodes, but are leaf nodes and simply contain text. So the function `xmlValue()` provides access to their raw contents. 
-
-Now let us briefly discuss _regular expressions_. A _regular expression_ is a pattern that describes a set of strings. So we will use `regexec()` to search for matches to argument pattern within each element of a character vector. In this case, we are going to look for the pattern "Max length", because, after this pattern, we can read its value as shown in the next figure.
-
-![Maximal length.](../data/images/length.png)
-
-
-```{r}
-fish_length <- xmlValue(fishbase_span[[which.max(sapply(lapply(fishbase_span,xmlValue) 
-, function(x){regexec(pattern="Max length", x)[[1]][1]}))]])
+```{r length, echo=FALSE, fig.cap='In blue highlighted is the regular expression on the FishBase website which we are looking for.'}
+knitr::include_graphics(rep("./figures/length.png"))
 ```
 
+The code to identify the position where the regular expression *Max Length* is located is rather complex, so here is a step-by-step breakdown. You can run each part of the pipe below one-by-one to better understand what is happening.
 
 ```{r}
+pos <- fishbase_span %>% lapply(xmlValue) %>%  # 1. Convert all list objects in fishbase_span into strings
+  regexec(pattern =" Max length") %>%          # 2. Search strings for pattern 
+  which.max()                                  # 3. Return position in list where highest number is found
+                                               # (just one way to identify the node with relevant information)
+pos
+```
+
+Now we know that our regular expression *Max length* can be found in node number 42. To get access to the text in this node we simply access `fishbase_span` via the list notation `[[ ]]` and turn the object into a string and save it as `fish_length`. As you can see in the output, the information on max length has been found correctly.
+
+```{r}
+fish_length <- fishbase_span[[pos]] %>% xmlValue()
 fish_length
 ```
 
+We now use the function `substr()`, which you already encountered in previous chapters. It allows to extract a section of a string that lies between two characters. Think of this as extracting a number interval in a series of numbers. Unfortuntaly, identifying this start and end has to be done somewhat by hand. In Figure \@ref(fig:length) you can see that, starting from the *'M'* in *Max Length*, there are 13 characters until the value begins with a *7* and 16 characters until it ends with a *0*. Keep in mind that every blank space is also counted as character. Knowing this, we can first use `regexec()` to get the character position where *Max Length* starts and just add 13, respectively 16 to the value.
 
-'\r\n\t\t\t\t\tMaturity: Lm27.1, range 40 - ? cm Max length : 73.0 cm TL male/unsexed; (Ref. 40637); max. published weight: 10.0 kg (Ref. 35388)\t\t\t\t'
-
-
-We then use the function `substr()`, which you already encountered in previous chapters, to extract a part (the length we are looking for) of the character vector. We need to find the interval (section) we want to extract. With `regexec()` we are looking for the pattern _Max length_. To get the fish length we will extract the letters from position 13 (which is a 7) to position 16 (which is a 0). You can also count these positions from the image above starting from 'M' in Max length. Keep in mind that every blank space is also counted. Another way to do that is based on a trial and error basis. 
-
+Two things to note here: (i) Keep in mind that every blank space is also counted. (ii) Note that the output of `regexec()` is a list where the first object is the character position where the pattern begins in the string. Thus, we need to access this position number by using `[[1]][1]`. Another way instead of using `regexec()` is just by typing in some numbers into `substr()` and find the relevant characters by trial and error.
 
 ```{r}
-max_length <- substr(fish_length, regexec(pattern="Max length", fish_length)[[1]][1]+13
-, regexec(pattern="Max length", fish_length)[[1]][1]+16)
+start_M <- fish_length %>%  regexec(pattern= "Max length")
+max_length <- fish_length %>% substr(start_M[[1]][1] + 13,
+                                     start_M[[1]][1] + 16)
 max_length
 ```
 
+At last, we have to convert the value of the maximal length (which is a string of characters) into a number using the function `as.double()`. This converts the value into a machine readable format which makes things easier later. We see from the output below that we correctly exctracted a maximal length of *Coregonus lavaretus* of 73 cm. Now, we can start thinking about looping this approach to extract the maximal length of various species and collect them in a nicely formatted data frame.
 
-'73.0'
-
-
-Now we should convert the value of the maximal length (which is a character) into a number with the function `as.double()`. We convert it into a double format in order to simplify things and make it machine readable. For example, if an integer value is followed by any character let's say 'R', we would be able to read that value without an error if it is in double format. It increases the flexibility in data reading.
-
+To demonstrate fexibility in data reading: This entire approach can also be used to for example to identify any numeric value that is followed by any one or enclosed by any two characters.
 
 ```{r}
-max_length <- as.double(max_length, base = 0L)
+max_length <- as.double(max_length)
 max_length
 ```
+***
+### Scraping Text Snippetrs
+#### International Union for Conservation of Nature {-}
 
-
-73
-
-
-We see the maximal length of the *Coregonus lavaretus* is 73 cm. One can now start to assemble/collect those numbers into "suitable" data containers or formats. We will put all the data into a dataframe in the later sections.
-
----
-
-<div style="border: 2px black solid; border-radius: 7px; padding:10px">
-    <b>IUCN Red List</b><br/>
-    
-Before we go on we would like to introduce the <b>IUCN</b> status of species. IUCN (International Union for Conservation of Nature’s) Red List of Threatened Species, also called <b>IUCN Red List</b> has evolved to become the world’s most comprehensive information source on the global extinction risk status of animal, fungus and plant species.
+Another interesting information on FishBase is the IUCN (International Union for Conservation of Nature) status of each species. The IUCN Red List of threatened Species has evolved to become the world’s most comprehensive information source on the global extinction risk status of animal, fungus and plant species.
  
-The IUCN Red List is a critical indicator of the health of the world’s biodiversity. Far more than a list of species and their status, it is a powerful tool to inform and catalyse action for biodiversity conservation and policy change, critical to protecting the natural resources we need to survive. It provides information about the range, population size, habitat and ecology, use and/or trade, threats, and conservation actions that will help inform necessary conservation decisions.
+The IUCN Red List is a critical indicator of world’s biodiversity and has been established in 1994. It contains explicit criteria and categories to classify the conservation status of individual species on the basis of their probability of extinction. After a species is evaluated by the IUCN, it is placed into one of eight categories based on its current conservation status as shown in the figure.
 
-IUCN Red List is one of the most well-known objective assessment systems for classifying the status of plants, animals, and other organisms threatened with extinction. IUCN unveiled this assessment system in 1994. It contains explicit criteria and categories to classify the conservation status of individual species on the basis of their probability of extinction. After a species is evaluated by the IUCN, it is placed into one of eight categories based on its current conservation status as shown in the figure.
+Far more than a list of species and their status, it is a powerful tool to inform and catalyze action for biodiversity conservation and policy change, critical to protecting the natural resources we depend on for survival. The IUCN also provides information about the range, population size, habitat and ecology, use and/or trade, threats, and conservation actions that will help inform necessary conservation decisions.
 
-![IUCN status.](../data/images/iucn.png)
-</div>
-
----
-
-### 3.5 Getting a block of text value from FishBase
-
-In this part, we are going to get the IUCN Status of *Coregonus lavaretus*. We are going to use the function `which()` to find the position of the elements we are looking for. We use `regexec()` to search for matches to the argument pattern within each element of a character vector. In this case, the pattern is IUCN. The pattern can be found, as for the maximal length, on the webpage from which we are getting the data.
-
-
-```{r}
-w_IUCN  <-which(sapply(lapply(fishbase_div,xmlValue),function(x)
-  {regexec(pattern="IUCN", x)[[1]][1]})>0)
+```{r iucn,echo=FALSE, fig.cap='Structure of IUCN categories.'}
+knitr::include_graphics(rep("./figures/iucn.png"))
 ```
 
-Now if w_IUCN is empty, we set it as NA. Otherwise we use the function `xmlValue()` to get the value at the node.
+#### Extracting IUCN Status {-}
 
+Now that we learned how to extract values, we can move on to extracting text snippets! In this part, we are going to get the IUCN Status of *Coregonus lavaretus*. In contrary to above, we are going to use the function `which()` (not `which.max()`) to find the position of the elements we are looking for. We use `regexec()` to search for matches of our pattern within each element of a character vector. In this case, the pattern is simply *IUCN*. As for the maximal length, we can look up this pattern on the website we are scraping from.
 
 ```{r}
-if(length(w_IUCN)==0){ 
-  IUCN_status="NA"
-} else {
-  d1_IUCN  <- xmlValue(fishbase_div[[w_IUCN[length(w_IUCN)]]])
-} 
+IUCN_pos <- which(                 # which() gives us the numbers of nodes where pattern was found
+  fishbase_div %>%                 # pipe from above to find pattern put into which()
+    lapply(xmlValue) %>%   
+    regexec(pattern = "IUCN")      # end of pipe
+  > 0                              # check for which() to only give positive numbers for nodes
+)                                  # we do this because if pattern is not found, regexec returns a -1
+   
+IUCN_pos                           # pattern can be found in nodes 5, 14 and 24
 ```
 
-In the next  we can see the output of *d1_IUCN*.
-
+If the pattern cannot be found in `fishbase_div `, the variable `w_IUCN` will be empty (we use `fishbase_div` here because the pattern was not found in `fishbase_span`). To avoid complications later, we better do a quick check and set the variable to `NA` if it is empty and else use `xmlValue()` to get the value at the last node where the pattern was found.
 
 ```{r}
-d1_IUCN 
+if(length(IUCN_pos)==0){              # if which() from above returned 0 (no node with >0)
+  IUCN_stat = "NA"                    # set status to NA
+} else {                              # else
+  IUCN_xml <- fishbase_div[[          # access fishbase_div nodes with [[
+    IUCN_pos[length(IUCN_pos)]]] %>%  # access last node where pattern was found, length(IUCN_pos) = 24
+    xmlValue()                        # feed node into xmlValue() to return readable string
+}
+
+IUCN_xml
 ```
 
+The `IUCN_xml` looks a little confusing and we only need a tiny part of it, namely *VU*. We can see that in this node *VU* has a unique character pattern which does not appear twice: The closing bracket `)`is right after `U`, an alphabetical character. We can use this pattern to extract *VU*! Here, the `str_extract()` function from tidyverse comes in very handy. We can directly specify the pattern we are looking for and extract the substring from the original string. Note that for generalization, we need to specify `[[:alpha:]]` for any alphabetical character `+[)]` for the closing bracket.
 
-<span style=white-space:pre-wrap>'\r\n\t\t\t\t\r\n\t\t\t\t\tIUCN Red List Status   (Ref. 120744)\r\n\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\t  Vulnerable (VU) (D2); Date assessed: 01 January 2008\t\t\t\t\r\n\t\t\t\t'</span>
-
-
-This all looks a little confusing and we only really need a tiny part, namely _VU_, of the above information. So we are going to use `unlist()` to produce a vector which contains all the atomic components that occurs in the pattern (the pattern `[[:alpha:]]+` is used to get the alphabetic characters) and `regmatches()` is used to extract or replace matched substrings from  data obtained by `gregexpr()`. The function `gregexpr()`does the same thing as `regexec()`, except that its returned object is a list rather than a vector.
-
+However, if we do so, we still extract the bracket as well. To get rid of it, we can simply remove it by replacing it with "nothing" using `str_replace()`. Instead of specifying the closing bracket, we use `[:punct:]` which generalizes punctuations like `. , : ; ? !` etc. As we see in the output below, the IUCN status *VU* has been correctly extracted - nice! Plus, we don't need to convert it and can use it as string later on.
 
 ```{r}
-IUCN <- unlist(regmatches(d1_IUCN,gregexpr(pattern= "[[:alpha:]]+)",   d1_IUCN)))
-IUCN
+IUCN_sta <- IUCN_xml %>%
+  str_extract(pattern = "[:alpha:]+[)]") %>%
+  str_replace(pattern = "[:punct:]", replacement = "")
+
+IUCN_sta
+```
+***
+### Scraping Tables
+
+The next step is to read a table from a website. Here, we are going to get information on the eggs of  *Coregonus lavaretus*. Have a look at its [profile](https://www.fishbase.de/summary/Coregonus-lavaretus.html). In section **Life cycle and mating behavior** you can see that the table for information on eggs is a link and not a table directly. Foruntatley for us, we can use the function `getHTMLLinks()` to retrieve links within an HTML document or the collection of names of external files referenced in an HTML document. In Figure \@ref(fig:eggs), an extract is shown of the list with more than 100 links found on the profile page.
+
+We see that either we could directly access link number 100 or search for the substring *FishEggInfoSummary* to look for other links. In fact, we will find two links with this substring (see Figure \@ref(fig:outputlink). For this reason, we quickly check if the links are identical of if they lead to different pages. We can do this by using the logic operator `==`. The link comparison gives `TRUE` as output meaning that both links are completely identical and it does not matter which one we use. Let us save the first one in `egg_link`.
+
+```{r}
+egg_link <- fishbase %>% getHTMLLinks() %>%
+  str_subset(pattern = "FishEggInfoSummary")
+
+egg_link[1] == egg_link[2]
+egg_link <- egg_link[1]
+```
+```{r eggs,echo=FALSE, fig.cap='Extract of the list of links found on the FishBase profile of *Coregonus lavaretus*.'}
+knitr::include_graphics(rep("./figures/eggs.png"))
+```
+```{r outputlink,echo=FALSE, fig.cap='List of links that have the substring *FishEggInfoSummary*.'}
+knitr::include_graphics(rep("./figures/outputlink.png"))
 ```
 
+***
+**Checkpoint**
+Call the variable *egg_link*, you will notice the link begins with '..' (see above \@ref(fig:outputlink)). Try to remove these dots so that the link begins with '/Reproduction/.. '. As a hint, you can use the function `str_replace()` as was done above. You will need this code later, so make sure that you run it.
 
-'VU)'
-
-
-As you see to get to IUCN Status we need to remove the _")"_. So we will use the function `str_replace()`. The `pattern="[[:punct:]]"` is used to remove punctuation.
-
-
-```{r}
-IUCN_status <- str_replace(IUCN,pattern="[[:punct:]]","" )
-IUCN_status
-```
-
-
-'VU'
-
-
-Hence the IUCN Status is _VU_ (vulnerable) which is saved as a character. In this case, we will keep it as a character. 
-
----
-
-### 3.6 Reading a table from a website
-
-The next step is to read a table from a website. We are going to get information about the eggs of the *Coregonus lavaretus*. 
-We will use the function `getHTMLLinks()` to retrieve either the links within an HTML document or the collection of names of external files referenced in an HTML document.
-
-
-```{r}
-link_list <- getHTMLLinks(fishbase, externalOnly = TRUE, xpQuery = "//a/@href"
-, baseURL = docName(fishbase))
-```
-
-In the next figure we can see an extract of _link_list_.
-
-![link_list.](../data/images/eggs.png)
-
-As highlighted, we need to look for the pattern _FishEggInfoSummary_ and to do that we use the function `grep()` (similar to what we did before with `gregexpr()`).
-
-
-```{r}
-eggs_link <- link_list[grep("FishEggInfoSummary",link_list)]
-```
-
-![](../data/images/outputlink.png)
-
-The two extracts above look like they are the same object. To check if two objects are identical we use the logic operator `==`.
-
-
-```{r}
-eggs_link[1]==eggs_link[2]
-```
-
-
-TRUE
-
-
-Since, the output is TRUE. This indicates that the two objects are identical, now we can arbitrarily select the first or second object.
-
-
-```{r}
-eggs_link <-eggs_link[1]
-```
-
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-    <b>Checkpoint</b><br/>
-    Call the variable <i>egg_link</i>, you will notice the link begins with '..' (see above in the image). Your task is to remove these dots and so the link begins with '/Reproduction/.. '. 
-    
-_Note:_ make sure you run the code you will need it in the subsequent code. 
-    
-_Hint:_ make use of function 'str_replace()'.
-    
-</div>
-
-
-```{r}
+```{r, eval = FALSE}
 # your code
 ```
 
+**Solution**
+```{r}
+egg_link <- egg_link %>% str_replace("..", "" )
+egg_link
+```
+***
+
+As you can see, this is no proper URL yet. Thus, we first need to create a working URL to access its content. Similarly to what we did previously, we do this using the function `getURLContent()`. Since we know that this link leads to a table, we can pipe the URL content into `readHTMLTable()`. The output here is a list and we have access the first object as done below.
 
 ```{r}
-### Solution
+egg_tab <- paste("http://www.fishbase.de/", egg_link, sep="") %>%
+  getURLContent(followlocation=TRUE, .encoding="CE_UTF8") %>%
+  readHTMLTable()
 
-# replace '..' or here effectively remove '..'
-eggs_link <- str_replace(eggs_link, "..", "" )
-eggs_link
-
+egg_tab <- egg_tab[[1]] # To save the list object as a data frame
+egg_tab
 ```
 
-
-'/Reproduction/FishEggInfoSummary.php?ID=232&amp;GenusName=Coregonus&amp;SpeciesName=lavaretus&amp;fc=76&amp;StockCode=246'
-
-
-Similarly to what we did previously, we can get the content of the webpage with the function `getURLContent()`.
-
+Now we can extract information from this table by using the function `which()`. We want to find the position in this table, where *Shape of Egg* is defined. To identify the right row, we look in the first column for the respective string and extract the value stored in the second column of this row. To automatize, we add a check to see whether any information was extracted at all from the table. If not (as it is the case here), we just set `egg_shape` to NA.
 
 ```{r}
-url_egg <- paste ("http://www.fishbase.org/",eggs_link,sep="")
-egg_content <- getURLContent(url_egg, followlocation=TRUE, .encoding="CE_UTF8")
-```
-
-In the next figure we can see an extract of _egg_content_.
-
-![Extract of egg_content.](../data/images/extract_tt.png)
-
-We will use `readHTMLTable()` to read in the table in the document.
-
-
-```{r}
-egg_table <- readHTMLTable(egg_content,header=TRUE,colClasses=NULL,skip.rows=integer(),
-                       stringsAsFactors=FALSE,trim=TRUE,elFun=xmlValue,
-                       as.data.frame=TRUE,which=integer())[[1]]
-egg_table
-```
-
-
-<table>
-<caption>A data.frame: 7 × 2</caption>
-<thead>
-	<tr><th scope=col>Main Ref.</th><th scope=col></th></tr>
-	<tr><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th></tr>
-</thead>
-<tbody>
-	<tr><td>Place of Development </td><td>      </td></tr>
-	<tr><td>Shape of Egg         </td><td>      </td></tr>
-	<tr><td>Attributes           </td><td>      </td></tr>
-	<tr><td>Color of Eggs        </td><td>      </td></tr>
-	<tr><td>Color of Oil Globule </td><td>      </td></tr>
-	<tr><td>Additional Characters</td><td>      </td></tr>
-	<tr><td>Get Information on   </td><td>Scirus</td></tr>
-</tbody>
-</table>
-
-
-
-Now we can extract information from the table. By using the function `which()` to find the information we are looking for. As we are looking for the shape of the egg, we will pass this value.
-
-
-```{r}
-egg_shape = egg_table[which(egg_table[,1] == "Shape of Egg"),2] # Shape of Egg
+egg_shape <- egg_tab[                     # Accessing rows of egg_tab (remember: df[rows, cols])
+  which(egg_tab[, 1] == "Shape of Egg"),  # Get number of row where "Shape of Egg" appears in the first column
+  2]                                      # Access the second column
 
 egg_shape
-```
 
-
-''
-
-
-In case there is no information about a feature (hence the character is empty). We set the feature as NA.
-
-
-```{r}
 if(egg_shape == "") {egg_shape = "NA"}
-```
-
-By calling the variable _egg_shape_ again we see NA as output which indicates that the field that provides the data about the shape of an egg is empty.
-
-
-```{r}
 egg_shape
 ```
 
-
-'NA'
-
-
-We have no informations about the shape of the eggs of the <i>Coregonus lavaretus</i>.
-
-Now we can put all the information into a data structure for the <b>Coregonus lavaretus</b>. In order to do that we will use the function `tibble()`.
-
+Now we can put all the information into a data frame for the entry *Coregonus lavaretus* by using the function `tibble()`. Having done this entire data scraping for one species, we can start to automatize the process for multiple species and simply append the data to our data frame.
 
 ```{r}
-data_species <- tibble("Coregonus-lavaretus", max_length, IUCN_status, egg_shape)
-data_species
+species_df <- tibble(Species = "Coregonus-lavaretus", Length = max_length, IUCN = IUCN_sta, Egg = egg_shape)
+species_df
 ```
 
+***
+**Checkpoint**
+Try to create and add a new variable *egg_color* to the data frame and feed it with the respective information from our `egg_table` (follow the same process used for 'egg_shape'). 
 
-<table>
-<caption>A tibble: 1 × 4</caption>
-<thead>
-	<tr><th scope=col>"Coregonus-lavaretus"</th><th scope=col>max_length</th><th scope=col>IUCN_status</th><th scope=col>egg_shape</th></tr>
-	<tr><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th></tr>
-</thead>
-<tbody>
-	<tr><td>Coregonus-lavaretus</td><td>73</td><td>VU</td><td>NA</td></tr>
-</tbody>
-</table>
-
-
-
-
-```{r}
-names(data_species)[1] <- "Species"
-data_species
-```
-
-
-<table>
-<caption>A tibble: 1 × 4</caption>
-<thead>
-	<tr><th scope=col>Species</th><th scope=col>max_length</th><th scope=col>IUCN_status</th><th scope=col>egg_shape</th></tr>
-	<tr><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th></tr>
-</thead>
-<tbody>
-	<tr><td>Coregonus-lavaretus</td><td>73</td><td>VU</td><td>NA</td></tr>
-</tbody>
-</table>
-
-
-
-In this way, we can now fetch the data about other species by repeating the same process and adding it to our _data_species_ tibble. 
-
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-    <b>Checkpoint</b><br/>
-
-Now your task is to create a new variable _'egg_color'_ and fetch its data and add it to the table (follow the same process used for 'egg_shape'). 
-</div>
-
-
-```{r}
+```{r, eval = FALSE}
 # your code 
 ```
 
-
+**Solution**
 ```{r}
-### Solution
-
-# extract the info
-egg_color = egg_table[which(egg_table[,1] == "Color of Eggs"),2]
-
-# set no information to NA
-if(egg_color == "") {egg_color = "NA"}
-data_species <- tibble("Coregonus-lavaretus", max_length, IUCN_status, egg_shape, egg_color)
-data_species
+egg_color = egg_tab[which(egg_tab[, 1] == "Color of Eggs"), 2]  # extract information
+if(egg_color == ""){egg_color = "NA"}                           # set missing information to NA
+species_df <- tibble(species_df, Color = egg_color)             # Add new variable to data frane
+species_df
 
 ```
 
+***
+### The Fishbase Package
+#### Using an API {-}
 
-<table>
-<caption>A tibble: 1 × 5</caption>
-<thead>
-	<tr><th scope=col>"Coregonus-lavaretus"</th><th scope=col>max_length</th><th scope=col>IUCN_status</th><th scope=col>egg_shape</th><th scope=col>egg_color</th></tr>
-	<tr><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th></tr>
-</thead>
-<tbody>
-	<tr><td>Coregonus-lavaretus</td><td>73</td><td>VU</td><td>NA</td><td>NA</td></tr>
-</tbody>
-</table>
-
-
-
----
-
-### 3.7 R interface to FishBase
-
-In this subsection, we want to get data using an API. We use the R package `rfishbase` to get data from https://www.fishbase.de. The package `rfishbase` makes it relatively easy to look up for information on the most well-known fish species. As we saw in the previous sections, web scraping can be tedious. The `rfishbase` package simplifies the data extraction process but also has some limits as we will see later in the section.
-
-Now we can get information on *Coregonus lavaretus* with this new package. 
-
+ As we saw in the previous sections, web scraping can be tedious. In this subsection, we want to get data using an API which is a much easier way. We use the R package `rfishbase` to get data from [https://www.fishbase.de](https://www.fishbase.de). This package makes it very easy to look up for information on the most well-known fish species. It simplifies the data extraction process but also has some limits as we will see below. You ca have a look at the functions built into `rfishbase` by typing `help(package = "rfishbase")` into your RStudio console or have a look at the [RDocumentation](https://www.rdocumentation.org/packages/rfishbase/versions/3.0.4). Most functions have straight forward names and have a sring as input which holds the Latin name of the wanted fish species.
+ 
+Let us get some information on *Coregonus lavaretus* with this new package! We see that the super short code `species("Coregonus lavaretus")`provides us with 101 variables with entries for our fish species - think about the hand-written web scraping code this would require! To directly asses the maximal length of the species, we can directly use the `$` notation. As you might recall, this is the same length as we got above.
 
 ```{r}
-suppressWarnings(suppressMessages(
-data_CL<- species("Coregonus lavaretus") 
-))  
-data_CL
+CL <- species("Coregonus lavaretus")
+CL$Length
 ```
 
-
-<table>
-<caption>A tibble: 1 × 100</caption>
-<thead>
-	<tr><th scope=col>SpecCode</th><th scope=col>Species</th><th scope=col>SpeciesRefNo</th><th scope=col>Author</th><th scope=col>FBname</th><th scope=col>PicPreferredName</th><th scope=col>PicPreferredNameM</th><th scope=col>PicPreferredNameF</th><th scope=col>PicPreferredNameJ</th><th scope=col>FamCode</th><th scope=col>⋯</th><th scope=col>Profile</th><th scope=col>PD50</th><th scope=col>Emblematic</th><th scope=col>Entered</th><th scope=col>DateEntered</th><th scope=col>Modified</th><th scope=col>DateModified</th><th scope=col>Expert</th><th scope=col>DateChecked</th><th scope=col>TS</th></tr>
-	<tr><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>⋯</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dttm&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dttm&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dttm&gt;</th><th scope=col>&lt;lgl&gt;</th></tr>
-</thead>
-<tbody>
-	<tr><td>232</td><td>Coregonus lavaretus</td><td>5204</td><td>(Linnaeus, 1758)</td><td>European whitefish</td><td>Colav_u4.jpg</td><td>NA</td><td>NA</td><td>NA</td><td>76</td><td>⋯</td><td>NA</td><td>0.5</td><td>0</td><td>2</td><td>1990-10-17</td><td>393</td><td>2017-03-06</td><td>1</td><td>1994-03-08</td><td>NA</td></tr>
-</tbody>
-</table>
-
-
-
-We will start by getting the maximal length of the species. We'll use the function `species()` to do this. In order to do that we look for the column _'Length'_ in the data.
-
-
-```{r}
-length_max_CL <- species("Coregonus lavaretus", fields=c("Length"))
-length_max_CL <- length_max_CL$Length
-length_max_CL
-```
-
-
-73
-
-
-As you might recall, this is the same value we got in section 3.4.
-
-In the next step we are interested to get the information about the diet of *Coregonus lavaretus*. To get the diet information, we will use the function `diet_items()`. The function `diet_items()` allows us to access the table on the food items of the chosen species.
-
+In the next step we are interested to get information about the diet of *Coregonus lavaretus* by using the function `diet_items()`. It allows us to access the table on the food items of the chosen species. To extract information on food, we can save the diet items in a table and use the tidyverse notation plus the respective variables *FoodI*, *FoodII*:
 
 ```{r}
 food <- diet_items("Coregonus lavaretus")
-head(food)
+food %>% select(FoodI, FoodII) %>% head()
 ```
+***
+**Checkpoint**
+Now your next task is to get information on predators (hint: the function is exactly named like that).
 
-
-<table>
-<caption>A tibble: 6 × 15</caption>
-<thead>
-	<tr><th scope=col>autoctr</th><th scope=col>DietCode</th><th scope=col>FoodI</th><th scope=col>FoodII</th><th scope=col>FoodIII</th><th scope=col>Stage</th><th scope=col>DietPercent</th><th scope=col>ItemName</th><th scope=col>Comment</th><th scope=col>DietSpeccode</th><th scope=col>DietSpeccodeSLB</th><th scope=col>AlphaCode</th><th scope=col>PreyTroph</th><th scope=col>PreySeTroph</th><th scope=col>PreyRemark</th></tr>
-	<tr><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;lgl&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;lgl&gt;</th></tr>
-</thead>
-<tbody>
-	<tr><td>122522</td><td>1</td><td>zoobenthos</td><td>mollusks     </td><td>bivalves      </td><td>n.a./others</td><td> 1.0</td><td>gastropods         </td><td>0.8% bivalves/gastropods incl.  0.1% euphausiids, 0.1% unid. organisms                                                                                                              </td><td> NA</td><td>NA</td><td>GAS</td><td>NA</td><td>NA</td><td>NA</td></tr>
-	<tr><td>101628</td><td>1</td><td><span style=white-space:pre-wrap>nekton    </span></td><td><span style=white-space:pre-wrap>finfish      </span></td><td><span style=white-space:pre-wrap>bony fish     </span></td><td>juv./adults</td><td>18.1</td><td>Trisopterus minutus</td><td>1% &lt;i&gt;Rhinonemus minutus&lt;/i&gt;,4.1% &lt;i&gt;Trisopterus minutus&lt;/i&gt;, 0.2% Gobiidae, 3.3% &lt;i&gt;Trisopterus esmarkii&lt;/i&gt;,0.8% &lt;i&gt;Lumpenus&lt;/i&gt;,1.3% &lt;i&gt;Scyliorhinus canicula&lt;/i&gt;,7.4% unid. Fish</td><td>481</td><td>NA</td><td>POD</td><td>NA</td><td>NA</td><td>NA</td></tr>
-	<tr><td>107359</td><td>1</td><td>zoobenthos</td><td>benth. crust.</td><td>lobsters      </td><td>juv./adults</td><td>12.6</td><td>Galatheidae        </td><td>Galatheidae                                                                                                                                                                         </td><td> NA</td><td>NA</td><td>LOQ</td><td>NA</td><td>NA</td><td>NA</td></tr>
-	<tr><td>119985</td><td>1</td><td>zoobenthos</td><td>worms        </td><td>polychaetes   </td><td>juv./adults</td><td> 2.3</td><td>polychaetes        </td><td>NA                                                                                                                                                                                  </td><td> NA</td><td>NA</td><td>WOR</td><td>NA</td><td>NA</td><td>NA</td></tr>
-	<tr><td>116667</td><td>1</td><td>zoobenthos</td><td>benth. crust.</td><td>shrimps/prawns</td><td>juv./adults</td><td> 5.0</td><td>Pandalidae         </td><td>Pandalidae                                                                                                                                                                          </td><td> NA</td><td>NA</td><td>PDZ</td><td>NA</td><td>NA</td><td>NA</td></tr>
-	<tr><td>112452</td><td>1</td><td>zoobenthos</td><td>benth. crust.</td><td>shrimps/prawns</td><td>juv./adults</td><td> 5.3</td><td><span style=white-space:pre-wrap>Macropipus         </span></td><td><span style=white-space:pre-wrap>0.5% &lt;i&gt;Crangon&lt;/i&gt;,    0.5% &lt;i&gt;Processa&lt;/i&gt;,    2.3% &lt;i&gt;Macropipus&lt;/i&gt;,    0.7% Majidae, 0.1% Paguridae                                                                            </span></td><td> NA</td><td>NA</td><td>NA </td><td>NA</td><td>NA</td><td>NA</td></tr>
-</tbody>
-</table>
-
-
-
-From the table food we can exract the column named _'FoodII'_. As you already know, the simplest way to extract a column from a table is to use the `$` operator between the table name and column name respectively.
-
-
-
-```{r}
-food_II <- food$FoodII
-```
-
-We can now extract the first and second elements of the column _'food_II'_ to get a short overview of the diet of *Coregonus lavaretus*.
-
-
-```{r}
-food_II[1]
-food_II[2]
-```
-
-
-'mollusks'
-
-
-
-'finfish'
-
-
-As an output we get 'mollusks'and 'finfish'.
-
-In the same way, can get the information about the predators. 
-
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-    <b>Checkpoint</b><br/>
-     Now your next task is to get the information about predators. In order to obtain the information you can simply use the function 'predators()'. 
-</div>
-
-
-```{r}
+```{r, eval = FALSE}
 # your code
 ```
 
-
-```{r}
-### Solution
-
+**Solution**
+```{r, eval}
 # use function 'predators()' for Coregonus lavaretus
-pred <- predators("Coregonus lavaretus")
-
-# you can look at the column 'PredatorName' to get the names of the predators
-pred_name <- pred$PredatorName
-pred_name
+pre <- predators("Coregonus lavaretus")
+pre %>% select(PredatorName) %>% head()
 ```
 
+***
 
-<style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>'Coregonus peled'</li><li>'Esox lucius'</li><li>'Sander lucioperca'</li><li>'Lampetra fluviatilis'</li><li>'Salmo trutta trutta'</li><li>'Coregonus lavaretus'</li><li>'Phryganea sp.'</li></ol>
+#### Limits of APIs {-}
 
+One of the major limitations of an API is that we can only use already implemented functions. For example, in our case, we cannot get the IUCN Status of a given species because it is not built into `rfishbase`. In order to obtain the IUCN Status we must use another API, namely the package `rredlist`. Unfortunately, to have access to the *rredlist* API we need an authentication key which we only get for a small fee. As it is with other things in life, either you try to put in the work yourself or you can pay someone to do so (except for the amazing open source community).
 
+### Summary
 
-So we obtained list of predators of *Coregonus lavaretus*.
-For other functions in the R package `rfishbase` check https://cran.r-project.org/web/packages/rfishbase/rfishbase.pdf. 
-
-**Limits of API:** One of the major limitations of an API is that we can only use already implemented functions. For example, in our case, we cannot get the IUCN Status of a given species. In order to obtain the IUCN Status we must use another API, namely the package `rredlist`. But to have access to the _rredlist_ API we need a key (a key serves as an authentication barrier to have access to the API and often comes as a paid service). Hence, we will not do that in this exercise.
-
-
----
-
-### 3.8 Summary
-
-<div style="border: 2px black solid; border-radius: 7px; padding:10px">
-    
 - In this third section we learned how to extract data from a website. 
-    
 - We saw that this can be done either with web scraping or using APIs. 
-    
-- We saw that web scraping can be tedious, but on the other hand we also saw some limitations of APIs.
-</div>
+- We saw that web scraping can be tedious, but we learned about some limitations of APIs.
 
-Next, we look at another case study on species richness and red list species proportions.
+***
+## Case Study: Species Richness and Red List species proportions
 
----
+*Please note that the code below is written in base R and not tidyverse which makes the codes a bit more difficult to read. But do not worry about this and simply just enjoy the beauty of what R is capable of.*
 
-## 4. Case Study: Species richness and Red List species proportions
+Next, we look at another case study on species richness and red list species proportions. To proceed with the case study we need to prepare our dataset. First, we need to get a list of species for the dataset. In this subsection we will see how to get all the species in a given family.
 
-To proceed with the case study we need to prepare our dataset. First, we need to get a list of species for the dataset. In this subsection we will see how to get all the species in a given family.
+***
+### Creating List of Species
 
----
-
-### 4.1 Getting all the species in a family 
-
-In this section, we want to get all the species of the family of **Salmonidae**. As before for flexibility reasons, we will create an object _y_ with the name of the family and use `paste()` to get the link.
-
+In this section, we want to get all the species of the family of *Salmonidae*. As we did above, for flexibility we will create an object _x_ with the name of the family and use `paste()` to get the link.
+We then use `getURLContent()` to get the content of the link `url` and save it in `con_sal`.
 
 ```{r}
-y <- "Salmonidae"
-  
-url2<-paste("http://www.fishbase.org/Nomenclature/FamilySearchList.php?Family=", y,sep="") 
+x <- "Salmonidae"
+url <- paste("http://www.fishbase.de/Nomenclature/FamilySearchList.php?Family=", x, sep="") 
+con_sal <- getURLContent(url, followlocation = TRUE) 
 ```
 
-We then use `getURLContent()` to get the content of the link _url2_ and save it in the variable _Content_Sal_.
-
-
-```{r}
-Content_Sal <- getURLContent(url2, followlocation=TRUE) 
-```
-
-Next we create a dataframe using `data.frame()` and get a list of variables. We will extract the variables with the same number of rows and unique row names. The function `readHTMLTable()` (from earlier) helps to extract data from HTML tables in an HTML document.
-
-
+Next we create a dataframe using `data.frame()` and get a list of variables. We will extract the variables with the same number of rows and unique row names. The function `readHTMLTable()` (from earlier) helps to extract data from HTML tables in an HTML document. Then we can extract the species from the given family with `as.character()`. We use `z[,1]` to get the first column which is the column with the scientific names of species. Now we can print the first element of the column with the scientific names.
 
 ```{r}
-z <- data.frame(readHTMLTable(Content_Sal))
-```
-
-Then we can extract the species from the given family with `as.character()`. We use `z[,1]` to get the first column which is the column with the scientific names of species. 
-
-
-```{r}
-sp_per_family <- as.character(z[,1])
-```
-
-Now we can print the first element of the column with the scientific names.
-
-
-```{r}
+df <- data.frame(readHTMLTable(con_sal))
+sp_per_family <- as.character(df[,1])
 sp_per_family[1]
 ```
 
-
-'Brachymystax lenok'
-
-
-Using `str_replace()` function we can substitute the empty space between the Genus and the Species with a `"-"`.
-
+Using `str_replace()` function we can substitute the empty space between the Genus and the Species with a `"-"`. Finally we can print the first element of _sp_per_family_ again.
 
 ```{r}
 sp_per_family <- str_replace(sp_per_family, " ", "-")
-```
-
-Finally we can print the first element of _sp_per_family_ again.
-
-
-```{r}
 sp_per_family[1]
 ```
 
+***
+### Extracting IUCN Status for all species
+
+In this section, we are going to get the IUCN Status for a given List of species using a 'for loop'. We will extract the IUCN Status of all the species from the Netherlands.
+First, we are going to upload the dataset containing the list of the species and some other data that is going to be useful for the next sections. We will do that by using the function `read_csv()`. This data is taken from this [nature article](https://www.nature.com/articles/sdata2017141) by cropping it to Western Europe. As we only need data related to Netherlands, we will use the function `grep()` and pass _Netherlands_ as an argument.
+
+```{r message=FALSE, warning=FALSE}
+dataset <- read_csv("./data/dataset2.csv")
+subset <- dataset[grep("Netherlands", dataset$Country),]
+```
+
+Let us first briefly discuss how to construct a 'for loop', since it's been a while since you used it in previous chapters. To get the IUCN Status of a list of species we always change the value of *x* (the species) and run the code, but if we have to do that for many species it will be very long and tedious. In this case 'for loops' come in handy. In a 'for loop' the variable *x* runs over the vector (here each species) and returns the IUCN Status. Before getting the IUCN status we will go over an easy example, such as printing the integers from 1 to 10 using a 'for loop'. In this case, we iterate over the vector 1:10. 
+
+```{r}
+for(j in 1:10) {
+print(j) # this prints the value of j for that given loop
+}
+```
+
+Now we can make a 'for loop' in order to get the IUCN status of all the species in the above subset (Netherlands) of the initial dataset. We are going to iterate over the column of the dataset with the valid FishBase species names. The code lines inside the loop are exactly a copy-paste of what we had for the *Coregonus lavaretus*, but in this case, we have to look for other species. In the last line of the code below, we created a new column in the data frame *subset* in order to save the IUCN Status. The 'i' in `subset$IUCN[i]` is used to save the IUCN status of the species we are iterating over in the 'for loop'. It will save the results of the species one by one. 
+
+```{r message=FALSE, warning=FALSE}
+i <- 0
+for(x in subset$X6.Fishbase.Valid.Species.Name) {
+  i <- i + 1
+  
+  url <- paste("http://www.fishbase.de/summary/",x,".html",sep="")       # we call the url
+  fish_species <- htmlParse(getURLContent(url, followlocation=TRUE))     # get the content
+  fish_species_div <-getNodeSet(fish_species, "//div ")                  # get the nodes with species
+  w_IUCN  <- which(sapply(lapply(fish_species_div,xmlValue),function(x)  # look for the IUCN pattern 
+    {regexec(pattern="IUCN", x)[[1]][1]})>0)
+  
+  if(length(w_IUCN)==0){                                                 # NA if no IUCN status
+    IUCN_status="NA"
+} else {                                                                 # else access information
+    d1_IUCN  <- xmlValue(fish_species_div[[w_IUCN[length(w_IUCN)]]])
+    IUCN <- unlist(regmatches(d1_IUCN,gregexpr(pattern= "[[:alpha:]]+)",     
+    d1_IUCN)))
+    IUCN_status <- sub(pattern="[[:punct:]]",replacement="",IUCN[1] ) 
+}
+  
+print(IUCN_status)
+subset$IUCN[i] <- IUCN_status # make a new column in 'subset' containing the IUCN status
+}
+
+```
+
+We can see which IUCN statuses are present in Netherlands by using the `unique()` function. There are LC for least concern, VU for vulnerable and of course NA for unknown values.
+
+```{r}
+unique(subset$IUCN)
+```
+
+***
+### Proportion of species in Netherlands
+
+We will now plot the proportion of species in each category for the Netherlands. So let us calculate the number of species in each category (from above we just have 2 outputs,* *LC* & *NT*). In general in other countries, we also have other IUCN Status, for example, VU. In this section, we will focus only on the two listed statuses. Using the function `length()` we can obtain the number of species in each category.
+
+```{r}
+number_lc <- length(which(subset$IUCN == "LC"))
+number_vu <- length(which(subset$IUCN == "VU"))
+number_na <- length(which(is.na(subset$IUCN)))
+
+# print the values for NT, VU and NA
+paste0("LC:", " ", number_lc)
+paste0("VU:", " ", number_vu)
+paste0("NA:", " ", number_na)
+```
+
+We are ready to plot this as pie chart.
+
+
+```{r}
+slices <- c(number_lc, number_vu, number_na)
+lbls <- c("LC","NT", "NA")
+pie(slices, labels = lbls, font.main = 1, 
+main = "Proportion of species per IUCN Status in Netherlands", col=c("red", "yellow", "grey")) 
+```
+***
+### Cleaning data with IUCN Status
+
+In this part of the tutorial, we have to clean the data that we will use for the correlations. We have provided the dataset already with the IUCN status since the code needs a lot of time to run, but the procedure is exactly the same as we did in the previous sections. So, let us load the dataset, it's called *datasetIUCN*.
+
+In the previous sections, we saw that for some species we did not have information on the IUCN status. In these cases, we set the IUCN status as NA. We can check for possible NA values by calling the `unique()` function. 
+
+
+```{r, message=FALSE, warning=FALSE}
+dataset_IUCN <- read_csv("./data/datasetIUCN.csv")
+unique(dataset_IUCN$IUCN)
+```
+
+**Checkpoint**
+Now your task is to remove the row with the IUCN status as NA. You can use the function `subset()` to get the subset of the dataset with information about the IUCN status.
+
+```{r, eval = FALSE}
+# your code
+```
+
+**Solution**
+```{r}
+# subset the data without NAs (!=NA; not equal to NA), so this effectively removes NAs
+dataset_IUCN_NA <- subset(dataset_IUCN, dataset_IUCN$IUCN != "NA")
+
+# check if it worked
+unique(dataset_IUCN_NA$IUCN)
+```
+Next, we will load the shapefile of glacial basins using the package `rgdal` and the function `readOGR()`. We fetch the data from different fish basins across Europe in the `basin_shapefile` from the data stored in the basins folder. In order to plot the basins on the map we will use `fortify()` function on the `basin_shapefile`. This function helps to convert a lines-and-points object into a data frame for ggplot. We will store this dataframe as `fort_basin`.
+
+```{r message=FALSE, warning=FALSE}
+basin_shapefile <- readOGR("./data/basins")
+fort_basin <- fortify(basin_shapefile)
+head(fort_basin)
+```
 
-'Brachymystax-lenok'
+We can visualise our `basin_shapefile` using `ggplot()`.
 
 
----
+```{r, eval = FALSE}
+ggplot() + geom_polygon(data = fort_basin, aes(x = long, y = lat, group = group), colour = "black", fill = NA)
+```
 
-<!-- ### 4.2 Getting the IUCN Status of a list of species -->
+```{r europe,echo=FALSE, fig.cap='Plot of `fort_basin`.'}
+knitr::include_graphics(rep("./figures/output_186_0.png"))
+```
 
-<!-- In this section, we are going to get the IUCN Status for a given List of species using a 'for loop'. We will extract the IUCN Status of all the species from the Netherlands. -->
-<!-- First, we are going to upload the dataset containing the list of the species and some other data that is going to be useful for the next sections. We will do that by using the function `read_csv()`. This data came from https://www.nature.com/articles/sdata2017141 by cropping it to Western Europe. -->
+***
+### Maps of species richness and Red List species proportions
+#### Preparing data {-}
 
+We now want to map the species richness and Red List species proportions. Let us first calculate the species richness and proportion of Red List species per basin. Species richness is the number of species pro basin and the proportion of red list species is the ratio between the number of species in the red list and the number of species pro basin. We will iterate over the vector with the basin names and we will use the function `nrow()` to find the number of occurrences.  
 
-<!-- ```{r} -->
-<!-- suppressWarnings(suppressMessages( -->
-<!-- dataset <- read_csv("../data/dataset2.csv"))) -->
-<!-- ``` -->
 
-<!-- As we only need data related to Netherlands, we will use the function `grep()` and pass _Netherlands_ as an argument. -->
+```{r}
+for (x in as.character(basin_shapefile$BasinName)) {
+    
+  # we now restrict to dataset to the basin x
+  dataset_basins <- dataset_IUCN[dataset_IUCN$X1.Basin.Name==x,]
+    
+  # number of species in the given country x
+  n1 <- nrow(dataset_basins)
+    
+  # we now restrict to dataset to the country x and Red List
+  dataset_c_IUCN <- dataset_basins[grep("VU|EN|EX|EW|CR", dataset_basins$IUCN),] 
+    
+  # number of species in the given country x with given IUCN Status
+  n2 <- nrow(dataset_c_IUCN)
+    
+  # compute the proportion 
+  basin_shapefile$proportion[basin_shapefile$BasinName==x] <- n2/n1
+  basin_shapefile$richness[basin_shapefile$BasinName==x] <- n1  
+}
+```
 
+We can see the newly computed data for the columns *'proportion'* and *'richness'* with respect to each basin in the `basin_shapefile`. 
 
-<!-- ```{r} -->
-<!-- subset <- dataset[grep("Netherlands", dataset$Country),] -->
+```{r}
+head(basin_shapefile@data)
+```
+Next we get the map of Europe. We will read the data in `continent_shapefile` and then will extract the continent 'Europe' map. If you call the variable `europe` you will see that the dataframe is empty. This is because it extracts only the map data which we can simply plot by passing the europe as an argument in `plot()` function. We will do it in the upcoming code cells.
 
-<!-- ``` -->
+```{r message=FALSE, warning=FALSE}
+continents <- readOGR('./data/continent_shapefile')
+europe <- continents[continents$CONTINENT == 'Europe',]
+```
 
-<!-- Let's first briefly discuss how to construct a 'for loop', since it's been a while since you used it in previous chapters. To get the IUCN Status of a list of species we always change the value of _x_ (the species) and run the code, but if we have to do that for many species it will be very long and tedious. In this case 'for loops' come in handy. In a 'for loop' the variable _x_ runs over the vector (here each species) and returns the IUCN Status. Before getting the IUCN status let's just go over an easy example, such as printing the integers from 1 to 10 using a 'for loop'. In this case, we iterate over the vector 1:10.  -->
+    Warning message in readOGR("../data/continent_shapefile"):
+    “First layer europe_map read; multiple layers present in
+    /work/04_data_scraping/data/continent_shapefile, check layers with ogrListLayers()”
 
 
-<!-- ```{r} -->
-<!-- for(j in 1:10) { -->
-<!-- print(j) # this prints the value of j for that given loop -->
-<!-- } -->
-<!-- ``` -->
+    OGR data source with driver: ESRI Shapefile 
+    Source: "/work/04_data_scraping/data/continent_shapefile", layer: "europe_map"
+    with 53 features
+    It has 94 fields
 
-<!--     [1] 1 -->
-<!--     [1] 2 -->
-<!--     [1] 3 -->
-<!--     [1] 4 -->
-<!--     [1] 5 -->
-<!--     [1] 6 -->
-<!--     [1] 7 -->
-<!--     [1] 8 -->
-<!--     [1] 9 -->
-<!--     [1] 10 -->
+#### Plotting data {-}
 
+So now let us plot the proportions of Red List species. First, we will create a new column _'proportion_colour'_ and in this column, we will store the colours. Then we will break the proportions into 10 different parts by grouping the values in the proportion column into 10 using the `cut()` function. Then we get rid of the index vector using `as.numeric()` and get all the values as numeric values. We used the `rev()` function to reverse the colours, red colour indicates the species that are getting distinct and have very less proportion pro basin and yellow indicates the species with comparatively more proportion in the basin. Finally, we store these colours to the column proportion_colour. The colour indicates the proportion of Red List species occurring in the corresponding basin. We do the same for the species richness.
 
-<!-- Now we can make a 'for loop' in order to get the IUCN status of all the species in the above subset (Netherlands) of the initial dataset. We are going to iterate over the column of the dataset with the valid FishBase species names. The code lines inside the loop are exactly a copy-paste of what we had for the *Coregonus lavaretus*, but in this case, we have to look for other species. In the last line of the code below, we created a new column in the data frame _subset_ in order to save the IUCN Status. The 'i' in `subset$IUCN[i]` is used to save the IUCN status of the species we are iterating over in the 'for loop'. It will save the results of the species one by one.  -->
+```{r}
+basin_shapefile$proportion_colour <- rev(heat.colors(11))[as.numeric(cut(basin_shapefile$proportion, breaks = 10))]
+```
 
+Now we create a new column in the _fort_basin_ dataframe and map the values of _'proportion_colour'_ into the new color column. We are doing this to have the colour (species proportion divided into 10 parts) and lat-long values in one datframe which helps to plot the graph using `ggplot()`. Remember, above we extracted the continent *'europe'* from the `continent_shapefile`, here we will use `fortiy()` on the europe dataset to plot it. In detail, we will plot the `fort_europe` and `fort_basin` data on the map.
 
-<!-- ```{r} -->
-<!-- i <- 0 -->
-<!-- for (x in subset$X6.Fishbase.Valid.Species.Name) { -->
-<!-- i <- i + 1 -->
-<!-- url3 <- paste("http://www.fishbase.de/summary/",x,".html",sep="")                 # we call the url -->
-<!-- fish_species <- htmlParse(getURLContent(url3, followlocation=TRUE))              # get the content -->
-<!-- fish_species_div <-getNodeSet(fish_species, "//div ")                            # get the node with the fish species (the nodeSet gets all the values inside the //div tag) -->
-<!-- w_IUCN  <-which(sapply(lapply(fish_species_div,xmlValue),function(x)            # look for the IUCN content -->
-<!--   {regexec(pattern="IUCN", x)[[1]][1]})>0) -->
-<!-- if(length(w_IUCN)==0){                                                        # here we assign NA if the fileds are empty -->
-<!--   IUCN_status="NA" -->
-<!-- } else {                                                                     # else we read the information and iterate over the fields -->
-<!--   d1_IUCN  <- xmlValue(fish_species_div[[w_IUCN[length(w_IUCN)]]]) -->
-<!--   IUCN <- unlist(regmatches(d1_IUCN,gregexpr(pattern= "[[:alpha:]]+)",      -->
-<!--   d1_IUCN))) -->
-<!--   IUCN_status <- sub(pattern="[[:punct:]]",replacement="",IUCN[1] )  -->
-<!-- }  -->
-<!-- print(IUCN_status) -->
-<!-- subset$IUCN[i] <- IUCN_status # make a new column in 'subset' containing the IUCN status -->
-<!-- } -->
+```{r, eval = FALSE, message=FALSE, warning=FALSE}
+fort_basin$color <- fort_basin$id   # create a new column color
 
-<!-- ``` -->
+for (i in as.numeric(unique(fort_basin$id))){   # map the values into color column by id
+   fort_basin$color[fort_basin$id == i] <- basin_shapefile@data$proportion_colour[i+1]
+}
 
-<!--     [1] "LC" -->
+fort_europe <- fortify(europe)
+```
 
+```{r, eval = FALSE}
+ggplot(fort_basin, aes(x = long, y = lat, group = group)) +
+  geom_polygon(data = fort_europe, aes(x = long, y = lat, group = group), colour = 'white') +
+  geom_polygon(fill = fort_basin$color, colour = "black")+
+  xlim(-25, 28)
+```
 
-<!--     Warning message: -->
-<!--     “Unknown or uninitialised column: `IUCN`.” -->
+```{r europe2,echo=FALSE, fig.cap='Proportions of Red List species in Europe.'}
+knitr::include_graphics(rep("./figures/output_201_0.png"))
+```
 
+From the Figure \@ref(fig:europe2), we see that the proportion of Red List species is highest in South-Western Europe. The aim of the Red List is to inform decision-makers about potentially endangered species, i.e. species whose population size has been rapidly declining during the last decades or the species that only occur in small numbers at present. The proportion of species on the Red List of each region, therefore, gives an indication of the risk of species going extinct in a region and represents an important tool for conservation strategies.
 
-<!--     [1] "LC" -->
-<!--     [1] "LC" -->
-<!--     [1] "LC" -->
-<!--     [1] "LC" -->
-<!--     [1] "LC" -->
-<!--     [1] "NT" -->
-<!--     [1] NA -->
-<!--     [1] NA -->
+#### Repeat for mapping species richness {-}
 
+We will repeat the above steps all together for plotting the species richness on map.
 
-<!-- We can see which IUCN statuses are present in Netherlands by using the `unique()` function. -->
+```{r, eval = FALSE}
+# break the richness  of the species into 10 parts and then we assign colors to each part 
+basin_shapefile$richness_colour <- rev(heat.colors(11))[as.numeric(cut(basin_shapefile$richness, breaks = 10))]
 
+fort_basin$rich_color <- fort_basin$id    # create a new column rich_color
 
-<!-- ```{r} -->
-<!-- unique(subset$IUCN) -->
-<!-- ``` -->
+# mapping the values from basin_shapefile to fort_basin
 
+for (i in as.numeric(unique(fort_basin$id))) 
+{
+   fort_basin$rich_color[fort_basin$id == i] <- basin_shapefile@data$richness_colour[i+1]
+}
 
-<!-- <style> -->
-<!-- .list-inline {list-style: none; margin:0; padding: 0} -->
-<!-- .list-inline>li {display: inline-block} -->
-<!-- .list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex} -->
-<!-- </style> -->
-<!-- <ol class=list-inline><li>'LC'</li><li>'NT'</li><li>NA</li></ol> -->
+# plot
+ggplot(fort_basin, aes(x = long, y = lat, group = group)) +
+  geom_polygon(data = fort_europe, aes(x = long, y = lat, group = group), colour = 'white') +
+  geom_polygon(fill = fort_basin$rich_color, colour = "black")+
+  xlim(-25, 28)
+```
 
+```{r europe3,echo=FALSE, fig.cap='Species richness in Europe.'}
+knitr::include_graphics(rep("./figures/output_204_0.png"))
+```
 
+### Relation of basin size and species richness
 
-<!-- --- -->
+In the previous section, you observed the spatial patterns of fish diversity across Europe. In this section, we will try to explain these patterns. To achieve this, we will correlate the fish species richness of each basin to the surface area of the corresponding area to see how the species richness varies with respect to the surface area of the basin. We begin with plotting a simple scatterplot. We will log transform the data we have on surface area as it helps to make data conform to normality and also helps to deal with the outliers and skeweness in the data. Then we will plot this data against species richness. Since the data-deficient basins show zero observations in the dataframe, we will remove those first. 
 
-<!-- ### 4.3 Proportion of species in Netherlands -->
+Now we will create a new dataframe with the _surface area_ and _richness_. We'll rename the columns as _'Basin_area'_ and _'Species_richness'_ respectively. We make a simple scatterplot with a regression line to visualise the relationship.
 
-<!-- We will now plot the proportion of species in each category for the Netherlands. So let us calculate the number of species in each category (from above we just have 2 outputs, _LC_ & _NT_). In general in other countries, we also have other IUCN Status, for example, VU. In this section, we will focus only on the two listed statuses. Using the function `length()` we can obtain the number of species in each category. -->
 
+```{r}
+basin_shapefile <- basin_shapefile[basin_shapefile$richness!=0,]
 
-<!-- ```{r} -->
-<!-- number_lc <- length(which(subset$IUCN == "LC")) -->
-<!-- number_nt <- length(which(subset$IUCN == "NT")) -->
+bs_sr <- tibble(basin_shapefile@data$Surf_area, basin_shapefile@data$richness )
+names(bs_sr)[1]<- 'Basin_area'
+names(bs_sr)[2]<- 'Species_richness'
 
-<!-- # print the values for LC, using 'paste0()'' to help visualise the results. -->
-<!-- paste0("LC:", " ", number_lc) -->
+ggplot(bs_sr, aes(x = log(Basin_area), y = Species_richness)) +
+geom_point() +
+geom_smooth(method='lm', color="red", size=0.5, se=FALSE)+
+xlab("Basin Area") +
+ylab("Species Richness") +
+theme_classic()
+```
 
-<!-- # print the values for NT -->
-<!-- paste0("NT:", " ", number_nt) -->
-<!-- ``` -->
+The plot shows a positive correlation between basin area and fish richness, meaning that we expect to see a higher richness in larger basins. This pattern is commonly observed in ecology and one explanation for this is that larger areas provide different habitat types (niches), which allows more species to co-exist.
 
+As a next step, we will create a simple model of this relationship. This allows us to make predictions on the richness of fish species in other basins based on the basin area.
 
-<!-- 'LC: 6' -->
+```{r}
+richness_model <- lm(richness~log(Surf_area), data=basin_shapefile@data) #create a linear model
+```
 
+We now want to calculate the confidence intervals of the model to have a better idea of the uncertainty of the model. We will then coerce the basin surface, the model fit and the confidence interval into a new data frame called *model_df*.
 
+```{r}
+#calculate the confidence intervals
+model_df <- as.data.frame(cbind(log(basin_shapefile$Surf_area), predict(richness_model, interval='confidence')))
+names(model_df)[1] <- 'log_area'
+head(model_df)
+```
+The final step is  to plot the model fit and prediction intervals over the data. To get nice lines in the plot, the *model_df* dataframe needs to be ordered by the basin area first.
 
-<!-- 'NT: 1' -->
+```{r}
+ggplot(bs_sr, aes(x = log(Basin_area), y = Species_richness)) +
+geom_point() +
+geom_line(aes(x = model_df$log_area, y= model_df$fit ), color = "red")+
+geom_line(aes(x = model_df$log_area, y= model_df$lwr ), color = "red", linetype = "dotted")+
+geom_line(aes(x = model_df$log_area, y= model_df$upr ), color = "red", linetype = "dotted")+
+xlab("Basin Area") +
+ylab("Species Richness") +
+theme_classic()
+```
 
+***
+**Checkpoint**
+You have now seen how you can calculate and plot the confidence interval of your data. Based on your model you can also create a so-called **prediction interval** which gives an estimate of the range in which the model will most likely predict the y-values (for a given x-value). In our case the prediction interval would indicate in which range the model would expect the fish richness to be for a given basin surface area. Do you think that these prediction intervals will be broader or narrower than the confidence interval? Try to write the code for calculating and plotting the prediction intervals by yourself.
 
-<!-- We are ready to plot this as pie chart. -->
+```{r, eval = FALSE}
+# your code
+```
 
+**Solution**
+```{r, message=FALSE, warning=FALSE}
+#prediction intervals
 
-<!-- ```{r} -->
-<!-- slices <- c(number_lc, number_nt) -->
-<!-- lbls <- c("LC","NT") -->
-<!-- pie(slices, labels = lbls,font.main = 1,  -->
-<!-- main = "Proportion of species per IUCN Status in Netherlands", col=c("red", "yellow"))  -->
-<!-- ``` -->
+# make a dataframe of area and richness model predictions
+model_df_prediction <- as.data.frame(cbind(log(basin_shapefile$Surf_area), predict(richness_model, interval='prediction')))
+names(model_df_prediction)[1] <- 'log_area' 
 
+# order the basins by size
+model_df_prediction <- model_df_prediction[order(model_df_prediction$log_area),]
 
-<!-- ![png](output_172_0.png) -->
+# plot the model
+plot(log(basin_shapefile$Surf_area), basin_shapefile$richness, pch=16, cex=1, col=rgb(0,0,0,0.6), xlab='Basin area', ylab='Basin species richness')
+lines(model_df_prediction$log_area, model_df_prediction$fit, col='skyblue3', lwd=2)
+lines(model_df_prediction$log_area, model_df_prediction$lwr, col='skyblue2', lwd=2, lty=3)
+lines(model_df_prediction$log_area, model_df_prediction$upr, col='skyblue2', lwd=2, lty=3)
+```
 
+***
 
-<!-- ### 4.4 Cleaning the data with the IUCN Status -->
-
-<!-- In this part of the tutorial, we have to clean the data that we will use for the correlations. We have provided the dataset already with the IUCN status since the code needs a lot of time to run, but the procedure is exactly the same as we did in the previous sections. So, let's load the dataset, it's called _datasetIUCN_. -->
-
-
-<!-- ```{r} -->
-<!-- suppressWarnings(suppressMessages( -->
-<!-- dataset_IUCN <- read_csv("../data/datasetIUCN.csv") -->
-<!-- )) -->
-<!-- ``` -->
-
-<!-- In the previous sections, we saw that for some species we did not have information on the IUCN status. In these cases, we set the IUCN status as NA. We can check for possible NA values by calling the `unique()` function.  -->
-
-
-<!-- ```{r} -->
-<!-- unique(dataset_IUCN$IUCN) -->
-<!-- ``` -->
-
-
-<!-- <style> -->
-<!-- .list-inline {list-style: none; margin:0; padding: 0} -->
-<!-- .list-inline>li {display: inline-block} -->
-<!-- .list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex} -->
-<!-- </style> -->
-<!-- <ol class=list-inline><li>'LC'</li><li>'CR'</li><li>'lc'</li><li>'VU'</li><li>NA</li><li>'EX'</li><li>'NT'</li><li>'DD'</li><li>'EN'</li><li>'EW'</li></ol> -->
-
-
-
-<!-- <div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px"> -->
-<!--     <b>Checkpoint</b><br/> -->
-<!--      Now your task is to remove the row with the IUCN status as NA. You can use the function `subset()` to get the subset of the dataset with information about the IUCN status. -->
-<!-- </div> -->
-
-
-
-
-<!-- ```{r} -->
-<!-- # your code -->
-<!-- ``` -->
-
-
-<!-- ```{r} -->
-<!-- ### Solution -->
-
-<!-- # subset the data without NAs (!=NA; not equal to NA), so this effectively removes the NAs -->
-<!-- dataset_IUCN_NA <- subset(dataset_IUCN, dataset_IUCN$IUCN != "NA") -->
-
-<!-- # check it worked -->
-<!-- unique(dataset_IUCN_NA$IUCN) -->
-<!-- ``` -->
-
-
-<!-- <style> -->
-<!-- .list-inline {list-style: none; margin:0; padding: 0} -->
-<!-- .list-inline>li {display: inline-block} -->
-<!-- .list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex} -->
-<!-- </style> -->
-<!-- <ol class=list-inline><li>'LC'</li><li>'CR'</li><li>'lc'</li><li>'VU'</li><li>'EX'</li><li>'NT'</li><li>'DD'</li><li>'EN'</li><li>'EW'</li></ol> -->
-
-
-
-<!-- Next, we will load the shapefile of glacial basins using the package <b>rgdal</b> and the function `readOGR()`. We fetch the data from different fish basins across Europe in the _basin_shapefile_ from the data stored in the basins folder.  -->
-
-
-<!-- ```{r} -->
-<!-- basin_shapefile <- readOGR("../data/basins") -->
-<!-- ``` -->
-
-<!--     OGR data source with driver: ESRI Shapefile  -->
-<!--     Source: "/work/04_data_scraping/data/basins", layer: "basins_glaciation" -->
-<!--     with 250 features -->
-<!--     It has 11 fields -->
-
-
-<!-- In order to plot the basins on the map we will use `fortify()` function on the _basin_shapefile_. This function helps to convert a lines and points object to a data frame for ggplot. We will store this dataframe as _fort_basin_. -->
-
-
-<!-- ```{r} -->
-<!-- fort_basin <- fortify(basin_shapefile) -->
-<!-- head(fort_basin) -->
-<!-- ``` -->
-
-<!--     Regions defined for each Polygons -->
-
-
-
-
-<!-- <table> -->
-<!-- <caption>A data.frame: 6 × 7</caption> -->
-<!-- <thead> -->
-<!-- 	<tr><th></th><th scope=col>long</th><th scope=col>lat</th><th scope=col>order</th><th scope=col>hole</th><th scope=col>piece</th><th scope=col>id</th><th scope=col>group</th></tr> -->
-<!-- 	<tr><th></th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;int&gt;</th><th scope=col>&lt;lgl&gt;</th><th scope=col>&lt;fct&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;fct&gt;</th></tr> -->
-<!-- </thead> -->
-<!-- <tbody> -->
-<!-- 	<tr><th scope=row>1</th><td>-5.658333</td><td>36.05417</td><td>1</td><td>FALSE</td><td>1</td><td>0</td><td>0.1</td></tr> -->
-<!-- 	<tr><th scope=row>2</th><td>-5.668877</td><td>36.05473</td><td>2</td><td>FALSE</td><td>1</td><td>0</td><td>0.1</td></tr> -->
-<!-- 	<tr><th scope=row>3</th><td>-5.672790</td><td>36.05777</td><td>3</td><td>FALSE</td><td>1</td><td>0</td><td>0.1</td></tr> -->
-<!-- 	<tr><th scope=row>4</th><td>-5.677210</td><td>36.05890</td><td>4</td><td>FALSE</td><td>1</td><td>0</td><td>0.1</td></tr> -->
-<!-- 	<tr><th scope=row>5</th><td>-5.681123</td><td>36.06193</td><td>5</td><td>FALSE</td><td>1</td><td>0</td><td>0.1</td></tr> -->
-<!-- 	<tr><th scope=row>6</th><td>-5.685544</td><td>36.06307</td><td>6</td><td>FALSE</td><td>1</td><td>0</td><td>0.1</td></tr> -->
-<!-- </tbody> -->
-<!-- </table> -->
-
-
-
-<!-- We can visualise our _basin_shapefile_ using `ggplot()`. -->
-
-
-<!-- ```{r} -->
-<!-- ggplot() + geom_polygon(data = fort_basin, aes(x = long, y = lat, group = group), colour = "black", fill = NA) -->
-
-<!-- ``` -->
-
-
-<!-- ![png](output_186_0.png) -->
-
-
-<!-- ### 4.5 Maps of species richness and Red List species proportions -->
-
-<!-- We now want to map the species richness and Red List species proportions. -->
-<!-- Let us first calculate the species richness and proportion of Red List species per basin. Species richness is the number of species pro basin and the proportion of red list species is the ratio between the number of species in the red list and the number of species pro basin. We will iterate over the vector with the basin names and we will use the function `nrow()` to find the number of occurrences.   -->
-
-
-<!-- ```{r} -->
-<!-- for (x in as.character(basin_shapefile$BasinName)) { -->
-
-<!--   # we now restrict to dataset to the basin x -->
-<!--   dataset_basins <- dataset_IUCN[dataset_IUCN$X1.Basin.Name==x,] -->
-
-<!--   # number of species in the given country x -->
-<!--   n1 <- nrow(dataset_basins) -->
-
-<!--   # we now restrict to dataset to the country x and Red List -->
-<!--   dataset_c_IUCN <- dataset_basins[grep("VU|EN|EX|EW|CR", dataset_basins$IUCN),]  -->
-
-<!--   # number of species in the given country x with given IUCN Status -->
-<!--   n2 <- nrow(dataset_c_IUCN) -->
-
-<!--   # compute the proportion  -->
-<!--   basin_shapefile$proportion[basin_shapefile$BasinName==x] <- n2/n1 -->
-<!--   basin_shapefile$richness[basin_shapefile$BasinName==x] <- n1   -->
-<!-- } -->
-<!-- ``` -->
-
-<!-- We can see the newly computed data for the columns _'proportion'_ and _'richness'_ with respect to each basin in the _basin_shapefile_.  -->
-
-
-<!-- ```{r} -->
-<!-- head(basin_shapefile@data) -->
-<!-- ``` -->
-
-
-<!-- <table> -->
-<!-- <caption>A data.frame: 6 × 13</caption> -->
-<!-- <thead> -->
-<!-- 	<tr><th></th><th scope=col>BasinName</th><th scope=col>Country</th><th scope=col>Ecoregion</th><th scope=col>Endorheic</th><th scope=col>Out_Longit</th><th scope=col>Out_Latit</th><th scope=col>Med_Longit</th><th scope=col>Med_Latit</th><th scope=col>Surf_area</th><th scope=col>ice_dist</th><th scope=col>temp</th><th scope=col>proportion</th><th scope=col>richness</th></tr> -->
-<!-- 	<tr><th></th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;int&gt;</th></tr> -->
-<!-- </thead> -->
-<!-- <tbody> -->
-<!-- 	<tr><th scope=row>0</th><td>Valle           </td><td>Spain  </td><td>Palearctic</td><td>NA</td><td> -5.721676</td><td>36.06629</td><td> -5.7671465</td><td>36.11803</td><td>  146.6600</td><td>1592409.4</td><td>18.031604</td><td>0.25000000</td><td> 8</td></tr> -->
-<!-- 	<tr><th scope=row>1</th><td>Laxa.Leirarsveit</td><td>Iceland</td><td>Palearctic</td><td>NA</td><td>-21.874556</td><td>64.39327</td><td>-21.6432853</td><td>64.44753</td><td>  187.1266</td><td> 368687.7</td><td> 2.507056</td><td>       NaN</td><td> 0</td></tr> -->
-<!-- 	<tr><th scope=row>2</th><td>Andakilsa       </td><td>Iceland</td><td>Palearctic</td><td>NA</td><td>-21.781420</td><td>64.54236</td><td>-21.4828095</td><td>64.49633</td><td>  219.6690</td><td> 387360.4</td><td> 3.113605</td><td>       NaN</td><td> 0</td></tr> -->
-<!-- 	<tr><th scope=row>3</th><td>Aa              </td><td>France </td><td>Palearctic</td><td>NA</td><td>  2.098209</td><td>51.01710</td><td>  2.0492197</td><td>50.78136</td><td> 1200.3646</td><td> 261541.3</td><td>10.529269</td><td>0.06666667</td><td>30</td></tr> -->
-<!-- 	<tr><th scope=row>4</th><td>Adour           </td><td>France </td><td>Palearctic</td><td>NA</td><td> -1.498072</td><td>43.53500</td><td> -0.5065982</td><td>43.42947</td><td>16911.1610</td><td> 875198.0</td><td>12.460502</td><td>0.08888889</td><td>45</td></tr> -->
-<!-- 	<tr><th scope=row>5</th><td>Agly            </td><td>France </td><td>Palearctic</td><td>NA</td><td>  3.046515</td><td>42.81225</td><td>  2.6066918</td><td>42.81292</td><td> 1125.2007</td><td>1060457.1</td><td>13.120775</td><td>0.09090909</td><td>22</td></tr> -->
-<!-- </tbody> -->
-<!-- </table> -->
-
-
-
-<!-- Next we get the map of Europe. We will read the data in the _continent_shapefile_ and then will extract the continent 'Europe' map. If you call the variable _europe_, you will see that the dataframe is empty. This is because it extracts only the map data which we can simply plot by passing the europe as an argument in `plot()` function. We will do it in the upcoming code cells. -->
-
-
-<!-- ```{r} -->
-<!-- continents <- readOGR('../data/continent_shapefile') -->
-<!-- europe <- continents[continents$CONTINENT=='Europe',] -->
-<!-- ``` -->
-
-<!--     Warning message in readOGR("../data/continent_shapefile"): -->
-<!--     “First layer europe_map read; multiple layers present in -->
-<!--     /work/04_data_scraping/data/continent_shapefile, check layers with ogrListLayers()” -->
-
-
-<!--     OGR data source with driver: ESRI Shapefile  -->
-<!--     Source: "/work/04_data_scraping/data/continent_shapefile", layer: "europe_map" -->
-<!--     with 53 features -->
-<!--     It has 94 fields -->
-
-
-<!-- **So now let us plot the proportions of Red List species.**  -->
-
-<!-- First, we will create a new column _'proportion_colour'_ and in this column, we will store the colours. Then we will break the proportions into 10 different parts by grouping the values in the proportion column into 10 using the `cut()` function. Then we get rid of the index vector using `as.numeric()` and get all the values as numeric values. We used the `rev()` function to reverse the colours, red colour indicates the species that are getting distinct and have very less proportion pro basin and yellow indicates the species with comparatively more proportion in the basin. Finally, we store these colours to the column proportion_colour. The colour indicates the proportion of Red List species occurring in the corresponding basin. We do the same for the species richness. -->
-
-
-<!-- ```{r} -->
-<!-- basin_shapefile$proportion_colour <- rev(heat.colors(11))[as.numeric(cut(basin_shapefile$proportion, breaks = 10))] -->
-<!-- ``` -->
-
-<!-- Now we create a new column in the _fort_basin_ dataframe and map the values of _'proportion_colour'_ into the new color column. We are doing this to have the colour (species proportion divided into 10 parts) and lat-long values in one datframe which helps to plot the graph using `ggplot()`.  -->
-
-
-<!-- ```{r} -->
-<!-- fort_basin$color <- fort_basin$id    # create a new column color -->
-
-<!-- for (i in as.numeric(unique(fort_basin$id))) # map the values into color column by id -->
-<!-- { -->
-<!--    fort_basin$color[fort_basin$id == i] <- basin_shapefile@data$proportion_colour[i+1] -->
-<!-- } -->
-<!-- ``` -->
-
-<!-- Remember above we extracted the continent _'europe'_ from the _continent_shapefile_, here we will use `fortiy()` on the europe dataset to plot it using ggplot also. -->
-
-
-<!-- ```{r} -->
-<!-- fort_europe <- fortify(europe) -->
-<!-- ``` -->
-
-<!--     Regions defined for each Polygons -->
-
-
-
-<!-- We will plot the _fort_europe_ and _fort_basin_ data on the map. -->
-
-
-<!-- ```{r} -->
-<!-- ggplot(fort_basin, aes(x = long, y = lat, group = group)) + -->
-<!--   geom_polygon(data = fort_europe, aes(x = long, y = lat, group = group), colour = 'white') + -->
-<!--   geom_polygon(fill = fort_basin$color, colour = "black")+ -->
-<!--   xlim(-25, 28) -->
-<!-- ``` -->
-
-
-<!-- ![png](output_201_0.png) -->
-
-
-<!-- From the graph, we see that the proportion of Red List species is highest in South-Western Europe. The aim of the Red List is to inform decision-makers about potentially endangered species, i.e. species whose population size has been rapidly declining during the last decades or the species that only occur in small numbers at present. The proportion of species on the Red List of each region, therefore, gives an indication of the risk of species going extinct in a region and represents an important tool for conservation strategies. -->
-
-<!-- **We will repeat the above steps all together for plotting the species richness on map.** -->
-
-
-<!-- ```{r} -->
-<!-- # break the richness  of the species into 10 parts and then we assign colours to each part  -->
-<!-- basin_shapefile$richness_colour <- rev(heat.colors(11))[as.numeric(cut(basin_shapefile$richness, breaks = 10))] -->
-
-<!-- fort_basin$rich_color <- fort_basin$id    # create a new column rich_color -->
-
-<!-- # mapping the values from basin_shapefile to fort_basin -->
-
-<!-- for (i in as.numeric(unique(fort_basin$id)))  -->
-<!-- { -->
-<!--    fort_basin$rich_color[fort_basin$id == i] <- basin_shapefile@data$richness_colour[i+1] -->
-<!-- } -->
-
-<!-- # plot -->
-
-<!-- ggplot(fort_basin, aes(x = long, y = lat, group = group)) + -->
-<!--   geom_polygon(data = fort_europe, aes(x = long, y = lat, group = group), colour = 'white') + -->
-<!--   geom_polygon(fill = fort_basin$rich_color, colour = "black")+ -->
-<!--   xlim(-25, 28) -->
-<!-- ``` -->
-
-
-<!-- ![png](output_204_0.png) -->
-
-
-<!-- ### 4.6 Investigate the relationship of basin size and species richness -->
-
-<!-- In the previous section, you observed the spatial patterns of fish diversity across Europe. In this section, we will try to explain these patterns. To achieve this, we will correlate the fish species richness of each basin to the surface area of the corresponding area to see how the species richness varies with respect to the surface area of the basin. We begin with plotting a simple scatterplot. We will log transform the data we have on surface area as it helps to make data conform to normality and also helps to deal with the outliers and skeweness in the data. Then we will plot this data against species richness. Since the data-deficient basins show zero observations in the dataframe, we will remove those first.  -->
-
-
-<!-- ```{r} -->
-<!-- basin_shapefile <- basin_shapefile[basin_shapefile$richness!=0,] -->
-<!-- ``` -->
-
-<!-- Now we will create a new dataframe with the _surface area_ and _richness_. We'll the columns as _'Basin_area'_ and _'Species_richness'_ respectively. -->
-
-
-<!-- ```{r} -->
-<!-- bs_sr <- tibble(basin_shapefile@data$Surf_area, basin_shapefile@data$richness ) -->
-<!-- names(bs_sr)[1]<- 'Basin_area' -->
-<!-- names(bs_sr)[2]<- 'Species_richness' -->
-
-
-<!-- ``` -->
-
-<!-- We make a simple scratterplot with a regression line to visualise the relationship. -->
-
-
-<!-- ```{r} -->
-<!-- ggplot(bs_sr, aes(x = log(Basin_area), y = Species_richness)) + -->
-<!-- geom_point() + -->
-<!-- geom_smooth(method='lm', color="red", size=0.5, se=FALSE)+ -->
-<!-- xlab("Basin Area") + -->
-<!-- ylab("Species Richness") + -->
-<!-- theme_classic() -->
-<!-- ``` -->
-
-<!--     `geom_smooth()` using formula 'y ~ x' -->
-
-
-
-
-<!-- ![png](output_211_1.png) -->
-
-
-<!-- The plot shows a positive correlation between basin area and fish richness, meaning that we expect to see a higher richness in larger basins. This pattern is commonly observed in ecology and one explanation for this is that larger areas provide different habitat types (niches), which allows more species to co-exist. -->
-
-<!-- As a next step, we will create a simple model of this relationship. This allows us to make predictions on the richness of fish species in other basins based on the basin area. -->
-
-
-<!-- ```{r} -->
-<!-- #create a linear model -->
-<!-- richness_model <- lm(richness~log(Surf_area), data=basin_shapefile@data) -->
-<!-- ``` -->
-
-<!-- We now want to calculate the confidence intervals of the model to have a better idea of the uncertainty of the model. We will then coerce the basin surface, the model fit and the confidence interval into a new data frame called *model_df*. -->
-
-
-<!-- ```{r} -->
-<!-- #calculate the confidence intervals -->
-<!-- model_df <- as.data.frame(cbind(log(basin_shapefile$Surf_area), predict(richness_model, interval='confidence'))) -->
-<!-- names(model_df)[1] <- 'log_area' -->
-<!-- head(model_df) -->
-<!-- ``` -->
-
-
-<!-- <table> -->
-<!-- <caption>A data.frame: 6 × 4</caption> -->
-<!-- <thead> -->
-<!-- 	<tr><th></th><th scope=col>log_area</th><th scope=col>fit</th><th scope=col>lwr</th><th scope=col>upr</th></tr> -->
-<!-- 	<tr><th></th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr> -->
-<!-- </thead> -->
-<!-- <tbody> -->
-<!-- 	<tr><th scope=row>0</th><td>4.988117</td><td> 7.215144</td><td> 4.416531</td><td>10.01376</td></tr> -->
-<!-- 	<tr><th scope=row>3</th><td>7.090381</td><td>20.001125</td><td>18.488035</td><td>21.51421</td></tr> -->
-<!-- 	<tr><th scope=row>4</th><td>9.735729</td><td>36.090151</td><td>34.001427</td><td>38.17887</td></tr> -->
-<!-- 	<tr><th scope=row>5</th><td>7.025717</td><td>19.607838</td><td>18.069980</td><td>21.14570</td></tr> -->
-<!-- 	<tr><th scope=row>6</th><td>7.492151</td><td>22.444692</td><td>21.046504</td><td>23.84288</td></tr> -->
-<!-- 	<tr><th scope=row>7</th><td>6.602807</td><td>17.035701</td><td>15.301404</td><td>18.77000</td></tr> -->
-<!-- </tbody> -->
-<!-- </table> -->
-
-
-
-<!-- The final step is  to plot the model fit and prediction intervals over the data. To get nice lines in the plot, the *model_df* dataframe needs to be ordered by the basin area first. -->
-
-
-<!-- ```{r} -->
-<!-- ggplot(bs_sr, aes(x = log(Basin_area), y = Species_richness)) + -->
-<!-- geom_point() + -->
-<!-- geom_line(aes(x = model_df$log_area, y= model_df$fit ), color = "red")+ -->
-<!-- geom_line(aes(x = model_df$log_area, y= model_df$lwr ), color = "red", linetype = "dotted")+ -->
-<!-- geom_line(aes(x = model_df$log_area, y= model_df$upr ), color = "red", linetype = "dotted")+ -->
-<!-- xlab("Basin Area") + -->
-<!-- ylab("Species Richness") + -->
-<!-- theme_classic() -->
-<!-- ``` -->
-
-
-<!-- ![png](output_217_0.png) -->
-
-
-<!-- <div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px"> -->
-<!--     <b>Checkpoint</b><br/> -->
-<!--      You have now seen how you can calculate and plot the confidence interval of your data. Based on your model you can also create a so called <b>prediction interval</b> which gives an estimate of the range in which the model will most likely predict the y-values (for a given x-value). In our case the prediction interval would indicate in which range the model would expect the fish richness to be for a given basin surface area. Do you think that these prediction intervals will be broader or narrower than the confidence interval? Try to write the code for calculating and plotting the prediction intervals by yourself. -->
-<!-- </div> -->
-
-
-
-
-<!-- ```{r} -->
-<!-- # your code -->
-<!-- ``` -->
-
-
-<!-- ```{r} -->
-<!-- ### Solution -->
-
-<!-- #prediction intervals -->
-
-<!-- # make a dataframe of area and richness model predictions -->
-<!-- model_df_prediction <- as.data.frame(cbind(log(basin_shapefile$Surf_area), predict(richness_model, interval='prediction'))) -->
-<!-- names(model_df_prediction)[1] <- 'log_area'  -->
-
-<!-- # order the basins by size -->
-<!-- model_df_prediction <- model_df_prediction[order(model_df_prediction$log_area),] -->
-
-<!-- # plot the model -->
-<!-- plot(log(basin_shapefile$Surf_area), basin_shapefile$richness, pch=16, cex=1, col=rgb(0,0,0,0.6), xlab='Basin area', ylab='Basin species richness') -->
-<!-- lines(model_df_prediction$log_area, model_df_prediction$fit, col='skyblue3', lwd=2) -->
-<!-- lines(model_df_prediction$log_area, model_df_prediction$lwr, col='skyblue2', lwd=2, lty=3) -->
-<!-- lines(model_df_prediction$log_area, model_df_prediction$upr, col='skyblue2', lwd=2, lty=3) -->
-
-
-<!-- ``` -->
-
-<!--     Warning message in predict.lm(richness_model, interval = "prediction"): -->
-<!--     “predictions on current data refer to _future_ responses -->
-<!--     ” -->
-
-
-
-<!-- ![png](output_220_1.png) -->
-
-
----
-
-## 5. References
+## References
 
 * Automated Data Collection with R, S. Munzert, C. Rubba, P. Meißner and D. Nyhuis
 * XML and Web Technologies for Data Sciences with R, D. Nolan, D. Temple Lang
@@ -2140,15 +754,13 @@ sp_per_family[1]
 * https://ourcodingclub.github.io/tutorials/webscraping/
 * https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
 
----
 
+***
 ## Exercise
-
 
 For this week's exercise open up the Rstudio environment. Remember to save all your changes to this notebook using git status, git add <filename>, git commit -m "your comment", git push.
     
-Exercise 04 is about getting data from the web and extracting usefull insights from it. 
+Today's exercise is about getting data from the web and extracting useful insights from it. 
     
 Get in touch with your teaching assistant if you have any further questions.
 
----
