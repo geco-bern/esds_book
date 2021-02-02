@@ -1,3 +1,53 @@
+--- 
+title: "Environmental Systems Data Science"
+author: "Loïc Pellissier, Joshua Payne, Benjamin Stocker"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+description: "Text book and exercises. ETH Zürich"
+---
+
+# Prerequisites
+
+Placeholder
+
+
+
+<!--chapter:end:index.Rmd-->
+
+# Primers
+
+You can label chapter and section titles using `{#label}` after them, e.g., we can reference Chapter \@ref(intro). If you do not manually label them, there will be automatic labels anyway, e.g., Chapter \@ref(methods).
+
+Figures and tables with captions will be placed in `figure` and `table` environments, respectively.
+
+```{r nice-fig, fig.cap='Here is a nice figure!', out.width='80%', fig.asp=.75, fig.align='center'}
+par(mar = c(4, 4, .1, .1))
+plot(pressure, type = 'b', pch = 19)
+```
+
+Reference a figure by its code chunk label with the `fig:` prefix, e.g., see Figure \@ref(fig:nice-fig). Similarly, you can reference tables generated from `knitr::kable()`, e.g., see Table \@ref(tab:nice-tab).
+
+```{r nice-tab, tidy=FALSE}
+knitr::kable(
+  head(iris, 20), caption = 'Here is a nice table!',
+  booktabs = TRUE
+)
+```
+
+You can write citations, too. For example, we are using the **bookdown** package [@R-bookdown] in this sample book, which was built on top of R Markdown and **knitr** [@xie2015].
+
+<!--chapter:end:01-primers.Rmd-->
+
+# Data wrangling
+
+TBC
+
+<!--chapter:end:02-data_wrangling.Rmd-->
+
 # Data variety
 
 ## Introduction
@@ -1266,3 +1316,125 @@ points(df_sp_sites$lon, df_sp_sites$lat, col=datColleaves,cex=leaf_t/18, pch = 1
 ```
 
 The distribution of leaf thickness seems to depend on latitude. In Southern regions, leaves are generally thinner than in Northern regions. To confirm this we would have to make a model and test our observation.
+
+<!--chapter:end:03-data_variety.Rmd-->
+
+
+# Data Scraping
+
+Placeholder
+
+
+## Introduction
+## Theory
+## Web Scraping Applied
+### R-Packages and Functions
+#### lapply() {-}
+#### sapply() {-}
+### The FishBase website
+### Accessing FishBase
+### Scraping Numbers
+### Scraping Text Snippetrs
+#### International Union for Conservation of Nature {-}
+#### Extracting IUCN Status {-}
+### Scraping Tables
+### The Fishbase Package
+#### Using an API {-}
+#### Limits of APIs {-}
+### Summary
+## Case Study: Species Richness and Red List species proportions
+### Creating List of Species
+### Extracting IUCN Status for all species
+### Proportion of species in Netherlands
+### Cleaning data with IUCN Status
+### Maps of species richness and Red List species proportions
+#### Preparing data {-}
+#### Plotting data {-}
+#### Repeat for mapping species richness {-}
+### Relation of basin size and species richness
+## References
+## Exercise
+
+<!--chapter:end:04-scraping.Rmd-->
+
+# Catch-up
+
+TBC
+
+<!--chapter:end:05-catchup.Rmd-->
+
+
+# Supervised machine learning basics I
+
+Placeholder
+
+
+## Introduction 
+### Learning objectives
+### Important points from the lecture
+## Tutorial
+### Linear regression
+### K-nearest neighbours
+### Essential methods for the modelling process
+#### Model formulation
+#### Data splitting
+### Bonus 
+#### Pre-processing
+#### Standardization
+#### Zero-variance predictors
+#### One-hot encoding
+#### Dealing with missingness and bad data
+
+<!--chapter:end:06_supervised_ml_1.Rmd-->
+
+# Supervised machine learning methods II
+
+<!--chapter:end:07_supervised_ml_2.Rmd-->
+
+
+# Application 1: Variable selection
+
+Placeholder
+
+
+## Introduction
+## Warm-up 1: Nested for-loop
+## Warm-up 2: Find the best single predictor
+## Full stepwise regression
+## Bonus: Stepwise regression out-of-the-box
+## Warm-up 2: Find the best single predictor
+## Full stepwise regression
+## [BONUS] Stepwise regression out-of-the-box
+
+<!--chapter:end:08_variable_selection.Rmd-->
+
+# XXX
+
+<!--chapter:end:09-XXX.Rmd-->
+
+# XXX
+
+<!--chapter:end:10-XXX.Rmd-->
+
+# XXX
+
+<!--chapter:end:11-XXX.Rmd-->
+
+# XXX
+
+<!--chapter:end:12-XXX.Rmd-->
+
+# XXX
+
+<!--chapter:end:13-XXX.Rmd-->
+
+# XXX
+
+<!--chapter:end:14-XXX.Rmd-->
+
+`r if (knitr::is_html_output()) '
+# References {-}
+'`
+
+<!--chapter:end:15-references.Rmd-->
+

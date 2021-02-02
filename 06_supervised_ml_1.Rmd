@@ -498,12 +498,7 @@ recipe_example <- recipe_example %>%
 #### One-hot encoding
 
 For ML algorithms that require that all predictors be numerical (e.g., neural networks, or KNN), categorical predictors have to be pre-processed and converted into new numerical predictors. The most common such transformation is *one-hot encoding*, where a categorical feature (predictor) that has $N$ levels is replaced by $N$ new features that contain either zeros or ones depending whether the value of the categorical feature corresponds to the respective column. This creates perfect collinearity between these new column, we can also drop one of them. This is referred to as *dummy encoding*.
-
-<img src="./../data/images/onehot.png" style="width: 60%;"/> 
-
-Figure from [www.kaggle.com](https://www.kaggle.com/dansbecker/using-categorical-data-with-one-hot-encoding).
-
-Using the recipes package, one-hot encoding is implemented by:
+Check out the Figure from [www.kaggle.com](https://www.kaggle.com/dansbecker/using-categorical-data-with-one-hot-encoding) for a one-hot encoding visualization. Using the recipes package, one-hot encoding is implemented by:
 
 ```{r}
 recipe(GPP_NT_VUT_REF ~ ., data = df) %>% 
@@ -536,7 +531,7 @@ Visualising missing data is essential for making decisions about dropping rows w
 Note: the code below is set to `raw` since the notebook sturggles to handle the amount of values in _hhdf_. We have provided the results as images instead.
 
 ```{r eval=F}
-load("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN.RData")
+load("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN.csv")
 
 # DO NOT RUN THIS CODE IS NOT WORKING IN THE NOTEBOOK (or only for a max of 30000 values)
 ## Code from https://bradleyboehmke.github.io/HOML/engineering.html#dealing-with-missingness
