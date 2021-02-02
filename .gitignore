@@ -7,3 +7,7 @@
 data/
 _book/
 _bookdown_files/
+
+packages.bib
+esds_book.log
+
