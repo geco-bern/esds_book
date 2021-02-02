@@ -1,12 +1,4 @@
----
-title: 04 Data Scraping
-author: Pascal Schneider
-output:
-  bookdown::html_document2: default
-
----
-
-# Data Scraping [in progress]
+# Data Scraping
 
 ***
 ## Introduction
@@ -140,13 +132,13 @@ fishbase <- url %>% getURLContent(followlocation = TRUE) %>% htmlParse()
 
 The HTML document saved in `fishbase` is quite long to show it entirely but a snapshot is displayed in Figure \@ref(fig:fishbase). 
 
-```{r fishbase, echo=FALSE, fig.cap='Extract from the HTML document saved in the variable `fishbase*`.'}
+```{r fishbase, echo=FALSE, fig.cap='Extract from the HTML document saved in the variable `fishbase`.'}
 knitr::include_graphics(rep("./figures/fishbase.png"))
 ```
 
 Somewhere in this gigantic object we can find the relevant information we are looking for. For example, Figure \@ref(fig:maxle) below shows the extract where the maximal lenght of the fish is documented. Check out the online profile to double check whether the value is correct.
 
-```{r maxle, echo=FALSE, fig.cap='Extract of `fishbase*` documenting maximal length of *Coregonus lavaretus*.'}
+```{r maxle, echo=FALSE, fig.cap='Extract of `fishbase` documenting maximal length of *Coregonus lavaretus*.'}
 knitr::include_graphics(rep("./figures/fishbase_maxle.png"))
 ```
 
@@ -159,11 +151,11 @@ fishbase_span <- fishbase %>% getNodeSet("//span ")
 
 In the next two Figures \@ref(fig:before) and \@ref(fig:after) we can see the differences of what is stored in variable `fishbase` and `fishbase_div`. The difference to `fishbase_span` is similar. We see that instead of having this one long unstructured extract in Figure \@ref(fig:before), we have now a list of objects that we easily access. In Figure \@ref(fig:after), the list can be identified by the `[[22]]` in the top left corner which marks the position of the object within the list. In short, `getNodeSet()` identifies all the sections for a given tag (i.e., nodes), separates them and gathers them in a list.
 
-```{r before, echo=FALSE, fig.cap='`Fishbase` before the command `getNodeSet()`'}
+```{r before, echo=FALSE, fig.cap='`fishbase` before the command `getNodeSet()`'}
 knitr::include_graphics(rep("./figures/before.png"))
 ```
 
-```{r after, echo=FALSE, fig.cap='`Fishbase` after the command `getNodeSet()`'}
+```{r after, echo=FALSE, fig.cap='`fishbase` after the command `getNodeSet()`'}
 knitr::include_graphics(rep("./figures/after.png"))
 ```
 ***
