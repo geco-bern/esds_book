@@ -16,7 +16,7 @@ After you've gone through the lecture and solved the exercises you should be abl
 - Apply data aggregation.
 - Apply data cleaning and gapfilling.
 
----
+
 
 ### Data transformation with dplyr
 
@@ -49,7 +49,7 @@ ggplot(data = df, aes(x = time, y = temperature)) +
   geom_point()
 ```
 
---- 
+
 
 ## Hands-on
 
@@ -68,7 +68,7 @@ Let's read in the half-hourly data from the eddy-covariance site CH-Lae again (a
 
 ```{r, message=FALSE}
 library(tidyverse)
-hhdf <- read_csv("./data/fluxnet_hourly/data_HH/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3.csv")
+hhdf <- read_csv("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3.csv")
 hhdf
 ```
 
@@ -107,7 +107,7 @@ hhdf <- hhdf %>%
 
 This reduces our dataset from 235 to 68 variables. As you can see, `select()` is a powerful tool to apply multiple selection criteria on your data frame at the same time and formulate criteria based on the variable names (e.g., `starts_with()` ). Note that the selection criteria are evaluated in the order we write them in the `select()` function call. You can find the complete reference for selecting variables [here](https://dplyr.tidyverse.org/reference/select.html).
 
---- 
+
 
 #### Time objects
 
@@ -166,7 +166,7 @@ new_day
 ```
 No, it is not the same year!
 
---- 
+
 
 #### Variable (re-) definition
 
@@ -191,7 +191,7 @@ hhdf %>%
 ```
 A complete reference to `mutate()` is available [here](https://r4ds.had.co.nz/transform.html#add-new-variables-with-mutate).
 
---- 
+
 
 #### Cleaning and gap-filling
 
@@ -299,7 +299,7 @@ paste0("na.omit():")
 NA_matrix %>% na.omit()
 ```
 
---- 
+
 
 #### Functions
 
@@ -392,7 +392,7 @@ vis_miss(
 
 This looks reasonable now. Let's save this as a RData file for later use.
 ```{r}
-save(hhdf, file = "./data/fluxnet_hourly/data_HH/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN.RData")
+save(hhdf, file = "./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN.RData")
 ```
 
 **Checkpoint**
@@ -418,7 +418,7 @@ function_exercise <- function(x) {
 function_exercise(some_numbers)
 ```
 
---- 
+
 
 #### Data visualisation I
 
@@ -464,7 +464,7 @@ Note that we added two visualisation layers above. First just the histogram (the
 
 You can find a complete reference to ggplot [here](https://ggplot2.tidyverse.org/). More complete tutorials data visualization are available [there](https://r4ds.had.co.nz/data-visualisation.html) or even more complete [here](https://clauswilke.com/dataviz/). Below, we'll introduce some more content on data visualisation with R and ggplot2.
 
---- 
+
 
 #### Aggregating
 
@@ -502,7 +502,7 @@ ddf <- hhdf %>%
     mutate(f_measured = n_measured / n_datapoints) # calculate the fraction of measured values over total observations
 ```
 
---- 
+
 
 #### Data visualisation II
 
@@ -609,7 +609,8 @@ ddf %>%
 
 Eureka! The relationships, indeed, separate quite a bit between months. In spring months (3 = March, 4 = April), light levels can be already quite high, but GPP remains much lower than in summer months. Why is this?
 
---- 
+
+
 
 ### Dataset 2 (daily flux data)
 
@@ -621,7 +622,7 @@ Of course, we can also combine each site's data frame into a single large one, e
 
 The **purrr** package of tidyverse offers the functionalities for functional programming. It makes use of lists and applies (or "maps") a function to each element of the list. Let's start by creating a list of paths that point to the files with daily data. They are all located in the directory `"./data_DD"` and share a certain string of characters in their file names `"_FLUXNET2015_FULLSET_DD_"`.
 ```{r}
-vec_files <- list.files("./data/fluxnet_daily/data_DD", pattern = "_FLUXNET2015_FULLSET_DD_", full.names = TRUE)
+vec_files <- list.files("./data", pattern = "_FLUXNET2015_FULLSET_DD_", full.names = TRUE)
 print(vec_files[1:5])
 ```
 
@@ -708,7 +709,7 @@ vis_miss(
 
 We see that, unfortunately, `PPFD_IN` is often missing.
 
---- 
+
 
 #### Strings
 
@@ -720,14 +721,14 @@ ddf_allsites$siteid %>% head()
 
 The paths each start with the subdirectory where they are located (`"./data_DD/"`), then `"FLX_"`, and then the site name (the first three entries of the table containing data from all sites are for the site `"BE-Bra"`), and then some more specifications, including the years that respective files' data cover. What's the most effective way to extract the site name from all these strings? The `stringr` package offers a set of very handy tools to work with strings, see this [cheat sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) for a summary of them. Here, we would like to extract the six characters, starting at position 15.
 ```{r}
-vec_sites <- str_sub(vec_files, start = 34, end = 39)
+vec_sites <- str_sub(vec_files, start = 12, end = 17)
 head(vec_sites)
 ```
 
 ... and overwrite the values of column `"siteid"` with just these six characters.
 ```{r}
 ddf_allsites <- ddf_allsites %>%
-  mutate(siteid = str_sub(siteid, start = 34, end = 39))
+  mutate(siteid = str_sub(siteid, start = 12, end = 17))
 
 head(ddf_allsites)
 ```
@@ -746,8 +747,6 @@ address <- str_replace(address, "16", "")
 print(address)
 ```
 
---- 
-
 #### Combining relational data
 
 It's common that we want to combine information from multiple data frames into a single one. In our case, we are interested in knowing more about the sites for which we have time series data. We are interested in *meta-information* about the sites, for example, the vegetation type, geographical location, elevation, etc. In such cases, where information about common set of units (here sites) is distributed across multiple data objects, we're speaking of *relational data*. Of course, there has to be a link between them. In our case, this is the site identity or site name. Specifically, this means that the same labeling of site identities has to be available from all relational data objects. 
@@ -756,7 +755,7 @@ You may ask yourself what's the purpose of keeping data in separate relational d
 
 A comprehensive collection of FLUXNET site meta information is freely available from [Falge et al.](https://daac.ornl.gov/FLUXNET/guides/Fluxnet_site_DB.html). Let's read this file (`"fluxnet_site_info_all.csv"`) from the sub-directory `"data_DD/"`.
 ```{r}
-df_sites <- read_csv("./data/fluxnet_daily/data_DD/fluxnet_site_info_all.csv")
+df_sites <- read_csv("./data/fluxnet_site_info_all.csv")
 head(df_sites)
 ```
 
@@ -788,7 +787,7 @@ head(ddf_allsites)
 
 Here, we've done a `right_join()`. This can be understood as joining the data frame given by the first argument to `right_join()` (here, what's being piped from the left side of the pipe) onto the data frame given by the second argument (`ddf_allsites`). The output of `right_join()` has the same number or rows as the data frame on the "right" (the second argument) and is, as for all tidyverse functions, a data frame. There is also a `left_join()` that creates a new data frame with the number of rows corresponding to the data frame on the "left" (the first argument). You can find more on relational data and joining data frames, e.g., [here](https://r4ds.had.co.nz/relational-data.html), or [here](https://rpubs.com/williamsurles/293454).
 
---- 
+
 
 **Everything below this box is Bonus Material**
 
@@ -892,7 +891,7 @@ print("Flat long and joined:"); object.size(ddf_allsites_joined) %>% print(units
 print("Nested and joined:"); object.size(ddf_allsites_nested_joined %>% select(-linmod, -summ, -rsq)) %>% print(units = "auto", standard = "SI")  # removing added columns that are not in the flat long df
 ```
 
----
+
 
 #### Advanced data visualisation
 
@@ -947,7 +946,7 @@ Before we finish, let's save our nice daily data frame, after having selected in
 Since `ddf_allsites_nested_joined` is no longer a "flat" table (it's nested), we cannot save it in a plain text-based format like CSV. Instead, we save it as an R object. In can be later loaded into an R session by `load()`.
 
 ```{r}
-save(ddf_allsites_nested_joined, file = "ddf_allsites_nested_joined.RData")
+save(ddf_allsites_nested_joined, file = "data/ddf_allsites_nested_joined.RData")
 ```
 
 ```{r include=FALSE}
@@ -957,7 +956,7 @@ ddf_ch_lae <- ddf_allsites_nested_joined %>%
   select(data) %>%
   unnest(data)
 
-save(ddf_ch_lae, file = "ddf_ch_lae.RData")
+save(ddf_ch_lae, file = "data/ddf_ch_lae.RData")
 ```
 
 #### Exercise
