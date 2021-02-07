@@ -564,3 +564,61 @@ vis_miss(
 The question about what is "bad data" and whether or when it should be removed is often critical. In Chapter 3, we've encountered quality control information in our data set (e.g., `NEE_VUT_REF_QC`), and removed data that didn't satisfy our own definition of the quality criterion. Such decisions are important to keep track of and should be reported as transparently as possible in publications. In reality, where the data generation process may start in the field with actual human beings writing notes in a lab book, and where the human collecting the data is often not the same as the human writing the paper that contains that data, it's often more difficult to keep track of such decisions. As a general principle, it is advisable to design data records such that decisions made during its process remain transparent throughout all stages of the workflow and that sufficient information be collected to enable later revisions of particularly critical decisions. 
 
 Often, and particularly when humans (and more so in the case of multiple humans) collected and recorded the data, steps are necessary to make it machine-readable. For example, dates need to be formatted consistently, units need to be specified consistently, etc. An overview of common problems with bad data and their solutions is given by the [Quartz Guide to Bad Data](https://github.com/Quartz/bad-data-guide#spelling-is-inconsistent).
+
+
+## Exercise
+
+### Model formulation
+
+Load the file `"ddf_ch_lae.RData"` and rename the data frame to `df`. First, drop columns `NEE_VUT_REF_QC` and `TIMESTAMP` and then remove any row with missing values. To have all necessary data wrangling functions available, it may be handy to load the "super-package" *tidyverse* (which contains multiple individual packages).
+
+Train a linear regression model to predict `GPP_NT_VUT_REF` from  the variables `PPFD_IN`, `PA_F`, `TA_F` in the dataframe `df`, using (a) the suitable base-R function and (b) the caret function `train()` with argument `trControl = trainControl("none")` (This fits one model to the entire training set without resampling. You'll learn more about what this is in Chapter 7). Compare the fitted models with the function `summary()` and answer the following questions:
+
+- What are the values for the intercept $\beta_0$ and the slope $\beta_1$? 
+- Do the two packages yield identical estimates of the coefficients?
+- What is the root mean square error of the fitted model?
+- Is the relationship between `GPP_NT_VUT_REF` and `PPFD_IN` positive or negative? Is it significant?
+
+### One-hot encoding
+
+Using the dataset with daily data from multiple sites `ddf_allsites.RData`, apply a One-hot encoding and a dummy encoding on the column containing vegetation type information (`igbp_land_use`), using the recipes package. Execute the recipe by applying the functions `prep()` and `bake()`. You may avoid the data splitting here and apply all functions on the same dataframe.
+
+How many columns does the un-processed original data frame have and how many columns are in the freshly "baked" data frames created by the One-hot encoding and how many in the one from the dummy-encoding? Explain the differences.
+
+Determine which column was created by the One-hot-encoding but not by the dummy-encoding.
+
+### Sequential pre-processing
+
+You have learned about several pre-processing steps. The implementation of these steps was demonstrated using the recipes package which allows you to be specific about the order in which the pre-processing steps are applied. Does the order matter?
+
+Apply the following three pre-processing steps on the daily dataset you used above (for the problem on 'One-hot encoding') and make sure that, after all three steps are applied by your specified order, the columns created by the dummy-encoding can be interpreted as logical variables.
+
+- Filter out zero or near-zero variance features.
+- Standardize (center and scale) numeric features.
+- Dummy encode categorical features.
+
+Visualise the distribution of numeric variables (not including the ones created by the dummy-encoding) in the original and pre-processed dataset using an appropriate plot type.
+
+**Hint:**
+
+We have learned in Chapter two that ggplot2 is designed to implement the *grammar of graphics* where variables are mapped onto aesthetics. If we want to create, for example, separate boxplots for each variable, arranged side-by-side along the x-axis, we want to specify the x-axis aesthetics to be the variable identity (something like `aes(x = variable)`). However, in our dataset, we have multiple variables (eleven to be precise) in separate columns. Strictly speaking, this is not entirely *tidy* and therefore, it's not quite straight-forward to create a ggplot graphics with data from multiple separate columns and organise them along one of the available aesthetics (here, x-axis). We have to take an additional step and combine the multiple columns into a single one. The new-rearranged and very *tidy* dataframe then has a new column (e.g., called `value`) that contains all the values of all the variables, and another new column (e.g. called `variable`) that specifies which variable the value belongs to. This re-arrangement can also be described as converting a table in *wide* format (wide because of its large number of columns) to a *long* format (long because of its large number of rows). This transformation is illustrated below.
+
+![](./figures/fig_pivot_longer_wide_to_long_tidy.jpg)
+
+
+Figure from [https://cmdlinetips.com/2020/02/r-for-data-science-book-gets-tidyr-1-0-0-friendly/](https://cmdlinetips.com/2020/02/r-for-data-science-book-gets-tidyr-1-0-0-friendly/).
+
+In R, this conversion from a wide to a long table (usable with ggplot) is done in one line by `pivot_longer()` from the tidyr package (part of the tidyverse).
+
+### K-nearest neighbours
+
+Load the file `"ddf_ch_lae.RData"` and split the dataset into 70% used for training and 30% for testing. Fit three KNN models of the form `GPP_NT_VUT_REF ~ .` with $k = (1, 25, 250)$ on the training set and evaluate the RMSE on the training and on the validation set. For the model training, use the caret function `train()` with arguments `trControl = trainControl("none")` and `tuneGrid = data.frame(k = 25)` (in the case of k = 25). Explain your observations. Which case (data set, k) has the lowest RMSE? Why? Is there a pattern in the difference between RMSE derived from `df_train` and `df_test`, depending on k? How do the three models relate to the bias-variance trade-off? Regarding their performance on the training set evaluation, which model has the highest bias? Which one has the highest variance? How does this relate to their performance on the validation set? Please explain.
+
+**Hint:**
+
+To evaluate the performance of a fitted model on a dataset `df`, you can use the object returned by the function `train()` (`modl` in the example below) in combination with `predict()` as:
+```{r eval = FALSE}
+values_redicted <- predict(modl, newdata = df)
+```
+
+This returns a vector of predicted values of the same length as rows in `df`. To get the RMSE of predicted vs. observed values, you can use the function `rmse()` from the tidyverse package *yardstick*. Check `?yardstick::rmse` for more information.
