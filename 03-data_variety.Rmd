@@ -1266,3 +1266,39 @@ points(df_sp_sites$lon, df_sp_sites$lat, col=datColleaves,cex=leaf_t/18, pch = 1
 ```
 
 The distribution of leaf thickness seems to depend on latitude. In Southern regions, leaves are generally thinner than in Northern regions. To confirm this we would have to make a model and test our observation.
+
+## Exercise: Using Spatial Data 
+
+### Part 1: Plotting Elevation differences
+
+
+In this first part of the exercise, we consider elevation data from the ETOPO dataset. ETOPO is a 1 arc-minute global relief model of the Earth's surface that integrates land topography and ocean bathymetry. Since it is modelled date there is a certain level of uncertainty associated with it. In this exercise, you will look at the differences between the elevations from the tower data, which is directly measured at the site, and the values you will extract from this modelled ETOPO data.
+
+_Note:_ think about which packages you need to load to complete each of the tasks.
+
+a. Load the _'dataset_ex3.csv'_ file containing the elevations of the towers.
+
+b. Load both the _'ETOPO.tif'_ raster and the _'europe_shape'_ shapefile. Plot the shape of Europe over the raster. 
+(Since we used the shapefile in the tutorial too, it isn't located in the same folder as the data for this exercise. You'll have to use the correct pathway to load it, if you are unsure about how to find this use the 'Files' tab on the right can help you figure it out.)
+
+c. Extract the elevations from the raster at the tower sites.
+
+d. Calculate the difference between the elevations of the towers and the one extracted from the ETOPO.
+
+e. Plot the difference in elevation calculated for each site on a map of Europe.
+_Hint:_ there are several ways to do this, one could be to using ifelse().
+
+### Part 2: Temperature and Elevation Correlations
+
+In this second part, we want to find out which of the elevations we gathered in the first part (ETOPO and towers) correlates better with the temperatures measured at the towers.
+
+a. Correlate the ETOPO elevations at the towers sites with the temperatures measured at the towers. 
+
+b. Correlate the elevations measured at the tower sites with the temperatures measured at the towers.
+
+c. What is the mean squared errors of the two models above. Which of the two correlates better?
+
+d. The _'lapse rate'_ is known as the rate of decrease of an atmospheric variable, in our case temperature, with increased elevation (also altitude). This _lapse_ (gradual fall)  in temperature with increasing altitude at a given time and place, is the slope of your models above. Find and compare the _lapse rate_ of the two models. _Hint:_ if you are stuck take a closer look at your model with summary().
+
+Now, that you've made it to the end of the exercise, remember to 'knit' this document so you can upload the html to moodle.
+
