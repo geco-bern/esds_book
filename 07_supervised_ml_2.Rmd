@@ -3,6 +3,7 @@
 ## Learning objectives
 
 After this learning unit, you will be able to ...
+
 - Explain the effect of hyper-parameter tuning in the context of the K-nearest neighbour algorithm.
 - Assess the generalisability of a trained model.
 - Explain the purpose and the method of cross-validation.
@@ -10,13 +11,17 @@ After this learning unit, you will be able to ...
 
 ## Key points from the lecture
 
-<b>Testing data</b> is set aside at the initial split and not "touched" during model training. It is key to test a model’s predictive power or whether it is overfitted. <br>
-<b>Validation data</b> is used for determining the loss during model training. The reason for distinguishing between testing and validation data is to assure we're not misleading model training by some peculiarities of the validation data and we get an assessment of generalisability based on data that was not seen during model training.<br>
-<b>Model training</b> minimises the loss. In other words, it optimises the agreement between predicted and observed values. The loss is most commonly measured by the root mean square error (RMSE).<br>
-To tune a model, you can set <i>hyperparameters</i> that determine model structure or calibrate the coefficients. The <i>k</i> in KNN is such a hyperparameter.<br>
-<b>Generalisability</b> refers to the model’s performance on data not seen during the training - the testing data.<br>
-To avoid overfitting, model generalisability is desired already during model training. One method to do this is <b>cross validation</b>. <br>
-<b>Data leakage</b> is when data from the testing dataset creeps into the training data. To avoid this the testing set must be left completely untouched! 
+**Testing data** is set aside at the initial split and not "touched" during model training. It is key to test a model’s predictive power or whether it is overfitted. 
+
+**Validation data** is used for determining the loss during model training. The reason for distinguishing between testing and validation data is to assure we're not misleading model training by some peculiarities of the validation data and we get an assessment of generalisability based on data that was not seen during model training.
+
+**Model training** minimises the loss. In other words, it optimises the agreement between predicted and observed values. The loss is most commonly measured by the root mean square error (RMSE).
+
+To tune a model, you can set *hyperparameters* that determine model structure or calibrate the coefficients. The *k* in KNN is such a hyperparameter.
+
+**Generalisability** refers to the model’s performance on data not seen during the training - the testing data. To avoid overfitting, model generalisability is desired already during model training. One method to guide model training is **cross validation**.
+
+**Data leakage** is when data from the testing dataset creeps into the training data. To avoid this the testing set must be left completely untouched! 
 
 ### Model training and the loss function
 

@@ -1,5 +1,12 @@
 # Primers
 
+
+<!-- ```{r include=FALSE} -->
+<!-- ## link datasets -->
+<!-- system("mkdir data") -->
+<!-- system("ln -svf  ~/polybox/Shared/Data\ Science\ Lecture\ Planning\ -\ shared\ folder/4\ Datasets/* ./data/") -->
+<!-- ``` -->
+
 ## Introduction
 In this section, we'll show you how to structure a project and how to work with version control (git). You will learn how to read data into your workspace, get to know how different data is structured and what data types are, conduct simple data explorations and visualisations, and write data to files. Of course, you will also learn where you can turn to for help.
 

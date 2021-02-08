@@ -21,22 +21,15 @@ Machine learning refers to a class of algorithms that automatically generate sta
     
 There are two main types of machine learning:
     
-**_Unsupervised machine learning_**: 
-A class of algorithms that automatically detect patterns in data without using labels or ‘learning without a teacher’.  
-    Examples are: PCAs, clustering, autoencoders, self-organizing maps, etc.
-
-**_Supervised machine learning_**: 
-A class of algorithms that automatically learn an input-output function based on example input-output pairs.  
-    Examples include: support vector machines, random forests, decision trees, neural networks, etc. 
-Supervised machine learning requires three ingredients:
-(1) Input data (2) Output data (3) A measure of model performance (a.k.a. “loss”)
+Machine learning refers to a class of algorithms that generate statistical models of data.
     
-_Loss_ is a concept central to many supervised machine learning algorithms. It measures how well our predicted model values fit the actual observed model values, a higher value indicates a higher loss, essentially meaning the model fits less well. Ideally, loss should be minimised. 
-Loss can be used to update our model parameters in the next iteration of model training, this is called learning.
-
-Supervised machine learning be used for regression (predict a continuous label) or classification (predict a categorical label).
+There are two main types of machine learning:
     
-Essentially, supervised machine learning is an optimization problem, which searches a vast and high dimensional solution space.
+**Unsupervised machine learning**: A class of algorithms that automatically detect patterns in data without using labels or ‘learning without a teacher’. Examples are: PCAs, k-means clustering, autoencoders, self-organizing maps, etc.
+
+**Supervised machine learning**: A class of algorithms that automatically learn an input-output relationships based on example input-output pairs. Examples include: support vector machines, random forests, decision trees, neural networks, etc. Supervised machine learning requires three ingredients: (1) Input data (2) Output data (3) A measure of model performance (a.k.a. "loss"). Supervised machine learning be used for regression (predict a continuous label) or classification (predict a categorical label).
+    
+**Loss** is a concept central to many supervised machine learning algorithms. It measures how well our predicted model values fit the actual observed model values, a higher value indicates a higher loss, essentially meaning the model fits less well. Ideally, loss should be minimised. Loss can be used to update our model parameters in the next iteration of model training, this is called learning.
 
 ## Tutorial
 

@@ -22,6 +22,9 @@ This is the source for the text book. For instructions on how to use **bookdown*
 
 ## Formatting
 
+- Strictly follow [Markdown syntax](https://www.markdownguide.org/basic-syntax/) (no html!).
+- Apply a sensible hierarchy of sections. Feel free to revise what we initially had.
+- Use cross-references to point to figures, sections, etc. See [here](https://bookdown.org/yihui/bookdown/cross-references.html).
 - Avoid manual numbering of sections (numbers are automatically rendered).
 - Avoid horizontal lines (`---`)
 - Please follow naming conventions as defined in `01-primers` (see below). It would be optimal if you could follow the [tidyverse style guide](https://style.tidyverse.org/)
