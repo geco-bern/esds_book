@@ -756,3 +756,48 @@ Today's exercise is about getting data from the web and extracting useful insigh
     
 Get in touch with your teaching assistant if you have any further questions.
 
+This exercise is about getting the data from the web. Once you have finished the exercise please 'knit' this document to create an .html file, export it and upload it to moodle. 
+
+## Part 1: Get the data
+
+a. Following the steps described in the tutorial, get the maximal length of the species *Salvelinus alpinus* and the *Salmo trutta* using an API. After fetching the values create a table to store these values in one dataframe. 
+
+```{r eval = F}
+# enter your solution here
+```
+
+b. Get the **IUCN Status** and **eggs shape** for *Salvelinus alpinus* and *Salmo trutta* using web scraping. Again follow the same steps you learned in the tutorial. In the end, add the new information to the dataframe.
+
+```{r eval = F}
+# enter your solution here
+```
+
+
+## Part 2: Get all the species in a family and the IUCN status
+
+a. Your next task is to get all the species in the family _'Neoscopelidae'_ and print the first 5 elements of the family.
+
+```{r eval = F}
+# enter your solution here
+```
+
+b. Extract the 'Native Exotic Status' of all the species from France. Then end get the unique values of the Native Exotic Status. For this task you will need to use the csv file _'dataset2'_.
+
+```{r eval = F}
+# enter your solution here
+```
+
+c. Now, use the information you got above to plot the proportion of species in each category for France.
+
+```{r eval = F}
+# enter your solution here
+```
+
+
+## Part 3: Extract the temperature of the species  
+
+Extract the mean temperature for **Coregonus lavaretus** and **Salvelinus alpinus** using the function `stocks()` from `rfishbase` package and store the values in a new dataframe.
+
+```{r eval = F}
+# enter your solution here
+```
