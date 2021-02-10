@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 .DS_Store
+.RDataTmp
 
 data/
 _book/
@@ -11,6 +12,7 @@ _bookdown_files/
 packages.bib
 esds_book.log
 esds_book.Rmd
+esds_book_files
 
 libs
 saved_models

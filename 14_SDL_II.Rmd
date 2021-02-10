@@ -436,8 +436,7 @@ callbacks_cnn <- list(
 compile(model, loss = 'mse',optimizer = opt, metrics = list('mse'))
 
 # train the model
-# history_cnn = fit(model,x = ndvi_train_pr,y = y_train,batch_size = 128,
-#              epochs = 200,shuffle = T,validation_data = list(ndvi_val_pr,y_val),callbacks = callbacks_cnn)
+# history_cnn = fit(model,x = ndvi_train_pr,y = y_train,batch_size = 128, epochs = 200,shuffle = T,validation_data = list(ndvi_val_pr,y_val),callbacks = callbacks_cnn)
 ```
 
 ```{r message=FALSE, warning=FALSE}

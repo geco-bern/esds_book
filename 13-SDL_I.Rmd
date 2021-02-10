@@ -212,10 +212,6 @@ cat('data batch shape:', dim(batch[[1]]),"\n")
 cat('labels batch shape:', dim(batch[[2]]),"\n")
 ```
 
-    data batch shape: 32 150 150 3 
-    labels batch shape: 32 
-
-
 Notice the dimensions of the tensor `data_batch`: 
 - The _first_ dimension is the number of images in the batch. 
 - The _second_ and _third_ dimensions are the dimensions of each image. 
@@ -360,54 +356,15 @@ model_baseline = build_model(0, 0)
 #history_baseline = compile_and_train(model_baseline, 1e-3, 20, F)
 ```
 
-    Model: "convnet_L2_0_dropout_0"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    conv2d (Conv2D)                     (None, 148, 148, 32)            896         
-    ________________________________________________________________________________
-    max_pooling2d (MaxPooling2D)        (None, 74, 74, 32)              0           
-    ________________________________________________________________________________
-    conv2d_1 (Conv2D)                   (None, 72, 72, 64)              18496       
-    ________________________________________________________________________________
-    max_pooling2d_1 (MaxPooling2D)      (None, 36, 36, 64)              0           
-    ________________________________________________________________________________
-    conv2d_2 (Conv2D)                   (None, 34, 34, 128)             73856       
-    ________________________________________________________________________________
-    max_pooling2d_2 (MaxPooling2D)      (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    dropout (Dropout)                   (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    conv2d_3 (Conv2D)                   (None, 15, 15, 128)             147584      
-    ________________________________________________________________________________
-    max_pooling2d_3 (MaxPooling2D)      (None, 7, 7, 128)               0           
-    ________________________________________________________________________________
-    flatten (Flatten)                   (None, 6272)                    0           
-    ________________________________________________________________________________
-    dropout_1 (Dropout)                 (None, 6272)                    0           
-    ________________________________________________________________________________
-    dense (Dense)                       (None, 512)                     3211776     
-    ________________________________________________________________________________
-    dropout_2 (Dropout)                 (None, 512)                     0           
-    ________________________________________________________________________________
-    dense_1 (Dense)                     (None, 1)                       513         
-    ================================================================================
-    Total params: 3,453,121
-    Trainable params: 3,453,121
-    Non-trainable params: 0
-    ________________________________________________________________________________
-
-
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-    <b>Checkpoint</b><br/>
+**Checkpoint**
 Take some time to digest this model summary. Make sure you understand and can answer the following questions:
     
-    
-* **A**: Why is the dimensionality of the output of the first convolution layer (148, 148, 32) rather than (150, 150, 32)?
-* **B**: Why does the first convolution layer have 896 free parameters? 
-* **C**: Why don't the max-pooling layers have any free parameters?
-* **D**: Why does the last layer contain only a single neuron with a sigmoid activation function?
-# your answers
+- **A**: Why is the dimensionality of the output of the first convolution layer (148, 148, 32) rather than (150, 150, 32)?
+- **B**: Why does the first convolution layer have 896 free parameters? 
+- **C**: Why don't the max-pooling layers have any free parameters?
+- **D**: Why does the last layer contain only a single neuron with a sigmoid activation function?
+
+
 **Solutions**
 - **A**: Because the size of the filter is 3 x 3 
 - **B**: There are 3x3 = 9 parameters for each filter, times 3 channels (RGB), plus one bias term per filter. Thus: 32 x (9x3+1)
@@ -419,19 +376,11 @@ Let's have a look at loss and accuracy during training. Both are measured on the
 
 ```{r}
 #load history of trained models
-history = readRDS('./saved_models/models_history.rds')
+history = readRDS('./data/SDL_I/saved_models/models_history.rds')
 
 fig_size(8,8)
 plot(history$baseline) + theme_grey(base_size = 20)
 ```
-
-    `geom_smooth()` using formula 'y ~ x'
-    
-
-
-
-![png](output_32_1.png)
-
 
 What do you observe?
 
@@ -464,43 +413,6 @@ model_L2 = build_model(L2_rate = 0.005)
 #history_L2_reg = compile_and_train(model_L2, 1e-3, 20, F)
 ```
 
-    Model: "convnet_L2_0.005_dropout_0"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    conv2d_4 (Conv2D)                   (None, 148, 148, 32)            896         
-    ________________________________________________________________________________
-    max_pooling2d_4 (MaxPooling2D)      (None, 74, 74, 32)              0           
-    ________________________________________________________________________________
-    conv2d_5 (Conv2D)                   (None, 72, 72, 64)              18496       
-    ________________________________________________________________________________
-    max_pooling2d_5 (MaxPooling2D)      (None, 36, 36, 64)              0           
-    ________________________________________________________________________________
-    conv2d_6 (Conv2D)                   (None, 34, 34, 128)             73856       
-    ________________________________________________________________________________
-    max_pooling2d_6 (MaxPooling2D)      (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    dropout_3 (Dropout)                 (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    conv2d_7 (Conv2D)                   (None, 15, 15, 128)             147584      
-    ________________________________________________________________________________
-    max_pooling2d_7 (MaxPooling2D)      (None, 7, 7, 128)               0           
-    ________________________________________________________________________________
-    flatten_1 (Flatten)                 (None, 6272)                    0           
-    ________________________________________________________________________________
-    dropout_4 (Dropout)                 (None, 6272)                    0           
-    ________________________________________________________________________________
-    dense_2 (Dense)                     (None, 512)                     3211776     
-    ________________________________________________________________________________
-    dropout_5 (Dropout)                 (None, 512)                     0           
-    ________________________________________________________________________________
-    dense_3 (Dense)                     (None, 1)                       513         
-    ================================================================================
-    Total params: 3,453,121
-    Trainable params: 3,453,121
-    Non-trainable params: 0
-    ________________________________________________________________________________
-
 
 Let's have again a look at loss and accuracy during training, both measured on the training data and the validation data. 
 
@@ -509,14 +421,6 @@ Let's have again a look at loss and accuracy during training, both measured on t
 fig_size(8,8)
 plot(history$L2_reg) + theme_grey(base_size = 20)
 ```
-
-    `geom_smooth()` using formula 'y ~ x'
-    
-
-
-
-![png](output_40_1.png)
-
 
 It seems that overfitting has been prevented with L2 regularization since validation loss keeps decreasing as long as training loss also decreases.
 
@@ -536,54 +440,10 @@ model_dropout = build_model(0, 0.5)
 #history_dropout = compile_and_train(model_dropout, 1e-3, 20, F)
 ```
 
-    Model: "convnet_L2_0_dropout_0.5"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    conv2d_8 (Conv2D)                   (None, 148, 148, 32)            896         
-    ________________________________________________________________________________
-    max_pooling2d_8 (MaxPooling2D)      (None, 74, 74, 32)              0           
-    ________________________________________________________________________________
-    conv2d_9 (Conv2D)                   (None, 72, 72, 64)              18496       
-    ________________________________________________________________________________
-    max_pooling2d_9 (MaxPooling2D)      (None, 36, 36, 64)              0           
-    ________________________________________________________________________________
-    conv2d_10 (Conv2D)                  (None, 34, 34, 128)             73856       
-    ________________________________________________________________________________
-    max_pooling2d_10 (MaxPooling2D)     (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    dropout_6 (Dropout)                 (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    conv2d_11 (Conv2D)                  (None, 15, 15, 128)             147584      
-    ________________________________________________________________________________
-    max_pooling2d_11 (MaxPooling2D)     (None, 7, 7, 128)               0           
-    ________________________________________________________________________________
-    flatten_2 (Flatten)                 (None, 6272)                    0           
-    ________________________________________________________________________________
-    dropout_7 (Dropout)                 (None, 6272)                    0           
-    ________________________________________________________________________________
-    dense_4 (Dense)                     (None, 512)                     3211776     
-    ________________________________________________________________________________
-    dropout_8 (Dropout)                 (None, 512)                     0           
-    ________________________________________________________________________________
-    dense_5 (Dense)                     (None, 1)                       513         
-    ================================================================================
-    Total params: 3,453,121
-    Trainable params: 3,453,121
-    Non-trainable params: 0
-    ________________________________________________________________________________
-
-
-
 ```{r}
 fig_size(8,8)
 plot(history$drop) + theme_grey(base_size = 20)
 ```
-
-    `geom_smooth()` using formula 'y ~ x'
-    
-
-
 
 ![png](output_45_1.png)
 
@@ -622,27 +482,27 @@ train_generator = flow_images_from_directory(
 
 Let's have a closer look at the parameters of this function.
 
-* `rescale`: You've seen this in our first use of 'ImageDataGenerator'. This simply rescales the RGB values to be between 0 and 1. <br> 
-<br> 
-* `rotation_range`: is the range in degrees of permitted image rotations.  <br> 
-<br> 
-* `width_shift_range`: shifts the image to the left or to the right by the fraction of the total width specified (i.e., 0.1 in this example).<br> 
-<br> 
-* `height_shift_range`: shifts the image up or down by the fraction of the total width specified (i.e., 0.1 in this example).<br> 
-<br> 
-* `shear_range`: distorts the image along an axis, in effect approximating a change in the position of the photographer. <br> 
-<br> 
-* `zoom_range`: zooms in and out of the image. <br> 
-<br> 
-* `horizontal_flip`: randomly flips the image along the horizontal axis.<br> 
-<br> 
-* `fill_mode`: This defines how pixels are to be filled, for example when the image is shifted such that some pixels become empty.
+- `rescale`: You've seen this in our first use of 'ImageDataGenerator'. This simply rescales the RGB values to be between 0 and 1.  
+ 
+- `rotation_range`: is the range in degrees of permitted image rotations.   
+ 
+- `width_shift_range`: shifts the image to the left or to the right by the fraction of the total width specified (i.e., 0.1 in this example). 
+ 
+- `height_shift_range`: shifts the image up or down by the fraction of the total width specified (i.e., 0.1 in this example). 
+ 
+- `shear_range`: distorts the image along an axis, in effect approximating a change in the position of the photographer.  
+ 
+- `zoom_range`: zooms in and out of the image.  
+ 
+- `horizontal_flip`: randomly flips the image along the horizontal axis. 
+ 
+- `fill_mode`: This defines how pixels are to be filled, for example when the image is shifted such that some pixels become empty.
 
 You can read more details about this function [here](https://keras.io/api/preprocessing/image/).
 
 If you'd like to see more examples of how the parameters of this function affect images, see [this blog post](https://fairyonice.github.io/Learn-about-ImageDataGenerator.html).
 
-To get your own feel for what this function does, and to enjoy some funny cat pictures, execute the code cell below with different cats by just changing the index to the list _fnames_ on line 5.
+To get your own feel for what this function does, and to enjoy some funny cat pictures, execute the code cell below with different cats by just changing the index to the list *fnames* on line 5.
 
 
 ```{r}
@@ -673,10 +533,6 @@ for (j in 1:(i-1)){
 p  + plot_layout(nrow = 2)
 ```
 
-
-![png](output_50_0.png)
-
-
 Get the idea? Data augmentation stretches, moves, rotates, shears, and inverts your raw data images to produce new images, with the goal of never showing your model the same image twice during training.
 
 Now let's put our new `train_datagen` function to work.
@@ -687,44 +543,6 @@ model_data_augment = build_model(0, 0)
 #history_data_augment = compile_and_train(model_data_augment, 1e-3, 20, F)
 ```
 
-    Model: "convnet_L2_0_dropout_0"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    conv2d_12 (Conv2D)                  (None, 148, 148, 32)            896         
-    ________________________________________________________________________________
-    max_pooling2d_12 (MaxPooling2D)     (None, 74, 74, 32)              0           
-    ________________________________________________________________________________
-    conv2d_13 (Conv2D)                  (None, 72, 72, 64)              18496       
-    ________________________________________________________________________________
-    max_pooling2d_13 (MaxPooling2D)     (None, 36, 36, 64)              0           
-    ________________________________________________________________________________
-    conv2d_14 (Conv2D)                  (None, 34, 34, 128)             73856       
-    ________________________________________________________________________________
-    max_pooling2d_14 (MaxPooling2D)     (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    dropout_9 (Dropout)                 (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    conv2d_15 (Conv2D)                  (None, 15, 15, 128)             147584      
-    ________________________________________________________________________________
-    max_pooling2d_15 (MaxPooling2D)     (None, 7, 7, 128)               0           
-    ________________________________________________________________________________
-    flatten_3 (Flatten)                 (None, 6272)                    0           
-    ________________________________________________________________________________
-    dropout_10 (Dropout)                (None, 6272)                    0           
-    ________________________________________________________________________________
-    dense_6 (Dense)                     (None, 512)                     3211776     
-    ________________________________________________________________________________
-    dropout_11 (Dropout)                (None, 512)                     0           
-    ________________________________________________________________________________
-    dense_7 (Dense)                     (None, 1)                       513         
-    ================================================================================
-    Total params: 3,453,121
-    Trainable params: 3,453,121
-    Non-trainable params: 0
-    ________________________________________________________________________________
-
-
 Let's again plot the learning curves
 
 
@@ -733,18 +551,10 @@ fig_size(8,8)
 plot(history$augment) + theme_grey(base_size = 20)
 ```
 
-    `geom_smooth()` using formula 'y ~ x'
-    
-
-
-
-![png](output_55_1.png)
-
 
 As you can see clearly above, overfitting is avoided by using the data augmentation technique.
 
 This was a lot of information and different techniques of how to avoid overfitting. So, to avoid complete confusion and provide a visual comparison, we will summarize all the different models below. This way you can see how the different techniques for reducing overfitting can change the behaviour of training and validation metrics.
-
 
 
 ```{r}
@@ -754,23 +564,9 @@ p_dropout = plot(history$drop) + labs(title = 'Dropout') +theme_gray(base_size =
 p_data_augment = plot(history$augment) + labs(title = 'Data Augmentation') +theme_gray(base_size = 15) + theme(plot.title = element_text(size=17,hjust = 0.5)) 
 
 #plot them
-fig_size(20,8)
-p_base + p_L2 + p_dropout + p_data_augment+plot_layout(nrow = 1)
+# fig_size(20,16)
+p_base + p_L2 + p_dropout + p_data_augment + plot_layout(nrow = 2)
 ```
-
-    `geom_smooth()` using formula 'y ~ x'
-    
-    `geom_smooth()` using formula 'y ~ x'
-    
-    `geom_smooth()` using formula 'y ~ x'
-    
-    `geom_smooth()` using formula 'y ~ x'
-    
-
-
-
-![png](output_58_1.png)
-
 
 Now, it's time to train our final model so it can be used in the next section. We will be using data augmentation and dropout. Further, we'll use early stopping and a maximum of 100 epochs. The best model will be saved automatically with the callback `callback_model_checkpoint`
 
@@ -780,48 +576,10 @@ model_final = build_model(0, 0.5)
 #history_final = compile_and_train(model_final, 1e-3, 100, T)
 ```
 
-    Model: "convnet_L2_0_dropout_0.5"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    conv2d_16 (Conv2D)                  (None, 148, 148, 32)            896         
-    ________________________________________________________________________________
-    max_pooling2d_16 (MaxPooling2D)     (None, 74, 74, 32)              0           
-    ________________________________________________________________________________
-    conv2d_17 (Conv2D)                  (None, 72, 72, 64)              18496       
-    ________________________________________________________________________________
-    max_pooling2d_17 (MaxPooling2D)     (None, 36, 36, 64)              0           
-    ________________________________________________________________________________
-    conv2d_18 (Conv2D)                  (None, 34, 34, 128)             73856       
-    ________________________________________________________________________________
-    max_pooling2d_18 (MaxPooling2D)     (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    dropout_12 (Dropout)                (None, 17, 17, 128)             0           
-    ________________________________________________________________________________
-    conv2d_19 (Conv2D)                  (None, 15, 15, 128)             147584      
-    ________________________________________________________________________________
-    max_pooling2d_19 (MaxPooling2D)     (None, 7, 7, 128)               0           
-    ________________________________________________________________________________
-    flatten_4 (Flatten)                 (None, 6272)                    0           
-    ________________________________________________________________________________
-    dropout_13 (Dropout)                (None, 6272)                    0           
-    ________________________________________________________________________________
-    dense_8 (Dense)                     (None, 512)                     3211776     
-    ________________________________________________________________________________
-    dropout_14 (Dropout)                (None, 512)                     0           
-    ________________________________________________________________________________
-    dense_9 (Dense)                     (None, 1)                       513         
-    ================================================================================
-    Total params: 3,453,121
-    Trainable params: 3,453,121
-    Non-trainable params: 0
-    ________________________________________________________________________________
-
-
 
 ```{r}
 #load the model
-model = load_model_hdf5('./saved_models/final_model.h5')
+model = load_model_hdf5('./data/SDL_I/saved_models/final_model.h5')
 ```
 
 Let's also evaluate the perfomance on the test set.
@@ -924,10 +682,10 @@ plot_filter(first_layer_activation[1,,,i])
 ![png](output_72_0.png)
 
 
-What do you observe? <br>
+What do you observe? 
 It appears this 3rd filter encodes an edge detector. 
 
-How about other filters? <br>
+How about other filters? 
 Rerun the code cell for different filters. You can do this by changing the value of _i_, currently _i=3_, on line 5 of the code cell above to any number between 1 and 32. 
 
 See anything else that interests you?
