@@ -29,7 +29,7 @@ Big data are characterised by four characteristics:
 - Volume: A data volume is simply the amount of data in a file or database.
 - Velocity: Data velocity is the speed at which data is collected and processed.
 - Variety: Data variety is the diversity of data in a data collection or problem space.
-- Veracity: Data veracity is the degree to which data is accurate and precise.
+- Veracity: Data veracity is the degree to which data is accurate and precise.  
 
 FAIR data criteria are:
 
