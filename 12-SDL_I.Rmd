@@ -159,7 +159,7 @@ Keras has built-in functionality for feeding batches of training and validation 
 Let's use `ImageDataGenerator` to generate batches of training and validation data.
 
 
-```{r}
+```{r eval = F}
 # Specify image size
 IMAGE_HEIGHT = 150
 IMAGE_WIDTH = 150
@@ -352,8 +352,8 @@ Now let's compile and train our model, using a learning rate of 0.001, a maximum
 
 ```{r}
 model_baseline = build_model(0, 0)
-#We have already run it and we saved the results because it takes more than 30 minutes for 20 epochs. But you can run in if you are curious.
-#history_baseline = compile_and_train(model_baseline, 1e-3, 20, F)
+# We have already run it and we saved the results because it takes more than 30 minutes for 20 epochs. But you can run it if you are curious.
+# history_baseline = compile_and_train(model_baseline, 1e-3, 20, F)
 ```
 
 **Checkpoint**
@@ -586,25 +586,24 @@ Let's also evaluate the perfomance on the test set.
 
 
 ```{r}
-validation_eval = evaluate_generator(model,validation_generator,steps = as.integer(N_VALIDATION/BATCH_SIZE_VALIDATION))
-test_eval = evaluate_generator(model,test_generator,steps = as.integer(N_TEST/BATCH_SIZE_TEST))
+# evaluate_generator() causes R to crash because of C stack overflow.
+# Results taken from calculations done on Renku.io
 
-#Evaluate model on validation and test data
-cat("Validation accuracy: ",validation_eval$acc,"\n")
-cat("Test accuracy: ",test_eval$acc,"\n")
+# validation_eval = evaluate_generator(model, validation_generator,steps = as.integer(N_VALIDATION/BATCH_SIZE_VALIDATION))
+# test_eval = evaluate_generator(model, test_generator,steps = as.integer(N_TEST/BATCH_SIZE_TEST))
+
+# Evaluate model on validation and test data
+# cat("Validation accuracy: ",validation_eval$acc,"\n")
+# cat("Test accuracy: ",test_eval$acc,"\n")
+
+cat("Validation accuracy: 0.846 \n")
+cat("Test accuracy: 0.849 \n")
 ```
 
-    Validation accuracy:  0.846 
-    Test accuracy:  0.849 
 
-
-Great, we have a well performing model.
-
-Now let's interpret what the CNN learns.
+Great, we have a well performing model. Now let's interpret what the CNN learns.
 
 ### Visualizing what convolutional neural networks learn
-
-<div style="border: 2px black solid; border-radius: 7px; padding:10px">
 
 There are multiple ways to visualize what convolutional neural networks learn, here are three examples:
 
@@ -614,8 +613,6 @@ There are multiple ways to visualize what convolutional neural networks learn, h
 
 3) _**Visualizing heatmaps of class activation in an image**_ - this shows you which parts of an image were identified as belonging to a particular class.
     
-</div>
-
 #### Visualizing intermediate activations
 
 The activation of a layer is the output of the activation function for that layer, given some input. This shows how an input is decomposed by the different filters learned by a convolutional neural network.
@@ -642,10 +639,6 @@ img_tensor = img_tensor * 1/255
 fig_size(7,7)
 plotRGB(img_tensor)
 ```
-
-
-![png](output_69_0.png)
-
 
 To visualize the intermediate activations, you'll create a Keras model that takes an image as input and outputs the activations of all the convolution layers. This is simply a model that shows you how the neurons in each layer of your trained network respond to a particular image.
 
@@ -678,10 +671,6 @@ fig_size(7,7)
 plot_filter(first_layer_activation[1,,,i])
 ```
 
-
-![png](output_72_0.png)
-
-
 What do you observe? 
 It appears this 3rd filter encodes an edge detector. 
 
@@ -692,12 +681,7 @@ See anything else that interests you?
 
 Let's go ahead and visualize the intermediate activations of all of the filters of all of the convolution layers.
 
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-    <b>Checkpoint</b><br/>
-Go and choose pic 50 from dogs. What do you observe?
-
-### Answer
-Amazing result!!! Dog leash is activated!!! That can be a very powerful feature for our classifier.
+Go and choose pic 50 from dogs. What do you observe? Can you see how the filter works as a leash detector? This makes a lot of sense considering that dogs are seldom without a leash and cats always! That can be a very powerful feature for our classifier.
 
 
 ```{r}
