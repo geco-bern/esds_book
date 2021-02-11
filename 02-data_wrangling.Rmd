@@ -961,8 +961,119 @@ save(ddf_ch_lae, file = "data/ddf_ch_lae.RData")
 
 #### Exercise
 
-For this week's exercise open up the Rstudio environment. Remember to save all your changes to this notebook using `git status`, `git add <filename>`, `git commit -m "your comment"`, `git push`.
+For this week's exercise open up an Rstudio environment. 
 
-Exercise 02 is about outlier removal and the visualisation of diurnal and seasonal cycles.
+### 1. Outlier removal
 
-Get in touch with your teaching assistant if you have any further questions.
+a. Based on the half-hourly dataset for site CH-Lae, aggregated to daily means, **identify outliers** in `GPP_NT_VUT_REF` with respect to the linear relationship between `GPP_NT_VUT_REF` and `PPFD_IN`. To do so, first fit a linear regression model using `lm()`. This function returns a list of objects, one of which is `residuals`. Determine outliers as the "outlying" points in the distribution of residuals. See the definition of the boxplot in the tutorial section of Chapter 4. You may use the base-R function `boxplot.stats()` and set the argument `coef` accordingly to our customised threshold definition.
+```{r}
+library(tidyverse) 
+library(lubridate)  # not part of the automatic load of tidyverse
+
+# read half-hourly data
+hhdf <- read_csv("./data_HH/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3.csv") %>% 
+  
+    # interpret -9999 as missing value
+    na_if(-9999) %>% 
+  
+    # interpret timestamp as a date-time object
+    mutate_at(vars(starts_with("TIMESTAMP_")), ymd_hm)
+
+
+# aggregate to daily
+ddf <- hhdf %>% 
+  
+    # create a date-only object
+    mutate(date = as_date(TIMESTAMP_START)) %>% 
+  
+    # aggregate
+    group_by(date) %>% 
+    summarise(GPP_NT_VUT_REF = mean(GPP_NT_VUT_REF, na.rm = TRUE),
+              PPFD_IN = mean(PPFD_IN, na.rm = TRUE),
+              .groups = 'drop' # not mandatory
+    )
+
+# fit linear regression
+linmod <- lm(GPP_NT_VUT_REF ~ PPFD_IN, data = ddf)
+
+# get box plot statistics for determining "outlying" points
+out_boxplot <- boxplot.stats(linmod$residuals)
+
+# record the row numbers of outlying points based on the output list element 'out'
+# row numbers are the names of elements in out_boxplot$out, provided as strings. 
+# convert them to integers.
+idx_outlying <- names(out_boxplot$out) %>% as.integer()
+```
+
+b. **Remove outliers** by setting values in the data frame (aggregated daily data frame for CH-Lae) to `NA`.
+
+In base-R, this could be done (admittedly quite simply) as:
+```{r}
+ddf$GPP_NT_VUT_REF_clean <- ddf$GPP_NT_VUT_REF
+ddf$GPP_NT_VUT_REF_clean[idx_outlying] <- NA
+```
+
+With dplyr:
+```{r}
+ddf <- ddf %>% 
+  mutate(rownumber = row_number()) %>%    # could also do: mutate(rownumber = 1:nrow(.))
+  mutate(GPP_NT_VUT_REF_clean = ifelse(rownumber %in% idx_outlying, NA, GPP_NT_VUT_REF))
+```
+
+c. Create a scatterplot of all daily data (GPP vs. PPFD) and highlight outliers that are removed by step b.
+```{r}
+ddf %>% 
+  ggplot(aes(x = PPFD_IN)) + 
+  geom_point(aes(y = GPP_NT_VUT_REF), color = "red") +  # first, plot all points including outliers in one color
+  geom_point(aes(y = GPP_NT_VUT_REF_clean), color = "black")  # then overplot cleaned data in black so that remaining red points are outliers
+```
+
+### 2. Visualising diurnal and seasonal cycles
+
+Using the half-hourly dataset for site CH-Lae, visualise how GPP (`GPP_NT_VUT_REF`) varies on two time scales: diurnal (within-day at hourly time scale) and seasonal. To implement this, follow the following steps:
+
+a. Summarise half-hourly data for each data across multiple years to get a mean seasonality with a mean diurnal cycle for each day of the year. You will use functions from the lubridate package (e.g., `yday()`). To deal with date-time objects, use the lubridate package. Enter `?day` to get more hints.
+```{r}
+library(tidyverse) 
+library(lubridate)
+
+hhdf_meanseason <- hhdf %>% 
+  mutate(hour_day = hour(TIMESTAMP_START),
+         day_year = yday(TIMESTAMP_START)) %>% 
+  group_by(hour_day, day_year) %>% 
+  summarise(gpp = mean(GPP_NT_VUT_REF, na.rm = TRUE))
+```
+
+b. Create a raster plot (`geom_raster()`), mapping the hour of the day to the x-axis, the day of the year to the y-axis, and the magnitude of `GPP_NT_VUT_REF` to color (fill).
+```{r}
+hhdf_meanseason %>% 
+  ggplot(aes(x = hour_day, y = day_year, fill = gpp)) +
+  geom_raster()
+```
+
+c. Make this figure ready for publication by adding nice labels and choosing a good color scale.
+```{r}
+# This is up to your judgement. Below is an example. 
+library(viridisLite)
+
+hhdf_meanseason %>% 
+  
+  # as above
+  ggplot(aes(x = hour_day, y = day_year, fill = gpp)) +
+  geom_raster() +
+  
+  # use a color scale that works also for color-blind people
+  scale_fill_viridis_c(option = "magma") +
+  
+  ## change theme (axes style)
+  theme_classic() +
+  
+  # adjust the aspect ratio of the plotting region
+  coord_fixed(ratio=0.2) +
+  
+  # labels of each mapping axis, \n is a line break
+  labs(x = "Hour of day", y = "Day of year", fill = expression(paste("GPP \ngC m"^-2, "s"^-1))) +
+  
+  # avoid adding distance from the lowest values to the axes
+  scale_x_continuous(expand = c(0,0)) + scale_y_continuous(expand = c(0,0))
+```
