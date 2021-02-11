@@ -1,0 +1,425 @@
+# Supervised Learning Neural Networks: the theory
+---
+
+### Learning objectives
+- Build and train neural networks for binary classification
+- Observe the influence of network architecture on model performance
+- Assess model performance using the following metrics 
+    - Accuracy
+    - Precision 
+    - Recall 
+    - F-Score
+    - Receiver operating characteristic (ROC) curves
+    - Area under the ROC curve 
+- Account for the stochasticity of model training when assessing model performance
+
+---
+
+**Important points from the lecture**
+
+- For binary classification problems, the output node often uses a *sigmoid activation function*.
+- A *classification threshold* is applied to the output of the sigmoid activation function to determine which label is predicted.
+- *Accuracy* is a popular measure of model performance, but it is not useful for class-imbalanced data.
+- The area under the *ROC curve * is a measure of model performance that considers the full range of possible classification thresholds.
+- Like accuracy, the area under the ROC curve can also be misleading in datasets with strong class imbalance 
+- Regression and classification problems require different measures of model performance.
+
+---
+
+#### Import libraries
+We first need to import some libraries. You have seen all of these in previous tutorials. Keras will play an especially prominent role in this tutorial.
+
+```{r, message=FALSE}
+library(tidyverse)
+library(rsample)
+library(reticulate)
+use_condaenv()
+library(keras)
+library(pROC)
+# plot size 
+options(repr.plot.width = 10, repr.plot.height = 7)
+```
+
+#### Construct a toy dataset
+For this exercise we will create a toy dataset that illusrates some of the vagaries (unexpected changes that cannot be controlled but can influence a situation) of classification, as well as some of the pros and cons of model performance measures. 
+
+In this toy dataset, each example has two real-valued features on the unit interval (i.e., these values are between 0 and 1). Each example has one of two labels, $\color{green}{\text{green}}$ or $\color{blue}{\text{blue}}$. The dataset is constructed such that those examples _within_ a specified radius of the point (0.5, 0.5) are assigned a $\color{green}{\text{green}}$ label and those _outside_ this radius are assigned a $\color{blue}{\text{blue}}$ label. 
+
+```{r}
+#Seed the random number generator for reproducible results
+set.seed(41)
+
+#Number of examples
+N <- 10000 
+#Square radius  of inner circle
+radius_2 <- 0.125 
+#Noise applied to the boundary separating green and blue examples
+noise <- 0.025 
+
+#Place N points on the unit square. 
+#Label those within some radius 0, and those outside 1.
+x1 <- runif(n = N,min = 0,max = 1) 
+x2 <- runif(n = N,min = 0,max = 1) 
+y <- ((x1-0.5)**2 + (x2-0.5)**2) + rnorm(n = N,mean = 0, sd = noise) > radius_2
+
+#Create a data frame
+df_data <- data.frame(x1 = x1, x2 = x2, y = y*1)
+
+#Split the data into training (80%) and test (20%) sets
+#Make a breakpoint at 80%
+breakpoint <- as.integer(0.8 * nrow(df_data))
+
+#training data
+df_train <- df_data[1:breakpoint,]
+
+#testing data
+df_test <- df_data[(breakpoint+1):nrow(df_data),]
+```
+
+Let's visualize our data to get a feel for the classification task at hand. Let's also visualize the true decision boundary used to delineate the $\color{green}{\text{green}}$ from the $\color{blue}{\text{blue}}$ labels, and print the number of examples per label. 
+
+_Notice_ that there are more examples labeled $\color{blue}{\text{blue}}$ than there are examples labeled $\color{green}{\text{green}}$. 
+
+This means the data are **class imbalanced** (but not heavily).
+
+```{r}
+#visualize our data
+df_data %>% 
+    ggplot(aes(x = x1 , y = x2, color =as.factor(y)))+
+    geom_point()+
+    geom_path(aes(x=0.5+sqrt(radius_2)*cos(seq(0,2*pi,length.out=N)),
+                  y=0.5+sqrt(radius_2)*sin(seq(0,2*pi,length.out=N)),
+                  linetype = ' True \n Decision \n Boundary'),
+                  color = 'black',
+                  size = 3)+
+    scale_color_manual(name = 'Class',values = c('0'="green",'1'='blue'))+
+    labs(linetype='')+
+    theme_grey(base_size = 15)
+
+
+#print some summary statistics about these data
+cat('Proportion of data in class blue: ' , sum(df_data$y)/length(df_data$y),'\n')
+cat('Proportion of data in class green: ' , 1-sum(df_data$y)/length(df_data$y),'\n')
+```
+
+
+A more appropriate way to split the data into training and test sets is to take care such that each label is represented to its proportion in both sets (_stratified splitting_). To this end, we use the `rsample` package and we choose `strata = y`. That is crucial especially for heavily class imbalanced data sets. In essence, what we want to avoid is to have an over representantion of one class in the training data set and an under representation of this class in the the test data set.
+
+```{r}
+# split with r sample and strata = y
+split <- initial_split(df_data, prop = 0.8, strata = 'y')
+
+#train set
+df_train <- training(split)
+
+#test set
+df_test <- testing(split)
+
+#print statistics for each set
+## training set
+cat("Training set \n")
+cat('Proportion of data in class blue: ' , sum(df_train$y)/length(df_train$y),'\n')
+cat('Proportion of data in class green: ' , 1-sum(df_train$y)/length(df_train$y),'\n')
+
+##test set
+cat("\nTest set \n")
+cat('Proportion of data in class blue: ' , sum(df_test$y)/length(df_test$y),'\n')
+cat('Proportion of data in class green: ' , 1-sum(df_test$y)/length(df_test$y),'\n')
+```
+
+As it is obvious now, each label is represented to its initial proportion in training and test set.
+
+## Build and train a neural network for classification
+
+As you saw in your previous tutorial, Keras is a powerful API for building, training, and evaluating artificial neural networks. In that lecture, you used Keras to construct, train, and analyze extremely simple neural networks, comprising just a single layer of a single node. 
+
+Here we'll build and consider more complex network architectures. To do so, we'll generalize the `build_and_train_model` function from our previous tutorial. Specifically, we'll change the function such that it builds and trains a network with an arbitrary number of layers and nodes per layer, such that the number of nodes per layer is the same for all layers, except the output layer, which will contain just a single node with a sigmoid activation function.
+
+---
+*Neural Networks: A closer look*
+
+Before we procceed further let's have a closer look on neural networks and what keras hides from the user. To this end, we will manually create a neural network with 1 hidden layer with 5 units and an output layer (with 1 unit).
+
+Let 's assume that we have d features (x) and therefore $W_1$(weights) is a matrix with dimension $d\times 5$ and $b_1$ has a dimension $5\times 1$(biases). Then the output of the 1st hidden layer is
+
+$$1st\_hidden = xW_1 + b_1$$
+    
+The dimension of the $1st\_hidden$ is 5 (equals the number of units or more intuitively 5 different linear models output). On top of this we apply an activation function such as relu,sigmoid etc.
+
+So,
+
+$$1st\_hidden\_out = activation(1st\_hidden)$$
+
+    
+For the ouput layer we just take the values of 1st\_hidden\_out (now those are our new 'features') and we apply a matrix multiplication as we did with our features. 
+
+$$ output\_layer = 1st\_hidden\_out W_2 + b_2$$ 
+    
+where $W_2$ has dimension $5\times 1$(equals the dimension of the previous layer output) and b_2 a dimension of 1 . Therefore
+
+$$ y = activation(output\_layer)$$
+    
+where the output activation for a binary classification problem is the sigmoid.
+
+In total, $$y = activation(activation(xW_1 + b_1)*W_2 +b_2)$$
+
+As it is obvious a neural network is a collection of connected linear models with an activation function on top of each. We can stack several hidden layers (each of those has its own number of units) following the same procedure as above.
+
+---
+
+```{r}
+#Learning rate
+lr <- 0.01
+#Number of epochs
+ne <- 100
+#Batch size
+bs <- 512
+
+build_and_train_model = function (data = df_train,
+                                  learning_rate = lr, 
+                                  num_epochs = ne, 
+                                  batch_size = bs, 
+                                  num_layers, 
+                                  num_units_per_layer,
+                                  print_model_summary = F
+                                 ){
+    
+    #Most models are so-called 'sequential' models
+    model <- keras_model_sequential()
+    
+    #Keras makes building neural networks as simple as adding layer upon layer with simple sequential 
+    #calls to the function "layer_dense". Take a moment to appreciate how easy that makes things.
+    
+    #The input layer is the only layer that requires the user to specify its shape. The shape of all
+    #subsequent layers is automatically determined based on the output of the preceding layer. Let's
+    #use a ReLU activation function in each node in the input and hidden layers.
+    model <- model %>% layer_dense(units=num_units_per_layer, input_shape=(ncol(data)-1), activation="relu")
+    
+    #Add the hidden layers. Note this requires just a simple for loop that calls the function "layer_dense"
+    #again and again.
+    if (num_layers>1){
+        for (i in 1:(num_layers-1)){
+            model = model %>% layer_dense(units=num_units_per_layer, activation="relu")
+        }
+    }
+    
+    #Add the output layer. Note that it uses a sigmoid activation function. Make sure you know why.
+    model <- model %>% layer_dense(units=1, activation="sigmoid")    
+    
+    #Print the model description
+    if (print_model_summary){
+    
+        summary(model)        
+    }
+         
+    #Specify the learning rate for stochastic gradient descent
+    opt <- optimizer_adam(lr = learning_rate)
+
+    #Compile the model, using binary cross-entropy to define loss. Measure accuracy during training.
+    #Note how easy Keras makes this. Did you have to write any functions for loss or for measuring model
+    #performance during training? No, Keras takes care of all of this for you.
+    model %>% compile(optimizer=opt, loss='binary_crossentropy', metrics= list('accuracy'))         
+
+    #Fit the model
+    history <-  model %>% fit(x = as.matrix(data[,c('x1','x2')]),
+                            y = data$y,
+                            epochs=num_epochs,
+                            batch_size=batch_size,
+                            )
+
+    #Return the model and the training history
+    return(list(model = model, history = history))                                      
+}
+```
+
+---
+
+**Checkpoint**
+
+Why does the output layer use a sigmoid activation function rather than a linear activation function? Can you think of a case where you'd want the output layer to use a linear activation function?
+
+**Solution**
+
+For a continuous response y then the output activation should be linear. 
+
+---
+
+Can we train an accurate classifier with just a single layer of a single node? 
+
+Let's try. And let's assess model performance using a metric called **Accuracy**. This is simply the number of correct predictions divided by the number of predictions. 
+
+In the context of this toy dataset, it's the number of examples predicted to be blue that actually are blue plus the number of examples predicted to be green that actually are green, divided by the number of predictions.
+
+```{r}
+c(model,history) %<-% build_and_train_model(data = df_train,
+                                            learning_rate = 0.01,
+                                            batch_size = 512,
+                                            num_epochs = 100,
+                                            num_layers = 1,
+                                            num_units_per_layer =  1,
+                                            print_model_summary = T)
+
+cat('Final training accuracy: ', round(history$metrics$acc[ne],3),'\n')
+```
+
+Note the final training accuracy. 
+
+Let's have a look at how accuracy and loss change during model training.
+
+```{r}
+plot(history)
+```
+
+Observe how quickly accuracy converges to the final value. And note the final value - wow, we're doing better than a coin flip (a coin flip choice would have an accuracy of 0.5) during training, using just a single layer of a single node! How is this possible? Take a moment to think about how this might be happening. Think about what you already know about these data (What is the percentage of each class? Is it possible a classifier that only predicts the largest class to seems better than a coin flip?).
+
+To see if you're intuition is correct, let's plot our model predictions on the test data. Note that in making these predictions, we need to choose a classification threshold. The reason is that the output layer yields a real value between 0 and 1, which needs to be discretized for the purpose of binary classification. For now, let's just set this threshold at 0.5. We'll see how changing the threshold impacts model performance later.
+
+```{r}
+#Predict on test data. Note how easy this is to do in Keras.
+pred <- predict(model,as.matrix(df_test[,c('x1','x2')]))
+
+#Set the classification threshold to 0.5
+threshold <- 0.5
+
+#Make label predictions based on the classification threshold
+y_pred <- (pred >= threshold)*1
+
+#Plot the predictions
+df_test %>%
+    ggplot(aes(x = x1, y = x2))+
+    geom_point(color = ifelse(y_pred==1,'blue','green'))
+
+#Evaluate and print model performance on test data
+c(loss,acc) %<-% evaluate(model,as.matrix(df_test[,c('x1','x2')]),df_test$y)
+cat('Accuracy on held-out test data: ' , round(acc,3),'\n')
+```
+
+Aha, the model is always predicting blue! Why is this simple trick effective? It's because the data are class imbalanced, meaning that one class is more prevalent than the other in our dataset. Specifically, there are more blue examples than green examples. So by simply using the rule "<font color=blue>always blue</font>", we can obtain an accuracy that's better than a coin toss. 
+
+This shows that _accuracy_ has its limitations as a model performance metric and reveals the need for more nuanced metrics, such as the following:
+
+* `True positives`: The number of positive examples predicted to be positive **(+ / +)**
+* `True negatives`: The number of negative examples predicted to be negative **(- / -)**
+* `False positives`: The number of negative examples predicted to be positive **(+ / -)**
+* `False negatives`: The number of positive examples predicted to be negative **(- / +)**
+
+These metrics can be summarized in the so-called **_confusion matrix_**.
+
+![](./figures/confusion-matrix.png)
+
+In this toy dataset, we'll call the $\color{blue}{\text{blue}}$ examples $\color{blue}{\text{'positive'}}$ and the $\color{green}{\text{green}}$ examples $\color{green}{\text{'negative'}}$. This terminology makes more sense in more realistic classification problems, such as delineating spam email from non-spam.
+
+### Evaluate model performance
+Let's write a function that calculates the building blocks of the confusion matrix.
+
+```{r}
+confusion <- function(y_true, pred_out, threshold = 0.5, verbose = T){
+  
+  true_positives <- sum((pred_out >= threshold) & (y_true == 1))
+  true_negatives <- sum((pred_out < threshold) & (y_true == 0))
+  false_positives <- sum((pred_out >= threshold) & (y_true == 0))
+  false_negatives <- sum((pred_out < threshold) & (y_true == 1))
+  
+  if (verbose) {
+    cat('true positives: ',true_positives,'\n')
+    cat('true negatives: ',true_negatives,'\n')
+    cat('false positives: ',false_positives,'\n')
+    cat('false negatives: ',false_negatives,'\n')
+  }
+  return (list(tp = true_positives, tn = true_negatives, fp = false_positives, fn = false_negatives))
+}
+```
+
+Note that we can also define _accuracy_ in terms of true/false positives/negatives
+
+* Accuracy: $ \frac{\mbox{TP} + \mbox{TN}}{\mbox{TP + TN + FP + FN}}$
+
+where `TP + FN` is the number of _positive cases (P)_ while `TN + FP` is the number of _negative cases (N)_.
+
+Let's apply this function to our model predictions.
+
+```{r}
+c(true_positives, true_negatives,false_positives, false_negatives) %<-% confusion(df_test$y, pred, threshold)
+```
+
+This reveals a more nuanced picture of model performance. Sure, accuracy is better than a coin toss, but we now see that we do not correctly predict _a single negative example_. 
+
+These four metrics are the basis for two additional, commonly used performance metrics:
+
+* **precision**: $\frac{\mbox{TP}}{\mbox{TP + FP}}$
+
+
+* **recall**: $\frac{\mbox{TP}}{\mbox{TP + FN}} = \frac{\mbox{TP}}{\mbox{P}}$
+
+![](./figures/Precisionrecall.svg.png)
+
+**_Precision_** tells us the proportion of positive predictions that were actually correct, whereas **_Recall_** tells us the proportion of positive examples that were correctly predicted to be positive. 
+
+Let's define a function that calculates precision and recall.
+
+```{r}
+precision_and_recall <- function(true_positives, true_negatives,false_positives, false_negatives, verbose=T){
+  
+  #Protect against division by zero
+  if ((true_positives + false_positives) > 0){
+    precision = true_positives /(true_positives + false_positives)
+  }
+  else{
+    precision = 1
+  }
+  
+  if ((true_positives + false_negatives) > 0){    
+    recall = true_positives / (true_positives + false_negatives)
+  }
+  else{
+      recall = 0
+  }
+  
+  if (verbose){
+    cat("Precision: " ,precision,"\n")
+    cat("Recall: ",recall,"\n")
+  }
+  
+  return (list(precision = precision, recall = recall))
+}
+```
+
+Let's apply this function to our model predictions.
+```{r}
+c(precision, recall) %<-% precision_and_recall(true_positives, true_negatives,false_positives, false_negatives)
+```
+
+Now we see that the model $\color{blue}{\text{always blue}}$ does a great job at correctly predicting positive examples (_'recall'_), but many of its positive predictions are incorrect (_'precision'_).
+
+Wouldn't it be nice if we could combine _precision_ and _recall_ into a single metric? 
+Ideally, this metric would take on a high value when both _precision_ and _recall_ are large and a low value when either _precision_ or _recall_ is small.
+
+The **F-score** does exactly that:
+
+* `F-score` : $2 \cdot \frac{\mbox{precision $\cdot$ recall}}{\mbox{precision + recall}}$
+
+The _F-score_ takes values on the interval [0,1]. An F-score of 1 indicates that both precision and recall are 1 and an F-score of 0 corresponds to a value of 0 for either precision or recall.
+
+So now let's also define a function for the F-score and apply it to the previous example.
+
+```{r}
+f_score <- function(precision,recall,verbose=T){
+    
+    #Calculate F
+    f <- 2*precision*recall/(precision+recall)
+    
+    #If the user has requested verbose output, provide it
+    if(verbose){
+        cat("F-score: ",f)
+    }
+    
+    #Return F
+    return(f)
+}
+
+f <- f_score(precision,recall)
+```
+
+---
+
+## Evaluate the influence of network architecture on model performance
