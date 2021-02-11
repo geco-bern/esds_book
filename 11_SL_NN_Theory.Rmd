@@ -1,5 +1,5 @@
 # Supervised Learning Neural Networks: the theory
----
+
 
 ### Learning objectives
 - Build and train neural networks for binary classification
@@ -13,7 +13,7 @@
     - Area under the ROC curve 
 - Account for the stochasticity of model training when assessing model performance
 
----
+
 
 **Important points from the lecture**
 
@@ -24,7 +24,7 @@
 - Like accuracy, the area under the ROC curve can also be misleading in datasets with strong class imbalance 
 - Regression and classification problems require different measures of model performance.
 
----
+
 
 #### Import libraries
 We first need to import some libraries. You have seen all of these in previous tutorials. Keras will play an especially prominent role in this tutorial.
@@ -135,7 +135,7 @@ As you saw in your previous tutorial, Keras is a powerful API for building, trai
 
 Here we'll build and consider more complex network architectures. To do so, we'll generalize the `build_and_train_model` function from our previous tutorial. Specifically, we'll change the function such that it builds and trains a network with an arbitrary number of layers and nodes per layer, such that the number of nodes per layer is the same for all layers, except the output layer, which will contain just a single node with a sigmoid activation function.
 
----
+
 *Neural Networks: A closer look*
 
 Before we procceed further let's have a closer look on neural networks and what keras hides from the user. To this end, we will manually create a neural network with 1 hidden layer with 5 units and an output layer (with 1 unit).
@@ -165,7 +165,7 @@ In total, $$y = activation(activation(xW_1 + b_1)*W_2 +b_2)$$
 
 As it is obvious a neural network is a collection of connected linear models with an activation function on top of each. We can stack several hidden layers (each of those has its own number of units) following the same procedure as above.
 
----
+
 
 ```{r}
 #Learning rate
@@ -232,7 +232,7 @@ build_and_train_model = function (data = df_train,
 }
 ```
 
----
+
 
 **Checkpoint**
 
@@ -242,7 +242,6 @@ Why does the output layer use a sigmoid activation function rather than a linear
 
 For a continuous response y then the output activation should be linear. 
 
----
 
 Can we train an accurate classifier with just a single layer of a single node? 
 
@@ -420,6 +419,6 @@ f_score <- function(precision,recall,verbose=T){
 f <- f_score(precision,recall)
 ```
 
----
+
 
 ## Evaluate the influence of network architecture on model performance
