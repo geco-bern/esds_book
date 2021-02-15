@@ -8,7 +8,7 @@
 <!-- ``` -->
 
 ## Introduction
-In this section, we'll show you how to structure a project and how to work with version control (git). You will learn how to read data into your workspace, get to know how different data is structured and what data types are, conduct simple data explorations and visualisations, and write data to files. Of course, you will also learn where you can turn to for help.
+In this section, we'll show you how to structure a project and how to work with version control (git). You will learn how to read data into your workspace, get to know how different data is structured and what data types are, conduct simple data explorations and visualisations, and write data to files. You will also learn where you can turn to for help.
 
 After you've gone through the lecture and solved the exercises you should be able to:
 
@@ -18,16 +18,16 @@ After you've gone through the lecture and solved the exercises you should be abl
 - Explain what a system is and why system understanding is needed in environmental sciences.
 - Define data, understand the structure of data, and list examples of environmental data.
 - List sources of environmental data and explain the methodological difference in their collection.
-- Execute R and load an dataset for data analyses.
+- Execute R and load a dataset for data analyses.
 - Apply basic Git commands for version control.
-- Plot data science outputs on screen and write them on the disk.
+- Plot data science outputs and write them on the disk.
 
 ## Important points from the lecture 
 
-Big data are characterised by four characteristics: 
+Big data is described by four characteristics: 
 
 - Volume: A data volume is simply the amount of data in a file or database.
-- Velocity: Data velocity is the speed at which data is collected and processed.
+- Velocity: Data velocity is the lag between time of observation observation and data ingest for analysis.
 - Variety: Data variety is the diversity of data in a data collection or problem space.
 - Veracity: Data veracity is the degree to which data is accurate and precise.  
 
@@ -38,12 +38,12 @@ FAIR data criteria are:
 - **I**nteroperatable: Exchangeable and correctly cited
 - **R**eusable: Sufficiently documented and clear legal terms
 
-Environmental data is retrieved from a diversity of methods, including remote sensing, continuous site scale measurements (e.g., meteorological variables, hydrological variables, ecosystem-atmosphere exchange fluxes of water vapour and CO2), episodic observations (e.g., forest inventories, biodiversity assessments), field campaigns, or experiments in the field or under laboratory conditions. Data from these sources come in different shapes and formats. In this course, you'll learn to handle this diversity efficiently to answer research questions that you will encounter in the future. In many of the exercises, we will focus on data from continuous site scale observations, where meteorological variables are measured in parallel with ecosystem-atmosphere exchange fluxes of water vapour and CO2, collected from eddy covariance method. In addition, you will learn to tap into large environmental data repositories to complement your site-scale data.
+Environmental data is retrieved from a diversity of methods, including remote sensing, continuous site scale measurements (e.g., meteorological variables, hydrological variables, ecosystem-atmosphere exchange fluxes of water vapour and CO~2~), episodic observations (e.g., forest inventories, biodiversity assessments), field campaigns, or experiments in the field or under laboratory conditions. Data from these sources come in different shapes and formats. In this course, you'll learn to handle this diversity efficiently to answer research questions that you will likely encounter in the future. In many of the exercises, we will focus on data from continuous site scale observations, where meteorological variables are measured in parallel with ecosystem-atmosphere exchange fluxes of water vapour and CO~2~, collected from Eddy covariance technique. In addition, you will learn to tap into large environmental data repositories to complement your site-scale data.
 
-At the end of each chapter, you'll sum up this section with a bigger exercise. For this, you will work in a different environment: RStudio on Renku. We'll show you how to get there at the end of this tutorial.
+At the end of each chapter, you'll sum up the section with a comprehensive exercise using RStudio on Renku. We'll show you how to set up RStudio and Renku at the end of this tutorial.
 
 ## Working with Jupyter notebook
-Most of you have worked with R before. However, most likely you only know it within RStudio. For this course, we're going to work with Rstudio and Jupyter notebooks. Each chapter is made of two parts. The first part is a tutorial for you to learn the basics of data science in an environmental context. Here we're going to work with Jupyter notebooks. As most of you probably have never worked with this platform, we'll give you a short introduction to it in this very first tutorial. The second part usually is a somewhat bigger exercise where the contents of the tutorials are to be applied. For that, you'll work with RStudio.
+Most of you have worked with R before, most likely within RStudio. For this course, we're going to work with RStudio and Jupyter notebooks. Each chapter is made of two parts. The first part is a tutorial to learn the basics of data science in an environmental context where we will work with Jupyter notebooks (on Renku). As most of you probably have never worked with this platform, we'll give you a short introduction to it in this very first tutorial. The second part usually consists of a somewhat more extensive exercise in RStudio where the contents of the tutorials are applied.
 
 Right now your browser should look something like this:
 ![](./figures/jupyter.png)
@@ -242,7 +242,7 @@ Having data in a tidy format greatly facilitates all data wrangling steps. The c
 
 ## Reading data into R
 
-In the next step, we want to read the data. We're going to work with FLUXNET data from the site "Laegern" ([CH-Lae](https://gl.ethz.ch/infrastructure/sites/laegeren.html)), located close to Zürich. FLUXNET is a global network of sites where ecosystem-atmosphere exchange fluxes are measured (e.g., CO2, water vapour). In Switzerland, there is a total of six such sites. Laegern is one of them. The data is stored in a `.csv` file. To import it into the R workspace, we use the function `read_csv()` from the tidyverse. In the other R code, you'll also encounter the base R `read.csv()` function. However, `read_csv()` is much faster and reads data into a tidyverse-data frame (a *tibble*) which has some useful additional characteristics, on top of a common R data frame. To tell the function where the data is located, pass the data's path as an argument. You can either enter an *absolute path*, starting from `C:/` on a Windows computer or `~/` on a Mac. Or, alternatively, you can provide a *relative path*, where `./` points to the present working directory and `../` is one level up, or `../../` is two levels up, etc.
+In the next step, we want to read the data. We're going to work with FLUXNET data from the site "Laegern" ([CH-Lae](https://gl.ethz.ch/infrastructure/sites/laegeren.html)), located close to Zürich. FLUXNET is a global network of sites where ecosystem-atmosphere exchange fluxes are measured (e.g., CO~2~, water vapour). In Switzerland, there is a total of six such sites. Laegern is one of them. The data is stored in a `.csv` file. To import it into the R workspace, we use the function `read_csv()` from the tidyverse. In the other R code, you'll also encounter the base R `read.csv()` function. However, `read_csv()` is much faster and reads data into a tidyverse-data frame (a *tibble*) which has some useful additional characteristics, on top of a common R data frame. To tell the function where the data is located, pass the data's path as an argument. You can either enter an *absolute path*, starting from `C:/` on a Windows computer or `~/` on a Mac. Or, alternatively, you can provide a *relative path*, where `./` points to the present working directory and `../` is one level up, or `../../` is two levels up, etc.
 
 ```{r message=F}
 df <- read_csv("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3.csv")
@@ -317,7 +317,7 @@ A description of standardized FLUXNET data variables is available [here](https:/
 - `LW_IN` (W m$^{−2}$): incoming (down-welling) longwave radiation
 - `SWC` (%): soil water content (volumetric), range 0–100%
 - `TS` (deg C): soil temperature
-- `CO2` ($\mu$molCO2 mol$^{-1}$): Carbon Dioxide (CO$_2$) mole fraction in moist air
+- `CO2` ($\mu$molCO~2~ mol$^{-1}$): Carbon Dioxide (CO$_2$) mole fraction in moist air
 
 ## Selecting data and entering the tidyverse
 
