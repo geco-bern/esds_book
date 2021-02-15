@@ -42,8 +42,8 @@ Environmental data is retrieved from a diversity of methods, including remote se
 
 At the end of each chapter, you'll sum up this section with a bigger exercise. For this, you will work in a different environment: RStudio on Renku. We'll show you how to get there at the end of this tutorial.
 
-## Working with jupyter notebook
-Most of you have worked with R before. However, most likely you only know it within RStudio. For this course, we're going to work with Rstudio and Jupyter notebooks. Each chapter is made of two parts. The first part is a tutorial for you to learn the basics of data science in an environmental context. Here we're going to work with jupyter notebooks. As most of you probably have never worked with this platform, we'll give you a short introduction to it in this very first tutorial. The second part usually is a somewhat bigger exercise where the contents of the tutorials are to be applied. For that, you'll work with RStudio.
+## Working with Jupyter notebook
+Most of you have worked with R before. However, most likely you only know it within RStudio. For this course, we're going to work with Rstudio and Jupyter notebooks. Each chapter is made of two parts. The first part is a tutorial for you to learn the basics of data science in an environmental context. Here we're going to work with Jupyter notebooks. As most of you probably have never worked with this platform, we'll give you a short introduction to it in this very first tutorial. The second part usually is a somewhat bigger exercise where the contents of the tutorials are to be applied. For that, you'll work with RStudio.
 
 Right now your browser should look something like this:
 ![](./figures/jupyter.png)
@@ -59,7 +59,7 @@ The last thing we've marked in the image is <span style="color:purple">Git</span
 
 ## Git
 
-Git is a program that lets you organise your code development and collaborate. The basic unit of a code project is a *repository*, which usually contains multiple source code files that may be orgnised in (sub) directories. It's advisable, only to add code to a project, but not data. You'll soon understand why... Multiple edits and additions of new files are grouped into *commits*. The power of Git is that it knows the entire history of all the files in your repository. Therefore, it allows you to recover previous versions (previous commits) and track changes between them. Git also allows you to have multiple versions of your repository (*branches*), but we won't use this here. 
+Git is a program which lets you organise your code development and collaborate. The basic unit of a code project is a *repository*, which usually contains multiple source code files that may be orgnised in (sub) directories. It's advisable, only to add code to a project, but not data. You'll soon understand why... Multiple edits and additions of new files are grouped into *commits*. The power of Git is that it knows the entire history of all the files in your repository. Therefore, it allows you to recover previous versions (previous commits) and track changes between them. Git also allows you to have multiple versions of your repository (*branches*), but we won't use this here. 
 
 Your Git repository exists locally, that is, on your computer. But the power of Git really only plays out when your local repository has its counterpart in the cloud. Different services exist to host a copy of your repository remotely (e.g., GitHub or GitLab). Git lets you *push* (upload) your commits to this *remote* copy and *pull* (download) changes that have been uploaded by your collaborator or yourself from a different *clone* (local copy) of your repository.
 
