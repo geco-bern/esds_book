@@ -119,13 +119,14 @@ Once you pick up your work again, either stop the environment you're working wit
 
 ## Writing code
 
-You all have entered individual statements into the R console. For example:
+You probably all have entered individual statements into the R console. For example:
 
 ```{r}
 print(mean(c(1,2,3)))
 ```
 
-Congratulations, you're already coding! But usually, multiple statments are needed to get you, e.g., from the raw data you read into R to final numbers and figures that make up your thesis or paper. Together, these multiple statments constitute a *workflow*. It is essential that all workflows that underlie results of publications be *reproducible*. To achieve this, you can write multiple statements into an R script, save it, and enable your peers to reproduce the same workflow. This is what you will do as an exercise at the end of this session.
+Congratulations, you're already coding!
+But usually, multiple statments are needed to get, e.g., from the raw data you read into R to final numbers and figures that make up your thesis or paper. Together, these multiple statments constitute a *workflow*. It is essential that all workflows that underlie results of publications are *reproducible*. To achieve this, you can write multiple statements into an R script, save it, and enable your peers to reproduce the same workflow. This is what you will do as an exercise at the end of this session.
 
 An R script is basically a text file, named with the suffix `.R` to indicate that it is executable by R. Executing the script is running each statement, line-by-line, starting from the top, and can be done in R by:
 
@@ -161,7 +162,7 @@ c <- 10 # c() is used to create a vector (example <- c(1, 2, 3))
 
 ### Comments
 
-Adding comments helps to explain exactly what the code is doing. This makes it easy to understand, modify, and can be key when debugging. In R source files, comments are prefixed with a `#`, which means that all what's right of the `#` is not interpreted by R. If written well, anyone new to the code or even yourself returning to it after some time should easily be able to follow what was done and why it was done. 
+Adding comments helps to explain exactly what the code is doing. This makes it easy to understand and modify the code, and can be key when debugging. In R source files, comments are prefixed with a `#`, which means that all what's right of the `#` is not interpreted by R. If written well, anyone new to the code or even yourself returning to it after some time should easily be able to follow what was done and why it was done. 
 
 ### Syntax
 
@@ -196,13 +197,13 @@ Next, load all **libraries** needed within the script.
 
 (For this chapter, we'll mostly work with functions already integrated into R directly, also known as *base R*. Additionally, you'll work with functions from *tidyverse*. *tidyverse* is a collection of packages specifically designed for writing efficient data science workflows.)
 
-Go ahead and click the "play" icon to run on the next cell.
+<!-- Go ahead and click the "play" icon to run on the next cell. -->
 
 ```{r message=F}
 library(tidyverse)
 ```
 
-This loads all the package of the tidyverse at once (ggplot2, dplyr, tidyr, ...), some of which you will learn more about in Chapter 4.
+This loads all the packages of the tidyverse at once (ggplot2, dplyr, tidyr, ...), some of which you will learn more about in Chapter 4.
 
 Next, **source** any scripts and **load** data.
 
@@ -220,7 +221,7 @@ library("tidyverse")
 Often, analyses require so many steps that your script gets excessively long. Over 2000 lines of code in one file are hard to digest. To split your code up, consider the following points:
 
 - Avoid duplicating code. If the same sequence of multiple statements or functions are to be applied repeatedly to different objects, then it's usually advisable to "package" them up into a new function and apply this single function to each object. This may sound abstract now, but you'll encounter this again in later chapters.
-- Functions can be saved in separate source files. It's advised to save all functions that belong to a project or workflow in a subdirectory (e.g., named `R/`. To use the functions in your script, you have to load them into the workspace, e.g., by `source("./R/my_function.R")`.
+- Functions can be saved in separate source files. It's advised to save all functions that belong to a project or workflow in a subdirectory (e.g., named `R/`. To use these functions in your script, you have to load them into the workspace, e.g., by `source("./R/my_function.R")`.
 - Always use relative paths to load or write files. E.g., `"./R/my_function.R"` points to a file named `my_function.R` that sits in a subdirectory `R` of the current working directory (`.`).
 - Write figures into a separate subdirectory (e.g., `./fig/`), and processed data files into a different one (e.g., `./data/`).
 - Keep your script and all these subdirectories from/to which it loads/writes files together in a main directory - the project directory. All code of a project directory, including its subdirectories, make up a Git repository.
@@ -244,9 +245,12 @@ Having data in a tidy format greatly facilitates all data wrangling steps. The c
 
 ## Reading data into R
 
-In the next step, we want to read the data. We're going to work with FLUXNET data from the site "Laegern" ([CH-Lae](https://gl.ethz.ch/infrastructure/sites/laegeren.html)), located close to Zürich. FLUXNET is a global network of sites where ecosystem-atmosphere exchange fluxes are measured (e.g., CO~2~, water vapour). In Switzerland, there is a total of six such sites. Laegern is one of them. The data is stored in a `.csv` file. To import it into the R workspace, we use the function `read_csv()` from the tidyverse. In the other R code, you'll also encounter the base R `read.csv()` function. However, `read_csv()` is much faster and reads data into a tidyverse-data frame (a *tibble*) which has some useful additional characteristics, on top of a common R data frame. To tell the function where the data is located, pass the data's path as an argument. You can either enter an *absolute path*, starting from `C:/` on a Windows computer or `~/` on a Mac. Or, alternatively, you can provide a *relative path*, where `./` points to the present working directory and `../` is one level up, or `../../` is two levels up, etc.
+In the next step, we want to read the data. We're going to work with FLUXNET data from the site "Laegern" ([CH-Lae](https://gl.ethz.ch/infrastructure/sites/laegeren.html)), located close to Zürich. FLUXNET is a global network of sites where ecosystem-atmosphere exchange fluxes are measured (e.g., CO~2~, water vapour). In Switzerland, there is a total of six such sites. Laegern is one of them. The data is stored in a `.csv` file. To import it into the R workspace, we use the function `read_csv()` from the tidyverse packages. In the other R code, you'll also encounter the base R `read.csv()` function. However, `read_csv()` is much faster and reads data into a tidyverse-data frame (a *tibble*) which has some useful additional characteristics, on top of a common R data frame. To tell the function where the data is located, pass the data's path as an argument. You can either enter an *absolute path*, starting from `C:/` on a Windows computer or `~/` on a Mac. Or, alternatively, you can provide a *relative path*, where `./` points to the present working directory and `../` is one level up, or `../../` is two levels up, etc.
 
 ```{r message=F}
+# set working directory
+setwd("~/Documents/ETH/ESDS")
+# use a relative path to read the data
 df <- read_csv("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3.csv")
 print(df) # to print an overview of the data frame
 ```
@@ -277,7 +281,7 @@ We have loaded the data frame `df` into the workspace. Now, we can check the dat
 - Size
   - `dim()`  - returns the size of the dimensions of an object (here: number of rows and columns)
   - `nrow()` - returns the number of rows of an object
-  - `ncol()` - returns the nuber of columns of an object
+  - `ncol()` - returns the number of columns of an object
 - Content
   - `head()` - returns the first 6 rows
   - `tail()` - returns the last 6 rows
