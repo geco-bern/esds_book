@@ -1,28 +1,28 @@
 # Supervised Learning Neural Networks: the theory
----
+
 
 ### Learning objectives
-* Build and train neural networks for binary classification
-* Observe the influence of network architecture on model performance
-* Assess model performance using the following metrics 
-    * Accuracy
-    * Precision 
-    * Recall 
-    * F-Score
-    * Receiver operating characteristic (ROC) curves
-    * Area under the ROC curve 
-* Account for the stochasticity of model training when assessing model performance
+- Build and train neural networks for binary classification
+- Observe the influence of network architecture on model performance
+- Assess model performance using the following metrics 
+    - Accuracy
+    - Precision 
+    - Recall 
+    - F-Score
+    - Receiver operating characteristic (ROC) curves
+    - Area under the ROC curve 
+- Account for the stochasticity of model training when assessing model performance
 
-<div style="border: 2px black solid; border-radius: 7px; padding:10px">
-    <b>Important points from the lecture</b><br/>
-    <br>
-    <ul>
-<li>For binary classification problems, the output node often uses a <i>sigmoid activation function. </i></li>
-<li>A <i>classification threshold</i> is applied to the output of the sigmoid activation function to determine which label is predicted.</li>
-<li><i>Accuracy</i> is a popular measure of model performance, but it is not useful for class-imbalanced data.</li>
-<li>The area under the <i>ROC curve </i> is a measure of model performance that considers the full range of possible classification thresholds.</li>
-<li>Like accuracy, the area under the ROC curve can also be misleading in datasets with strong class imbalance </li>
-<li>Regression and classification problems require different measures of model performance.</li>
+
+
+**Important points from the lecture**
+
+- For binary classification problems, the output node often uses a *sigmoid activation function*.
+- A *classification threshold* is applied to the output of the sigmoid activation function to determine which label is predicted.
+- *Accuracy* is a popular measure of model performance, but it is not useful for class-imbalanced data.
+- The area under the *ROC curve * is a measure of model performance that considers the full range of possible classification thresholds.
+- Like accuracy, the area under the ROC curve can also be misleading in datasets with strong class imbalance 
+- Regression and classification problems require different measures of model performance.
 
 
 
@@ -68,65 +68,74 @@ options(repr.plot.width = 10, repr.plot.height = 7)
 #### Construct a toy dataset
 For this exercise we will create a toy dataset that illusrates some of the vagaries (unexpected changes that cannot be controlled but can influence a situation) of classification, as well as some of the pros and cons of model performance measures. 
 
-In this toy dataset, each example has two real-valued features on the unit interval (i.e., these values are between 0 and 1). Each example has one of two labels, <font color =green> green </font> or <font color =blue> blue </font>. The dataset is constructed such that those examples _within_ a specified radius of the point (0.5, 0.5) are assigned a <font color =green> green </font> label and those _outside_ this radius are assigned a <font color =blue> blue </font> label. 
-
+In this toy dataset, each example has two real-valued features on the unit interval (i.e., these values are between 0 and 1). Each example has one of two labels, $\color{green}{\text{green}}$ or $\color{blue}{\text{blue}}$. The dataset is constructed such that those examples _within_ a specified radius of the point (0.5, 0.5) are assigned a $\color{green}{\text{green}}$ label and those _outside_ this radius are assigned a $\color{blue}{\text{blue}}$ label.
 
 ```{r}
-#Seed the random number generator for reproducible results
+# Seed the random number generator for reproducible results
 set.seed(41)
 
-#Number of examples
-N = 10000 
-#Square radius  of inner circle
-radius_2 = 0.125 
-#Noise applied to the boundary separating green and blue examples
-noise = 0.025 
+#  Number of examples
+N <- 10000 
 
-#Place N points on the unit square. 
-#Label those within some radius 0, and those outside 1.
-x1 = runif(n = N,min = 0,max = 1) 
-x2 = runif(n = N,min = 0,max = 1) 
-y = ((x1-0.5)**2 + (x2-0.5)**2) + rnorm(n = N,mean = 0, sd = noise) > radius_2
+#  Square radius  of inner circle
+radius_2 <- 0.125 
 
-#Create a data frame
-df_data = data.frame(x1 = x1, x2 = x2, y = y*1)
+#  Noise applied to the boundary separating green and blue examples
+noise <- 0.025 
 
-#Split the data into training (80%) and test (20%) sets
-#Make a breakpoint at 80%
-breakpoint = as.integer(0.8 * nrow(df_data))
+#  Place N points on the unit square. 
+#  Label those within some radius 0, and those outside 1.
+x1 <- runif(n = N, min = 0, max = 1) 
+x2 <- runif(n = N, min = 0, max = 1) 
+y  <- ((x1-0.5)**2 + (x2-0.5)**2) + rnorm(n = N,mean = 0, sd = noise) > radius_2
 
-#training data
-df_train = df_data[1:breakpoint,]
+#  Create a data frame
+df_data <- data.frame(x1 = x1, x2 = x2, y = y*1)
 
-#testing data
-df_test = df_data[(breakpoint+1):nrow(df_data),]
+#  Split the data into training (80%) and test (20%) sets
+#  Make a breakpoint at 80%
+breakpoint <- as.integer(0.8 * nrow(df_data))
+
+#  training data
+df_train <- df_data[1:breakpoint,]
+
+#  testing data
+df_test <- df_data[(breakpoint + 1):nrow(df_data),]
 ```
 
-Let's visualize our data to get a feel for the classification task at hand. Let's also visualize the true decision boundary used to delineate the <font color =green> green </font> from the <font color =blue> blue </font> labels, and print the number of examples per label. 
+Let's visualize our data to get a feel for the classification task at hand. Let's also visualize the true decision boundary used to delineate the $\color{green}{\text{green}}$ from the $\color{blue}{\text{blue}}$ labels, and print the number of examples per label. 
 
-_Notice_ that there are more examples labeled <font color =blue> blue </font> than there are examples labeled <font color =green> green </font>. 
+_Notice_ that there are more examples labeled $\color{blue}{\text{blue}}$ than there are examples labeled $\color{green}{\text{green}}$. 
 
 This means the data are **class imbalanced** (but not heavily).
 
 
 ```{r}
-#visualize our data
+# visualize our data
 df_data %>% 
-    ggplot(aes(x = x1 , y = x2, color =as.factor(y)))+
-    geom_point()+
-    geom_path(aes(x=0.5+sqrt(radius_2)*cos(seq(0,2*pi,length.out=N)),
-                  y=0.5+sqrt(radius_2)*sin(seq(0,2*pi,length.out=N)),
+  
+    ggplot(aes(x = x1 , y = x2, color  =  as.factor(y))) +
+  
+    geom_point() +
+  
+    geom_path(aes(x =  0.5 + sqrt(radius_2) * cos(seq(0, 2 * pi, length.out =  N)),
+                  y =  0.5 + sqrt(radius_2) * sin(seq(0, 2 * pi, length.out =  N)),
                   linetype = ' True \n Decision \n Boundary'),
                   color = 'black',
-                  size = 3)+
-    scale_color_manual(name = 'Class',values = c('0'="green",'1'='blue'))+
-    labs(linetype='')+
+                  size = 3) +
+  
+    scale_color_manual(name = 'Class', 
+                       values = c('0' = "green", '1' = 'blue')) +
+  
+    labs(linetype = '') +
+  
     theme_grey(base_size = 15)
 
 
-#print some summary statistics about these data
-cat('Proportion of data in class blue: ' , sum(df_data$y)/length(df_data$y),'\n')
-cat('Proportion of data in class green: ' , 1-sum(df_data$y)/length(df_data$y),'\n')
+# print some summary statistics about these data
+cat('Proportion of data in class blue: ' , sum(df_data$y) / length(df_data$y), '\n')
+
+cat('Proportion of data in class green: ' , 1 - sum(df_data$y) / length(df_data$y), '\n')
 ```
 
     Proportion of data in class blue:  0.6018 
@@ -142,24 +151,27 @@ A more appropriate way to split the data into training and test sets is to take 
 
 ```{r}
 # split with r sample and strata = y
-split = initial_split(df_data, prop = 0.8, strata = 'y')
+split <- initial_split(df_data, prop = 0.8, strata = 'y')
 
 #train set
-df_train = training(split)
+df_train <- training(split)
 
 #test set
-df_test = testing(split)
+df_test <- testing(split)
 
 #print statistics for each set
+
 ## training set
+
 cat("Training set \n")
-cat('Proportion of data in class blue: ' , sum(df_train$y)/length(df_train$y),'\n')
-cat('Proportion of data in class green: ' , 1-sum(df_train$y)/length(df_train$y),'\n')
+cat('Proportion of data in class blue: ' , sum(df_train$y) / length(df_train$y), '\n')
+cat('Proportion of data in class green: ' , 1 - sum(df_train$y) / length(df_train$y), '\n')
 
 ##test set
+
 cat("\nTest set \n")
-cat('Proportion of data in class blue: ' , sum(df_test$y)/length(df_test$y),'\n')
-cat('Proportion of data in class green: ' , 1-sum(df_test$y)/length(df_test$y),'\n')
+cat('Proportion of data in class blue: ' , sum(df_test$y) / length(df_test$y), '\n')
+cat('Proportion of data in class green: ' , 1 - sum(df_test$y) / length(df_test$y), '\n')
 
 ```
 
@@ -180,10 +192,9 @@ As you saw in your previous tutorial, Keras is a powerful API for building, trai
 
 Here we'll build and consider more complex network architectures. To do so, we'll generalize the `build_and_train_model` function from our previous tutorial. Specifically, we'll change the function such that it builds and trains a network with an arbitrary number of layers and nodes per layer, such that the number of nodes per layer is the same for all layers, except the output layer, which will contain just a single node with a sigmoid activation function.
 
-<div style="border: 2px black solid; border-radius: 7px; padding:10px">
-<b>Neural Networks: A closer look</b><br/>
-    <br>
-    
+
+*Neural Networks: A closer look*
+
 Before we procceed further let's have a closer look on neural networks and what keras hides from the user. To this end, we will manually create a neural network with 1 hidden layer with 5 units and an output layer (with 1 unit).
 
 Let 's assume that we have d features (x) and therefore $W_1$(weights) is a matrix with dimension $d\times 5$ and $b_1$ has a dimension $5\times 1$(biases). Then the output of the 1st hidden layer is
@@ -213,14 +224,16 @@ As it is obvious a neural network is a collection of connected linear models wit
 
 
 ```{r}
-#Learning rate
-lr = 0.01
-#Number of epochs
-ne = 100
-#Batch size
-bs = 512
+# Learning rate
+lr <- 0.01
 
-build_and_train_model = function (data = df_train,
+# Number of epochs
+ne <- 100
+
+# Batch size
+bs <-  512
+
+build_and_train_model <- function (data = df_train,
                                   learning_rate = lr, 
                                   num_epochs = ne, 
                                   batch_size = bs, 
@@ -229,62 +242,67 @@ build_and_train_model = function (data = df_train,
                                   print_model_summary = F
                                  ){
     
-    #Most models are so-called 'sequential' models
-    model = keras_model_sequential()
+    # Most models are so-called 'sequential' models
+    model <- keras_model_sequential()
     
-    #Keras makes building neural networks as simple as adding layer upon layer with simple sequential 
-    #calls to the function "layer_dense". Take a moment to appreciate how easy that makes things.
+    # Keras makes building neural networks as simple as adding layer upon layer with simple sequential 
+    # calls to the function "layer_dense". Take a moment to appreciate how easy that makes things.
     
-    #The input layer is the only layer that requires the user to specify its shape. The shape of all
-    #subsequent layers is automatically determined based on the output of the preceding layer. Let's
-    #use a ReLU activation function in each node in the input and hidden layers.
-    model = model %>% layer_dense(units=num_units_per_layer, input_shape=(ncol(data)-1), activation="relu")
+    # The input layer is the only layer that requires the user to specify its shape. The shape of all
+    # subsequent layers is automatically determined based on the output of the preceding layer. Let's
+    # use a ReLU activation function in each node in the input and hidden layers.
+    model <- model %>% layer_dense(units = num_units_per_layer, 
+                                   input_shape = (ncol(data) - 1), 
+                                   activation = "relu")
     
-    #Add the hidden layers. Note this requires just a simple for loop that calls the function "layer_dense"
-    #again and again.
+    # Add the hidden layers. Note this requires just a simple for loop that calls the function "layer_dense"
+    # again and again.
     if (num_layers>1){
         for (i in 1:(num_layers-1)){
-            model = model %>% layer_dense(units=num_units_per_layer, activation="relu")
+            model <- model %>% layer_dense(units = num_units_per_layer, 
+                                           activation = "relu")
         }
     }
     
-    #Add the output layer. Note that it uses a sigmoid activation function. Make sure you know why.
-    model = model %>% layer_dense(units=1, activation="sigmoid")    
+    # Add the output layer. Note that it uses a sigmoid activation function. Make sure you know why.
+    model <- model %>% layer_dense(units = 1, activation = "sigmoid")    
     
-    #Print the model description
+    # Print the model description
     if (print_model_summary){
     
         summary(model)        
     }
          
-    #Specify the learning rate for stochastic gradient descent
-    opt = optimizer_adam(lr = learning_rate)
+    #  Specify the learning rate for stochastic gradient descent
+    opt <- optimizer_adam(lr = learning_rate)
 
-    #Compile the model, using binary cross-entropy to define loss. Measure accuracy during training.
-    #Note how easy Keras makes this. Did you have to write any functions for loss or for measuring model
-    #performance during training? No, Keras takes care of all of this for you.
-    model %>% compile(optimizer=opt, loss='binary_crossentropy', metrics= list('accuracy'))         
+    # Compile the model, using binary cross-entropy to define loss. Measure accuracy during training.
+    # Note how easy Keras makes this. Did you have to write any functions for loss or for measuring model
+    # performance during training? No, Keras takes care of all of this for you.
+    model %>% compile(optimizer = opt, 
+                      loss ='binary_crossentropy', 
+                      metrics = list('accuracy'))         
 
-    #Fit the model
-    history = model %>% fit(x = as.matrix(data[,c('x1','x2')]),
+    # Fit the model
+    history <- model %>% fit(x = as.matrix(data[, c('x1', 'x2')]),
                             y = data$y,
-                            epochs=num_epochs,
-                            batch_size=batch_size,
+                            epochs = num_epochs,
+                            batch_size = batch_size,
                             )
 
-    #Return the model and the training history
+    # Return the model and the training history
     return(list(model = model, history = history))                                      
 }
 ```
 
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-    <b>Checkpoint</b><br/>
-    Why does the output layer use a sigmoid activation function rather than a linear activation function? Can you think of a case where you'd want the output layer to use a linear activation function?
-    </div>
+**Checkpoint**
 
-#### Answer
+Why does the output layer use a sigmoid activation function rather than a linear activation function? Can you think of a case where you'd want the output layer to use a linear activation function?
+
+**Solution**
 
 For a continuous response y then the output activation should be linear. 
+
 
 Can we train an accurate classifier with just a single layer of a single node? 
 
@@ -294,7 +312,7 @@ In the context of this toy dataset, it's the number of examples predicted to be 
 
 
 ```{r}
-c(model,history) %<-% build_and_train_model(data = df_train,
+c(model, history) %<-% build_and_train_model(data = df_train,
                                             learning_rate = 0.01,
                                             batch_size = 512,
                                             num_epochs = 100,
@@ -302,7 +320,7 @@ c(model,history) %<-% build_and_train_model(data = df_train,
                                             num_units_per_layer =  1,
                                             print_model_summary = T)
 
-cat('Final training accuracy: ', round(history$metrics$acc[ne],3),'\n')
+cat('Final training accuracy: ', round(history$metrics$acc[ne], 3), '\n')
 ```
 
     Model: "sequential"
@@ -343,23 +361,24 @@ To see if you're intuition is correct, let's plot our model predictions on the t
 
 
 ```{r}
-#Predict on test data. Note how easy this is to do in Keras.
-pred = predict(model,as.matrix(df_test[,c('x1','x2')]))
+# Predict on test data. Note how easy this is to do in Keras.
+pred <- predict(model, as.matrix(df_test[, c('x1', 'x2')]))
 
-#Set the classification threshold to 0.5
-threshold = 0.5
+# Set the classification threshold to 0.5
+threshold <- 0.5
 
-#Make label predictions based on the classification threshold
-y_pred = (pred >= threshold)*1
+# Make label predictions based on the classification threshold
+y_pred <- (pred >= threshold) * 1
 
-#Plot the predictions
+# Plot the predictions
 df_test %>%
-    ggplot(aes(x = x1, y = x2))+
-    geom_point(color = ifelse(y_pred==1,'blue','green'))
+    ggplot(aes(x = x1, y = x2)) +
+    geom_point(color = ifelse(y_pred == 1, 'blue', 'green'))
 
-#Evaluate and print model performance on test data
-c(loss,acc) %<-% evaluate(model,as.matrix(df_test[,c('x1','x2')]),df_test$y)
-cat('Accuracy on held-out test data: ' , round(acc,3),'\n')
+# Evaluate and print model performance on test data
+c(loss, acc) %<-% evaluate(model, as.matrix(df_test[,c('x1', 'x2')]), df_test$y)
+
+cat('Accuracy on held-out test data: ' , round(acc, 3), '\n')
 ```
 
     Accuracy on held-out test data:  0.602 
@@ -382,25 +401,25 @@ These metrics can be summarized in the so-called **_confusion matrix_**.
 
 ![](./figures/confusion-matrix.png)
 
-In this toy dataset, we'll call the <font color=blue>blue</font> examples <font color=blue>_'positive'_</font> and the <font color=green>green</font> examples <font color=green>_'negative'_</font>. This terminology makes more sense in more realistic classification problems, such as delineating spam email from non-spam.
+In this toy dataset, we'll call the $\color{blue}{\text{blue}}$ examples $\color{blue}{\text{'positive'}}$ and the $\color{green}{\text{green}}$ examples $\color{green}{\text{'negative'}}$. This terminology makes more sense in more realistic classification problems, such as delineating spam email from non-spam.
 
 ### Evaluate model performance
 Let's write a function that calculates the building blocks of the confusion matrix.
 
 
 ```{r}
-confusion = function(y_true, pred_out, threshold = 0.5, verbose = T){
+confusion <- function(y_true, pred_out, threshold = 0.5, verbose = T){
   
-  true_positives = sum((pred_out >= threshold) & (y_true == 1))
-  true_negatives = sum((pred_out < threshold) & (y_true == 0))
+  true_positives  = sum((pred_out >= threshold) & (y_true == 1))
+  true_negatives  = sum((pred_out < threshold)  & (y_true == 0))
   false_positives = sum((pred_out >= threshold) & (y_true == 0))
-  false_negatives = sum((pred_out < threshold) & (y_true == 1))
+  false_negatives = sum((pred_out < threshold)  & (y_true == 1))
   
   if (verbose) {
-    cat('true positives: ',true_positives,'\n')
-    cat('true negatives: ',true_negatives,'\n')
-    cat('false positives: ',false_positives,'\n')
-    cat('false negatives: ',false_negatives,'\n')
+    cat('true positives: ',  true_positives,  '\n')
+    cat('true negatives: ',  true_negatives,  '\n')
+    cat('false positives: ', false_positives, '\n')
+    cat('false negatives: ', false_negatives, '\n')
   }
   return (list(tp = true_positives, tn = true_negatives, fp = false_positives, fn = false_negatives))
 }
@@ -416,7 +435,9 @@ Let's apply this function to our model predictions.
 
 
 ```{r}
-c(true_positives, true_negatives,false_positives, false_negatives) %<-% confusion(df_test$y, pred, threshold)
+c(true_positives, true_negatives, false_positives, false_negatives) %<-% confusion(df_test$y, 
+                                                                                   pred, 
+                                                                                   threshold)
 ```
 
     true positives:  1203 
@@ -429,10 +450,15 @@ This reveals a more nuanced picture of model performance. Sure, accuracy is bett
 
 These four metrics are the basis for two additional, commonly used performance metrics:
 
-* **precision**: $\frac{\mbox{TP}}{\mbox{TP + FP}}$
-<br>
-<br>
-* **recall**: $\frac{\mbox{TP}}{\mbox{TP + FN}} = \frac{\mbox{TP}}{\mbox{P}}$
+This reveals a more nuanced picture of model performance. Sure, accuracy is better than a coin toss, but we now see that we do not correctly predict _a single negative example_. 
+
+These four metrics are the basis for two additional, commonly used performance metrics:
+
+- **precision**: $\frac{\mbox{TP}}{\mbox{TP + FP}}$
+
+
+- **recall**: $\frac{\mbox{TP}}{\mbox{TP + FN}} = \frac{\mbox{TP}}{\mbox{P}}$
+
 
 ![](./figures/1200px-Precisionrecall.svg.png)
 
@@ -442,11 +468,11 @@ Let's define a function that calculates precision and recall.
 
 
 ```{r}
-precision_and_recall = function(true_positives, true_negatives,false_positives, false_negatives, verbose=T){
+precision_and_recall <- function(true_positives, true_negatives,false_positives, false_negatives, verbose=T){
   
-  #Protect against division by zero
+  # Protect against division by zero
   if ((true_positives + false_positives) > 0){
-    precision = true_positives /(true_positives + false_positives)
+    precision = true_positives / (true_positives + false_positives)
   }
   else{
     precision = 1
@@ -460,8 +486,8 @@ precision_and_recall = function(true_positives, true_negatives,false_positives, 
   }
   
   if (verbose){
-    cat("Precision: " ,precision,"\n")
-    cat("Recall: ",recall,"\n")
+    cat("Precision: ", precision, "\n")
+    cat("Recall: ", recall, "\n")
   }
   
   return (list(precision = precision, recall = recall))
@@ -472,14 +498,18 @@ Let's apply this function to our model predictions.
 
 
 ```{r}
-c(precision, recall) %<-% precision_and_recall(true_positives, true_negatives,false_positives, false_negatives)
+c(precision, recall) %<-% precision_and_recall(true_positives, 
+                                               true_negatives, 
+                                               false_positives, 
+                                               false_negatives)
 ```
 
     Precision:  0.6018009 
     Recall:  1 
 
 
-Now we see that the model "<font color=blue>always blue</font>" does a great job at correctly predicting positive examples (_'recall'_), but many of its positive predictions are incorrect (_'precision'_).
+
+Now we see that the model $\color{blue}{\text{always blue}}$ does a great job at correctly predicting positive examples (_'recall'_), but many of its positive predictions are incorrect (_'precision'_).
 
 Wouldn't it be nice if we could combine _precision_ and _recall_ into a single metric? 
 Ideally, this metric would take on a high value when both _precision_ and _recall_ are large and a low value when either _precision_ or _recall_ is small.
@@ -494,21 +524,21 @@ So now let's also define a function for the F-score and apply it to the previous
 
 
 ```{r}
-f_score = function(precision,recall,verbose=T){
+f_score <- function(precision, recall, verbose = T){
     
     #Calculate F
-    f = 2*precision*recall/(precision+recall)
+    f = 2 * precision * recall / (precision + recall)
     
-    #If the user has requested verbose output, provide it
+    # If the user has requested verbose output, provide it
     if(verbose){
-        cat("F-score: ",f)
+        cat("F-score: ", f)
     }
     
-    #Return F
+    # Return F
     return(f)
 }
 
-f = f_score(precision,recall)
+f <- f_score(precision, recall)
 ```
 
     F-score:  0.7514054
@@ -521,8 +551,11 @@ Let's try a single layer of two nodes.
 
 
 ```{r}
-c(model,history) %<-% build_and_train_model(num_layers = 1,num_units_per_layer =  2,print_model_summary = T)
-cat('Final training accuracy: ', round(history$metrics$acc[ne],3),'\n')
+c(model, history) %<-% build_and_train_model(num_layers = 1, 
+                                             num_units_per_layer =  2, 
+                                             print_model_summary = T)
+
+cat('Final training accuracy: ', round(history$metrics$acc[ne], 3), '\n')
 ```
 
     Model: "sequential_2"
@@ -548,28 +581,37 @@ Now that you've obtained a model with improved training accuracy, let's see how 
 
 
 ```{r}
-#Predict on test data
-pred = predict(model,as.matrix(df_test[,c('x1','x2')]))
+# Predict on test data
+pred <- predict(model, as.matrix(df_test[, c('x1', 'x2')]))
 
-#Set the classification threshold
-threshold = 0.5
+# Set the classification threshold
+threshold <- 0.5
 
-#Make label predictions based on the classification threshold
-y_pred = (pred >= threshold)*1
+# Make label predictions based on the classification threshold
+y_pred <- (pred >= threshold) * 1
 
-#Plot our predictions
+# Plot our predictions
 df_test %>%
-    ggplot(aes(x = x1, y = x2))+
-    geom_point(color = ifelse(y_pred==1,'blue','red'))
+    ggplot(aes(x = x1, y = x2)) +
+    geom_point(color = ifelse(y_pred == 1, 'blue', 'red'))
 
-#Evaluate model performance on test data
-c(loss,acc) %<-% evaluate(model,as.matrix(df_test[,c('x1','x2')]),df_test$y)
-cat('Accuracy on held-out test data: ' , round(acc,3),'\n')
+# Evaluate model performance on test data
+c(loss,acc) %<-% evaluate(model, as.matrix(df_test[, c('x1', 'x2')]), df_test$y)
 
-#Print precision,recall and F-score
-c(true_positives, true_negatives,false_positives, false_negatives) %<-% confusion(df_test$y, pred, threshold,verbose=F)
-c(precision, recall) %<-% precision_and_recall(true_positives, true_negatives,false_positives, false_negatives)
-f = f_score(precision,recall)
+cat('Accuracy on held-out test data: ', round(acc, 3), '\n')
+
+# Print precision,recall and F-score
+c(true_positives, true_negatives, false_positives, false_negatives) %<-% confusion(df_test$y, 
+                                                                                   pred, 
+                                                                                   threshold, 
+                                                                                   verbose = F)
+
+c(precision, recall) %<-% precision_and_recall(true_positives, 
+                                               true_negatives, 
+                                               false_positives, 
+                                               false_negatives)
+
+f <- f_score(precision, recall)
 ```
 
     Accuracy on held-out test data:  0.75 
@@ -601,31 +643,43 @@ Again, you may have to train the model several times due to the stochastic natur
 
 
 ```{r}
-c(model,history) %<-% build_and_train_model(num_layers = 4, num_units_per_layer =  8,print_model_summary = T)
+c(model, history) %<-% build_and_train_model(num_layers = 4, 
+                                             num_units_per_layer =  8, 
+                                             print_model_summary = T)
+
 cat('Final training accuracy: ', round(history$metrics$acc[ne],3),'\n')
 
-#predict on test data
-pred = predict(model,as.matrix(df_test[,c('x1','x2')]))
+# predict on test data 
+pred <- predict(model, as.matrix(df_test[, c('x1', 'x2')]))
 
-#set the classification threshold
-threshold = 0.5
+# set the classification threshold
+threshold <- 0.5
 
-#make predictions
-y_pred = (pred >= threshold)*1
+# make predictions
+y_pred <- (pred >= threshold) * 1
 
-#plot our predictions
+# plot our predictions
 df_test %>%
-    ggplot(aes(x = x1, y = x2))+
-    geom_point(color = ifelse(y_pred==1,'blue','red'))
+    ggplot(aes(x = x1, y = x2)) +
+    geom_point(color = ifelse(y_pred == 1, 'blue', 'red'))
 
 #evaluate model performance on test data
-c(loss,acc) %<-% evaluate(model,as.matrix(df_test[,c('x1','x2')]),df_test$y)
-cat('Accuracy on held-out test data: ' , round(acc,3),'\n')
+c(loss, acc) %<-% evaluate(model, as.matrix(df_test[, c('x1', 'x2')]), df_test$y)
 
-#print precision,recall and F-score
-c(true_positives, true_negatives,false_positives, false_negatives) %<-% confusion(df_test$y, pred, threshold,verbose = F)
-c(precision, recall) %<-% precision_and_recall(true_positives, true_negatives,false_positives, false_negatives)
-f = f_score(precision,recall)
+cat('Accuracy on held-out test data: ', round(acc, 3), '\n')
+
+#print precision, recall and F-score
+c(true_positives, true_negatives, false_positives, false_negatives) %<-% confusion(df_test$y, 
+                                                                                   pred, 
+                                                                                   threshold, 
+                                                                                   verbose = F)
+
+c(precision, recall) %<-% precision_and_recall(true_positives, 
+                                               true_negatives, 
+                                               false_positives, 
+                                               false_negatives)
+
+f <- f_score(precision, recall)
 ```
 
     Model: "sequential_1"
@@ -658,11 +712,11 @@ f = f_score(precision,recall)
 
 What do you observe? Does model performance improve with model complexity? If so, is this always the case?
 
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-    <b>Checkpoint</b><br/>
-    Compare the number of trainable parameters of this model with the previous one. Comment on this.
-    </div>
-# your answer
+**Checkpoint**
+
+Compare the number of trainable parameters of this model with the previous one. Comment on this.
+
+
 **Solution**
 
 The number of trainable parameters for the 1st model is 9 while for the last is 249. This increase is huge (almost 28 times the previous one). 
@@ -675,24 +729,29 @@ First, calculate precision and recall for thresholds between 0.05 and 0.95.
 
 
 ```{r}
-#Consider 100 thresholds between 0 and 1
-num_thresholds = 100
-thresholds = seq(0,1,length.out = num_thresholds)
+# Consider 100 thresholds between 0 and 1
+num_thresholds <- 100
+thresholds <- seq(0, 1, length.out = num_thresholds)
 
-#Allocate space for the four metrics of the confusion matrix,
-#as well as for precision and recall
-fp = rep(NA,num_thresholds)
-fn = rep(NA,num_thresholds)
-tp = rep(NA,num_thresholds)
-tn = rep(NA,num_thresholds)
-precision = rep(NA,num_thresholds)
-recall = rep(NA,num_thresholds)
+# Allocate space for the four metrics of the confusion matrix, as well as for precision and recall
+fp <- rep(NA, num_thresholds)
+fn <- rep(NA, num_thresholds)
+tp <- rep(NA, num_thresholds)
+tn <- rep(NA, num_thresholds)
+precision <- rep(NA, num_thresholds)
+recall <- rep(NA, num_thresholds)
 
-#Loop over the thresholds, calculate the confusion matrix as well as precision and recall
+# Loop over the thresholds, calculate the confusion matrix as well as precision and recall
 for (i in 1:num_thresholds){
     
-    c(tp[i], tn[i],fp[i], fn[i]) %<-% confusion(df_test$y, pred, thresholds[i],verbose = F)
-    c(precision[i], recall[i]) %<-% precision_and_recall(tp[i], tn[i],fp[i], fn[i],verbose = F)
+    c(tp[i], tn[i], fp[i], fn[i]) %<-% confusion(df_test$y, 
+                                                 pred, thresholds[i], 
+                                                 verbose = F)
+  
+    c(precision[i], recall[i]) %<-% precision_and_recall(tp[i], 
+                                                         tn[i], 
+                                                         fp[i], 
+                                                         fn[i], verbose = F)
     }
 ```
 
@@ -700,13 +759,25 @@ Plot precision and recall as a function of the classification threshold.
 
 
 ```{r}
-df = data.frame(x = thresholds,metrics = c(precision, recall),type = rep(c('precision','recall'),each=num_thresholds))
+df_pre_rec <- data.frame(x = thresholds, 
+                         metrics = c(precision, recall), 
+                         type = rep(c('precision','recall'), each = num_thresholds))
 
-df %>%
-    ggplot(aes(x=x,y=metrics,color = type))+
-    geom_line(lwd=1.5,lty=2)+
-    scale_color_manual(name = '',labels = c('Precision','Recall'),values = c('Red','Blue'))+
-    labs(x = 'Classification Threshold',y='')+
+df_pre_rec %>%
+  
+    ggplot(aes(x = x, 
+               y = metrics, 
+               color = type)) +
+  
+    geom_line(lwd = 1.5, 
+              lty = 2) +
+  
+    scale_color_manual(name = '', 
+                       labels = c('Precision','Recall'), 
+                       values = c('Red','Blue')) +
+  
+    labs(x = 'Classification Threshold', y = '') +
+  
     theme_grey(base_size = 15)
 ```
 
@@ -722,12 +793,13 @@ Intutuively, this behaivor was expected since if the model predict very easily t
 
 On the other hand, if we desire our model to be very confident while predicting the positive class (high classification threshold) we expect a high precision. But in this case, we are eager to misclassify a lot of positive examples and therefore a low recall is anticipated.
 
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-<b>Checkpoint</b><br/>
-1. Can you think of a real world examples where it's neccessary to have a high precision model (and potentially low recall)? <br>
+**Checkpoint**
+
+1. Can you think of a real world examples where it's neccessary to have a high precision model (and potentially low recall)?
+
 2. Can you think of a real world example where it's necassary to have a high recall model (and potentially low precision)? 
-</div>
-# your answers
+
+
 **Solution**
 
 1. Consider that you create a model for company X where the aim is to decide who is allowed to pass the company's office entrance. The input of the model is a real time face photo and the prediction is Yes or No. You do not want to allow strangers to get inside the offices. You only want company's related people. In this case your model should not have false positives. So you demand a high classication threshold and therefore a high precision. 
@@ -755,42 +827,52 @@ Let's write a function to calculate the ROC curve and the area under it.
 
 
 ```{r}
-#Area Under Curve
+# Area Under Curve
 simple_auc <- function(x, y){
-  #Revert order
-  x = rev(x)
-  y = rev(y)  
-  #Define rectangles, calculate area and add those
+  
+  # Revert order
+  x <- rev(x)
+  y <- rev(y)  
+  
+  # Define rectangles, calculate area and add those
   dx <- c(diff(x), 0)
   dy <- c(diff(y), 0)
-  sum(y * dx) + sum(dy * dx)/2
+  sum(y * dx) + sum(dy * dx) / 2
 }
 
-#ROC CURVE
-ROC = function(fpr, recall, viz = T){
+# ROC CURVE
+ROC <- function(fpr, recall, viz = T){
      
-    #Calculate the area under the ROC
-    auc = simple_auc(fpr,recall)
+    # Calculate the area under the ROC
+    auc = simple_auc(fpr, recall)
      
-    #Visualize the ROC
+    # Visualize the ROC
     if (viz){
         
-        x = seq(0,1,length.out = 100)
+        x = seq(0, 1, length.out = 100)
         g = ggplot() +
-        geom_line(aes(x = fpr, y = recall,color='Model') , lty =2,lwd = 1.2)+
-        geom_line(aes(x=x,y=x,color = 'Baseline'),inherit.aes = F,lty=2,alpha=0.8)+
+        geom_line(aes(x = fpr, y = recall,  color = 'Model') , 
+                  lty = 2, 
+                  lwd = 1.2) +
+          
+        geom_line(aes(x = x, y = x, color = 'Baseline'), 
+                  inherit.aes = F, 
+                  lty = 2, 
+                  alpha = 0.8) +
+          
         labs(x = 'False Positive Rate',
              y = 'Recall',
-             color='',
-             title='Area Under The curve ROC',
-            subtitle=paste("AUC : ",round(auc,2)))+
+             color ='',
+             title ='Area Under The curve ROC',
+            subtitle = paste("AUC : ", round(auc, 2))) +
+          
         theme_grey(base_size = 20)
     }
     else{
         g = NA
     }
     
-    return (list(plot = g,value = auc))
+    return (list(plot = g, value = auc))
 }
 ```
 
@@ -798,8 +880,8 @@ Now let's apply this function to our model predictions.
 
 
 ```{r}
-fpr = fp/(fp+tn)
-auc = ROC(fpr, recall, viz = T)
+fpr <- fp / (fp + tn)
+auc <- ROC(fpr, recall, viz = T)
 auc$plot
 auc$value
 ```
@@ -822,8 +904,14 @@ We note here that instead of building the `ROC` function from scratch we can alt
 
 
 ```{r}
-#ROC Curve - pROC package
-roc_object = roc(df_test$y~ c(pred),plot=TRUE,print.auc=TRUE,col="blue",lwd =4,legacy.axes=TRUE,main="ROC Curve")
+# ROC Curve - pROC package
+roc_object <- roc(df_test$y ~ c(pred), 
+                  plot = TRUE, 
+                  print.auc = TRUE, 
+                  col = "blue", 
+                  lwd  = 4, 
+                  legacy.axes = TRUE, 
+                  main = "ROC Curve")
 ```
 
     Setting levels: control = 0, case = 1
@@ -858,48 +946,55 @@ Because we're averaging over 10 random initializations per model, this script wi
 
 
 ```{r}
-#Consider 100 thresholds between 0 and 1
-num_thresholds = 100
-thresholds = seq(0, 1, length.out = num_thresholds)
+# Consider 100 thresholds between 0 and 1
+num_thresholds <- 100
+thresholds <- seq(0, 1, length.out = num_thresholds)
 
-#Consider 10 random initializations of the model
-num_initializations = 10
+# Consider 10 random initializations of the model
+num_initializations <- 10
 
-#Consider 4 model architectures
-num_layers = c(1, 2, 4, 8)
-num_units_per_layer = c(2, 2, 4, 8)
-num_models = length(num_layers)
+# Consider 4 model architectures
+num_layers <- c(1, 2, 4, 8)
+num_units_per_layer <- c(2, 2, 4, 8)
+num_models <- length(num_layers)
 
-#Allocate space for model performance metrics
-fp = array(NA,dim = c(num_thresholds, num_initializations, num_models))
-fn = array(NA,dim = c(num_thresholds, num_initializations, num_models))
-tp = array(NA,dim = c(num_thresholds, num_initializations, num_models))
-tn = array(NA,dim = c(num_thresholds, num_initializations, num_models))
-precision = array(NA,dim = c(num_thresholds, num_initializations, num_models))
-recall = array(NA,dim = c(num_thresholds, num_initializations, num_models))
+# Allocate space for model performance metrics
+fp <- array(NA, dim = c(num_thresholds, num_initializations, num_models))
+fn <- array(NA, dim = c(num_thresholds, num_initializations, num_models))
+tp <- array(NA, dim = c(num_thresholds, num_initializations, num_models))
+tn <- array(NA, dim = c(num_thresholds, num_initializations, num_models))
+precision <- array(NA, dim = c(num_thresholds, num_initializations, num_models))
+recall <- array(NA, dim = c(num_thresholds, num_initializations, num_models))
 
-#Loop over the four network architectures
+# Loop over the four network architectures
 for (i in 1:num_models){
         
-    #Loop over the 10 random initializations
+    # Loop over the 10 random initializations
     for (k in 1:num_initializations){
             
-        #Print some satisfying output    
+        # Print some satisfying output    
         message("You look nice today. Model configuration " , as.character(i) , " initialization " , as.character(k),'\n')
     
-        #Build and train the model
+        # Build and train the model
         c(model, history) %<-% build_and_train_model(num_layers = num_layers[i],
                                                      num_units_per_layer = num_units_per_layer[i], 
                                                      print_model_summary = F)
         
-        #Predict on test data
-        pred = predict(model,as.matrix(df_test[,c('x1','x2')]))
+        # Predict on test data
+        pred = predict(model, as.matrix(df_test[,c('x1','x2')]))
     
-        #Loop over thresholds to assess model performance
+        # Loop over thresholds to assess model performance
         for (j in 1:num_thresholds){
 
-            c(tp[j,k,i], tn[j,k,i],fp[j,k,i], fn[j,k,i]) %<-% confusion(df_test$y, pred, thresholds[j],verbose = F)
-            c(precision[j,k,i], recall[j,k,i]) %<-% precision_and_recall(tp[j,k,i], tn[j,k,i],fp[j,k,i], fn[j,k,i],verbose = F)
+            c(tp[j,k,i], tn[j,k,i],fp[j,k,i], fn[j,k,i]) %<-% confusion(df_test$y, 
+                                                                        pred, 
+                                                                        thresholds[j],
+                                                                        verbose = F)
+          
+            c(precision[j,k,i], recall[j,k,i]) %<-% precision_and_recall(tp[j,k,i], 
+                                                                         tn[j,k,i], 
+                                                                         fp[j,k,i], 
+                                                                         fn[j,k,i], verbose = F)
             
         }
     }
@@ -1032,29 +1127,31 @@ Now let's average our measures of model performance across the 10 random initial
 
 
 ```{r}
-#Average over the 10 random initializations        
-average_precision = matrix(NA,nrow = num_thresholds,ncol =  num_models)
-average_fpr = matrix(NA,nrow = num_thresholds,ncol =  num_models)
-average_recall = matrix(NA,nrow = num_thresholds,ncol =  num_models)
+# Average over the 10 random initializations        
+average_precision <- matrix(NA, nrow = num_thresholds, ncol =  num_models)
 
-#Allocate space for the area under the ROC curves
-aucs = rep(NA,num_models)
+average_fpr <- matrix(NA, nrow = num_thresholds, ncol =  num_models)
 
-#Loop over the models
+average_recall <- matrix(NA, nrow = num_thresholds, ncol =  num_models)
+
+# Allocate space for the area under the ROC curves
+aucs <- rep(NA, num_models)
+
+# Loop over the models
 for (i in 1:num_models){
     
     #Loop over the thresholds
     for (j in 1:num_thresholds){
-        average_fpr[j,i] = mean(fp[j,,i]/(fp[j,,i]+tn[j,,i]))
+        average_fpr[j,i] = mean(fp[j,,i] / (fp[j,,i] + tn[j,,i]))
         average_recall[j,i] = mean(recall[j,,i])
     }
 
-    #Calculate the ROC curve and the area under it     
+    # Calculate the ROC curve and the area under it     
     auc = ROC(average_fpr[,i], average_recall[,i])
     aucs[i] = auc$value
     
-    #Print the area under the ROC curve
-    cat("Auc for model " , as.character(i) , " is " ,as.character(round(auc$value,3)),'\n')
+    # Print the area under the ROC curve
+    cat("Auc for model ", as.character(i), " is ", as.character(round(auc$value, 3)), '\n')
 }
 ```
 
@@ -1070,28 +1167,49 @@ The most complex model (8 layers, each with 8 nodes) clearly outperforms its com
 
 
 ```{r}
-#Create a vector of points between 0 and 1
-x = seq(0, 1, length.out = 101)
+# Create a vector of points between 0 and 1
+x <- seq(0, 1, length.out = 101)
 
-#Name the different models
-model_name = c('Layers: 1 , Units : 2','Layers: 2 , Units : 2','Layers: 4 , Units : 4','Layers: 8 , Units : 8')
+# Name the different models
+model_name <- c('Layers: 1 , Units : 2','Layers: 2 , Units : 2','Layers: 4 , Units : 4','Layers: 8 , Units : 8')
 
-#Build a data frame
-df = data.frame(avg_fpr = c(average_fpr[,1],average_fpr[,2],average_fpr[,3],average_fpr[,4]),
-               avg_recall = c(average_recall[,1],average_recall[,2],average_recall[,3],average_recall[,4]),
-               Model= rep(model_name,each = num_thresholds))
+# Build a data frame
+df <- data.frame(avg_fpr = c(average_fpr[,1], 
+                             average_fpr[,2], 
+                             average_fpr[,3], 
+                             average_fpr[,4]),
+                 
+                 avg_recall = c(average_recall[,1], 
+                                average_recall[,2], 
+                                average_recall[,3], 
+                                average_recall[,4]),
+                 
+               Model = rep(model_name, 
+                           each = num_thresholds))
 
-#Plot the results
-df %>% ggplot(aes(x = avg_fpr,y = avg_recall,color = Model))+
-      geom_line(lwd=1,lty=2)+
-      geom_line(data = data.frame(x=x),mapping = aes(x=x,y=x),inherit.aes = F,alpha=0.7)+
-      labs(title='Area Under the Curve ROC',x = 'False Positive Rate' ,y = 'Recall')+
-      xlim(0,1)+
+# Plot the results
+df %>% ggplot(aes(x = avg_fpr, 
+                  y = avg_recall, 
+                  color = Model)) +
+  
+      geom_line(lwd = 1, lty = 2) +
+  
+      geom_line(data = data.frame(x = x), 
+                mapping = aes(x = x, y = x), 
+                inherit.aes = F, 
+                alpha = 0.7) +
+  
+      labs(title='Area Under the Curve ROC', 
+           x = 'False Positive Rate', 
+           y = 'Recall') +
+  
+      xlim(0,1) +
+  
       scale_color_discrete(labels = c(paste(model_name,' AUC: ',
-                                          c(round(aucs[1],3),
-                                            round(aucs[2],3),
-                                            round(aucs[3],3),
-                                            round(aucs[4],3)))))+
+                                          c(round(aucs[1], 3),
+                                            round(aucs[2], 3),
+                                            round(aucs[3], 3),
+                                            round(aucs[4], 3))))) +
       theme_grey(base_size = 20)
 
 ```
@@ -1108,37 +1226,39 @@ To see this, let's create a toy dataset that is even more class imbalanced.
 
 
 ```{r}
-#Seed the random number generator for reproducible results
+# Seed the random number generator for reproducible results
 set.seed(41)
 
-#Number of examples
-N = 10000 
-#Square radius  of inner circle
-radius_2 = 0.055 
-#Noise applied to the boundary separating green and blue examples
-noise = 0.045 
+# Number of examples
+N <- 10000 
 
-#Place N points on the unit square. 
-#Label those within some radius 0, and those outside 1.
-x1 = runif(n = N,min = 0,max = 1) 
-x2 = runif(n = N,min = 0,max = 1) 
-y = ((x1-0.5)**2 + (x2-0.5)**2) + rnorm(n = N,mean = 0, sd = noise) <= radius_2
+# Square radius  of inner circle
+radius_2 <- 0.055 
 
-#Create a data frame
-df_new = data.frame(x1 = x1, x2 = x2, y = y*1)
+# Noise applied to the boundary separating green and blue examples
+noise <- 0.045 
+
+# Place N points on the unit square. 
+# Label those within some radius 0, and those outside 1.
+x1 <- runif(n = N, min = 0, max = 1) 
+x2 <- runif(n = N, min = 0, max = 1) 
+y  <- ((x1 - 0.5)**2 + (x2 - 0.5)**2) + rnorm(n = N, mean = 0, sd = noise) <= radius_2
+
+# Create a data frame
+df_new <- data.frame(x1 = x1, x2 = x2, y = y*1)
 
 # split with r sample and strata = y
-split = initial_split(df_new, prop = 0.8, strata = 'y')
+split  <- initial_split(df_new, prop = 0.8, strata = 'y')
 
-#train set
-df_train_new = training(split)
+# train set
+df_train_new <- training(split)
 
-#test set
-df_test_new = testing(split)
+# test set
+df_test_new  <- testing(split)
 
-#Print some summary statistics about these new data
-cat('Proportion of data in class blue: ' , sum(df_new$y)/length(df_new$y),'\n')
-cat('Proportion of data in class green: ' , 1-sum(df_new$y)/length(df_new$y),'\n')
+# Print some summary statistics about these new data
+cat('Proportion of data in class blue: ' , sum(df_new$y) / length(df_new$y), '\n')
+cat('Proportion of data in class green: ' , 1 - sum(df_new$y) / length(df_new$y),'\n')
 ```
 
     Proportion of data in class blue:  0.1817 
@@ -1151,23 +1271,34 @@ Let's build and train the most complex model considered above (8 layers, each wi
 
 
 ```{r}
-#Build and train the model
-c(model,history) %<-% build_and_train_model(data = df_train_new , num_layers = 8, num_units_per_layer =  8, print_model_summary = T)
+# Build and train the model
+c(model, history) %<-% build_and_train_model(data = df_train_new , 
+                                             num_layers = 8, 
+                                             num_units_per_layer =  8, 
+                                             print_model_summary = T)
 
-#Print the final training accuracy
-cat('Final training accuracy: ', round(history$metrics$acc[ne],3),'\n')
+# Print the final training accuracy
+cat('Final training accuracy: ', round(history$metrics$acc[ne], 3), '\n')
 
-#Predict on test data
-pred = predict(model,as.matrix(df_test_new[,c('x1','x2')]))
+# Predict on test data
+pred = predict(model, as.matrix(df_test_new[, c('x1', 'x2')]))
 
-#make decisions
+# set decisions threshold
 threshold = 0.5
 y_pred = (pred >= threshold)*1
 
-#Print precision,recall, and F-score
-c(true_positives, true_negatives,false_positives, false_negatives) %<-% confusion(df_test_new$y, pred, threshold,verbose = F)
-c(precision, recall) %<-% precision_and_recall(true_positives, true_negatives,false_positives, false_negatives)
-f = f_score(precision,recall)
+# Print precision,recall, and F-score
+c(true_positives, true_negatives, false_positives, false_negatives) %<-% confusion(df_test_new$y, 
+                                                                                   pred, 
+                                                                                   threshold, 
+                                                                                   verbose = F)
+
+c(precision, recall) %<-% precision_and_recall(true_positives, 
+                                               true_negatives, 
+                                               false_positives, 
+                                               false_negatives)
+
+f <- f_score(precision, recall)
 ```
 
     Model: "sequential_43"
@@ -1207,7 +1338,7 @@ Let's also have a look at the confusion matrix.
 
 
 ```{r}
-table(y_pred,df_test_new$y)
+table(y_pred, df_test_new$y)
 ```
 
 
@@ -1222,27 +1353,37 @@ So let's also calculate the areas under the ROC curve.
 
 
 ```{r}
-#Create 100 threhsolds between 0 and 1
-num_thresholds = 100
-thresholds = seq(0,1,length.out = num_thresholds)
+# Create 100 threhsolds between 0 and 1
+num_thresholds <- 100
 
-#Allocate space for the performance metrics
-fp = rep(NA,num_thresholds)
-fn = rep(NA,num_thresholds)
-tp = rep(NA,num_thresholds)
-tn = rep(NA,num_thresholds)
-precision = rep(NA,num_thresholds)
-recall = rep(NA,num_thresholds)
+thresholds <- seq(0, 1, length.out = num_thresholds)
+ 
+# Allocate space for the performance metrics
+fp <- rep(NA, num_thresholds)
+fn <- rep(NA, num_thresholds)
+tp <- rep(NA, num_thresholds)
+tn <- rep(NA, num_thresholds)
+precision <- rep(NA, num_thresholds)
+recall <- rep(NA, num_thresholds)
 
-#Loop over the thresholds and measure model performance
+# Loop over the thresholds and measure model performance
 for (i in 1:num_thresholds){
     
-    c(tp[i], tn[i],fp[i], fn[i]) %<-% confusion(df_test_new$y, pred, thresholds[i],verbose = F)
-    c(precision[i], recall[i]) %<-% precision_and_recall(tp[i], tn[i],fp[i], fn[i],verbose = F)
+    c(tp[i], tn[i],fp[i], fn[i]) %<-% confusion(df_test_new$y, 
+                                                pred, 
+                                                thresholds[i], 
+                                                verbose = F)
+  
+    c(precision[i], recall[i]) %<-% precision_and_recall(tp[i], 
+                                                         tn[i], 
+                                                         fp[i], 
+                                                         fn[i], 
+                                                         verbose = F)
+    
     }
 
-#Calculate and plot the ROC curve
-auc = ROC(fp/(fp+tn),recall,viz = T)
+# Calculate and plot the ROC curve
+auc <- ROC(fp / (fp + tn), recall, viz = T)
 auc$plot
 ```
 
@@ -1284,65 +1425,77 @@ library(rsample)
 ### Import functions
 ```{r}
 
-#Area Under Curve
+# Area Under Curve
 simple_auc <- function(x, y){
-  #Revert order
-  x = rev(x)
-  y = rev(y)  
+  
+  # Revert order
+  x <- rev(x)
+  y <- rev(y)  
+  
   #Define rectangles, calculate area and add those
   dx <- c(diff(x), 0)
   dy <- c(diff(y), 0)
-  sum(y * dx) + sum(dy * dx)/2
+  sum(y * dx) + sum(dy * dx) / 2
 }
 
-#ROC CURVE
-ROC = function(fpr, recall, viz = T){
+# ROC CURVE
+ROC <- function(fpr, recall, viz = T){
      
-    #Calculate the area under the ROC
-    auc = simple_auc(fpr,recall)
+    # Calculate the area under the ROC
+    auc = simple_auc(fpr, recall)
      
-    #Visualize the ROC
+    # Visualize the ROC
     if (viz){
         
         x = seq(0,1,length.out = 100)
+        
         g = ggplot() +
-        geom_line(aes(x = fpr, y = recall,color='Model') , lty =2,lwd = 1.2)+
-        geom_line(aes(x=x,y=x,color = 'Baseline'),inherit.aes = F,lty=2,alpha=0.8)+
+          
+        geom_line(aes(x = fpr, y = recall, color = 'Model'), 
+                  lty = 2, 
+                  lwd = 1.2) +
+          
+        geom_line(aes(x = x, y = x, color = 'Baseline'), 
+                  inherit.aes = F, 
+                  lty = 2, 
+                  alpha = 0.8) +
+          
         labs(x = 'False Positive Rate',
              y = 'Recall',
-             color='',
-             title='Area Under The curve ROC',
-            subtitle=paste("AUC : ",round(auc,2)))+
+             color = '',
+             title = 'Area Under The curve ROC',
+            subtitle = paste("AUC : ", round(auc, 2))) +
+          
         theme_grey(base_size = 20)
     }
     else{
         g = NA
     }
     
-    return (list(plot = g,value = auc))
+    return (list(plot = g, value = auc))
 }
 
-confusion = function(y_true, pred_out, threshold = 0.5, verbose = T){
+confusion <- function(y_true, pred_out, threshold = 0.5, verbose = T){
   
-  true_positives = sum((pred_out >= threshold) & (y_true == 1))
-  true_negatives = sum((pred_out < threshold) & (y_true == 0))
+  true_positives  = sum((pred_out >= threshold) & (y_true == 1))
+  true_negatives  = sum((pred_out < threshold)  & (y_true == 0))
   false_positives = sum((pred_out >= threshold) & (y_true == 0))
-  false_negatives = sum((pred_out < threshold) & (y_true == 1))
+  false_negatives = sum((pred_out < threshold)  & (y_true == 1))
   
   if (verbose) {
-    cat('true positives: ',true_positives,'\n')
-    cat('true negatives: ',true_negatives,'\n')
-    cat('false positives: ',false_positives,'\n')
-    cat('false negatives: ',false_negatives,'\n')
+    cat('true positives: ',  true_positives,  '\n')
+    cat('true negatives: ',  true_negatives,  '\n')
+    cat('false positives: ', false_positives, '\n')
+    cat('false negatives: ', false_negatives, '\n')
   }
   return (list(tp = true_positives, tn = true_negatives, fp = false_positives, fn = false_negatives))
 }
 
-precision_and_recall = function(true_positives, true_negatives,false_positives, false_negatives, verbose=T){
+precision_and_recall <- function(true_positives, true_negatives,false_positives, false_negatives, verbose = T){
   
-  #Protect against division by zero
+  # Protect against division by zero
   if ((true_positives + false_positives) > 0){
-    precision = true_positives /(true_positives + false_positives)
+    precision = true_positives / (true_positives + false_positives)
   }
   else{
     precision = 1
@@ -1356,24 +1509,24 @@ precision_and_recall = function(true_positives, true_negatives,false_positives, 
   }
   
   if (verbose){
-    cat("Precision: " ,precision,"\n")
-    cat("Recall: ",recall,"\n")
+    cat("Precision: ", precision, "\n")
+    cat("Recall: ", recall, "\n")
   }
   
   return (list(precision = precision, recall = recall))
 }
 
-f_score = function(precision,recall,verbose=T){
+f_score <- function(precision, recall, verbose = T){
     
-    #Calculate F
-    f = 2*precision*recall/(precision+recall)
+    # Calculate F
+    f = 2 * precision * recall / (precision + recall)
     
-    #If the user has requested verbose output, provide it
+    # If the user has requested verbose output, provide it
     if(verbose){
         cat("F-score: ",f,"\n")
     }
     
-    #Return F
+    # Return F
     return(f)
 }
 ```
