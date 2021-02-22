@@ -201,6 +201,7 @@ Next, load all **libraries** needed within the script.
 
 ```{r message=F}
 library(tidyverse)
+
 ```
 
 This loads all the packages of the tidyverse at once (ggplot2, dplyr, tidyr, ...), some of which you will learn more about in Chapter 4.
@@ -247,9 +248,14 @@ Having data in a tidy format greatly facilitates all data wrangling steps. The c
 
 In the next step, we want to read the data. We're going to work with FLUXNET data from the site "Laegern" ([CH-Lae](https://gl.ethz.ch/infrastructure/sites/laegeren.html)), located close to Zürich. FLUXNET is a global network of sites where ecosystem-atmosphere exchange fluxes are measured (e.g., CO~2~, water vapour). In Switzerland, there is a total of six such sites. Laegern is one of them. The data is stored in a `.csv` file. To import it into the R workspace, we use the function `read_csv()` from the tidyverse packages. In the other R code, you'll also encounter the base R `read.csv()` function. However, `read_csv()` is much faster and reads data into a tidyverse-data frame (a *tibble*) which has some useful additional characteristics, on top of a common R data frame. To tell the function where the data is located, pass the data's path as an argument. You can either enter an *absolute path*, starting from `C:/` on a Windows computer or `~/` on a Mac. Or, alternatively, you can provide a *relative path*, where `./` points to the present working directory and `../` is one level up, or `../../` is two levels up, etc.
 
-```{r message=F}
+```{r eval=F}
 # set working directory
 setwd("~/Documents/ETH/ESDS")
+```
+
+Now, let's try to load a data set which is save in our data folder and can be accesses using the relative path below.
+
+```{r message=F}
 # use a relative path to read the data
 df <- read_csv("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3.csv")
 print(df) # to print an overview of the data frame
@@ -504,7 +510,6 @@ You can save your plot in as file. As long as the file size does not get too lar
 ```{r eval=F}
 pdf("./figures/filename.pdf")
 hist(df_small$temp)
-dev.off()
 ```
 
 **Checkpoint**

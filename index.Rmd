@@ -32,3 +32,14 @@ knitr::write_bib(c(
   .packages(), 'bookdown', 'knitr', 'rmarkdown'
 ), 'packages.bib')
 ```
+
+```{r include=FALSE}
+# Preferences for conflicting packages
+library(conflicted)
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("levelplot", "rasterVis")
+conflict_prefer("origin", "raster")
+conflict_prefer("extract", "raster")
+conflict_prefer("partial", "pdp")
+```

@@ -110,19 +110,17 @@ Let's finally turn to the implementation with KNN. First, we make the initial da
 
 ```{r message=F}
 # As always we start by loading the packages we'll need
-library(readr)
-library(dplyr)
-library(tidyr)
 library(ggplot2)
 library(patchwork)
 library(caret)
 library(recipes)
 library(broom)
+library(tidyverse)
 ```
 
 ```{r}
 ## Load daily data from all sites
-load("./data/ddf_allsites.RData")
+load("./data/ddf_allsites_nested_joined.RData")
 #load("ddf_allsites.RData")
 
 ## Load daily data and rename for use below
@@ -130,7 +128,7 @@ load("./data/ddf_ch_lae.RData") # loads 'ddf_ch_lae'
 #load("ddf_ch_lae.RData")
 
 df <- ddf_ch_lae %>% 
-  select(-NEE_VUT_REF_QC, -TIMESTAMP) %>%  # not numeric features
+  dplyr::select(-NEE_VUT_REF_QC, -TIMESTAMP) %>%  # not numeric features
   drop_na()                                # drop rows with missing data
 ```
 

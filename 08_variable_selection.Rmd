@@ -310,7 +310,7 @@ df_metrics %>% knitr::kable()
 
 - Visualise all metrics as a function of the number of predictors (add labels for the variable names of the added predictor). Highlight the best-performing model based on the respective metric. How many predictors are in the best performing model, when assessed based on each metric?
 
-```{r}
+```{r eval = FALSE}
 library(ggplot2)
 
 df_metrics$pred <-  factor(df_metrics$pred, levels = df_metrics$pred)

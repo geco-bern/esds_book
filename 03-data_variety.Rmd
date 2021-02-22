@@ -125,7 +125,7 @@ bands <- mt_bands(product = "MOD13Q1") %>% as_tibble()
 dates <- mt_dates(product = "MOD13Q1", lat = lat_lae, lon = lon_lae) %>% as_tibble()
 ```
 
-Now, we'll get the NDVI data for 6 years for a square of 2km x 2km around the tower site. We use the function `mt_subset()` for this. The parameters of this function download a subset of data within the chosen product (here 'MOD13Q1'). We specify the location as latitude and longitude, and the band we chose, which is at 250m spatial resolution and 16-day temporal resolution. The time period can be chosen as a subset of “dates” and must be provided in the form of start and end date. We will be looking at the beginning of 2009 to the end of 2014. `km_lr` and `km_ab` define the kilometers to the left and right of the location and kilometers above and below respectively. Since these values are being rounded to the nearest integer, we chose this minimum of 1, corresponding to 2km<sup>2</sup>. Sitename is used in writing data to file, internal gives the command whether the data should be returned as an internal structure. The progress setting defines whether the download progress should be shown or not.
+Now, we'll get the NDVI data for 6 years for a square of 2km x 2km around the tower site. We use the function `mt_subset()` for this. The parameters of this function download a subset of data within the chosen product (here 'MOD13Q1'). We specify the location as latitude and longitude, and the band we chose, which is at 250m spatial resolution and 16-day temporal resolution. The time period can be chosen as a subset of “dates” and must be provided in the form of start and end date. We will be looking at the beginning of 2009 to the end of 2014. `km_lr` and `km_ab` define the kilometers to the left and right of the location and kilometers above and below respectively. Since these values are being rounded to the nearest integer, we chose this minimum of 1, corresponding to 2km2. Sitename is used in writing data to file, internal gives the command whether the data should be returned as an internal structure. The progress setting defines whether the download progress should be shown or not.
 
 ```{r eval = F}
 df_ndvi <- mt_subset(product = "MOD13Q1",            # the chosen product
@@ -282,7 +282,7 @@ linmod2 <- lm(GPP_NT_VUT_REF ~ ppfd_abs, data = ddf_ch_lae_ndvi)
 summary(linmod2)
 ```
 
-Indeed, R<sup>2</sup> increased from 0.5229 to 0.603 when including considering NDVI * PPFD, instead of just PPFD. In other words, it also matters whether leaves are actually out and green for modelling the relationship between GPP and PPFD. NDVI * PPFD approximates the amount of *absorbed* incoming light (not just the incoming light) and is therefore closer to being a physiologically relevant quantity. 
+Indeed, R2 increased from 0.5229 to 0.603 when including considering NDVI * PPFD, instead of just PPFD. In other words, it also matters whether leaves are actually out and green for modelling the relationship between GPP and PPFD. NDVI * PPFD approximates the amount of *absorbed* incoming light (not just the incoming light) and is therefore closer to being a physiologically relevant quantity. 
 
 ### Points on the globe
 
@@ -454,11 +454,11 @@ ggplot() +
  
 Next up are rasters. A raster is a matrix or grid of cells each of which contains information in the form of a value.
 
-A <b>raster</b> object consists primarily of:
+A raster object consists primarily of:
 
-* A grid of <b>cells</b>;  
-* A <b>coordinate reference system (CRS)</b> for the grid and its cells so that we know the location to which the grid refers;
-* A <b>variable of interest</b> for which each cell in the grid has a value, and;
+* A grid of cells;  
+* A coordinate reference system (CRS) for the grid and its cells so that we know the location to which the grid refers;
+* A variable of interest for which each cell in the grid has a value, and;
 * Other information relating to the CRS, projection, resolution, etc.
 
 Let's take a look at some rasters and get familiar with some functions to analyse them.
@@ -651,7 +651,7 @@ df_sites_temp <- extract(raster_chelsa, sp_sites, sp = TRUE) %>%
   dplyr::rename(temp_chelsa = Chelsa_t_mean_2006.2012)
 ```
 
-In the lectures, you have already, heard that we must always be aware of modelled data and be aware of its limitations. Therefore, we don't just want to use CHELSA temperature data. It is important to consider different models and compare them. Hence, we'll look at another climate model. We load and plot the provided rasters showing the mean annual temperatures for the Worldclim data for the years 2006-2012. WorldClim is a set of global climate layers (gridded climate data) with a spatial resolution of about 1 km<sup>2</sup>. We extract values from Worldclim at the same tower sites and add them to the _df_sites_ data frame. Now we have a tidy dataframe with the site, latitude and longitude, temperatures for Chelsa and WorldClim at each tower location.
+In the lectures, you have already, heard that we must always be aware of modelled data and be aware of its limitations. Therefore, we don't just want to use CHELSA temperature data. It is important to consider different models and compare them. Hence, we'll look at another climate model. We load and plot the provided rasters showing the mean annual temperatures for the Worldclim data for the years 2006-2012. WorldClim is a set of global climate layers (gridded climate data) with a spatial resolution of about 1 km2. We extract values from Worldclim at the same tower sites and add them to the _df_sites_ data frame. Now we have a tidy dataframe with the site, latitude and longitude, temperatures for Chelsa and WorldClim at each tower location.
 
 ```{r}
 raster_worldclim <- raster("./data/WC_mean_t_2006-2012.tif")

@@ -380,11 +380,12 @@ hhdf <- hhdf %>%
   select(-USTAR, -SWC_F_MDS_4)
 ```
 
-We can also visualise the fraction of missing data after applying our data cleaning step, using the `vis_miss` from the **visdat** package.
+We can also visualise the fraction of missing data after applying our data cleaning step, using the `vis_miss` from the **visdat** package. For computational reasons, we randomly select 5'000 entries from `hhdf` to get a feeling for which data is missing how often.
+
 ```{r}
 library(visdat)
 vis_miss(
-  hhdf,
+  sample_n(hhdf, 5000),
   cluster = FALSE, 
   warn_large_data = FALSE
   )
@@ -701,7 +702,7 @@ ddf_allsites %>%
 ... and visualise data gaps for one site to check whether our filtering criteria are not too strong.
 ```{r}
 vis_miss(
-  ddf_allsites,
+  sample_n(ddf_allsites, 5000),
   cluster = FALSE,
   warn_large_data = FALSE
   )
