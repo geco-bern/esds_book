@@ -143,8 +143,6 @@ cat('Proportion of data in class green: ' , 1 - sum(df_data$y) / length(df_data$
 
 
 
-![png](output_8_1.png)
-
 
 A more appropriate way to split the data into training and test sets is to take care such that each label is represented to its proportion in both sets (_stratified splitting_). To this end, we use the `rsample` package and we choose `strata = y`. That is crucial especially for heavily class imbalanced data sets. In essence, what we want to avoid is to have an over representantion of one class in the training data set and an under representation of this class in the the test data set.
 
