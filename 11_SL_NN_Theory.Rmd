@@ -29,7 +29,7 @@
 #### Import libraries
 We first need to import some libraries. You have seen all of these in previous tutorials. Keras will play an especially prominent role in this tutorial.
 
-```{r, message=FALSE}
+```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(rsample)
 library(reticulate)

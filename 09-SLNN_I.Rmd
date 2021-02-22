@@ -31,7 +31,7 @@ We first need to import some libraries. Most of these will be familiar from prev
 These packages will be explained in detail later.
 
 
-```{r messages = F}
+```{r message=FALSE, warning=FALSE}
 library(rjson)
 library(tidyverse)
 library(patchwork)
@@ -132,7 +132,7 @@ What about the other inputs?
 It is worthwhile to study the innerworkings of this function to get a feel for some of the basic functionality of Keras. This will become particularly valuable in later tutorials, which use Keras to train more sophisticated models.
 
 
-```{r}
+```{r eval = F}
 #Let's save our output in the current working directory
 save_path_logs = './'
 
@@ -246,8 +246,7 @@ Similarly, the partial derivative $\frac{\partial L}{\partial w}(w_{t-1},b_{t-1}
 *Checkpoint*
 Can you apply the gradient descent algorithm in order to find the minimum of $f(x) = x^2 +1$? Use as starting point $x_0=10$, learning rate 0.01 and make 1000 iterations. Hint: Recall from Calculus I, that the derivative of $x^2$ is $2x$.
 
-# your code here
-
+*Solution*
 ```{r}
 ### Solution
 
@@ -261,7 +260,7 @@ for (i in 1:num_iterations){
     x_new = x_new - learning_rate*2*x_new
 }
 
-cat('Gradient descent output: x =',round(x_new,5),"\n")
+cat('Gradient descent output: x =', round(x_new,5), "\n")
 
 #The true minimum of the function is given at x = 0. 
 #As we can see the gradient descent algorithm returns a value very close
@@ -273,7 +272,6 @@ cat('Gradient descent output: x =',round(x_new,5),"\n")
 Let's use the function we wrote above, `build_and_train_model`, to apply gradient descent to the problem of solving `y = wx + b`, using a _learning rate_ of $0.01$. Note that we set the _batch_size_ to 512, which means that each step of the algorithm will use only 512 training examples, rather than the entire training set. We set the maximum number of _epochs_ to 20, which means that training will terminate after 20 full passes through the data. 
 
 The algorithm will therefore make $\frac{len(training \ data)}{batch\_size}\times epochs$ steps in total, where each step corresponds to a calculation of the gradient and an update of the model parameters. 
-
 
 ```{r eval = F}
 use_session_with_seed(0)
@@ -294,13 +292,7 @@ c(model,history,w,b) %<-%  build_and_train_model(
 cat('\nFinal solution: w =', w_est, ' b = ', b_est, "\n")
 ```
 
-```{r eval = F}
-# Load pre-calculated model to skip computation
-model = load_model_hdf5("./data/SLNN_I/saved_models/model_lr_0.01.h5") 
-w_est = as.numeric(get_weights(model)[1])
-b_est = as.numeric(get_weights(model)[2])
-cat('\nFinal solution: w =', w_est, ' b = ', b_est, "\n")
-```
+![](./figures/SLNN_I-output1.png)
 
 Compare the solution found by gradient descent to the exact solution determined above. What do you observe?
 
@@ -328,7 +320,7 @@ We can also observe the convergence (gradient descent update causes tiny changes
 
 Next let's visualize the best fit inferred by gradient descent, as compared to the exact solution, in the context of the data we're trying to fit.
 
-```{r warning=F, eval = F}
+```{r eval = F}
 df_train %>%
     ggplot(aes(x = PPFD_IN, y = GPP_NT_VUT_REF))+
     #plot points
@@ -342,6 +334,8 @@ df_train %>%
     scale_linetype_manual(values=c('GD Solution' = 1,'Exact Solution' = 2))+
     labs(color  = "", linetype = "")
 ```
+
+![](./figures/output_36_0.png)
 
 As we can see by the overlapping of the red and green lines, the gradient descent algorithm sufficiently approximates the exact solution. Although especially at the edges of the plot we can see that it is not a perfect match to the exact solution.
 
@@ -380,6 +374,8 @@ for (i in 1:length(learning_rates)){
 }
 ```
 
+![](./figures/SLNN_I_output2.png)
+
 Let's now plot the dynamics of learning, specifically how loss and the two model parameters change throughout training. Let's start with loss.
 
 ```{r eval = F}
@@ -404,7 +400,7 @@ df_loss %>%
     theme_gray(base_size = 15)
 ```
 
-![png](./figures/output_40_0.png)
+![ ](./figures/output_40_0.png)
 
 What do you observe?
 
@@ -467,7 +463,7 @@ gg1+gg2
 ```
 
 
-![png](./figures/output_42_0.png)
+![ ](./figures/output_42_0.png)
 
 What do you observe?
 
@@ -478,16 +474,13 @@ When using the learning rates 0.01 and 0.1, the algorithm converges (or nearly s
 To get a better understanding of what is happening here, let's visualize the surface of the loss function in relation to _w_ and _b_.
 
 
-```{r}
+```{r eval = F}
 #Define a function that calculates mean squared error, our loss function
 MSE = function(observed,predicted) {
   val = mean((observed - predicted)^2)
   return (val)
 }
 
-```
-
-```{r eval = F}
 #Get the observed PPFD_IN and GPP_NT_VUT_REF         
 x_observed = df_train$PPFD_IN #PPFD_IN
 y_observed = df_train$GPP_NT_VUT_REF #GPP_NT_VUT_REF
@@ -518,7 +511,7 @@ persp(w,b,loss,theta = 30, phi = 15,
 ```
 
 
-![png](./figures/output_44_0.png)
+![ ](./figures/output_44_0.png)
 
 What features of this surface stand out to you?
 
@@ -527,7 +520,7 @@ Notice that it does not appear to have local optima. Notice also that the value 
 First, look at loss as a function of _w_ for $b \approx 0.76$ . Second, look at loss as a function of _b_ for $w \approx 0.01$ . This pair of (_w_,_b_) are the weights found when training with a learning rate of 0.01.
 
 
-```{r}
+```{r eval = F}
 #Create data frames for w and b
 df_w = data.frame(loss = loss[,92],w = w)
 df_b = data.frame(loss = loss[55,],b = b)
@@ -557,11 +550,10 @@ gg2 = df_b %>%
         theme_gray(base_size = 20)+
         theme(legend.position="top")
 
-# gg1+gg2
+gg1+gg2
 ```
 
-
-![png](./figures/output_46_0.png)
+![ ](./figures/output_46_0.png)
 
 
 Notice how little loss changes as a function of _b_, relative to _w_. Also notice that we can decrease loss further than what was found in our best model by decreasing b. Why didn't our model find this solution?
@@ -570,7 +562,7 @@ Notice how little loss changes as a function of _b_, relative to _w_. Also notic
 Let's use our model to make predictions on our test data. First, let's calculate loss on our test data for a learning rate of 0.01.
 
 
-```{r}
+```{r eval = F}
 # Load model with lr = 0.01
 model = load_model_hdf5("./data/SLNN_I/saved_models/model_lr_0.01.h5")
 
@@ -582,15 +574,18 @@ y_observed = df_test$GPP_NT_VUT_REF
 loss_test = MSE(y_observed, y_predicted)
 
 # Print loss
-# cat('\nLoss on test data: ', loss_test, "\n")
-cat("\n Loss on test data: 34.42075 \n") # Number added by hand for computational reasons
+cat('\nLoss on test data: ', loss_test, "\n")
 
+```
+
+```{r echo = F}
+cat("Loss on test data: 34.42075 ")
 ```
 
 How does this compare to the loss observed on the training data?
 Next let's visualize the correlation between the predictions and observations for the test data and calculate its squared correlation. 
 
-```{r}
+```{r eval = F}
 # Calculate squared correlation
 cor2=cor(df_test$GPP_NT_VUT_REF,y_predicted)^2
 
@@ -609,7 +604,7 @@ Notice the difference in scale of the x- and y-axis. Despite the strong(ish) pos
 Another common approach for measuring model performance is via comparison to a less complex model. Let's compare our model to a null model that always predicts the mean of `y_train`.
 
 
-```{r}
+```{r eval = F}
 # Compare with a null model that always predicts the mean of y_train
 null_model = mean(df_train$GPP_NT_VUT_REF)
 
@@ -628,6 +623,7 @@ results = data.frame(Model = c('Null',"Linear"),
                      Test_MSE = c(mse_null_test,mse_lm_test))
 results
 ```
+![](./figures/SLNN_I_output3.png)
 
 What do you observe? How does the loss compare to that obtained during training? Is the linear model better than the null model?
 
@@ -829,8 +825,7 @@ cat("Test Accuracy: ",acc,'\n')
 
 Wow, an accuracy of 90%. Sounds good right!? In this case it actually is, but we'll see in the next tutorial where this metric breaks down.
 
-## Exercise
-## Hands on Logistic Regression
+## Exercise: Hands on Logistic Regression
 
 IMPORTANT NOTE: You have to solve the exercise using the keras library.
 
