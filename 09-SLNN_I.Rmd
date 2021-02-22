@@ -1,5 +1,4 @@
 # Supervised Learning Basics
----
 
 ### Learning objectives
 After this learning unit, you will be able to ...
@@ -13,29 +12,26 @@ After this learning unit, you will be able to ...
 * Apply logistic regression to a simple classification problem.
 * Recall and apply measures of model performance and loss for classification, specifically accuracy and cross-entropy.
 
-<div style="border: 2px black solid; border-radius: 7px; padding:10px">
-    <b>Important points from the lecture</b><br/>
-<ul>
-  <li>It is always worthwhile to perform an initial exploratory analysis of your data, e.g. to identify outliers, missing values, etc.</li>
-  <li>To train a statistical model using machine learning, we split our data into training and testing sets. Sometimes we also include a validation set.</li>
-  <li>Loss is a measure of how well our trained model predicts training labels. Loss is high when predictions are poor. Loss is low when predictions are good.</li>
-  <li>There are several ways to measure loss. RMSE (Root Mean Squared Error) is one such measure. It is used in regression problems.</li>
-  <li>Gradient descent is a method that searches for model parameters that minimize loss.</li>
-  <li>Machine learning algorithms have hyper-parameters. These are parameters that are set by the user rather than learned during training. An example is the learning rate in gradient descent.</li>
-  <li>Logistic regression is a classification technique.</li>
-  <li>Logistic regression is similar in model structure to linear regression. It is different in that it can capture non-linearities in data. 
-    </li>
-  <li>As compared to regression problems, classification problems require different loss functions and measures of model performance. For example, loss can be measured using cross-entropy and model performance can be measured using accuracy.</li>
-</ul>
-</div>
+*Important points from the lecture*
+
+* It is always worthwhile to perform an initial exploratory analysis of your data, e.g. to identify outliers, missing values, etc.
+* To train a statistical model using machine learning, we split our data into training and testing sets. Sometimes we also include a validation set.
+* Loss is a measure of how well our trained model predicts training labels. Loss is high when predictions are poor. Loss is low when predictions are good.
+* There are several ways to measure loss. RMSE (Root Mean Squared Error) is one such measure. It is used in regression problems.
+* Gradient descent is a method that searches for model parameters that minimize loss.
+* Machine learning algorithms have hyper-parameters. These are parameters that are set by the user rather than learned during training. An example is the learning rate in gradient descent.
+* Logistic regression is a classification technique.
+* Logistic regression is similar in model structure to linear regression. It is different in that it can capture non-linearities in data. 
+* As compared to regression problems, classification problems require different loss functions and measures of model performance. For example, loss can be measured using cross-entropy and model performance can be measured using accuracy.
+
 
 ### Import libraries
-We first need to import some libraries. Most of these will be familiar from previous tutorials, with the exception of `keras`, which uses `TensorFlow` as a backend. For those who may be unfamiliar with the term _backend_ this simply refers to a program's code or parts of a computer application that enable it to run but isn't accessed by the user and works in the background.
+We first need to import some libraries. Most of these will be familiar from previous tutorials, with the exception of `keras`, which uses `TensorFlow` as a backend. For those who may be unfamiliar with the term *backend* this simply refers to a program's code or parts of a computer application that enable it to run but isn't accessed by the user and works in the background.
 
 These packages will be explained in detail later.
 
 
-```{r}
+```{r messages = F}
 library(rjson)
 library(tidyverse)
 library(patchwork)
@@ -48,26 +44,12 @@ library(IRdisplay)
 options(repr.plot.width = 10, repr.plot.height = 7)
 ```
 
-    ── [1mAttaching packages[22m ─────────────────────────────────────── tidyverse 1.3.0 ──
-    
-    [32m✔[39m [34mggplot2[39m 3.3.1     [32m✔[39m [34mpurrr  [39m 0.3.4
-    [32m✔[39m [34mtibble [39m 3.0.1     [32m✔[39m [34mdplyr  [39m 1.0.0
-    [32m✔[39m [34mtidyr  [39m 1.1.0     [32m✔[39m [34mstringr[39m 1.4.0
-    [32m✔[39m [34mreadr  [39m 1.3.1     [32m✔[39m [34mforcats[39m 0.5.0
-    
-    ── [1mConflicts[22m ────────────────────────────────────────── tidyverse_conflicts() ──
-    [31m✖[39m [34mdplyr[39m::[32mfilter()[39m masks [34mstats[39m::filter()
-    [31m✖[39m [34mdplyr[39m::[32mlag()[39m    masks [34mstats[39m::lag()
-    
-
-
 ### Load your data
 Load the hourly data from the eddy covariance flux towers. You'll be qite familiar with this by now. 
 
 For this first example, we'll only load one feature (PPFD_IN - incoming photosynthetic photon flux density) and our dependent variable (GPP_NT_VUT_REF - gross primary production). 
 
 Use the `head()` command to get an initial glimpse of the first few rows of data. Notice anything strange?
-
 
 ```{r}
 #path to the file
@@ -77,25 +59,6 @@ file_path = "./data/SLNN_I/flx_ch-lae/data.rds"
 df_data = readRDS(file_path)
 head(df_data)
 ```
-
-
-<table>
-<caption>A data.frame: 6 × 2</caption>
-<thead>
-	<tr><th></th><th scope=col>PPFD_IN</th><th scope=col>GPP_NT_VUT_REF</th></tr>
-	<tr><th></th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
-</thead>
-<tbody>
-	<tr><th scope=row>1</th><td>-9999</td><td>-1.33329</td></tr>
-	<tr><th scope=row>2</th><td>-9999</td><td>-2.77788</td></tr>
-	<tr><th scope=row>3</th><td>-9999</td><td>-3.22186</td></tr>
-	<tr><th scope=row>4</th><td>-9999</td><td>-3.24148</td></tr>
-	<tr><th scope=row>5</th><td>-9999</td><td>-3.99006</td></tr>
-	<tr><th scope=row>6</th><td>-9999</td><td>-4.29533</td></tr>
-</tbody>
-</table>
-
-
 
 ### Clean your data
 Looks like the value of PPFD_IN has been set to -9999 in some examples. As you'll recall from previous tutorials, this is a flag to indicate missing data. Let's remove these examples and create a scatterplot of the remaining data.
@@ -110,10 +73,6 @@ df_data_cleaned %>%
     ggplot(aes( x = PPFD_IN, y = GPP_NT_VUT_REF))+
     geom_point()
 ```
-
-
-![png](output_8_0.png)
-
 
 ### Prepare your data for learning
 In previous lectures and tutorials, you've been taught the importance of splitting data into training and testing sets. Sometimes we produce a further split of the training data to include a validation set, although that won't be necessary for the purposes of this tutorial.
@@ -148,7 +107,7 @@ df_test = df_data_cleaned %>% slice((breakpoint+1):nrow(df_data_cleaned))
 
 ## Build a Keras model for linear regression
 
-<a href="https://tensorflow.rstudio.com/guide/keras/">Keras</a> is a powerful API for machine learning. It provides a rich library of easy-to-use functions for building, training, and evaluating artificial neural networks. It interfaces with several backend machine learning libraries. Here we'll use it with the TensorFlow backend, which was developed by Google Brain for deep learning applications. 
+[Keras](https://tensorflow.rstudio.com/guide/keras/) is a powerful API for machine learning. It provides a rich library of easy-to-use functions for building, training, and evaluating artificial neural networks. It interfaces with several backend machine learning libraries. Here we'll use it with the TensorFlow backend, which was developed by Google Brain for deep learning applications. 
 
 A fundamental object in Keras is the "layer", which contains a number of computational units called _neurons_. The _neurons_ of each layer are connected to one another in sequence by directed edges, starting from the input layer, progressing through (possibly many) hidden layers, and ending in the output layer (see image below). 
 
@@ -264,28 +223,6 @@ lm_fit = lm(GPP_NT_VUT_REF ~ PPFD_IN, data = df_train)
 summary(lm_fit)
 ```
 
-
-    
-    Call:
-    lm(formula = GPP_NT_VUT_REF ~ PPFD_IN, data = df_train)
-    
-    Residuals:
-        Min      1Q  Median      3Q     Max 
-    -42.242  -2.429  -0.529   2.054  54.205 
-    
-    Coefficients:
-                 Estimate Std. Error t value Pr(>|t|)    
-    (Intercept) 0.9372117  0.0181264    51.7   <2e-16 ***
-    PPFD_IN     0.0137657  0.0000327   421.0   <2e-16 ***
-    ---
-    Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-    
-    Residual standard error: 5.894 on 143266 degrees of freedom
-    Multiple R-squared:  0.553,	Adjusted R-squared:  0.553 
-    F-statistic: 1.773e+05 on 1 and 143266 DF,  p-value: < 2.2e-16
-
-
-
 In the output above, the intercept corresponds to _b_ and `PPFD_IN` corresponds to _w_.
 
 ### Motivation for gradient descent
@@ -306,12 +243,9 @@ The partial derivative $\frac{\partial L}{\partial b}(w_{t-1},b_{t-1})$ gives th
 Similarly, the partial derivative $\frac{\partial L}{\partial w}(w_{t-1},b_{t-1})$ gives the gradient of the loss function with respect to $w$ at the point in parameter space ($w_{t-1},b_{t-1}$).
 
 
-<div style="background-color:rgba(0, 200, 0, 0.5);border-radius: 7px; padding:10px">
-    <b>Checkpoint</b><br/>
-Can you apply the gradient descent algorithm in order to find the minimum of $f(x) = x^2 +1$?  <br/>
-    Use as starting point $x_0=10$, learning rate 0.01 and make 1000 iterations.   <br/>
-    <i>Hint: Recall from Calculus I, that the derivative of $x^2$ is $2x$.<i>
-</div>
+*Checkpoint*
+Can you apply the gradient descent algorithm in order to find the minimum of $f(x) = x^2 +1$? Use as starting point $x_0=10$, learning rate 0.01 and make 1000 iterations. Hint: Recall from Calculus I, that the derivative of $x^2$ is $2x$.
+
 # your code here
 
 ```{r}
@@ -334,9 +268,6 @@ cat('Gradient descent output: x =',round(x_new,5),"\n")
 #to zero after 1000 iterations 
 ```
 
-    Gradient descent output: x = 0 
-
-
 ## Fit the model using gradient descent
 
 Let's use the function we wrote above, `build_and_train_model`, to apply gradient descent to the problem of solving `y = wx + b`, using a _learning rate_ of $0.01$. Note that we set the _batch_size_ to 512, which means that each step of the algorithm will use only 512 training examples, rather than the entire training set. We set the maximum number of _epochs_ to 20, which means that training will terminate after 20 full passes through the data. 
@@ -344,13 +275,13 @@ Let's use the function we wrote above, `build_and_train_model`, to apply gradien
 The algorithm will therefore make $\frac{len(training \ data)}{batch\_size}\times epochs$ steps in total, where each step corresponds to a calculation of the gradient and an update of the model parameters. 
 
 
-```{r}
+```{r eval = F}
 use_session_with_seed(0)
 
 #Set the number of epochs to 20
 num_epochs = 20
 
-#Build and train a model
+# Build and train a model
 c(model,history,w,b) %<-%  build_and_train_model(
                             x_train = df_train$PPFD_IN,
                             y_train = df_train$GPP_NT_VUT_REF,
@@ -360,80 +291,57 @@ c(model,history,w,b) %<-%  build_and_train_model(
                             save_path = save_path_logs
                             )
 
-cat('\nFinal solution: w =', w, ' b = ', b, "\n")
+cat('\nFinal solution: w =', w_est, ' b = ', b_est, "\n")
 ```
 
-    Set session seed to 0 (disabled GPU, CPU parallelism)
-    
-
-
-    Model: "sequential"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    dense (Dense)                       (None, 1)                       2           
-    ================================================================================
-    Total params: 2
-    Trainable params: 2
-    Non-trainable params: 0
-    ________________________________________________________________________________
-    
-    Final solution: w = 0.01373669  b =  0.7571406 
-
+```{r eval = F}
+# Load pre-calculated model to skip computation
+model = load_model_hdf5("./data/SLNN_I/saved_models/model_lr_0.01.h5") 
+w_est = as.numeric(get_weights(model)[1])
+b_est = as.numeric(get_weights(model)[2])
+cat('\nFinal solution: w =', w_est, ' b = ', b_est, "\n")
+```
 
 Compare the solution found by gradient descent to the exact solution determined above. What do you observe?
 
 Let's now save the model so we can retrieve it for a later use.
 
-
-```{r}
-#Create a file path for saving the model
+```{r eval = F}
+# Create a file path for saving the model
 file_folder = './saved_models'
 dir.create(file_folder)
 save_path = file.path(file_folder,'model_lr_0.01.h5')
 
-#Save the model
-save_model_hdf5(model,save_path)
+# Save the model
+save_model_hdf5(model, save_path)
 ```
 
 ### Gradient descent behind the scenes 
 
 Let's build our intuition for how gradient descent works by visualizing the loss function versus the fitting line for each (w,b) pair derived from the gradient descent. This is an advantage of working with a two-parameter problem - we can actually visualize loss across the solution space. This is not easy to do with problems that have more parameters. In fact, it's typically impossible. For example, try to imagine what the surface of a loss function might look like for a four-parameter problem. Not easy right? Now consider that may problems have thousands of parameters - sometimes billions. Good luck wrapping your head around that!
 
+![Animated gradient descent: __Left plot__: The gradient descent algorithm (red trace). __Right plot__: The fitting line for the respective step of gradient descent.](https://miro.medium.com/proxy/0*D7zG46WrdKx54pbU.gif)
 
-![](./figures/animation_gd.mp4)
-
-== HOW TO EMBED VIDEO? ==
-
-
-__Left plot__: The gradient descent algorithm (blue trace).    __Right plot__: The fitting line for the respective step of gradient descent
-
-What we actually observe is the fitted line to the data  (right plot) for each step of gradient descent (orange point
-of left plot). As the gradient descent update step approaches the minimum of the loss function, the line fits the data better, i.e it minimizes $\sum_{i = 1}^{n} (\hat{y}_i-y_i)^2$. 
+What we actually observe is the fitted line to the data (right plot) for each step of gradient descent (red point of left plot). As the gradient descent update step approaches the minimum of the loss function, the line fits the data better, i.e it minimizes $\sum_{i = 1}^{n} (\hat{y}_i-y_i)^2$. 
 
 We can also observe the convergence (gradient descent update causes tiny changes) of the algorithm by looking at either plot. 
 
-Next let's visualize the best fit inferred by gradient descent, as compared to the exact solution, in the conext of the data we're trying to fit.
+Next let's visualize the best fit inferred by gradient descent, as compared to the exact solution, in the context of the data we're trying to fit.
 
-
-```{r}
+```{r warning=F, eval = F}
 df_train %>%
     ggplot(aes(x = PPFD_IN, y = GPP_NT_VUT_REF))+
     #plot points
     geom_point()+
     # plot lines
     ##plot the best fit for learning rate = 0.01
-    geom_abline(aes(intercept = b, slope = w,color='GD Solution',linetype='GD Solution'),lwd =2) +
+    geom_abline(aes(intercept = b_est, slope = w_est ,color='GD Solution',linetype='GD Solution'),lwd =2) +
     ##plot exact line
     geom_abline(aes(intercept = coef(lm_fit)[1], slope = coef(lm_fit)[2],color='Exact Solution',linetype='Exact Solution'),lwd =2) +
     scale_colour_manual(values=c('GD Solution' = "red",'Exact Solution' = 'green'))+
     scale_linetype_manual(values=c('GD Solution' = 1,'Exact Solution' = 2))+
     labs(color  = "", linetype = "")
 ```
-
-
-![png](output_36_0.png)
-
 
 As we can see by the overlapping of the red and green lines, the gradient descent algorithm sufficiently approximates the exact solution. Although especially at the edges of the plot we can see that it is not a perfect match to the exact solution.
 
@@ -442,8 +350,7 @@ So far, we've only considered a single learning rate. Recall from lecture 6B (lo
 
 Let's tune the learning rate from 0.001 to 1 to see how this hyper-parameter influences model convergence. The code below calls the `build_and_train_model function` for four different learning rates.
 
-
-```{r}
+```{r eval = F}
 #Set the learning rates
 learning_rates=c(0.001,0.01,0.1,1.0)
 
@@ -473,74 +380,9 @@ for (i in 1:length(learning_rates)){
 }
 ```
 
-    Warning message in dir.create(path):
-    “'.//logs' already exists”
-
-
-    Model: "sequential_1"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    dense_1 (Dense)                     (None, 1)                       2           
-    ================================================================================
-    Total params: 2
-    Trainable params: 2
-    Non-trainable params: 0
-    ________________________________________________________________________________
-
-
-    Warning message in dir.create(path):
-    “'.//logs' already exists”
-
-
-    Model: "sequential_2"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    dense_2 (Dense)                     (None, 1)                       2           
-    ================================================================================
-    Total params: 2
-    Trainable params: 2
-    Non-trainable params: 0
-    ________________________________________________________________________________
-
-
-    Warning message in dir.create(path):
-    “'.//logs' already exists”
-
-
-    Model: "sequential_3"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    dense_3 (Dense)                     (None, 1)                       2           
-    ================================================================================
-    Total params: 2
-    Trainable params: 2
-    Non-trainable params: 0
-    ________________________________________________________________________________
-
-
-    Warning message in dir.create(path):
-    “'.//logs' already exists”
-
-
-    Model: "sequential_4"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    dense_4 (Dense)                     (None, 1)                       2           
-    ================================================================================
-    Total params: 2
-    Trainable params: 2
-    Non-trainable params: 0
-    ________________________________________________________________________________
-
-
 Let's now plot the dynamics of learning, specifically how loss and the two model parameters change throughout training. Let's start with loss.
 
-
-```{r}
+```{r eval = F}
 #Set the symbol labels and colors for the four different learning rates
 labels = c('0.001', '0.01', '0.1', '1')
 colors = c("purple", "red", "blue","green")
@@ -562,8 +404,7 @@ df_loss %>%
     theme_gray(base_size = 15)
 ```
 
-![png](output_40_0.png)
-
+![png](./figures/output_40_0.png)
 
 What do you observe?
 
@@ -572,9 +413,9 @@ Using the learning rate 0.001, the algorithm slowly converges on a solution. Usi
 To find out, let's have a look at the dynamics of our model parameters _w_ and _b_ during model training.
 
 
-```{r}
+```{r eval = F}
 #Get the list of file names
-fnames=list.files(file.path(save_path_logs,'logs'),full.names = T)
+fnames = list.files(file.path(save_path_logs,'logs'),full.names = T)
 
 #Allocate space for saving the model parameters
 w = matrix(0,nrow = num_epochs, ncol=length(fnames))    
@@ -626,8 +467,7 @@ gg1+gg2
 ```
 
 
-![png](output_42_0.png)
-
+![png](./figures/output_42_0.png)
 
 What do you observe?
 
@@ -643,8 +483,11 @@ To get a better understanding of what is happening here, let's visualize the sur
 MSE = function(observed,predicted) {
   val = mean((observed - predicted)^2)
   return (val)
-  }
+}
 
+```
+
+```{r eval = F}
 #Get the observed PPFD_IN and GPP_NT_VUT_REF         
 x_observed = df_train$PPFD_IN #PPFD_IN
 y_observed = df_train$GPP_NT_VUT_REF #GPP_NT_VUT_REF
@@ -675,8 +518,7 @@ persp(w,b,loss,theta = 30, phi = 15,
 ```
 
 
-![png](output_44_0.png)
-
+![png](./figures/output_44_0.png)
 
 What features of this surface stand out to you?
 
@@ -690,8 +532,8 @@ First, look at loss as a function of _w_ for $b \approx 0.76$ . Second, look at 
 df_w = data.frame(loss = loss[,92],w = w)
 df_b = data.frame(loss = loss[55,],b = b)
 
-#Load (w,b) found by model with lr = 0.01
-model = load_model_hdf5(save_path)
+# Load (w,b) found by model with lr = 0.01
+model = load_model_hdf5("./data/SLNN_I/saved_models/model_lr_0.01.h5") 
 w_est = as.numeric(get_weights(model)[1])
 b_est = as.numeric(get_weights(model)[2])
 
@@ -715,11 +557,11 @@ gg2 = df_b %>%
         theme_gray(base_size = 20)+
         theme(legend.position="top")
 
-gg1+gg2
+# gg1+gg2
 ```
 
 
-![png](output_46_0.png)
+![png](./figures/output_46_0.png)
 
 
 Notice how little loss changes as a function of _b_, relative to _w_. Also notice that we can decrease loss further than what was found in our best model by decreasing b. Why didn't our model find this solution?
@@ -729,43 +571,36 @@ Let's use our model to make predictions on our test data. First, let's calculate
 
 
 ```{r}
-#load model with lr = 0.01
-model = load_model_hdf5(save_path)
+# Load model with lr = 0.01
+model = load_model_hdf5("./data/SLNN_I/saved_models/model_lr_0.01.h5")
 
-#predict on test data
+# Predict on test data
 y_predicted =  model %>% predict(df_test$PPFD_IN)
 
-#Compute loss on test data
+# Compute loss on test data
 y_observed = df_test$GPP_NT_VUT_REF
 loss_test = MSE(y_observed, y_predicted)
 
-#Print loss
-cat('\nLoss on test data: ', loss_test, "\n")
+# Print loss
+# cat('\nLoss on test data: ', loss_test, "\n")
+cat("\n Loss on test data: 34.42075 \n") # Number added by hand for computational reasons
+
 ```
 
-    
-    Loss on test data:  34.42075 
-
-
 How does this compare to the loss observed on the training data?
-
 Next let's visualize the correlation between the predictions and observations for the test data and calculate its squared correlation. 
 
-
 ```{r}
-#Calculate squared correlation
+# Calculate squared correlation
 cor2=cor(df_test$GPP_NT_VUT_REF,y_predicted)^2
 
-#Visualize observed vs. predicted GPP_NT_VUT_REF
+# Visualize observed vs. predicted GPP_NT_VUT_REF
 df = data.frame(Observed = df_test$GPP_NT_VUT_REF, Predicted = y_predicted)
 df %>% ggplot(aes(x = Observed,y = Predicted))+
        geom_point()+
        labs(title = bquote('Observed Vs Predicted' ~ cor^2 == .(round(cor2,2))))
 ```
-
-
-![png](output_51_0.png)
-
+![](./figures/output_51_0.png)
 
 Can you think of any problems with this approach?
 
@@ -775,49 +610,30 @@ Another common approach for measuring model performance is via comparison to a l
 
 
 ```{r}
-#compare with a null model that always predicts the mean of y_train
+# Compare with a null model that always predicts the mean of y_train
 null_model = mean(df_train$GPP_NT_VUT_REF)
 
-#train MSE
+# Train MSE
 pred_train = model %>% predict(df_train$PPFD_IN)
 mse_lm_train = MSE(df_train$GPP_NT_VUT_REF,pred_train)
 mse_null_train = MSE(df_train$GPP_NT_VUT_REF,null_model)
 
-#test MSE  
+# Test MSE  
 mse_lm_test = MSE(df_test$GPP_NT_VUT_REF,y_predicted)
 mse_null_test = MSE(df_test$GPP_NT_VUT_REF,null_model)
 
-#results 
+# Results 
 results = data.frame(Model = c('Null',"Linear"), 
                      Train_MSE = c(mse_null_train,mse_lm_train), 
                      Test_MSE = c(mse_null_test,mse_lm_test))
 results
 ```
 
-
-<table>
-<caption>A data.frame: 2 × 3</caption>
-<thead>
-	<tr><th scope=col>Model</th><th scope=col>Train_MSE</th><th scope=col>Test_MSE</th></tr>
-	<tr><th scope=col>&lt;chr&gt;</th><th scope=col>&lt;dbl&gt;</th><th scope=col>&lt;dbl&gt;</th></tr>
-</thead>
-<tbody>
-	<tr><td>Null  </td><td>77.73053</td><td>77.37176</td></tr>
-	<tr><td>Linear</td><td>34.77979</td><td>34.42075</td></tr>
-</tbody>
-</table>
-
-
-
 What do you observe? How does the loss compare to that obtained during training? Is the linear model better than the null model?
-
-
 
 ## Logistic Regression
 
-So far in this tutorial, we have studied gradient descent in the context of linear regression. Such a linear model is given by the following formula: 
-
-$$y = w_1x_1 +...+ w_nx_n + b$$
+So far in this tutorial, we have studied gradient descent in the context of linear regression. Such a linear model is given by the following formula: $y = w_1x_1 +...+ w_nx_n + b$
 
 where _y_ is measured on a continuous scale, $x_1$ through $x_n$ are the $n$ features of the data and $w_1$ through $w_n$ are the weights you're trying to learn.
 
@@ -825,12 +641,7 @@ Recall from lecture 9B (nonlinear problems), that by applying a sigmoid function
 
 Let's consider a hypothetical binary classification example. That is, assume $y$ either takes the value $0$ (no cat) or $1$ (cat). We are interested in modeling the relation between $P(Y=1|x)$ and $x = (x_1,x_2,...,x_n)$.
 
-The aforementionted relation can be defined as 
-
-$$
-P(Y=1|x) = \sigma(w_1x_1 +...+ w_nx_n + b)
-$$
-where $$\sigma(t) = \frac{1}{1+e^{-t}}$$
+The aforementioned relation can be defined as $P(Y=1|x) = \sigma(w_1x_1 +...+ w_nx_n + b)$, where $\sigma(t) = \frac{1}{1+e^{-t}}$
 
 Here is what a logistic function looks like:
 
@@ -844,7 +655,7 @@ The parameters of logistic regression can be estimated using gradient descent, j
 
 Once the parameters have been estimated, the probability $\hat{p} = \sigma(w_1x_1 +...+ w_nx_n + b)$ that an example belongs to the positive class can be predicted as follows:
 
-$$   
+$$
 \hat{y} = 
      \begin{cases}
       1, &\quad if \  \hat{p} \geq 0.5\\ 
@@ -927,10 +738,6 @@ cat("Proportion of examples with label 0: ",100 * mean(y==0),"%\n")
 cat("Proportion of examples with label 1: ",100 * mean(y==1),"%\n")
 ```
 
-    Proportion of examples with label 0:  48.57143 %
-    Proportion of examples with label 1:  51.42857 %
-
-
 Now let 's plot the data.
 
 
@@ -946,10 +753,6 @@ df_data %>%
     ylab("P(positive)")+
     theme_grey(base_size = 15)
 ```
-
-
-![png](output_73_0.png)
-
 
 Prepare the data for training and testing, by shuffling and using an 80/20 split, as before.
 
@@ -982,32 +785,6 @@ lg_fit = glm(y ~ x , family = 'binomial',data = df_train)
 summary(lg_fit)
 ```
 
-
-    
-    Call:
-    glm(formula = y ~ x, family = "binomial", data = df_train)
-    
-    Deviance Residuals: 
-        Min       1Q   Median       3Q      Max  
-    -2.8559  -0.2164   0.0881   0.3190   1.9610  
-    
-    Coefficients:
-                Estimate Std. Error z value Pr(>|z|)    
-    (Intercept)  -7.1477     0.8874  -8.055 7.96e-16 ***
-    x             1.6944     0.1883   8.998  < 2e-16 ***
-    ---
-    Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-    
-    (Dispersion parameter for binomial family taken to be 1)
-    
-        Null deviance: 387.00  on 279  degrees of freedom
-    Residual deviance: 108.83  on 278  degrees of freedom
-    AIC: 112.83
-    
-    Number of Fisher Scoring iterations: 6
-
-
-
 Note that the decision boundary is $-7.1477 + 1.6944  x = 0$. 
 
 This means examples with $x \geq 4.22$ are predicted to have a label of `1` (i.e., they belong to the 'positive class'), whereas examples with $x < 4.22$ are predicted to have a label of `0` (i.e., they belong to the 'negative class'). 
@@ -1035,10 +812,6 @@ df_train %>%
     theme_grey(base_size = 15)
 ```
 
-
-![png](output_80_0.png)
-
-
 It seems the trained model does a good job at predicting which examples should be associated with which labels, although some examples are clearly misclassified. How else might we quantify model performance here? Remember the accuracy metric we introduced? Let's apply it to our model.
 
 
@@ -1053,9 +826,6 @@ pred_y = (pred_test >= 0.5)*1
 acc = mean(pred_y == df_test$y)
 cat("Test Accuracy: ",acc,'\n')
 ```
-
-    Test Accuracy:  0.9 
-
 
 Wow, an accuracy of 90%. Sounds good right!? In this case it actually is, but we'll see in the next tutorial where this metric breaks down.
 
@@ -1083,14 +853,14 @@ You have to solve questions 3-7 with 2 different configurations.
 A skeleton code is provided below:
 
 #### Import required libraries
-```{r}
+```{r eval = F}
 library(tidyverse)
 library(reticulate)
 use_condaenv()
 library(keras)
 library(tensorflow)
 ```
-------------------------------------------------------------------------------------------------
+
 IMPORTANT NOTE: READ CAREFULLY!
 Do not skip this part or you'll run into issues later on!
 In a moment, after you've read the following instructions carefully, you should:
@@ -1101,10 +871,9 @@ Now, you can normally continue with the exercise.
 
 If you were too eager and already pressed _Y_ (yes) and enter, don't panic! Just close your environment, re-open it and make sure that next time you go with _n_ (no).
 
-```{r}
+```{r eval = F}
 use_session_with_seed(0)
 ```
---------------------------------------------------------------------------------------------------
 
 #### Read Data
 ```{r}
@@ -1113,7 +882,7 @@ head(data)
 ```
 
 #### Tokenize Type
-```{r}
+```{r eval = F}
 #create a new column with name y where y=1 defines virginica while y=0 defines not_virginica
 
 #YOUR SOLUTION HERE 
@@ -1122,7 +891,7 @@ data$y =
 head(data)
 ```
 
-```{r}
+```{r eval = F}
 #YOUR SOLUTION HERE -> shuffle the data and make the train,test split
 #shuffle data
 set.seed(42)
@@ -1151,7 +920,7 @@ y_test = df_test$y
 
 #### Plot the training data
 
-```{r}
+```{r eval = F}
 #YOUR SOLUTION HERE: use only the Petal Width as input
 
 
@@ -1159,7 +928,7 @@ y_test = df_test$y
 
 #### Create the model
 
-```{r}
+```{r eval = F}
 #YOUR SOLUTION HERE
 #fill in what is missing
 # you have to use the right activation and loss function for logistic regression
@@ -1180,13 +949,13 @@ y_test = df_test$y
 
 #### Plot the decision boundary
 
-```{r}
+```{r eval = F}
 #Your solution
 ```
 
 #### Evaluate the accuracy of the model in the test set
 
-```{r}
+```{r eval = F}
 #YOUR SOLUTION HERE
 #fill in what is missing
 
@@ -1207,7 +976,7 @@ cat("Test Accuracy: ",round(accuracy,3),'/n')
 
 #### Plot misclassified predictions in the test data
 
-```{r}
+```{r eval = F}
 #YOUR SOLUTION
 # HINT: create a new column in the df_test which indicates those points that are misclassified
 ```
@@ -1216,7 +985,7 @@ cat("Test Accuracy: ",round(accuracy,3),'/n')
 
 #### Plot the training data
 
-```{r}
+```{r eval = F}
 #YOUR SOLUTION HERE: use both the Petal Length and Petal Width as inputs
 #HINT your x=Petal_Length,y=Petal_Width
 
@@ -1225,7 +994,7 @@ cat("Test Accuracy: ",round(accuracy,3),'/n')
 
 #### Create the model
 
-```{r}
+```{r eval = F}
 #YOUR SOLUTION HERE
 #fill in what is missing
 # you have to use the right activation and loss function for logistic regression
@@ -1248,14 +1017,14 @@ w_b = unlist(get_weights(model_b))
 
 #### Plot the decision boundary
 
-```{r}
+```{r eval = F}
 #Your solution
 #HINT: Your desicion boundary now is a line
 ```
 
 #### Evaluate the accuracy of the model in the test set
 
-```{r}
+```{r eval = F}
 #YOUR SOLUTION HERE
 #fill in what is missing
 
@@ -1277,9 +1046,7 @@ cat("Test Accuracy: ",round(accuracy,3),'\n')
 
 #### Plot misclassified predictions in the test data
 
-```{r}
+```{r eval = F}
 #YOUR SOLUTION
 # HINT: create a new column in the df_test which indicates those points that are misclassified
 ```
-
-
