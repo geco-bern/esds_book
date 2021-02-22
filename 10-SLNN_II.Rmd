@@ -1,4 +1,4 @@
-# Supervised Learning Neural Networks: the theory
+# Supervised Learning Neural Networks: Theory
 
 ### Learning objectives
 - Build and train neural networks for binary classification
@@ -107,15 +107,8 @@ df_data %>%
 
 # print some summary statistics about these data
 cat('Proportion of data in class blue: ' , sum(df_data$y) / length(df_data$y), '\n')
-
 cat('Proportion of data in class green: ' , 1 - sum(df_data$y) / length(df_data$y), '\n')
 ```
-
-    Proportion of data in class blue:  0.6018 
-    Proportion of data in class green:  0.3982 
-
-
-
 
 A more appropriate way to split the data into training and test sets is to take care such that each label is represented to its proportion in both sets (_stratified splitting_). To this end, we use the `rsample` package and we choose `strata = y`. That is crucial especially for heavily class imbalanced data sets. In essence, what we want to avoid is to have an over representantion of one class in the training data set and an under representation of this class in the the test data set.
 
@@ -145,15 +138,6 @@ cat('Proportion of data in class blue: ' , sum(df_test$y) / length(df_test$y), '
 cat('Proportion of data in class green: ' , 1 - sum(df_test$y) / length(df_test$y), '\n')
 
 ```
-
-    Training set 
-    Proportion of data in class blue:  0.6017998 
-    Proportion of data in class green:  0.3982002 
-    
-    Test set 
-    Proportion of data in class blue:  0.6018009 
-    Proportion of data in class green:  0.3981991 
-
 
 As it is obvious now, each label is represented to its initial proportion in training and test set.
 
@@ -274,7 +258,6 @@ Why does the output layer use a sigmoid activation function rather than a linear
 
 For a continuous response y then the output activation should be linear. 
 
-
 Can we train an accurate classifier with just a single layer of a single node? 
 
 Let's try. And let's assess model performance using a metric called **Accuracy**. This is simply the number of correct predictions divided by the number of predictions. 
@@ -282,7 +265,7 @@ Let's try. And let's assess model performance using a metric called **Accuracy**
 In the context of this toy dataset, it's the number of examples predicted to be blue that actually are blue plus the number of examples predicted to be green that actually are green, divided by the number of predictions.
 
 
-```{r}
+```{eval = F}
 c(model, history) %<-% build_and_train_model(data = df_train,
                                             learning_rate = 0.01,
                                             batch_size = 512,
@@ -294,41 +277,40 @@ c(model, history) %<-% build_and_train_model(data = df_train,
 cat('Final training accuracy: ', round(history$metrics$acc[ne], 3), '\n')
 ```
 
-    Model: "sequential"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    dense (Dense)                       (None, 1)                       3           
-    ________________________________________________________________________________
-    dense_1 (Dense)                     (None, 1)                       2           
-    ================================================================================
-    Total params: 5
-    Trainable params: 5
-    Non-trainable params: 0
-    ________________________________________________________________________________
-    Final training accuracy:  0.602 
+```{r eval = F}
+##    Model: "sequential"
+##    ________________________________________________________________________________
+##    Layer (type)                        Output Shape                    Param #     
+##    ================================================================================
+##    dense (Dense)                       (None, 1)                       3           
+##    ________________________________________________________________________________
+##    dense_1 (Dense)                     (None, 1)                       2           
+##    ================================================================================
+##    Total params: 5
+##    Trainable params: 5
+##    Non-trainable params: 0
+##    ________________________________________________________________________________
+##    Final training accuracy:  0.602 
+```
 
+![ ](./figures/SLNN_II-output1.png)
 
 Note the final training accuracy. 
 
 Let's have a look at how accuracy and loss change during model training.
 
 
-```{r}
+```{r eval = F}
 plot(history)
 ```
-
-    `geom_smooth()` using formula 'y ~ x'
-    
-
-
+![ ](./figures/SLNN_II-output2.png)
 
 Observe how quickly accuracy converges to the final value. And note the final value - wow, we're doing better than a coin flip (a coin flip choice would have an accuracy of 0.5) during training, using just a single layer of a single node! How is this possible? Take a moment to think about how this might be happening. Think about what you already know about these data (What is the percentage of each class? Is it possible a classifier that only predicts the largest class to seems better than a coin flip?).
 
 To see if you're intuition is correct, let's plot our model predictions on the test data. Note that in making these predictions, we need to choose a classification threshold. The reason is that the output layer yields a real value between 0 and 1, which needs to be discretized for the purpose of binary classification. For now, let's just set this threshold at 0.5. We'll see how changing the threshold impacts model performance later.
 
 
-```{r}
+```{r eval = F}
 # Predict on test data. Note how easy this is to do in Keras.
 pred <- predict(model, as.matrix(df_test[, c('x1', 'x2')]))
 
@@ -349,8 +331,9 @@ c(loss, acc) %<-% evaluate(model, as.matrix(df_test[,c('x1', 'x2')]), df_test$y)
 cat('Accuracy on held-out test data: ' , round(acc, 3), '\n')
 ```
 
-    Accuracy on held-out test data:  0.602 
-
+```{r echo = F}
+cat("Accuracy on held-out test data:  0.602")
+```
 
 
 
@@ -400,17 +383,16 @@ where `TP + FN` is the number of _positive cases (P)_ while `TN + FP` is the num
 Let's apply this function to our model predictions.
 
 
-```{r}
-c(true_positives, true_negatives, false_positives, false_negatives) %<-% confusion(df_test$y, 
-                                                                                   pred, 
-                                                                                   threshold)
+```{r eval = F}
+c(true_positives, true_negatives, false_positives, false_negatives) %<-% confusion(df_test$y,  pred, threshold)
 ```
 
-    true positives:  1203 
-    true negatives:  0 
-    false positives:  796 
-    false negatives:  0 
-
+```{r echo = F}
+cat('true positives: 1203 \n')
+cat('true negatives: 0 \n')
+cat('false positives: 796 \n')
+cat('false negatives: 0 \n')
+```
 
 This reveals a more nuanced picture of model performance. Sure, accuracy is better than a coin toss, but we now see that we do not correctly predict _a single negative example_. 
 
@@ -421,10 +403,7 @@ This reveals a more nuanced picture of model performance. Sure, accuracy is bett
 These four metrics are the basis for two additional, commonly used performance metrics:
 
 - **precision**: $\frac{\mbox{TP}}{\mbox{TP + FP}}$
-
-
 - **recall**: $\frac{\mbox{TP}}{\mbox{TP + FN}} = \frac{\mbox{TP}}{\mbox{P}}$
-
 
 ![](./figures/1200px-Precisionrecall.svg.png)
 
@@ -463,16 +442,17 @@ precision_and_recall <- function(true_positives, true_negatives,false_positives,
 Let's apply this function to our model predictions.
 
 
-```{r}
+```{r eval = F}
 c(precision, recall) %<-% precision_and_recall(true_positives, 
                                                true_negatives, 
                                                false_positives, 
                                                false_negatives)
 ```
 
-    Precision:  0.6018009 
-    Recall:  1 
-
+```{r echo = F}
+cat("Precision: 0.6018009 \n")
+cat("Recall: 1 \n")
+```
 
 
 Now we see that the model $\color{blue}{\text{always blue}}$ does a great job at correctly predicting positive examples (_'recall'_), but many of its positive predictions are incorrect (_'precision'_).
@@ -489,7 +469,7 @@ The _F-score_ takes values on the interval [0,1]. An F-score of 1 indicates that
 So now let's also define a function for the F-score and apply it to the previous example.
 
 
-```{r}
+```{r eval = F}
 f_score <- function(precision, recall, verbose = T){
     
     #Calculate F
@@ -507,8 +487,9 @@ f_score <- function(precision, recall, verbose = T){
 f <- f_score(precision, recall)
 ```
 
-    F-score:  0.7514054
-
+```{r echo = F}
+cat("F-score: 0.7514054")
+```
 ## Evaluate the influence of network architecture on model performance
 
 Might more complex network architectures allow us to make better predictions? 
@@ -516,7 +497,7 @@ Might more complex network architectures allow us to make better predictions?
 Let's try a single layer of two nodes.
 
 
-```{r}
+```{r eval = F}
 c(model, history) %<-% build_and_train_model(num_layers = 1, 
                                              num_units_per_layer =  2, 
                                              print_model_summary = T)
@@ -524,20 +505,7 @@ c(model, history) %<-% build_and_train_model(num_layers = 1,
 cat('Final training accuracy: ', round(history$metrics$acc[ne], 3), '\n')
 ```
 
-    Model: "sequential_2"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    dense_7 (Dense)                     (None, 2)                       6           
-    ________________________________________________________________________________
-    dense_8 (Dense)                     (None, 1)                       3           
-    ================================================================================
-    Total params: 9
-    Trainable params: 9
-    Non-trainable params: 0
-    ________________________________________________________________________________
-    Final training accuracy:  0.602 
-
+![ ](./figures/SLNN_II-output3.png)
 
 Do you observe an improvement in training accuracy? 
 
@@ -546,7 +514,7 @@ If not, keep trying until you do. This may take several attempts. _Note_ the rea
 Now that you've obtained a model with improved training accuracy, let's see how it achieves this improvement:
 
 
-```{r}
+```{r eval = F}
 # Predict on test data
 pred <- predict(model, as.matrix(df_test[, c('x1', 'x2')]))
 
@@ -580,12 +548,12 @@ c(precision, recall) %<-% precision_and_recall(true_positives,
 f <- f_score(precision, recall)
 ```
 
-    Accuracy on held-out test data:  0.75 
-    Precision:  0.8490566 
-    Recall:  0.7107232 
-    F-score:  0.7737557
-
-
+```{r echo = F}
+    cat("Accuracy on held-out test data: 0.75 ")
+    cat("Precision: 0.8490566 ")
+    cat("Recall: 0.7107232 ")
+    cat("F-score: 0.7737557")
+```
 
 What do you observe?
 
@@ -598,15 +566,13 @@ Now let's consider more complex network architecture. Specifically, consider:
 
 * Four layers of eight nodes
 
-
 To do so, simply alter the input arguments to `build_and_train_model`.
 
 Do we see improvements? 
 
 Again, you may have to train the model several times due to the stochastic nature of the training process.
 
-
-```{r}
+```{r eval = F}
 c(model, history) %<-% build_and_train_model(num_layers = 4, 
                                              num_units_per_layer =  8, 
                                              print_model_summary = T)
@@ -646,32 +612,7 @@ c(precision, recall) %<-% precision_and_recall(true_positives,
 f <- f_score(precision, recall)
 ```
 
-    Model: "sequential_1"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    dense_2 (Dense)                     (None, 8)                       24          
-    ________________________________________________________________________________
-    dense_3 (Dense)                     (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_4 (Dense)                     (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_5 (Dense)                     (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_6 (Dense)                     (None, 1)                       9           
-    ================================================================================
-    Total params: 249
-    Trainable params: 249
-    Non-trainable params: 0
-    ________________________________________________________________________________
-    Final training accuracy:  0.935 
-    Accuracy on held-out test data:  0.933 
-    Precision:  0.9370915 
-    Recall:  0.9534497 
-    F-score:  0.9451998
-
-
-
+![ ](./figures/SLNN_II-output4.png)
 
 What do you observe? Does model performance improve with model complexity? If so, is this always the case?
 
@@ -691,7 +632,7 @@ Let's see what happens when we change this threshold.
 First, calculate precision and recall for thresholds between 0.05 and 0.95.
 
 
-```{r}
+```{r eval = F}
 # Consider 100 thresholds between 0 and 1
 num_thresholds <- 100
 thresholds <- seq(0, 1, length.out = num_thresholds)
@@ -707,9 +648,7 @@ recall <- rep(NA, num_thresholds)
 # Loop over the thresholds, calculate the confusion matrix as well as precision and recall
 for (i in 1:num_thresholds){
     
-    c(tp[i], tn[i], fp[i], fn[i]) %<-% confusion(df_test$y, 
-                                                 pred, thresholds[i], 
-                                                 verbose = F)
+    c(tp[i], tn[i], fp[i], fn[i]) %<-% confusion(df_test$y, pred, thresholds[i], verbose = F)
   
     c(precision[i], recall[i]) %<-% precision_and_recall(tp[i], 
                                                          tn[i], 
@@ -721,7 +660,7 @@ for (i in 1:num_thresholds){
 Plot precision and recall as a function of the classification threshold.
 
 
-```{r}
+```{r eval = F}
 df_pre_rec <- data.frame(x = thresholds, 
                          metrics = c(precision, recall), 
                          type = rep(c('precision','recall'), each = num_thresholds))
@@ -744,8 +683,7 @@ df_pre_rec %>%
     theme_grey(base_size = 15)
 ```
 
-
-
+![ ](./figures/SLNN_II-output5.png)
 
 As it is obvious from the graph, precision and recall experience an opposite behaivor as the classification threshold varies. 
 
@@ -841,18 +779,18 @@ ROC <- function(fpr, recall, viz = T){
 Now let's apply this function to our model predictions.
 
 
-```{r}
+```{r eval = F}
 fpr <- fp / (fp + tn)
 auc <- ROC(fpr, recall, viz = T)
+cat("AUC Value: ", auc$value)
 auc$plot
-auc$value
 ```
 
+```{r echo = F}
+cat("AUC Value: 0.986246172675514")
+```
 
-0.986246172675514
-
-
-
+![ ](./figures/SLNN_II-output6.png)
 
 Models with ROC curves that lie on the identity line (here the 'Baseline' in red-ish) are no better than a random guess. As the ROC curve approaches the upper left corner of the plot, the model is improving (_Total Recall!_). 
 
@@ -863,7 +801,7 @@ As we've seen, a simple statistic that summarizes an ROC curve is the area under
 We note here that instead of building the `ROC` function from scratch we can alternatively use the package `pROC`
 
 
-```{r}
+```{r eval = F}
 # ROC Curve - pROC package
 roc_object <- roc(df_test$y ~ c(pred), 
                   plot = TRUE, 
@@ -874,22 +812,15 @@ roc_object <- roc(df_test$y ~ c(pred),
                   main = "ROC Curve")
 ```
 
-    Setting levels: control = 0, case = 1
-    
-    Setting direction: controls < cases
-    
 
-
-
-
-```{r}
+```{r eval = F}
 # AUC - pROC package
 auc(roc_object)
 ```
 
-
+```{r echo = F}
 0.986307263666629
-
+```
 
 Let's put these metrics into practice by comparing different network architectures. To do so, we need to remember that model training is stochastic. Different random initializations can lead to different outcomes, and for some model architectures, some outcomes are more likely than others. For example, we've seen that the "<font color=blue>always blue</font>" outcome is particularly seducing. To account for this stochasticity, we need to train our models multiple times, and take the average performance across random initializations.
 
@@ -902,7 +833,7 @@ Let's compare four model architectures:
 Because we're averaging over 10 random initializations per model, this script will take a bit of time - just enough for you to go prepare a cup of tea.
 
 
-```{r}
+```{r eval = F}
 # Consider 100 thresholds between 0 and 1
 num_thresholds <- 100
 thresholds <- seq(0, 1, length.out = num_thresholds)
@@ -958,132 +889,10 @@ for (i in 1:num_models){
 }
 ```
 
-    You look nice today. Model configuration 1 initialization 1
-    
-    
-    You look nice today. Model configuration 1 initialization 2
-    
-    
-    You look nice today. Model configuration 1 initialization 3
-    
-    
-    You look nice today. Model configuration 1 initialization 4
-    
-    
-    You look nice today. Model configuration 1 initialization 5
-    
-    
-    You look nice today. Model configuration 1 initialization 6
-    
-    
-    You look nice today. Model configuration 1 initialization 7
-    
-    
-    You look nice today. Model configuration 1 initialization 8
-    
-    
-    You look nice today. Model configuration 1 initialization 9
-    
-    
-    You look nice today. Model configuration 1 initialization 10
-    
-    
-    You look nice today. Model configuration 2 initialization 1
-    
-    
-    You look nice today. Model configuration 2 initialization 2
-    
-    
-    You look nice today. Model configuration 2 initialization 3
-    
-    
-    You look nice today. Model configuration 2 initialization 4
-    
-    
-    You look nice today. Model configuration 2 initialization 5
-    
-    
-    You look nice today. Model configuration 2 initialization 6
-    
-    
-    You look nice today. Model configuration 2 initialization 7
-    
-    
-    You look nice today. Model configuration 2 initialization 8
-    
-    
-    You look nice today. Model configuration 2 initialization 9
-    
-    
-    You look nice today. Model configuration 2 initialization 10
-    
-    
-    You look nice today. Model configuration 3 initialization 1
-    
-    
-    You look nice today. Model configuration 3 initialization 2
-    
-    
-    You look nice today. Model configuration 3 initialization 3
-    
-    
-    You look nice today. Model configuration 3 initialization 4
-    
-    
-    You look nice today. Model configuration 3 initialization 5
-    
-    
-    You look nice today. Model configuration 3 initialization 6
-    
-    
-    You look nice today. Model configuration 3 initialization 7
-    
-    
-    You look nice today. Model configuration 3 initialization 8
-    
-    
-    You look nice today. Model configuration 3 initialization 9
-    
-    
-    You look nice today. Model configuration 3 initialization 10
-    
-    
-    You look nice today. Model configuration 4 initialization 1
-    
-    
-    You look nice today. Model configuration 4 initialization 2
-    
-    
-    You look nice today. Model configuration 4 initialization 3
-    
-    
-    You look nice today. Model configuration 4 initialization 4
-    
-    
-    You look nice today. Model configuration 4 initialization 5
-    
-    
-    You look nice today. Model configuration 4 initialization 6
-    
-    
-    You look nice today. Model configuration 4 initialization 7
-    
-    
-    You look nice today. Model configuration 4 initialization 8
-    
-    
-    You look nice today. Model configuration 4 initialization 9
-    
-    
-    You look nice today. Model configuration 4 initialization 10
-    
-    
-
-
 Now let's average our measures of model performance across the 10 random initializations. By now it should be clear why we do this, but to drive the point home we'll say it again: Model training is stochastic, so every time you train a model with a different random initialization, you may get a different final model, even for models based with the same network architectures.
 
 
-```{r}
+```{r eval = F}
 # Average over the 10 random initializations        
 average_precision <- matrix(NA, nrow = num_thresholds, ncol =  num_models)
 
@@ -1112,18 +921,19 @@ for (i in 1:num_models){
 }
 ```
 
-    Auc for model  1  is  0.677 
-    Auc for model  2  is  0.611 
-    Auc for model  3  is  0.929 
-    Auc for model  4  is  0.981 
-
+```{r echo = F}
+cat("Auc for model  1  is  0.677")
+cat("Auc for model  2  is  0.611")
+cat("Auc for model  3  is  0.929")
+cat("Auc for model  4  is  0.981")
+```
 
 What do you observe?
 
 The most complex model (8 layers, each with 8 nodes) clearly outperforms its competitors. Let's see this in more detail by visualizing the ROC curves.
 
 
-```{r}
+```{r eval = F}
 # Create a vector of points between 0 and 1
 x <- seq(0, 1, length.out = 101)
 
@@ -1171,6 +981,7 @@ df %>% ggplot(aes(x = avg_fpr,
 
 ```
 
+![ ](./figures/SLNN_II-output7.png)
 
 Again you can see the most complex model (<font color=purple>8 layers, each with 8 nodes</font>) clearly outperforms the less complex ones.
 
@@ -1179,7 +990,7 @@ It is important to point out that the area under the ROC curve is not always an 
 To see this, let's create a toy dataset that is even more class imbalanced.
 
 
-```{r}
+```{r eval = F}
 # Seed the random number generator for reproducible results
 set.seed(41)
 
@@ -1215,16 +1026,17 @@ cat('Proportion of data in class blue: ' , sum(df_new$y) / length(df_new$y), '\n
 cat('Proportion of data in class green: ' , 1 - sum(df_new$y) / length(df_new$y),'\n')
 ```
 
-    Proportion of data in class blue:  0.1817 
-    Proportion of data in class green:  0.8183 
-
+```{r echo = F}
+cat("Proportion of data in class blue:  0.1817 ")
+cat("Proportion of data in class green:  0.8183 ")
+```
 
 Our data now are now heavily imbalanced with 82% of examples in the negative class. 
 
 Let's build and train the most complex model considered above (8 layers, each with 8 nodes) to classify these data and calculate several performance metrics of our trained model.
 
 
-```{r}
+```{r eval = F}
 # Build and train the model
 c(model, history) %<-% build_and_train_model(data = df_train_new , 
                                              num_layers = 8, 
@@ -1255,58 +1067,22 @@ c(precision, recall) %<-% precision_and_recall(true_positives,
 f <- f_score(precision, recall)
 ```
 
-    Model: "sequential_43"
-    ________________________________________________________________________________
-    Layer (type)                        Output Shape                    Param #     
-    ================================================================================
-    dense_199 (Dense)                   (None, 8)                       24          
-    ________________________________________________________________________________
-    dense_200 (Dense)                   (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_201 (Dense)                   (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_202 (Dense)                   (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_203 (Dense)                   (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_204 (Dense)                   (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_205 (Dense)                   (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_206 (Dense)                   (None, 8)                       72          
-    ________________________________________________________________________________
-    dense_207 (Dense)                   (None, 1)                       9           
-    ================================================================================
-    Total params: 537
-    Trainable params: 537
-    Non-trainable params: 0
-    ________________________________________________________________________________
-    Final training accuracy:  0.892 
-    Precision:  0.7072539 
-    Recall:  0.7520661 
-    F-score:  0.728972
-
+![ ](./figures/SLNN_II-output8.png)
 Observe that training accuracy is high, whereas precision, recall, and the F-score are all relatively low. 
 
 Let's also have a look at the confusion matrix.
 
 
-```{r}
+```{r eval = F}
 table(y_pred, df_test_new$y)
 ```
 
-
-          
-    y_pred    0    1
-         0 1523   90
-         1  113  273
-
-
+![ ](./figures/SLNN_II-output9.png)
  
 So let's also calculate the areas under the ROC curve.
 
 
-```{r}
+```{r eval = F}
 # Create 100 threhsolds between 0 and 1
 num_thresholds <- 100
 
@@ -1342,7 +1118,7 @@ auc$plot
 ```
 
 
-
+![ ](./figures/SLNN_II-output10.png)
 
 The area under the ROC curve indicates an adequate model, whereas the precision and recall are relatively low. This is misleading! 
 
@@ -1366,7 +1142,7 @@ Tasks:
 The required libraries and some useful functions are already imported in the following chunks. For the ROC curve you can also use the `pROC` package.
 
 ### Import libraries
-```{r}
+```{r eval = F}
 library(tidyverse)
 library(reticulate)
 library(pROC)
@@ -1376,8 +1152,7 @@ library(rsample)
 ```
 
 ### Import functions
-```{r}
-
+```{r  eval = F}
 # Area Under Curve
 simple_auc <- function(x, y){
   
@@ -1495,75 +1270,72 @@ Now, you can normally continue with the exercise.
 
 If you were too eager and already pressed _Y_ (yes) and enter, don't panic! Just close your environment, re-open it and make sure that next time you go with _n_ (no).
 
-```{r eval=F}
+```{r echo=F}
 keras_model_sequential()
 ```
 
-
-
-
 ### Read in the data
-```{r}
+```{r echo = F}
 
 
 ```
 
 ### Visualize data and print proportion of data belongs to each class.
-```{r}
+```{r echo = F}
 
 
 ```
 
 ### Split into training and test set (Stratified split).
-```{r}
+```{r echo = F}
 
 
 ```
 
 
 ### Create models
-```{r}
+```{r echo = F}
 
 ```
 
 
 ### Calculate output and make decisions for each model on test set.
-```{r}
+```{r echo = F}
 
 ```
 
 
 ### Visualize test predictions for each model.
-```{r}
+```{r echo = F}
 
 ```
 
 
 ### Calculate metrics for each model on test set.
 
-```{r}
+```{r echo = F}
 
 ```
 
 ### Calculate ROC and AUC for the best model.
-```{r}
+```{r echo = F}
 
 ```
 
 ### ROC Curve
-```{r}
+```{r echo = F}
 
 ```
 
 ### Train 5 times the best model, take probability outputs on test set for each time. 
 
-```{r}
+```{r echo = F}
 
 
 ```
 
 ### Average over the models output and then make decisions. Print Metrics.
-```{r}
+```{r echo = F}
 
     
 ```
