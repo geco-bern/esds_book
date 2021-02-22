@@ -350,9 +350,6 @@ plot(history)
 
 
 
-![png](output_21_1.png)
-
-
 Observe how quickly accuracy converges to the final value. And note the final value - wow, we're doing better than a coin flip (a coin flip choice would have an accuracy of 0.5) during training, using just a single layer of a single node! How is this possible? Take a moment to think about how this might be happening. Think about what you already know about these data (What is the percentage of each class? Is it possible a classifier that only predicts the largest class to seems better than a coin flip?).
 
 To see if you're intuition is correct, let's plot our model predictions on the test data. Note that in making these predictions, we need to choose a classification threshold. The reason is that the output layer yields a real value between 0 and 1, which needs to be discretized for the purpose of binary classification. For now, let's just set this threshold at 0.5. We'll see how changing the threshold impacts model performance later.
@@ -382,8 +379,6 @@ cat('Accuracy on held-out test data: ' , round(acc, 3), '\n')
     Accuracy on held-out test data:  0.602 
 
 
-
-![png](output_23_1.png)
 
 
 Aha, the model is always predicting blue! Why is this simple trick effective? It's because the data are class imbalanced, meaning that one class is more prevalent than the other in our dataset. Specifically, there are more blue examples than green examples. So by simply using the rule "<font color=blue>always blue</font>", we can obtain an accuracy that's better than a coin toss. 
@@ -618,8 +613,6 @@ f <- f_score(precision, recall)
     F-score:  0.7737557
 
 
-![png](output_40_1.png)
-
 
 What do you observe?
 
@@ -705,7 +698,6 @@ f <- f_score(precision, recall)
     F-score:  0.9451998
 
 
-![png](output_43_1.png)
 
 
 What do you observe? Does model performance improve with model complexity? If so, is this always the case?
@@ -780,7 +772,6 @@ df_pre_rec %>%
 ```
 
 
-![png](output_51_0.png)
 
 
 As it is obvious from the graph, precision and recall experience an opposite behaivor as the classification threshold varies. 
@@ -889,8 +880,6 @@ auc$value
 
 
 
-![png](output_59_1.png)
-
 
 Models with ROC curves that lie on the identity line (here the 'Baseline' in red-ish) are no better than a random guess. As the ROC curve approaches the upper left corner of the plot, the model is improving (_Total Recall!_). 
 
@@ -917,9 +906,6 @@ roc_object <- roc(df_test$y ~ c(pred),
     Setting direction: controls < cases
     
 
-
-
-![png](output_61_1.png)
 
 
 
@@ -1213,9 +1199,6 @@ df %>% ggplot(aes(x = avg_fpr,
 ```
 
 
-![png](output_68_0.png)
-
-
 Again you can see the most complex model (<font color=purple>8 layers, each with 8 nodes</font>) clearly outperforms the less complex ones.
 
 It is important to point out that the area under the ROC curve is not always an appropriate performance metric. Specifically, this measure can be misleading when the data are heavily class-imbalanced. 
@@ -1386,7 +1369,6 @@ auc$plot
 ```
 
 
-![png](output_76_0.png)
 
 
 The area under the ROC curve indicates an adequate model, whereas the precision and recall are relatively low. This is misleading! 
