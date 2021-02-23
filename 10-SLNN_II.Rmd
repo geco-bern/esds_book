@@ -376,7 +376,7 @@ confusion <- function(y_true, pred_out, threshold = 0.5, verbose = T){
 
 Note that we can also define _accuracy_ in terms of true/false positives/negatives
 
-* Accuracy: $ \frac{\mbox{TP} + \mbox{TN}}{\mbox{TP + TN + FP + FN}}$
+* Accuracy: $\frac{\mbox{TP} + \mbox{TN}}{\mbox{TP + TN + FP + FN}}$
 
 where `TP + FN` is the number of _positive cases (P)_ while `TN + FP` is the number of _negative cases (N)_.
 
@@ -462,7 +462,7 @@ Ideally, this metric would take on a high value when both _precision_ and _recal
 
 The **F-score** does exactly that:
 
-* `F-score` : $2 \cdot \frac{\mbox{precision $\cdot$ recall}}{\mbox{precision + recall}}$
+* `F-score` : $2 \cdot \frac{\mbox{precision} \cdot \mbox{recall}}{\mbox{precision + recall}}$
 
 The _F-score_ takes values on the interval [0,1]. An F-score of 1 indicates that both precision and recall are 1 and an F-score of 0 corresponds to a value of 0 for either precision or recall.
 
