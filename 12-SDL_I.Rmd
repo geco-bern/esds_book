@@ -1,6 +1,6 @@
 # Supervised Deep Learning I
 
-***
+
 ## Introduction
 
 In this tutorial, we'll use convolutional neural networks for image classification. The dataset we'll work with comes from a 2013 Kaggle competition, which you can read about [here](https://www.kaggle.com/c/dogs-vs-cats/overview). Kaggle is an online community for data scientists and machine learning engineers, where they can explore datasets, build models and enter contests to attempt solving data science hurdles.
@@ -20,7 +20,7 @@ The dataset contains 25,000 images of dogs and cats. We'll use just a subset of 
 - The final dense layer then learns global patterns in this spatial hierarchy of lower-level patterns
 - Convolutional neural networks are partially "white box", because you can visualize much of what the network learns, for example by visualizing intermediate activations.
 
-***
+
 ## Tutorial
 
 ![Features extraction from a CNN (convolutional neural network).](./figures/Chollet_Fig5.4.png)
@@ -350,10 +350,9 @@ compile_and_train = function(model, learning_rate, max_epochs, early_stopping = 
 Now let's compile and train our model, using a learning rate of 0.001, a maximum number of 20 epochs, but for now without early stopping, regularization, or dropout. This will take some time. Go make a cup of tea, coffee or even hot chocolate.
 
 
-```{r}
+```{r eval = F}
 model_baseline = build_model(0, 0)
-# We have already run it and we saved the results because it takes more than 30 minutes for 20 epochs. But you can run it if you are curious.
-# history_baseline = compile_and_train(model_baseline, 1e-3, 20, F)
+history_baseline = compile_and_train(model_baseline, 1e-3, 20, F)
 ```
 
 **Checkpoint**
@@ -374,13 +373,14 @@ Take some time to digest this model summary. Make sure you understand and can an
 Let's have a look at loss and accuracy during training. Both are measured on the training data and the validation data.
 
 
-```{r}
+```{r eval = F}
 #load history of trained models
 history = readRDS('./data/SDL_I/saved_models/models_history.rds')
-
 fig_size(8,8)
 plot(history$baseline) + theme_grey(base_size = 20)
 ```
+
+![ ](./figures/output_32_1.png)
 
 What do you observe?
 
@@ -408,19 +408,59 @@ A quick note here: _weight regularization_ can be applied to every model we have
 Let's now create a model with an _L2 rate_ that equals 0.005. 
 
 
-```{r}
+```{r eval = F}
 model_L2 = build_model(L2_rate = 0.005)
-#history_L2_reg = compile_and_train(model_L2, 1e-3, 20, F)
+history_L2_reg = compile_and_train(model_L2, 1e-3, 20, F)
+```
+
+```{r}
+## Model: "convnet_L2_0.005_dropout_0"
+## ______________________________________________________________________________________________________________
+## Layer (type)                                     Output Shape                                Param #          
+## ==============================================================================================================
+## conv2d (Conv2D)                                  (None, 148, 148, 32)                        896              
+## ______________________________________________________________________________________________________________
+## max_pooling2d (MaxPooling2D)                     (None, 74, 74, 32)                          0                
+## ______________________________________________________________________________________________________________
+## conv2d_1 (Conv2D)                                (None, 72, 72, 64)                          18496            
+## ______________________________________________________________________________________________________________
+## max_pooling2d_1 (MaxPooling2D)                   (None, 36, 36, 64)                          0                
+## ______________________________________________________________________________________________________________
+## conv2d_2 (Conv2D)                                (None, 34, 34, 128)                         73856            
+## ______________________________________________________________________________________________________________
+## max_pooling2d_2 (MaxPooling2D)                   (None, 17, 17, 128)                         0                
+## ______________________________________________________________________________________________________________
+## dropout (Dropout)                                (None, 17, 17, 128)                         0                
+## ______________________________________________________________________________________________________________
+## conv2d_3 (Conv2D)                                (None, 15, 15, 128)                         147584           
+## ______________________________________________________________________________________________________________
+## max_pooling2d_3 (MaxPooling2D)                   (None, 7, 7, 128)                           0                
+## ______________________________________________________________________________________________________________
+## flatten (Flatten)                                (None, 6272)                                0                
+## ______________________________________________________________________________________________________________
+## dropout_1 (Dropout)                              (None, 6272)                                0                
+## ______________________________________________________________________________________________________________
+## dense (Dense)                                    (None, 512)                                 3211776          
+## ______________________________________________________________________________________________________________
+## dropout_2 (Dropout)                              (None, 512)                                 0                
+## ______________________________________________________________________________________________________________
+## dense_1 (Dense)                                  (None, 1)                                   513              
+## ==============================================================================================================
+## Total params: 3,453,121
+## Trainable params: 3,453,121
+## Non-trainable params: 0
+## ______________________________________________________________________________________________________________
 ```
 
 
 Let's have again a look at loss and accuracy during training, both measured on the training data and the validation data. 
 
-
-```{r}
+```{r eval = F}
 fig_size(8,8)
 plot(history$L2_reg) + theme_grey(base_size = 20)
 ```
+
+![ ](./figures/output_40_1.png)
 
 It seems that overfitting has been prevented with L2 regularization since validation loss keeps decreasing as long as training loss also decreases.
 
@@ -434,19 +474,17 @@ In practice, dropout works by simply changing a certain fraction of outputs in t
 
 Dropout applied to an activation matrix at training time, with rescaling happening during training. At test time, the activation matrix is unchanged.
 
-
-```{r}
+```{r eval = F}
 model_dropout = build_model(0, 0.5)
-#history_dropout = compile_and_train(model_dropout, 1e-3, 20, F)
+history_dropout = compile_and_train(model_dropout, 1e-3, 20, F)
 ```
 
-```{r}
+```{r eval = F}
 fig_size(8,8)
 plot(history$drop) + theme_grey(base_size = 20)
 ```
 
-![png](output_45_1.png)
-
+![ ](./figures/output_45_1.png)
 
 What do you observe? Compare this to the figures above using L2 regularization.
 
@@ -456,9 +494,8 @@ Overfitting commonly occurs on small training sets. For image data, that we are 
 
 Keras makes this easy with the class ImageDataGenerator. Just by tweaking a few lines of our `train_datagen` function, we can augment our dataset during training. Let's take a look at this.
 
-
-```{r}
-#image generatos for data augmentation
+```{r eval = F}
+# Image generatos for data augmentation
 train_datagen = image_data_generator(
   rescale = 1./255,
   rotation_range = 15,
@@ -470,7 +507,7 @@ train_datagen = image_data_generator(
   fill_mode = 'nearest'
   )
 
-#Create a generator for the training data
+# Create a generator for the training data
 train_generator = flow_images_from_directory(
                         directory = train_dir,
                         generator = train_datagen,
@@ -505,7 +542,7 @@ If you'd like to see more examples of how the parameters of this function affect
 To get your own feel for what this function does, and to enjoy some funny cat pictures, execute the code cell below with different cats by just changing the index to the list *fnames* on line 5.
 
 
-```{r}
+```{r eval = F}
 #Get the file names of the test images for cats
 fnames = list.files(file.path(train_dir,'cats'),full.names = T)
 
@@ -533,75 +570,161 @@ for (j in 1:(i-1)){
 p  + plot_layout(nrow = 2)
 ```
 
+![ ](./figures/output_50_0.png)
+
+
 Get the idea? Data augmentation stretches, moves, rotates, shears, and inverts your raw data images to produce new images, with the goal of never showing your model the same image twice during training.
 
 Now let's put our new `train_datagen` function to work.
 
 
-```{r}
+```{r eval = F}
 model_data_augment = build_model(0, 0)
-#history_data_augment = compile_and_train(model_data_augment, 1e-3, 20, F)
+history_data_augment = compile_and_train(model_data_augment, 1e-3, 20, F)
+```
+
+```{r}
+
+## Model: "convnet_L2_0_dropout_0"
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## conv2d_12 (Conv2D)                  (None, 148, 148, 32)            896         
+## ________________________________________________________________________________
+## max_pooling2d_12 (MaxPooling2D)     (None, 74, 74, 32)              0           
+## ________________________________________________________________________________
+## conv2d_13 (Conv2D)                  (None, 72, 72, 64)              18496       
+## ________________________________________________________________________________
+## max_pooling2d_13 (MaxPooling2D)     (None, 36, 36, 64)              0           
+## ________________________________________________________________________________
+## conv2d_14 (Conv2D)                  (None, 34, 34, 128)             73856       
+## ________________________________________________________________________________
+## max_pooling2d_14 (MaxPooling2D)     (None, 17, 17, 128)             0           
+## ________________________________________________________________________________
+## dropout_9 (Dropout)                 (None, 17, 17, 128)             0           
+## ________________________________________________________________________________
+## conv2d_15 (Conv2D)                  (None, 15, 15, 128)             147584      
+## ________________________________________________________________________________
+## max_pooling2d_15 (MaxPooling2D)     (None, 7, 7, 128)               0           
+## ________________________________________________________________________________
+## flatten_3 (Flatten)                 (None, 6272)                    0           
+## ________________________________________________________________________________
+## dropout_10 (Dropout)                (None, 6272)                    0           
+## ________________________________________________________________________________
+## dense_6 (Dense)                     (None, 512)                     3211776     
+## ________________________________________________________________________________
+## dropout_11 (Dropout)                (None, 512)                     0           
+## ________________________________________________________________________________
+## dense_7 (Dense)                     (None, 1)                       513         
+## ================================================================================
+## Total params: 3,453,121
+## Trainable params: 3,453,121
+## Non-trainable params: 0
+## ________________________________________________________________________________
 ```
 
 Let's again plot the learning curves
 
-
-```{r}
+```{r eval = F}
 fig_size(8,8)
 plot(history$augment) + theme_grey(base_size = 20)
 ```
 
+![png](./figures/output_55_1.png)
 
 As you can see clearly above, overfitting is avoided by using the data augmentation technique.
 
 This was a lot of information and different techniques of how to avoid overfitting. So, to avoid complete confusion and provide a visual comparison, we will summarize all the different models below. This way you can see how the different techniques for reducing overfitting can change the behaviour of training and validation metrics.
 
-
-```{r}
+```{r eval = F}
 p_base = plot(history$baseline) + labs(title = 'Baseline') +theme_gray(base_size = 15) + theme(plot.title = element_text(size=17,hjust = 0.5)) 
+
 p_L2 = plot(history$L2_reg) + labs(title = 'L2 Regularization') +theme_gray(base_size = 15) + theme(plot.title = element_text(size=17,hjust = 0.5)) 
+
 p_dropout = plot(history$drop) + labs(title = 'Dropout') +theme_gray(base_size = 15) + theme(plot.title = element_text(size=17,hjust = 0.5)) 
+
 p_data_augment = plot(history$augment) + labs(title = 'Data Augmentation') +theme_gray(base_size = 15) + theme(plot.title = element_text(size=17,hjust = 0.5)) 
 
-#plot them
-# fig_size(20,16)
 p_base + p_L2 + p_dropout + p_data_augment + plot_layout(nrow = 2)
 ```
+
+![ ](./figures/output_58_1.png)
+
 
 Now, it's time to train our final model so it can be used in the next section. We will be using data augmentation and dropout. Further, we'll use early stopping and a maximum of 100 epochs. The best model will be saved automatically with the callback `callback_model_checkpoint`
 
 
-```{r}
+```{r eval = F}
 model_final = build_model(0, 0.5)
-#history_final = compile_and_train(model_final, 1e-3, 100, T)
+history_final = compile_and_train(model_final, 1e-3, 100, T)
+```
+
+```{r}
+##   Model: "convnet_L2_0_dropout_0.5"
+##   ________________________________________________________________________________
+##   Layer (type)                        Output Shape                    Param #     
+##   ================================================================================
+##   conv2d_16 (Conv2D)                  (None, 148, 148, 32)            896         
+##   ________________________________________________________________________________
+##   max_pooling2d_16 (MaxPooling2D)     (None, 74, 74, 32)              0           
+##   ________________________________________________________________________________
+##   conv2d_17 (Conv2D)                  (None, 72, 72, 64)              18496       
+##   ________________________________________________________________________________
+##   max_pooling2d_17 (MaxPooling2D)     (None, 36, 36, 64)              0           
+##   ________________________________________________________________________________
+##   conv2d_18 (Conv2D)                  (None, 34, 34, 128)             73856       
+##   ________________________________________________________________________________
+##   max_pooling2d_18 (MaxPooling2D)     (None, 17, 17, 128)             0           
+##   ________________________________________________________________________________
+##   dropout_12 (Dropout)                (None, 17, 17, 128)             0           
+##   ________________________________________________________________________________
+##   conv2d_19 (Conv2D)                  (None, 15, 15, 128)             147584      
+##   ________________________________________________________________________________
+##   max_pooling2d_19 (MaxPooling2D)     (None, 7, 7, 128)               0           
+##   ________________________________________________________________________________
+##   flatten_4 (Flatten)                 (None, 6272)                    0           
+##   ________________________________________________________________________________
+##   dropout_13 (Dropout)                (None, 6272)                    0           
+##   ________________________________________________________________________________
+##   dense_8 (Dense)                     (None, 512)                     3211776     
+##   ________________________________________________________________________________
+##   dropout_14 (Dropout)                (None, 512)                     0           
+##   ________________________________________________________________________________
+##   dense_9 (Dense)                     (None, 1)                       513         
+##   ================================================================================
+##   Total params: 3,453,121
+##   Trainable params: 3,453,121
+##   Non-trainable params: 0
+##   ________________________________________________________________________________
 ```
 
 
-```{r}
-#load the model
+
+```{r eval = F}
 model = load_model_hdf5('./data/SDL_I/saved_models/final_model.h5')
 ```
 
 Let's also evaluate the perfomance on the test set.
 
-
-```{r}
-# evaluate_generator() causes R to crash because of C stack overflow.
-# Results taken from calculations done on Renku.io
-
-# validation_eval = evaluate_generator(model, validation_generator,steps = as.integer(N_VALIDATION/BATCH_SIZE_VALIDATION))
-# test_eval = evaluate_generator(model, test_generator,steps = as.integer(N_TEST/BATCH_SIZE_TEST))
+```{r eval = F}
+ validation_eval = evaluate_generator(model, validation_generator,steps = as.integer(N_VALIDATION/BATCH_SIZE_VALIDATION))
+ test_eval = evaluate_generator(model, test_generator,steps = as.integer(N_TEST/BATCH_SIZE_TEST))
 
 # Evaluate model on validation and test data
-# cat("Validation accuracy: ",validation_eval$acc,"\n")
-# cat("Test accuracy: ",test_eval$acc,"\n")
+ cat("Validation accuracy: ",validation_eval$acc,"\n")
+ cat("Test accuracy: ",test_eval$acc,"\n")
+```
+
+```{r echo = F}
+# evaluate_generator() causes R to crash because of C stack overflow.
+# Results taken from calculations done on Renku.io
 
 cat("Validation accuracy: 0.846 \n")
 cat("Test accuracy: 0.849 \n")
 ```
 
-
 Great, we have a well performing model. Now let's interpret what the CNN learns.
+
 
 ### Visualizing what convolutional neural networks learn
 
@@ -622,28 +745,27 @@ Let's visualize the intermediate activations of the last convolutional neural ne
 Now let's grab a random image of a cat from the test set, get it in the right format, and visualize it.
 
 
-```{r}
-#Get the file names of the test images for cats
+```{r eval = F}
+# Get the file names of the test images for cats
 fnames = list.files(file.path(test_dir,'dogs'),full.names = T)
 
-#Choose a cat
+# Choose a cat
 cat = 50
 img_path= fnames[cat]
 
-#Read, resize, and rescale the image
+# Read, resize, and rescale the image
 img = image_load(img_path, target_size = IMAGE_SIZE)
 img_tensor = image_to_array(img)
 img_tensor = img_tensor * 1/255
 
-#Visualize the image
+# Visualize the image
 fig_size(7,7)
 plotRGB(img_tensor)
 ```
 
 To visualize the intermediate activations, you'll create a Keras model that takes an image as input and outputs the activations of all the convolution layers. This is simply a model that shows you how the neurons in each layer of your trained network respond to a particular image.
 
-
-```{r}
+```{r eval = F}
 #Extract the outputs of the top eight convolution layers
 n_layers = 8
 layers_outputs = list()
@@ -660,8 +782,7 @@ activation_model = keras_model(inputs = model$input, outputs = layers_outputs)
 activations = predict(activation_model,array_reshape(img_tensor,dim = c(-1,IMAGE_SIZE,IMAGE_CHANNELS)))
 ```
 
-
-```{r}
+```{r eval = F}
 #Get the first layer activations
 first_layer_activation = activations[[1]]
 
@@ -670,6 +791,8 @@ i = 3
 fig_size(7,7)
 plot_filter(first_layer_activation[1,,,i])
 ```
+
+![ ](./figures/output_72_0.png)
 
 What do you observe? 
 It appears this 3rd filter encodes an edge detector. 
@@ -684,7 +807,7 @@ Let's go ahead and visualize the intermediate activations of all of the filters 
 Go and choose pic 50 from dogs. What do you observe? Can you see how the filter works as a leash detector? This makes a lot of sense considering that dogs are seldom without a leash and cats always! That can be a very powerful feature for our classifier.
 
 
-```{r}
+```{r eval = F}
 #Get the layer names
 layer_names = list()
 for ( i in 1:n_layers){
@@ -734,32 +857,37 @@ for (i in 1:n_layers){
     }
 }
 
-#Plot all the filters for each layer
+# Plot all the filters for each layer
 
-#1st layer
+# 1st layer
 n_filters = dim(activations[[1]])[4]
 n_rows = as.integer(n_filters/images_per_row)
 fig_size(images_per_row +1,n_rows +1)
 plots[[1]]+labs(title = "1st CNN Layer")+ theme(plot.title = element_text(size=22,hjust = 0.5))
 
-#2nd layer
+# 2nd layer
 n_filters = dim(activations[[3]])[4]
 n_rows = as.integer(n_filters/images_per_row)
 fig_size(images_per_row +1,n_rows+1)
 plots[[2]]+labs(title = "2nd CNN Layer")+ theme(plot.title = element_text(size=22,hjust = 0.5))
 
-#3rd layer
+# 3rd layer
 n_filters = dim(activations[[5]])[4]
 n_rows = as.integer(n_filters/images_per_row)
 fig_size(images_per_row +1,n_rows+1)
 plots[[3]]+labs(title = "3rd CNN Layer")+ theme(plot.title = element_text(size=22,hjust = 0.5))
 
-#4th layer
+# 4th layer
 n_filters = dim(activations[[7]])[4]
 n_rows = as.integer(n_filters/images_per_row)
 fig_size(images_per_row +1,n_rows+1)
 plots[[4]]+labs(title = "4th CNN Layer")+ theme(plot.title = element_text(size=22,hjust = 0.5))
 ```
+
+![ ](./figures/output_76_0.png)
+![ ](./figures/output_76_1.png)
+![ ](./figures/output_76_2.png)
+![ ](./figures/output_76_3.png)
 
 To guide you a little, here are a few things to note:
 
@@ -774,7 +902,7 @@ These three points relate to a universal characteristic of data representation i
 Go back a few cells and see what happens with other cats. It's really fun to see what these filters are picking up!
 
 
-***
+
 ## Exercise
 
 The purpose of this exercise is to create a CNN model for a multiclass classification problem. 
@@ -793,7 +921,7 @@ Your task is to create a CNN architecture that outperforms the baseline model. T
 
 
 
-### Import libraries
+### Import libraries and data
 ```{r eval = F}
 library(reticulate)
 use_condaenv()
@@ -818,9 +946,7 @@ If you were too eager and already pressed _Y_ (yes) and enter, don't panic! Just
 keras_model_sequential()
 ```
 
-
-
-### Load mnist dataset 
+*Load mnist dataset:*
 
 ```{r eval = F}
 mnist = dataset_mnist()
@@ -831,7 +957,7 @@ test = mnist$test
 ```
 
 
-### Plot an image
+1. Plot an image
 ```{r eval = F}
 index_image = 5 ## change this index to see different image.
 input_matrix = train$x[index_image,,]
@@ -840,7 +966,7 @@ output_matrix <- t(output_matrix)
 image(output_matrix, col=gray.colors(256), xlab=paste('Image for digit ', train$y[index_image]), ylab="")
 ```
 
-### Specify image size and number of classes
+2. Specify image size and number of classes
 
 ```{r eval = F}
 img_size = dim(train$x)[2:3]
@@ -851,7 +977,7 @@ cat('Total classes: ',n_classes)
 ```
 
 
-### Create a validation set using stratified split and rescale input to [0,1]
+3. Create a validation set using stratified split and rescale input to [0,1]
 
 ```{r eval = F}
 #make stratified split
@@ -877,7 +1003,7 @@ y_test = test$y
 
 ```
 
-### Encode classes to one-hot vectors
+4. Encode classes to one-hot vectors
 
 ```{r eval = F}
 y_train = to_categorical(y_train, n_classes)
@@ -887,7 +1013,7 @@ y_test = to_categorical(y_test, n_classes)
 head(y_train)
 ```
 
-### Create and train the baseline model
+5. Create and train the baseline model
 
 A simple approach would be to create a vector (flatten the 2d input matrix) from the input image and then to apply a feed-forward neural network (i.e. dense layers). You are already provided with a trained model (because it takes a long time to train it from scratch), so you do not have to run the fit function. You just have to load the model.
 
@@ -919,7 +1045,7 @@ callbacks_ffnn = list(callback_early_stopping(monitor='val_loss',patience = 5,mo
 #                  validation_data = list(x_val,y_val),callbacks = callbacks_ffnn)
 ```
 
-### Load the saved Baseline model and evaluate the performance on validation and test set
+6. Load the saved Baseline model and evaluate the performance on validation and test set
 
 ```{r eval = F}
 model_ffnn = load_model_hdf5("./data/SDL_I/saved_models/baseline.h5")
@@ -933,13 +1059,10 @@ cat('Test Accuracy: ',test_acc,'\n')
 ```
 
 
-
-### Next steps to code:
+*Next steps to code:*
 
 1. Create a CNN architecture
 2. Train the model
   Hint: reshape your inputs so that they match the desired dimension of the input_shape in `layer_conv_2d`. Use callbacks for early stopping and model checkpoint (look at the baseline model).
 3. Load the saved model, evaluate performance on validation and test set
 4. Print summary of both models and comment on the number of parameters
-
-

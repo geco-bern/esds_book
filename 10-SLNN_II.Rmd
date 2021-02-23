@@ -12,7 +12,6 @@
     - Area under the ROC curve 
 - Account for the stochasticity of model training when assessing model performance
 
-
 **Important points from the lecture**
 
 - For binary classification problems, the output node often uses a *sigmoid activation function*.
@@ -293,8 +292,6 @@ cat('Final training accuracy: ', round(history$metrics$acc[ne], 3), '\n')
 ##    Final training accuracy:  0.602 
 ```
 
-![ ](./figures/SLNN_II-output1.png)
-
 Note the final training accuracy. 
 
 Let's have a look at how accuracy and loss change during model training.
@@ -334,7 +331,6 @@ cat('Accuracy on held-out test data: ' , round(acc, 3), '\n')
 ```{r echo = F}
 cat("Accuracy on held-out test data:  0.602")
 ```
-
 
 
 Aha, the model is always predicting blue! Why is this simple trick effective? It's because the data are class imbalanced, meaning that one class is more prevalent than the other in our dataset. Specifically, there are more blue examples than green examples. So by simply using the rule "<font color=blue>always blue</font>", we can obtain an accuracy that's better than a coin toss. 
@@ -505,7 +501,21 @@ c(model, history) %<-% build_and_train_model(num_layers = 1,
 cat('Final training accuracy: ', round(history$metrics$acc[ne], 3), '\n')
 ```
 
-![ ](./figures/SLNN_II-output3.png)
+```{r eval = F}
+## Model: "sequential"
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## dense (Dense)                       (None, 1)                       3           
+## ________________________________________________________________________________
+## dense_1 (Dense)                     (None, 1)                       2           
+## ================================================================================
+## Total params: 5
+## Trainable params: 5
+## Non-trainable params: 0
+## ________________________________________________________________________________
+## Final training accuracy:  0.602 
+```
 
 Do you observe an improvement in training accuracy? 
 
@@ -612,7 +622,31 @@ c(precision, recall) %<-% precision_and_recall(true_positives,
 f <- f_score(precision, recall)
 ```
 
-![ ](./figures/SLNN_II-output4.png)
+```{r eval = F}
+## Model: "sequential_2"
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## dense_4 (Dense)                     (None, 8)                       24          
+## ________________________________________________________________________________
+## dense_5 (Dense)                     (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_6 (Dense)                     (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_7 (Dense)                     (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_8 (Dense)                     (None, 1)                       9           
+## ================================================================================
+## Total params: 249
+## Trainable params: 249
+## Non-trainable params: 0
+## ________________________________________________________________________________
+## Final training accuracy:  0.934 
+## Accuracy on held-out test data:  0.936 
+## Precision:  0.9453642 
+## Recall:  0.9492934 
+## F-score:  0.9473248
+```
 
 What do you observe? Does model performance improve with model complexity? If so, is this always the case?
 
@@ -1067,7 +1101,39 @@ c(precision, recall) %<-% precision_and_recall(true_positives,
 f <- f_score(precision, recall)
 ```
 
-![ ](./figures/SLNN_II-output8.png)
+```{r eval = F}
+## Model: "sequential_87"
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## dense_407 (Dense)                   (None, 8)                       24          
+## ________________________________________________________________________________
+## dense_408 (Dense)                   (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_409 (Dense)                   (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_410 (Dense)                   (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_411 (Dense)                   (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_412 (Dense)                   (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_413 (Dense)                   (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_414 (Dense)                   (None, 8)                       72          
+## ________________________________________________________________________________
+## dense_415 (Dense)                   (None, 1)                       9           
+## ================================================================================
+## Total params: 537
+## Trainable params: 537
+## Non-trainable params: 0
+## ________________________________________________________________________________
+## Final training accuracy:  0.887 
+## Precision:  0.7365079 
+## Recall:  0.6391185 
+## F-score:  0.6843658
+```
+
 Observe that training accuracy is high, whereas precision, recall, and the F-score are all relatively low. 
 
 Let's also have a look at the confusion matrix.
@@ -1077,10 +1143,13 @@ Let's also have a look at the confusion matrix.
 table(y_pred, df_test_new$y)
 ```
 
-![ ](./figures/SLNN_II-output9.png)
- 
-So let's also calculate the areas under the ROC curve.
+```{r echo = F}
+## y_pred   0    1
+##      0  1546  112
+##      1    90  251
+```
 
+So let's also calculate the areas under the ROC curve.
 
 ```{r eval = F}
 # Create 100 threhsolds between 0 and 1
@@ -1128,7 +1197,7 @@ To understand why this occurs, remember that the denominator of the false positi
 
 For this exercise your task is to create 3 neural network models and to compare their performance. The provided data contains 2 classes (0 and 1). Our aim is to compare those models using the majority of the metrics we have seen in tutorial 10.
 
-Tasks:
+**Tasks:**
 
   1. Read in the data.
   2. Visualize the data and print the proportion of data belonging to each class.
@@ -1141,7 +1210,7 @@ Tasks:
   
 The required libraries and some useful functions are already imported in the following chunks. For the ROC curve you can also use the `pROC` package.
 
-### Import libraries
+**Import libraries**
 ```{r eval = F}
 library(tidyverse)
 library(reticulate)
@@ -1151,7 +1220,7 @@ library(keras)
 library(rsample)
 ```
 
-### Import functions
+**Import functions**
 ```{r  eval = F}
 # Area Under Curve
 simple_auc <- function(x, y){
@@ -1260,7 +1329,6 @@ f_score <- function(precision, recall, verbose = T){
 ```
 
 IMPORTANT NOTE: READ CAREFULLY!
-
 Do not skip this part or you'll run into issues later on!
 In a moment, after you've read the following instructions carefully, you should:
 - run the code chunk immediately below this text (`keras_model_sequential()`). 
@@ -1270,74 +1338,26 @@ Now, you can normally continue with the exercise.
 
 If you were too eager and already pressed _Y_ (yes) and enter, don't panic! Just close your environment, re-open it and make sure that next time you go with _n_ (no).
 
-```{r echo=F}
+```{r eval =F}
 keras_model_sequential()
 ```
 
-### Read in the data
-```{r echo = F}
+** Turn the pseudo-code into real code!**
 
+```{r eval = F}
 
-```
+# 1. Read in the data
+# 2. Visualize data and print proportion of data belongs to each class.
+# 3. Split into training and test set (Stratified split).
+# 4. Create models
+# 5. Calculate output and make decisions for each model on test set.
+# 6. Visualize test predictions for each model.
+# 7. Calculate metrics for each model on test set.
+# 8. Calculate ROC and AUC for the best model.
+# 9. ROC Curve
+# 10. Train 5 times the best model, take probability outputs on test set for each time. 
+# 11. Average over the models output and then make decisions. Print Metrics.
 
-### Visualize data and print proportion of data belongs to each class.
-```{r echo = F}
-
-
-```
-
-### Split into training and test set (Stratified split).
-```{r echo = F}
-
-
-```
-
-
-### Create models
-```{r echo = F}
-
-```
-
-
-### Calculate output and make decisions for each model on test set.
-```{r echo = F}
-
-```
-
-
-### Visualize test predictions for each model.
-```{r echo = F}
-
-```
-
-
-### Calculate metrics for each model on test set.
-
-```{r echo = F}
-
-```
-
-### Calculate ROC and AUC for the best model.
-```{r echo = F}
-
-```
-
-### ROC Curve
-```{r echo = F}
-
-```
-
-### Train 5 times the best model, take probability outputs on test set for each time. 
-
-```{r echo = F}
-
-
-```
-
-### Average over the models output and then make decisions. Print Metrics.
-```{r echo = F}
-
-    
 ```
 
 

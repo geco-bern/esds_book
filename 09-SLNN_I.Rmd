@@ -262,9 +262,9 @@ for (i in 1:num_iterations){
 
 cat('Gradient descent output: x =', round(x_new,5), "\n")
 
-#The true minimum of the function is given at x = 0. 
-#As we can see the gradient descent algorithm returns a value very close
-#to zero after 1000 iterations 
+# The true minimum of the function is given at x = 0. 
+# As we can see the gradient descent algorithm returns a value very close
+# to zero after 1000 iterations 
 ```
 
 ## Fit the model using gradient descent
@@ -289,10 +289,24 @@ c(model,history,w,b) %<-%  build_and_train_model(
                             save_path = save_path_logs
                             )
 
-cat('\nFinal solution: w =', w_est, ' b = ', b_est, "\n")
+cat('\nFinal solution: w =', w, ' b = ', b, "\n")
 ```
 
-![](./figures/SLNN_I-output1.png)
+```{r eval = F}
+## Model: "sequential"
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## dense (Dense)                       (None, 1)                       2           
+## ================================================================================
+## Total params: 2
+## Trainable params: 2
+## Non-trainable params: 0
+## ________________________________________________________________________________
+## 
+## Final solution: w = 0.01373669  b =  0.7571406 
+```
+
 
 Compare the solution found by gradient descent to the exact solution determined above. What do you observe?
 
@@ -374,7 +388,50 @@ for (i in 1:length(learning_rates)){
 }
 ```
 
-![](./figures/SLNN_I_output2.png)
+```{r eval = F}
+## Model: "sequential_1"
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## dense_1 (Dense)                     (None, 1)                       2           
+## ================================================================================
+## Total params: 2
+## Trainable params: 2
+## Non-trainable params: 0
+## ________________________________________________________________________________
+## Model: "sequential_2"
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## dense_2 (Dense)                     (None, 1)                       2           
+## ================================================================================
+## Total params: 2
+## Trainable params: 2
+## Non-trainable params: 0
+## ________________________________________________________________________________
+## Model: "sequential_3"
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## dense_3 (Dense)                     (None, 1)                       2           
+## ================================================================================
+## Total params: 2
+## Trainable params: 2
+## Non-trainable params: 0
+## ________________________________________________________________________________
+## Model: "sequential_4"
+## ________________________________________________________________________________
+## Layer (type)                        Output Shape                    Param #     
+## ================================================================================
+## dense_4 (Dense)                     (None, 1)                       2           
+## ================================================================================
+## Total params: 2
+## Trainable params: 2
+## Non-trainable params: 0
+## ________________________________________________________________________________
+## 
+
+```
 
 Let's now plot the dynamics of learning, specifically how loss and the two model parameters change throughout training. Let's start with loss.
 

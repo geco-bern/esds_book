@@ -42,4 +42,6 @@ conflict_prefer("levelplot", "rasterVis")
 conflict_prefer("origin", "raster")
 conflict_prefer("extract", "raster")
 conflict_prefer("partial", "pdp")
+conflict_prefer("mse", "Metrics")
+
 ```

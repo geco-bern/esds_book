@@ -704,7 +704,7 @@ We compute the mean squared error (MSE). The MSE calculates the average of the s
 
 ```{r}
 library(Metrics)
-mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_chelsa)
+Metrics::mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_chelsa)
 ```
 
 ```{r message=F}
@@ -719,7 +719,7 @@ df_sites_temp %>%
 We compute the mean squared error.
 
 ```{r}
-mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_wc)
+Metrics::mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_wc)
 ```
 
 We see that Chelsa correlates better (because the mean squared error is smaller) with the temperature values at the towers. We also see that Worldclim compared to CHELSA tends to predict colder temperatures.
