@@ -236,7 +236,6 @@ summary(lm_fit_)
 
 We can also fit a more complex model keeping the average NDVI value as the only input value. Let's fit polynomial of the 2^nd^ degree.
 
-
 ```{r}
 # polynomial model degree 2
 poly_fit <- lm(y ~ poly(avg_ndvi, 2), data = df_train)
@@ -300,7 +299,6 @@ Then we define the `model` (our function $f$), as follows with:
 - a hidden layer, with `relu` activation, with a size of 64
 - a hidden layer, with `relu` activation, with a size of 32
 - an ouput layer, of size 1 with `linear` activation
-
 
 ```{r message=FALSE, warning=FALSE}
 #ffnn

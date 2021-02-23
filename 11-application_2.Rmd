@@ -93,7 +93,6 @@ summary(df)
 
 We see that there are still a few variables with NAs. Let's see how many NAs each column has and what would be the number of rows in the resulting dataframe if we drop all rows with NAs 
 
-
 ```{r}
 ## Compute how many rows have NA values for each column, and report the result for each column, print the result 
 # e.g. 
