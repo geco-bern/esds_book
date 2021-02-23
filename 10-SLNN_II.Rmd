@@ -337,7 +337,7 @@ cat("Accuracy on held-out test data:  0.602")
 
 
 
-Aha, the model is always predicting blue! Why is this simple trick effective? It's because the data are class imbalanced, meaning that one class is more prevalent than the other in our dataset. Specifically, there are more blue examples than green examples. So by simply using the rule "<font color=blue>always blue</font>", we can obtain an accuracy that's better than a coin toss. 
+Aha, the model is always predicting blue! Why is this simple trick effective? It's because the data are class imbalanced, meaning that one class is more prevalent than the other in our dataset. Specifically, there are more blue examples than green examples. So by simply using the rule "$\color{blue}{\text{always blue}}$", we can obtain an accuracy that's better than a coin toss. 
 
 This shows that _accuracy_ has its limitations as a model performance metric and reveals the need for more nuanced metrics, such as the following:
 
@@ -822,7 +822,7 @@ auc(roc_object)
 0.986307263666629
 ```
 
-Let's put these metrics into practice by comparing different network architectures. To do so, we need to remember that model training is stochastic. Different random initializations can lead to different outcomes, and for some model architectures, some outcomes are more likely than others. For example, we've seen that the "<font color=blue>always blue</font>" outcome is particularly seducing. To account for this stochasticity, we need to train our models multiple times, and take the average performance across random initializations.
+Let's put these metrics into practice by comparing different network architectures. To do so, we need to remember that model training is stochastic. Different random initializations can lead to different outcomes, and for some model architectures, some outcomes are more likely than others. For example, we've seen that the "$\color{blue}{\text{always blue}}$" outcome is particularly seducing. To account for this stochasticity, we need to train our models multiple times, and take the average performance across random initializations.
 
 Let's compare four model architectures:
 * One layer with two nodes
@@ -983,7 +983,7 @@ df %>% ggplot(aes(x = avg_fpr,
 
 ![ ](./figures/SLNN_II-output7.png)
 
-Again you can see the most complex model (<font color=purple>8 layers, each with 8 nodes</font>) clearly outperforms the less complex ones.
+Again you can see the most complex model ($\color{purple}{\text{8 layers, each with 8 nodes}}$) clearly outperforms the less complex ones.
 
 It is important to point out that the area under the ROC curve is not always an appropriate performance metric. Specifically, this measure can be misleading when the data are heavily class-imbalanced. 
 
