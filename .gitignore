@@ -17,3 +17,7 @@ esds_book_files
 
 libs
 saved_models
+
+figure
+book.bib
+preamble.tex
