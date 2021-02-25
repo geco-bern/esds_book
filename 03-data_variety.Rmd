@@ -1,5 +1,17 @@
 # Data variety
 
+```{r include=FALSE}
+# Preferences for conflicting packages
+library(conflicted)
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("levelplot", "rasterVis")
+conflict_prefer("origin", "raster")
+conflict_prefer("extract", "raster")
+conflict_prefer("partial", "pdp")
+conflict_prefer("mse", "Metrics")
+```
+
 ## Introduction
 
 ### Overview
@@ -147,14 +159,14 @@ df_ndvi <- mt_subset(product = "MOD13Q1",            # the chosen product
 df_ndvi <- readRDS("./data/df_ndvi.rds")
 ```
 
-```{r}
-head(df_ndvi)
+```{r paged.print=TRUE}
+head(df_ndvi) %>% select(2:7) # Only displaying 6 of 21 features
 ```
 
 This dataframe takes some effort to make sense of. Let's make our lives a little easier and put this data into a useful spatial context. For that it needs to be converted to a raster. This is a key spatial data type and will be described in more detail in the section Raster below. 
 MODISTools provides a handy integrated function for converting the data to a raster `mt_to_raster()`.
 
-```{r echo=F, message=F}
+```{r echo=F, message=FALSE, warning=FALSE}
 library(sf)
 library(rgdal)
 library(raster)
@@ -173,8 +185,8 @@ Just out of interest let's calculate the minimum and maximum of these plots.
 ```{r}
 min_winter <- min(minValue(raster_ndvi[[1:4]]))
 max_winter <- max(maxValue(raster_ndvi[[1:4]]))
-paste0("Minimum Winter:", sep=" ", min_winter)
-paste0("Maximum Winter:", sep=" ", max_winter)
+cat(" Minimum Winter: ", min_winter, "\n",
+    "Maximum Winter: ", max_winter)
 ```
 
 We do the same for the summer season.
@@ -188,8 +200,8 @@ We compute minimum and maximum.
 ```{r}
 min_summer <- min(minValue(raster_ndvi[[13:16]]))
 max_summer <- max(maxValue(raster_ndvi[[13:16]]))
-paste0("Minimum Summer:", sep=" ", min_summer)
-paste0("Maximum Summer:", sep=" ", max_summer)
+cat(" Minimum Summer: ", min_summer, "\n",
+    "Maximum Summer: ", max_summer)
 ```
 
 From the two plots, we can clearly distinguish summer and winter time steps due to the differences in NDVI. Summer NDVI is much higher since our tower site is located in the Northern hemisphere where leaves get lost during winter for many vegetation types. Heterogeneity in winter is higher which might be due to conifers that don't lose their leaves.
@@ -317,7 +329,7 @@ We can make an educated guess where the points are but this plot doesn't tell us
 
 So to visualize the location of our points we plot them on a map. We use the package `SpData` to get the world map and crop it to Europe.
 
-```{r messages=F, warning=F}
+```{r message=FALSE, warning=FALSE}
 library(sf)
 library(spData)
 
@@ -327,7 +339,6 @@ ggplot() +
   labs(x = "Longitude", y = "Latitude") +
   coord_sf(xlim = c(-30,40), ylim = c(35,80), expand = FALSE) +
   theme_bw()
-  # coord_sf(crs = "+proj=robin")
 ```
 
 Of course, we can carry on using the data points as they are (for plotting or analysis) but for more detailed spatial analysis we will turn them into _SpatialPoints_. 
@@ -337,7 +348,7 @@ There are different ways (formulas) to project the earth (an ellipsoid) onto a 2
 
 To transform points into _SpatialPoints_ we use the function `SpatialPoints` in the r package `sp`.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(sp)
 sp_sites <- SpatialPoints(dplyr::select(df_sites, -site)) # remove character column
 ```
@@ -368,10 +379,10 @@ Let's see what class _europe_shape_ is:
 class(europe_shape)
 ```
 
-Above we mentioned that _SpatialPolygonsDataFrame_ contains both a list of _SpatialPolygons_ and a dataframe with information on each polygon. Here's how you can access the information in the dataframe. We'll just display the header for now.
+Above we mentioned that _SpatialPolygonsDataFrame_ contains both a list of _SpatialPolygons_ and a dataframe with information on each polygon. Here's how you can access the information in the dataframe. We'll just display the header of some of the 94 features for now.
 
 ```{r}
-head(europe_shape@data)
+europe_shape@data %>% select(c(NAME, SOVEREIGNT, SUBREGION, POP_EST))%>% head()
 ```
 
 Let's first plot our towers on this map of Europe. Remember, how when you transformed the tower locations we mentioned each point has a designated coordinate reference system? Here, we need to extract this projection from _europe_shape_ using `proj4string()` and add it to our _SpatialPoints_. This way we can make sure they are in the same reference system for plotting them together.
@@ -383,12 +394,12 @@ pts <- sp::SpatialPoints(sp_sites, proj4string = sp::CRS(geo.proj))
 
 Then we can take the _SpatialPoints_, now in the correct coordinate reference system, the data from _europe_shape_ and bind them to our tower sites in the dataframe _df_sites_.
 
-```{r}
+```{r paged.print=TRUE}
 df_sites_country_info <- sp::over(pts, europe_shape) %>% 
     as_tibble() %>% 
     bind_cols(df_sites, .)
 
-head(df_sites_country_info)
+head(df_sites_country_info) %>% select(1:6)
 ```
 
 For the next part we will be using a map European with country boarders. For this, we'll make an object called _shp_df_, this we do using the column _SOVEREIGNT_, which we saw when looking at `europe_shape@data`. This preserves only the data we need for further analysis and plotting. 
@@ -436,8 +447,8 @@ Start by finding the column that gives you this information in `europe_shape@dat
 **Solution**
 
 ```{r message=F, warning=F}
-# take a look at the column names
-names(europe_shape@data)
+# take a look at the first 6 column names
+names(europe_shape@data)[1:10]
 
 # make a df of the data needed from europe_shape
 shp_df_region <- broom::tidy(europe_shape, region = "SUBREGION")
@@ -468,7 +479,6 @@ To start off we'll look at some landcover data. With this data, we can investiga
 
 ```{r}
 # library(raster) -> we have already done this but remember you need this to load rasters!
-
 raster_landcover <- raster("./data/Globcover_EU.tif")
 ```
 
@@ -484,7 +494,7 @@ raster_landcover_crop <- crop(raster_landcover, bounding_box)
 
 We can plot our raster as the region around our tower. To indicate the position of our tower, we add a red dot.
 
-```{r}
+```{r eval = F}
 plot(raster_landcover_crop, legend=FALSE, xlab="longitude", ylab="latitude")
 points(lon_lae, lat_lae, pch = 16, col = "red")
 ```
@@ -567,13 +577,13 @@ plot(europe_shape, add=TRUE)
 A **raster grid** is uniquely defined by an _origin_, a point that one of the intersections of grid lines, and its resolution, the magnitude of each cell-side. In the R package `raster`, the origin is defined as the point closest to (0,0) that is still an intersection of grid lines. The functions `origin()` and `res()` from the R package `raster` return the origin and resolution of a raster object. So let's see what the resolution and origin of the rasters we loaded before are.
 
 ```{r}
-res(raster_landcover)
-res(raster_chelsa)
+cat(" Resolution Raster Landover: ", res(raster_landcover), "\n",
+    "Resolution Raster Chelsa: ", res(raster_chelsa))
 ```
 
 ```{r}
-origin(raster_landcover)
-origin(raster_chelsa)
+cat(" Origin Raster Landover: ", origin(raster_landcover), "\n",
+    "Origin Raster Chelsa: ", origin(raster_chelsa))
 ```
 
 Landcover has a much higher resolution. Let's re-grid the Landcover raster to match the grid of the Chelsa raster. Aggregating means resampling an input raster to a coarser resolution based on a specified aggregation strategy. We now determine the aggregation factor by dividing the resolution of the landcover raster by that of the Chelsa raster. We do it both for the longitude and latitude to make sure they match.
@@ -583,7 +593,10 @@ res_landcover <- res(raster_landcover)
 res_chelsa <- res(raster_chelsa)
 factor_agg_lon <- res_chelsa[1] / res_landcover[1]
 factor_agg_lat <- res_chelsa[2] / res_landcover[2]
-print(factor_agg_lon); print(factor_agg_lat)
+
+
+cat(" Longitudinal Aggregation Factor: ", factor_agg_lon, "\n",
+    "Latitudinal Aggregation Factor: ", factor_agg_lon)
 ```
 
 First, we observed that the land cover raster has a higher resolution than the temperature raster, now we now it is 3 times higher. So we need to transform the landcover raster to make sure it has the same grid (same _origin_ and _resolution_) as the temperature raster. This will allow us to combine them in a potential analysis. We achieve this using `aggregate()` from the R package `raster` to obtain a sum of edges raster at 1000m x 1000m resolution. 
@@ -602,11 +615,10 @@ raster_landcover_crop_agg <- aggregate(raster_landcover_crop, fact = factor_agg_
 We check the resolutions and origin of the two rasters and plot our the new landcover one.
 
 ```{r}
-res(raster_landcover_crop_agg)
-res(raster_chelsa)
-
-origin(raster_landcover_crop_agg)
-origin(raster_chelsa)
+cat(" Resolution Landcover: ", res(raster_landcover_crop_agg), "\n",
+    "Resolution Chelsa:    ", res(raster_chelsa), "\n",
+    "Origin Landcover:    ", origin(raster_landcover_crop_agg), "\n",
+    "Origin Chelsa:       ", origin(raster_chelsa), "\n")
 
 plot(raster_landcover_crop_agg, legend=FALSE, xlab="longitude", ylab="latitude")
 ```
@@ -621,19 +633,24 @@ Aligning rasters is done using the function `resample()`. There are two main res
 
 **_Bilinear Interpolation_** uses a weighted average of the four nearest cell centers. The closer an input cell center is to the output cell center, the higher the influence of its value is on the output cell value. This means that the output value could be different than the nearest input, but is always within the same range of values as the input. Since the values can change, Bilinear is not recommended for categorical data. Instead, it should be used for continuous data like elevation and raw slope values.
 
-```{r}
+```{r eval = F}
 raster_landcover_crop_resampl <- resample(raster_landcover_crop, raster_chelsa_crop, method="ngb")
 plot(raster_landcover_crop_resampl, legend=FALSE, xlab="longitude", ylab="latitude")
 ```
 
+```{r include=FALSE}
+raster_landcover_crop_resampl <- resample(raster_landcover_crop, raster_chelsa_crop, method="ngb")
+```
+
+[ ](./figures/04_output-crop.png)
+
 Now we check if the two rasters are aligned.
 
 ```{r}
-res(raster_landcover_crop_resampl)
-res(raster_chelsa)
-
-origin(raster_landcover_crop_resampl)
-origin(raster_chelsa)
+cat(" Resolution Landcover: ", res(raster_landcover_crop_resampl), "\n",
+    "Resolution Chelsa:    ", res(raster_chelsa), "\n",
+    "Origin Landcover:   ", origin(raster_landcover_crop_resampl), "\n",
+    "Origin Chelsa:      ", origin(raster_chelsa), "\n")
 ```
 
 Now the two rasters are aligned.
@@ -704,7 +721,7 @@ We compute the mean squared error (MSE). The MSE calculates the average of the s
 
 ```{r}
 library(Metrics)
-Metrics::mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_chelsa)
+mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_chelsa)
 ```
 
 ```{r message=F}
@@ -719,7 +736,7 @@ df_sites_temp %>%
 We compute the mean squared error.
 
 ```{r}
-Metrics::mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_wc)
+mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_wc)
 ```
 
 We see that Chelsa correlates better (because the mean squared error is smaller) with the temperature values at the towers. We also see that Worldclim compared to CHELSA tends to predict colder temperatures.
@@ -734,20 +751,17 @@ Plot the map of europe and add the tower locations as points. Colour the points 
 ```{r message=F, warning=F}
 # There are more way to do this but we used the function ifelse(). 
 # It takes 3 components: a condition, what to do if the condition applies and what to do if it doesn't apply.
-
 # So here if chelsa temperatures are higher we want the point to be purple otherwise orange:
 cols_chelsa_flux <- ifelse(df_sites_temp$temp_chelsa > df_sites_temp$temp_fluxnet,"purple","orange")
 
 # We could also do different shapes if we wanted...
 pch_chelsa_flux <- ifelse(df_sites_temp$temp_chelsa > df_sites_temp$temp_fluxnet, 19 ,17)
 
-# Plot the result:
-
+## Plot the result using base R:
 # plot(europe_shape)
 # points(df_sites_temp$lon,df_sites_temp$lat, pch=pch_diff, col = col_checkpoint)
 
-# OR with ggplot
-
+## Plot the result using ggplot:
 ggplot() +
   geom_polygon(data = europe_shape, aes(x = long, y = lat, group = group), fill=NA, colour = "black") +
   geom_point(data = df_sites_temp, aes(x = lon, y = lat), color = cols_chelsa_flux, shape = pch_chelsa_flux, size=2) +
@@ -944,9 +958,9 @@ occ_CHlae <- as.data.frame(occ_CHlae$data)
 
 ```
 
-```{r echo=F}
+```{r echo=F, paged.print=TRUE}
 occ_CHlae <- readRDS("./data/occ_CHlae.RDS")
-head(occ_CHlae)
+head(occ_CHlae) %>% select(1:6) # Only displaying 6 of the 303 features of occ_CHlae
 ```
 
 Let's have a quick look at the orders of the species in the polygon around our tower.
@@ -1027,19 +1041,19 @@ species_occ_df <- bind_rows(species_occurrences, .id="id")
 
 # make a species occurrence (or presence-absence) matrix
 species_occ_mat <- species_occ_df %>%
-  group_by(id)%>%                                                                     # group the species lists by the sites
-  distinct() %>%                                                                      # select only unique species names since some occur multiple times
-  mutate(present = 1) %>%                                                             # create a column where all the species get a 1 (for presence)
+  group_by(id)%>%                           # group the species lists by the sites
+  distinct() %>%                            # select only unique species names since some occur multiple times
+  mutate(present = 1) %>%                   # create a column where all the species get a 1 (for presence)
   pivot_wider(names_from = names.accepted.autocorrected, values_from = present) %>%   # turn (spread) the column of species names to the column names
-  mutate_all(funs(ifelse(is.na(.), 0, .)))                                            # replace the missing values with 0
+  mutate_all(funs(ifelse(is.na(.), 0, .)))  # replace the missing values with 0
 ```
 
 ```{r echo=F}
 load("./data/species_occ_mat.RData")
 ```
 
-```{r}
-head(species_occ_mat)
+```{r paged.print=TRUE}
+head(species_occ_mat) %>% select(1:6) # Only displaying the first 6 featurs of species_occ_mat
 ```
 
 GBIF is a great source for species occurrences. However, we have to keep in mind that the data collection is biased by regions. For example, we find much fewer plant records in Africa than in Europe. But also within Europe, there are some biases. Therefore we need to be careful with the interpretation.
@@ -1088,9 +1102,9 @@ For this tutorial we already requested a dataset, because usually, it takes time
 
 Let's load the data.
 
-```{r}
+```{r paged.print=TRUE}
 trait_df <- read.csv("./data/Trait_df.csv")
-head(trait_df)
+head(trait_df) %>% select(1:3, 5) # Only displaying 4 of 9 features
 ```
 
 Some examples of traits are are leaf texture, leaf thickness, eaf chlorophyll content per leaf area, specific leaf area, etc.
