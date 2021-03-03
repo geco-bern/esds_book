@@ -1,4 +1,4 @@
-# Primers
+# Primers {#ch-01}
 
 
 <!-- ```{r include=FALSE} -->
@@ -204,7 +204,7 @@ library(tidyverse)
 
 ```
 
-This loads all the packages of the tidyverse at once (ggplot2, dplyr, tidyr, ...), some of which you will learn more about in Chapter 4.
+This loads all the packages of the tidyverse at once (ggplot2, dplyr, tidyr, ...), some of which you will learn more about in Chapter \@ref(ch-02).
 
 Next, **source** any scripts and **load** data.
 
@@ -242,7 +242,7 @@ Not just code can be good or not-so-good, also data can be tidy or not. Even if 
 
 *Figure from [Grolemund & Hadley](https://r4ds.had.co.nz/tidy-data.html)*
 
-Having data in a tidy format greatly facilitates all data wrangling steps. The concept can even be taken further by understanding a "value" as any object type. You will learn more about this in Chapter 4.
+Having data in a tidy format greatly facilitates all data wrangling steps. The concept can even be taken further by understanding a "value" as any object type. You will learn more about this in Chapter \@ref(ch-02).
 
 ## Reading data into R
 
@@ -491,9 +491,7 @@ This was a very condensed introduction to vectors and lists. A more complete int
 
 ## Data visualisation
 
-Looking at data is an integral part of any data science workflow. In this chapter, we introduce just the very basics. In Chapter 4, you'll get introduced to additional methods for visualising data.
-
-Our data frame `fluxes_subset` contains three variables, one of which is `time`. In other words, we're dealing with a time series. Let's look at the temporal course of temperature in the first 1440 time steps (corresponding to 30 days) as a line plot (`type = "l"`)
+Looking at data is an integral part of any data science workflow. In this chapter, we introduce just the very basics. In later chapters, you'll get introduced to additional methods for visualising data. Our data frame `fluxes_subset` contains three variables, one of which is `time`. In other words, we're dealing with a time series. Let's look at the temporal course of temperature in the first 1440 time steps (corresponding to 30 days) as a line plot (`type = "l"`)
 
 ```{r}
 plot(1:1440, df_small$temp[1:1440], type = "l") 
@@ -568,7 +566,7 @@ This file can then be read into the R workspace. Sometimes, it's practical to gi
 temp_sum2 <- readRDS("temp_sum.rds")
 ```
 
-Note that making a file publicly available as a `.rds` file violates the FAIR principles. It's not *interoperable*. Therefore, whenever possible, save your data in a format that is readable across platforms without requiring proprietary software. Hence use `write_csv()` whenever possible. We'll encounter other non-proprietary formats that let you save and share more complex data structures in the next chapter.
+Note that making a file publicly available as a `.rds` file violates the FAIR principles. It's not *interoperable*. Therefore, whenever possible, save your data in a format that is readable across platforms without requiring proprietary software. Hence use `write_csv()` whenever possible. We'll encounter other non-proprietary formats that let you save and share more complex data structures in chapter \@ref(ch-02).
 
 ## Where to find solutions
 

@@ -1,4 +1,4 @@
-# Supervised Learning Neural Networks: Theory
+# Supervised Neural Networks II {#ch-10}
 
 ### Learning objectives
 - Build and train neural networks for binary classification

@@ -1,4 +1,4 @@
-# Supervised Learning Basics
+# Supervised Neural Networks II {#ch-09}
 
 ### Learning objectives
 After this learning unit, you will be able to ...

@@ -1,4 +1,4 @@
-# Data variety
+# Data variety {#ch-03}
 
 ```{r include=FALSE}
 # Preferences for conflicting packages
@@ -16,9 +16,9 @@ conflict_prefer("mse", "Metrics")
 
 ### Overview
 
-In this practical we will look at data variety in environmental sciences. We will start with the data from one eddy covariance measurement site in Switzerland encountered in Chapter 1, and complement it with remote sensing data. Specifically, we will download remote sensing data that measures vegetation greenness data, quantified by the normalised difference vegetation index, NDVI. We are interested in this data, because we expect ecosystem photosynthesis (gross primary production), measured at the eddy covariance tower, to covary with NDVI. Such covariation can provide powerful information for modelling. For example, we can train a machine learning model with the observed covariation between measured GPP and NDVI at eddy covariance sites and use that model to predict GPP from data obtained in space (NDVI is available for the whole globe, while GPP can only be measured locally.) You will be doing this kind of modelling in session 13. For now, we will focus on working with the spatial aspects of the data (since remote sensing data is inherently spatial) and introduce you to the toolset to work with spatial, in particular, geo-spatial data. 
+In this practical we will look at data variety in environmental sciences. We will start with the data from one eddy covariance measurement site in Switzerland encountered in Chapter \@ref(ch-01), and complement it with remote sensing data. Specifically, we will download remote sensing data that measures vegetation greenness data, quantified by the normalised difference vegetation index, NDVI. We are interested in this data, because we expect ecosystem photosynthesis (gross primary production), measured at the eddy covariance tower, to covary with NDVI. Such covariation can provide powerful information for modelling. For example, we can train a machine learning model with the observed covariation between measured GPP and NDVI at eddy covariance sites and use that model to predict GPP from data obtained in space (NDVI is available for the whole globe, while GPP can only be measured locally.) You will be doing this kind of modelling in session 13. For now, we will focus on working with the spatial aspects of the data (since remote sensing data is inherently spatial) and introduce you to the toolset to work with spatial, in particular, geo-spatial data. 
 
-To get you familiar with spatial data types we will use a variety of data from freely accessible sites. We can obtain abiotic and biotic conditions for the tower locations. We will be spatially plotting the eddy towers you have already encountered in the first two chapters and extracting values for these locations from other data. By doing this we can show that the climate at these sites spans a gradient temperature and landcover. There are also biotic components that could explain variation in productivity among sites, including species composition and functional traits of plants. 
+To get you familiar with spatial data types we will use a variety of data from freely accessible sites. We can obtain abiotic and biotic conditions for the tower locations. We will be spatially plotting the eddy towers you have already encountered in Chapters \@ref(ch-01) and \@ref(ch-02) and extracting values for these locations from other data. By doing this we can show that the climate at these sites spans a gradient temperature and landcover. There are also biotic components that could explain variation in productivity among sites, including species composition and functional traits of plants. 
 
 ### Learning objectives
 
@@ -94,9 +94,11 @@ The second part is the bonus part, there we will discuss trait data and the prin
 
 We'll be starting off this tutorial with an example on using remote sensing data. We'll focus on a Fluxnet site already familiar to you: CH-Lae. The Lägern site is located on a mountain in the Swiss Plateau NW of Zürich and is surrounded by managed mixed deciduous mountain forests. The forest is highly diverse and dominated by beech. In the following figures, you can get an impression of the tower and its surroundings. 
 
-![](./figures/site1.jpg)
-![](./figures/site2.jpg)
-![](./figures/site3.jpg)
+```{r, echo=FALSE, out.width="32%", out.height="49%", fig.show='hold', fig.align='center', fig.cap="Images of Fluxnet sites and measurement station."}
+knitr::include_graphics(c("./figures/site1.jpg",
+                          "./figures/site2.jpg",
+                          "./figures/site3.jpg"))
+```
 
 As always we start by loading `tidyverse`and our fluxnet site data.
 
@@ -206,7 +208,7 @@ cat(" Minimum Summer: ", min_summer, "\n",
 
 From the two plots, we can clearly distinguish summer and winter time steps due to the differences in NDVI. Summer NDVI is much higher since our tower site is located in the Northern hemisphere where leaves get lost during winter for many vegetation types. Heterogeneity in winter is higher which might be due to conifers that don't lose their leaves.
 
-However, we are also interested in the mean across all (spatial) pixels for each date. To clarify this means we collapse the pixel dimension into a single mean value for each date. This is can done using `group_by()` in combination with `summarise()`, which were explained in chapter 2. 
+However, we are also interested in the mean across all (spatial) pixels for each date. To clarify this means we collapse the pixel dimension into a single mean value for each date. This is can done using `group_by()` in combination with `summarise()`, which were explained in Chapter \@ref(ch-02). 
 
 ```{r, warning=F, message=F}
 library(lubridate) # lubridate is loaded to work with dates
@@ -773,7 +775,7 @@ ggplot() +
 
 #### Correlations with GPP
 
-We already had a look at GPP in Chapter 2. In this section we want to correlate Chelsa temperature and landcover with GPP. 
+We already had a look at GPP in Chapter \@ref(ch-02). In this section we want to correlate Chelsa temperature and landcover with GPP. 
 
 In models we often take multiple variables and correlate them to another variable (here GPP). By seeing if they correlate well we can see if any of the variables make good so-called _predictors_.  Let's see how well landcover and temperature correlate with GPP.
 

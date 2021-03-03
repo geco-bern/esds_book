@@ -1,4 +1,4 @@
-# Data wrangling
+# Data wrangling {#ch-02}
 
 In this chapter, you'll learn to efficiently explore your data. This includes understanding how the data is structured, what "dimensions" are in a dataset, how to manipulate the data and visualise it. Efficient data exploration and wrangling are the basis for generating hypotheses, testing them, and repeating the wrangling-visualisation-hypothesis circle over and over. That's science.
 
@@ -16,8 +16,6 @@ After you've gone through the lecture and solved the exercises you should be abl
 - Apply data aggregation.
 - Apply data cleaning and gapfilling.
 
-
-
 ### Data transformation with dplyr
 
 In video 2c, you've been introduced to the "dimensions" of data and some of the essential functions of the tidyverse package `dplyr`: 
@@ -29,7 +27,7 @@ In video 2c, you've been introduced to the "dimensions" of data and some of the 
 
 Remember also that `dplyr` functions (sometimes, they are called "verbs") all work similarly:
 
-- The first argument is the data frame. When using pipes (`%>%`, see Chapter 1), the first argument specifying the data frame is omitted and the function takes its place. What's being piped into it, "coming" from the left side of `%>%`.
+- The first argument is the data frame. When using pipes (`%>%`, see Chapter \@ref(ch-01)), the first argument specifying the data frame is omitted and the function takes its place. What's being piped into it, "coming" from the left side of `%>%`.
 - The remaining arguments specify what to do with the data frame (without quotes (`""`) on variable names).
 - The output of the function is again a data frame. 
 
@@ -64,7 +62,7 @@ Now that we roughly know what to expect from the contents of our dataset and we 
 
 #### Variables in a data frame
 
-Let's read in the half-hourly data from the eddy-covariance site CH-Lae again (as we did already in Chapter 1) and have a quick look at it. We use the function `read_csv()` from the `readr` package here for reading the CSV since it's faster than the base-R `read.csv()` and generates a nicely readable output when printing the object. You can find more information about reading data with `read_csv()` [here](https://r4ds.had.co.nz/data-import.html).
+Let's read in the half-hourly data from the eddy-covariance site CH-Lae again (as we did already in Chapter \@ref(ch-01)) and have a quick look at it. We use the function `read_csv()` from the `readr` package here for reading the CSV since it's faster than the base-R `read.csv()` and generates a nicely readable output when printing the object. You can find more information about reading data with `read_csv()` [here](https://r4ds.had.co.nz/data-import.html).
 
 ```{r, message=FALSE}
 library(tidyverse)
@@ -72,7 +70,7 @@ hhdf <- read_csv("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3.csv")
 hhdf
 ```
 
-You have already inspected the size and dimensions of this data frame in Chapter 1 with functions, such as `dim()`, `nrow()`, `ncol()`, `head()`, `names()` etc.
+You have already inspected the size and dimensions of this data frame in Chapter \@ref(ch-01) with functions, such as `dim()`, `nrow()`, `ncol()`, `head()`, `names()` etc.
 
 For our further data exploration, let's make a selection of variables to reduce the data frame we are working with. Such a selection should be guided by our understanding of the data and our own judgments. Of course, such a selection has to be documented for publications. Many of the variables in the original file record the same information but are derived with slightly different assumptions and gap-filling techniques. This is indicated by the suffices of the variable names. See [Pastorello et al. (2020)](https://www.nature.com/articles/s41597-020-0534-3) for a comprehensive description of this. Let's make the following choices and subset our original data for the further steps in this chapter. We select the following variables:
 
@@ -423,7 +421,7 @@ function_exercise(some_numbers)
 
 #### Data visualisation I
 
-Looking at data is an integral part of data processing. You have already encountered a simple x-y line plot, created with base-R, in Chapter 1. We're working with time series data. A natural first visualisation step is therefore to plot our variables against time, for example, `GPP_NT_VUT_REF` versus `TIMESTAMP_START`:
+Looking at data is an integral part of data processing. You have already encountered a simple x-y line plot, created with base-R, in Chapter \@ref(ch-01). We're working with time series data. A natural first visualisation step is therefore to plot our variables against time, for example, `GPP_NT_VUT_REF` versus `TIMESTAMP_START`:
 ```{r}
 plot(hhdf$TIMESTAMP_START, hhdf$GPP_NT_VUT_REF, type = "l")
 ```
@@ -966,7 +964,7 @@ For this week's exercise open up an Rstudio environment.
 
 ### 1. Outlier removal
 
-a. Based on the half-hourly dataset for site CH-Lae, aggregated to daily means, **identify outliers** in `GPP_NT_VUT_REF` with respect to the linear relationship between `GPP_NT_VUT_REF` and `PPFD_IN`. To do so, first fit a linear regression model using `lm()`. This function returns a list of objects, one of which is `residuals`. Determine outliers as the "outlying" points in the distribution of residuals. See the definition of the boxplot in the tutorial section of Chapter 4. You may use the base-R function `boxplot.stats()` and set the argument `coef` accordingly to our customised threshold definition.
+a. Based on the half-hourly dataset for site CH-Lae, aggregated to daily means, **identify outliers** in `GPP_NT_VUT_REF` with respect to the linear relationship between `GPP_NT_VUT_REF` and `PPFD_IN`. To do so, first fit a linear regression model using `lm()`. This function returns a list of objects, one of which is `residuals`. Determine outliers as the "outlying" points in the distribution of residuals. You may use the base-R function `boxplot.stats()` and set the argument `coef` accordingly to our customised threshold definition.
 ```{r}
 library(tidyverse) 
 library(lubridate)  # not part of the automatic load of tidyverse

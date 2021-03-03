@@ -1,4 +1,4 @@
-# Supervised Deep Learning I
+# Supervised Deep Learning I {#ch-12}
 
 
 ## Introduction
