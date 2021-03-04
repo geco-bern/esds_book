@@ -33,21 +33,21 @@ lapply(names,toupper)
 values = c(2,4,6)
 
 #initialize index
-i = 1
+i <- 1
 
 #initialize sum
-sum_ = 0
+sum <- 0
  
-while (i<=3){# for as long as i<=3 get inside and execute the code
+while (i <= 3){# for as long as i is smaller or equal to 3, execute the code below
    
    # add the next value to the sum 
-   sum_ = sum_ + values[i]
+   sum = sum + values[i]
    
    #update the index
-   i = i+1 
+   i <- i+1 
 }
 #print the sum
-cat("Sum = ", sum_)
+cat("Sum = ", sum)
 ```
 
 **For loops with breaks:**
@@ -73,7 +73,7 @@ for (i in 1:length(values)){
 values = c(3,1,5,18,10,12,13)
 
 #initialize index
-i = 1
+i <- 1
 
 while (TRUE){# It always gets inside and executes the code. The loop only stops when the break starement is encountered
     
@@ -86,7 +86,7 @@ while (TRUE){# It always gets inside and executes the code. The loop only stops 
     }
     
     #otherwise update the index and continue
-    i = i + 1
+    i <- i + 1
 }
 
 ```
@@ -94,7 +94,7 @@ while (TRUE){# It always gets inside and executes the code. The loop only stops 
 ### Nested loops
 
 ```{r}
-values = matrix(c(1,2,3,4,5,6),nrow = 2 ,ncol = 3)
+values <- matrix(c(1,2,3,4,5,6), nrow = 2 ,ncol = 3)
 values
 ```
 
@@ -103,29 +103,28 @@ values
 ## find the sum of the values per column
 
 #initialize the sums of the columns to zero
-col_sum = rep(0,ncol(values))
+col_sum <- rep(0,ncol(values))
 
 #iterate over the columns
 for (j in 1:ncol(values)){ 
     #iterate over the rows for each column
     for (i in 1:nrow(values)){
         #calculate the sum of the jth column by adding the values of each row (of the jth column)
-        col_sum[j] = col_sum[j] + values[i,j]
+        col_sum[j] <- col_sum[j] + values[i,j]
     }
 }
 col_sum
 ```
 
-```{r}
-values = matrix(c(3,4,1,5,2,6),nrow=2,ncol=3)
-values
-```
-
 ### Exercise
 Create a for loop program that estimates the sum of each row. However it has to take into account only the numbers than are greater that 2. If you get it right, you should come up with 3 for the first row and 15 for the second row.
 
+```{r}
+values <- matrix(c(3,4,1,5,2,6),nrow=2,ncol=3)
+values
+```
 
-## Functional Programming using purr
+## Functional programming using purr
 
 `purrr` is tidyverse's version of the base R's apply (lapply(), sapply(),..etc) functions for iterating over objects and lists. But `purrr` is a lot more powerful than that! While the main data-type used in dplyr is the dataframe, for `purrr` it is lists. Let us look at a few map functions and how they can be used to replace apply functions / loops in R. Then we look at nested data handling and a fairly realistic workflow. Splitting the data based on some column, fitting multiple models to each split, and extracting the R^2 for these models. Let us first load in the required libraries.
 
@@ -623,7 +622,7 @@ df_long %>%  ggplot(aes(x = year, y = cases, shape= country, color=country)) +
   geom_point(size=4)
 ```
 
-## Overview of some base R functions
+## Base R functions
 
 ```{r}
 ## lapply 

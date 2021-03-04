@@ -1,5 +1,6 @@
 # Supervised Neural Networks II {#ch-10}
 
+## Introduction
 ### Learning objectives
 - Build and train neural networks for binary classification
 - Observe the influence of network architecture on model performance
@@ -21,8 +22,8 @@
 - Like accuracy, the area under the ROC curve can also be misleading in datasets with strong class imbalance 
 - Regression and classification problems require different measures of model performance.
 
-
-#### Import libraries
+## Tutorial
+### Import libraries
 We first need to import some libraries. You have seen all of these in previous tutorials. Keras will play an especially prominent role in this tutorial.
 
 
@@ -37,7 +38,7 @@ library(pROC)
 options(repr.plot.width = 10, repr.plot.height = 7)
 ```
 
-#### Construct a toy dataset
+### Construct a toy dataset
 For this exercise we will create a toy dataset that illusrates some of the vagaries (unexpected changes that cannot be controlled but can influence a situation) of classification, as well as some of the pros and cons of model performance measures. 
 
 In this toy dataset, each example has two real-valued features on the unit interval (i.e., these values are between 0 and 1). Each example has one of two labels, $\color{green}{\text{green}}$ or $\color{blue}{\text{blue}}$. The dataset is constructed such that those examples _within_ a specified radius of the point (0.5, 0.5) are assigned a $\color{green}{\text{green}}$ label and those _outside_ this radius are assigned a $\color{blue}{\text{blue}}$ label.
@@ -105,8 +106,8 @@ df_data %>%
 
 
 # print some summary statistics about these data
-cat('Proportion of data in class blue: ' , sum(df_data$y) / length(df_data$y), '\n')
-cat('Proportion of data in class green: ' , 1 - sum(df_data$y) / length(df_data$y), '\n')
+cat('Proportion of data in class blue: ' , sum(df_data$y) / length(df_data$y), '\n',
+    'Proportion of data in class green: ' , 1 - sum(df_data$y) / length(df_data$y), '\n')
 ```
 
 A more appropriate way to split the data into training and test sets is to take care such that each label is represented to its proportion in both sets (_stratified splitting_). To this end, we use the `rsample` package and we choose `strata = y`. That is crucial especially for heavily class imbalanced data sets. In essence, what we want to avoid is to have an over representantion of one class in the training data set and an under representation of this class in the the test data set.
@@ -126,21 +127,21 @@ df_test <- testing(split)
 
 ## training set
 
-cat("Training set \n")
-cat('Proportion of data in class blue: ' , sum(df_train$y) / length(df_train$y), '\n')
-cat('Proportion of data in class green: ' , 1 - sum(df_train$y) / length(df_train$y), '\n')
+cat("Training set: \n",
+    'Proportion of data in class blue: ' , sum(df_train$y) / length(df_train$y), '\n',
+    'Proportion of data in class green: ' , 1 - sum(df_train$y) / length(df_train$y), '\n')
 
 ##test set
 
-cat("\nTest set \n")
-cat('Proportion of data in class blue: ' , sum(df_test$y) / length(df_test$y), '\n')
-cat('Proportion of data in class green: ' , 1 - sum(df_test$y) / length(df_test$y), '\n')
+cat("\nTest set: \n",
+    'Proportion of data in class blue: ' , sum(df_test$y) / length(df_test$y), '\n',
+    'Proportion of data in class green: ' , 1 - sum(df_test$y) / length(df_test$y), '\n')
 
 ```
 
 As it is obvious now, each label is represented to its initial proportion in training and test set.
 
-## Build and train a neural network for classification
+### Build and train NN
 
 As you saw in your previous tutorial, Keras is a powerful API for building, training, and evaluating artificial neural networks. In that lecture, you used Keras to construct, train, and analyze extremely simple neural networks, comprising just a single layer of a single node. 
 
@@ -332,13 +333,7 @@ cat('Accuracy on held-out test data: ' , round(acc, 3), '\n')
 cat("Accuracy on held-out test data:  0.602")
 ```
 
-
-<<<<<<< HEAD
-Aha, the model is always predicting blue! Why is this simple trick effective? It's because the data are class imbalanced, meaning that one class is more prevalent than the other in our dataset. Specifically, there are more blue examples than green examples. So by simply using the rule "<font color=blue>always blue</font>", we can obtain an accuracy that's better than a coin toss. 
-=======
-
-Aha, the model is always predicting blue! Why is this simple trick effective? It's because the data are class imbalanced, meaning that one class is more prevalent than the other in our dataset. Specifically, there are more blue examples than green examples. So by simply using the rule "$\color{blue}{\text{always blue}}$", we can obtain an accuracy that's better than a coin toss. 
->>>>>>> a015a88cdc3dcdf7abada59fc84c67d294263823
+Aha, the model is always predicting blue! Why is this simple trick effective? It's because the data are class imbalanced, meaning that one class is more prevalent than the other in our dataset. Specifically, there are more blue examples than green examples. So by simply using the rule "$\color{blue}{\text{always blue}}$", we can obtain an accuracy that's better than a coin toss.
 
 This shows that _accuracy_ has its limitations as a model performance metric and reveals the need for more nuanced metrics, such as the following:
 
@@ -355,7 +350,7 @@ knitr::include_graphics("./figures/confusion-matrix.png")
 
 In this toy dataset, we'll call the $\color{blue}{\text{blue}}$ examples $\color{blue}{\text{'positive'}}$ and the $\color{green}{\text{green}}$ examples $\color{green}{\text{'negative'}}$. This terminology makes more sense in more realistic classification problems, such as delineating spam email from non-spam.
 
-### Evaluate model performance
+### Model performance
 Let's write a function that calculates the building blocks of the confusion matrix.
 
 
@@ -368,10 +363,10 @@ confusion <- function(y_true, pred_out, threshold = 0.5, verbose = T){
   false_negatives = sum((pred_out < threshold)  & (y_true == 1))
   
   if (verbose) {
-    cat('true positives: ',  true_positives,  '\n')
-    cat('true negatives: ',  true_negatives,  '\n')
-    cat('false positives: ', false_positives, '\n')
-    cat('false negatives: ', false_negatives, '\n')
+    cat('true positives: ',  true_positives,  '\n',
+        'true negatives: ',  true_negatives,  '\n',
+        'false positives: ', false_positives, '\n',
+        'false negatives: ', false_negatives, '\n')
   }
   return (list(tp = true_positives, tn = true_negatives, fp = false_positives, fn = false_negatives))
 }
@@ -401,7 +396,7 @@ This reveals a more nuanced picture of model performance. Sure, accuracy is bett
 
 - **Precision**: $\frac{\mbox{TP}}{\mbox{TP + FP}}$
   tells us the proportion of positive predictions that were actually correct.
-- **recall**: $\frac{\mbox{TP}}{\mbox{TP + FN}} = \frac{\mbox{TP}}{\mbox{P}}$
+- **Recall**: $\frac{\mbox{TP}}{\mbox{TP + FN}} = \frac{\mbox{TP}}{\mbox{P}}$
   tells us the proportion of positive examples that were correctly predicted to be positive. 
 
 ```{r cf-metrics, echo = F, fig.cap = "Difference of Precision and Recall in classification problems."}
@@ -429,8 +424,8 @@ precision_and_recall <- function(true_positives, true_negatives,false_positives,
   }
   
   if (verbose){
-    cat("Precision: ", precision, "\n")
-    cat("Recall: ", recall, "\n")
+    cat("Precision: ", precision, "\n",
+        "Recall: ", recall, "\n")
   }
   
   return (list(precision = precision, recall = recall))
@@ -448,12 +443,12 @@ c(precision, recall) %<-% precision_and_recall(true_positives,
 ```
 
 ```{r echo = F}
-cat("Precision: 0.6018009 \n")
-cat("Recall: 1 \n")
+cat("Precision: 0.6018009 \n",
+    "Recall: 1 \n")
 ```
 
 
-Now we see that the model $\color{blue}{\text{always blue}}$ does a great job at correctly predicting positive examples (_'recall'_), but many of its positive predictions are incorrect (_'precision'_).
+Now we see that the model $\color{blue}{\text{always blue}}$ does a great job at correctly predicting positive examples (*recall*), but many of its positive predictions are incorrect (*precision*).
 
 Wouldn't it be nice if we could combine _precision_ and _recall_ into a single metric? 
 Ideally, this metric would take on a high value when both _precision_ and _recall_ are large and a low value when either _precision_ or _recall_ is small.
@@ -488,7 +483,8 @@ f <- f_score(precision, recall)
 ```{r echo = F}
 cat("F-score: 0.7514054")
 ```
-## Evaluate the influence of network architecture on model performance
+
+### Influence of NN architecture
 
 Might more complex network architectures allow us to make better predictions? 
 
@@ -561,10 +557,10 @@ f <- f_score(precision, recall)
 ```
 
 ```{r echo = F}
-    cat("Accuracy on held-out test data: 0.75 ")
-    cat("Precision: 0.8490566 ")
-    cat("Recall: 0.7107232 ")
-    cat("F-score: 0.7737557")
+    cat("Accuracy on held-out test data: 0.75 ",
+        "Precision: 0.8490566 ",
+        "Recall: 0.7107232 ",
+        "F-score: 0.7737557")
 ```
 
 What do you observe?
@@ -958,10 +954,10 @@ for (i in 1:num_models){
 ```
 
 ```{r echo = F}
-cat("Auc for model  1  is  0.677")
-cat("Auc for model  2  is  0.611")
-cat("Auc for model  3  is  0.929")
-cat("Auc for model  4  is  0.981")
+cat("Auc for model  1  is  0.677",
+    "Auc for model  2  is  0.611",
+    "Auc for model  3  is  0.929",
+    "Auc for model  4  is  0.981")
 ```
 
 What do you observe?
@@ -1058,8 +1054,8 @@ df_train_new <- training(split)
 df_test_new  <- testing(split)
 
 # Print some summary statistics about these new data
-cat('Proportion of data in class blue: ' , sum(df_new$y) / length(df_new$y), '\n')
-cat('Proportion of data in class green: ' , 1 - sum(df_new$y) / length(df_new$y),'\n')
+cat('Proportion of data in class blue: ' , sum(df_new$y) / length(df_new$y), '\n',
+    'Proportion of data in class green: ' , 1 - sum(df_new$y) / length(df_new$y),'\n')
 ```
 
 ```{r echo = F}
@@ -1282,10 +1278,10 @@ confusion <- function(y_true, pred_out, threshold = 0.5, verbose = T){
   false_negatives = sum((pred_out < threshold)  & (y_true == 1))
   
   if (verbose) {
-    cat('true positives: ',  true_positives,  '\n')
-    cat('true negatives: ',  true_negatives,  '\n')
-    cat('false positives: ', false_positives, '\n')
-    cat('false negatives: ', false_negatives, '\n')
+    cat('true positives: ',  true_positives,  '\n',
+        'true negatives: ',  true_negatives,  '\n',
+        'false positives: ', false_positives, '\n',
+        'false negatives: ', false_negatives, '\n')
   }
   return (list(tp = true_positives, tn = true_negatives, fp = false_positives, fn = false_negatives))
 }
@@ -1308,8 +1304,8 @@ precision_and_recall <- function(true_positives, true_negatives,false_positives,
   }
   
   if (verbose){
-    cat("Precision: ", precision, "\n")
-    cat("Recall: ", recall, "\n")
+    cat("Precision: ", precision, "\n",
+        "Recall: ", recall, "\n")
   }
   
   return (list(precision = precision, recall = recall))
@@ -1344,7 +1340,7 @@ If you were too eager and already pressed _Y_ (yes) and enter, don't panic! Just
 keras_model_sequential()
 ```
 
-** Turn the pseudo-code into real code!**
+**Turn the pseudo-code into real code!**
 
 ```{r eval = F}
 

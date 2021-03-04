@@ -466,7 +466,7 @@ _Dropout_ is a simple and effective way to reduce overfitting. The idea behind t
 
 In practice, dropout works by simply changing a certain fraction of outputs in the specified layers to zero, thus 'dropping them out'. This fraction is specified by the _dropout rate_, which is typically set between 0.2 and 0.5. Exactly which neurons get dropped out randomly changes for each example. To compensate for the decreased number of active neurons in layers with dropout, the layer's outputs are scaled by the inverse of the (`1-dropout rate`). This is shown graphically in Figure \@ref(fig:dropout) with the dropout rate being 0.5.
 
-```{r dropout, out.width = "75%", fig.cap="Visualization of dropout using a 0.5 dropout rate."}
+```{r dropout, out.width = "75%", echo=FALSE, fig.cap="Visualization of dropout using a 0.5 dropout rate."}
 knitr::include_graphics("./figures/dropout.png")
 ```
 Dropout applied to an activation matrix at training time, with rescaling happening during training. At test time, the activation matrix is unchanged.
@@ -723,7 +723,7 @@ cat("Test accuracy: 0.849 \n")
 Great, we have a well performing model. Now let's interpret what the CNN learns.
 
 
-### Visualizing what convolutional neural networks learn
+### Visualizing a CNN
 
 There are multiple ways to visualize what convolutional neural networks learn, here are three examples:
 
@@ -732,8 +732,6 @@ There are multiple ways to visualize what convolutional neural networks learn, h
 2) _**Visualizing convolutional filters**_ - this shows you what visual pattern or concept a filter responds to.
 
 3) _**Visualizing heatmaps of class activation in an image**_ - this shows you which parts of an image were identified as belonging to a particular class.
-    
-#### Visualizing intermediate activations
 
 The activation of a layer is the output of the activation function for that layer, given some input. This shows how an input is decomposed by the different filters learned by a convolutional neural network.
 
@@ -938,6 +936,8 @@ In a moment, after you've read the following instructions carefully, you should:
 Now, you can normally continue with the exercise.
 
 If you were too eager and already pressed _Y_ (yes) and enter, don't panic! Just close your environment, re-open it and make sure that next time you go with _n_ (no).
+
+### Tasks
 
 ```{r eval = F}
 keras_model_sequential()

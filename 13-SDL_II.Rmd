@@ -23,11 +23,10 @@ In this tutorial, we will put into practice and apply many of the models seen ea
 
 
 ## Tutorial 
-### Description of the modelling task
 
 Using the eddy-covariance technique, it is possible to measure the CO~2~ gas exchange fluxes between the vegetation and the atmosphere at high temporal resolution and throughout the year (see Figure \@ref(fig:eddytower). This is a key scientific measurement, for studying as an example the CO~2~ cycle. Technical details on the measurement can be found [here](https://en.wikipedia.org/wiki/Eddy_covariance).
 
-```{r eddytower, out.width="25%", fig.cap="Close-up of measuring device for $CO_2$ and other environmental parameters that is attached to eddy covariance towers. Image taken from [Wikipedia](https://upload.wikimedia.org/wikipedia/commons/5/52/Eddy_Covariance_IRGA_Sonic.jpg)."}
+```{r eddytower, out.width="25%", echo=FALSE, fig.cap="Close-up of measuring device for $CO_2$ and other environmental parameters that is attached to eddy covariance towers. Image taken from [Wikipedia](https://upload.wikimedia.org/wikipedia/commons/5/52/Eddy_Covariance_IRGA_Sonic.jpg)."}
 knitr::include_graphics("./figures/13_eddytower.jpg")
 ```
 
@@ -45,13 +44,11 @@ Although photosynthesis is performed differently by different species, the proce
 [The Normalised Difference Vegetation Index](https://en.wikipedia.org/wiki/Normalized_difference_vegetation_index) (NDVI) uses this property, by measuring the difference between the difference in reflectance between red light (*Red*) and near-infrared light (*NIR*) as:
 
 $$
-NDVI = \frac{NIR - Red}{NIR + Red}$$
+NDVI = \frac{NIR - Red}{NIR + Red}
+$$
 
 
 NDVI is a measure for live green foliage and is strongly related to the fraction of absorbed photosynthetically active radiation. In other words, it should scale (more or less linearly) with GPP. NDVI is easy to obtain at a fine spatial resolution, through satellite imagery. On the other hand, eddy covariance measurement sites are very scarce, and can only estimate CO~2~ fluxes at a few geographical positions.
-
-
-### Goal of the tutorial
 
 Our aim is to build a model that can estimate CO~2~ exchange rates between the vegetation and the atmosphere, extending the range of measurements from the towers to the entire Earth system.
 We will compare different approaches to find the function $f$ that best captures the relationship between NDVI (and other explanatory variables) to CO~2~ fluxes ($y_{CO2}$): $y_{CO2} = f(x_{NDVI},...)$
@@ -63,7 +60,7 @@ As a first step of any modeling problem, we need to get and process the data to 
 #### FLUXNET
 We will once again be using the FLUXNET dataset, that you have gotten familiar with in the previous tutorials. We want to try to predict the variable [`NEE_CUT_REF`](https://fluxnet.org/data/fluxnet2015-dataset/fullset-data-product/), which expresses the fluxes in gC $m^{-2} d^{-1}$, using the ndvi value of the corresponding region. Figure \@ref(fig:map) shows a map of the locations of all 34 European towers available in our dataset:
 
-```{r map, out.width="50%", fig.cap="Locations of all eddy covariance towers in Europe."}
+```{r map, out.width="50%", echo=FALSE, fig.cap="Locations of all eddy covariance towers in Europe."}
 knitr::include_graphics("./figures/location_of_towers.png")
 ```
 
@@ -75,7 +72,7 @@ Note that the choice for considering such a wide area around the tower is not on
 
 Each MODIS product gives a tile with the desired information. From this tile a region around each tower is extracted. The following picture shows you an example of such a tile and the area around the CH Oensingen tower. Extracted Region (black square) around the Tower of CH Oensingen (red cross) in the given Modis tile in Figure \@ref(fig:Oe2).
 
-```{r Oe2, out.width="49%", fig.show='hold', fig.cap = "Left: MODIS tile with extracted region in black and location of eddy covariance tower in CH Oensingen as red cross. Right: Monthly NDVI vs $CO_{2}$ Flux of CH Oensingen Tower in 2014."}
+```{r Oe2, out.width="49%", fig.show='hold', echo=FALSE, fig.cap = "Left: MODIS tile with extracted region in black and location of eddy covariance tower in CH Oensingen as red cross. Right: Monthly NDVI vs $CO_{2}$ Flux of CH Oensingen Tower in 2014."}
 knitr::include_graphics(c("./figures/extracted_region_CH_Oe2.jpg",
                         "./figures/ndvi_vs_CO2.gif"))
 ```
@@ -86,9 +83,7 @@ This might all seems a little abstract, so let's visualise it! The two animation
 
 What do you observe? Can you see any emerging patterns? Do you see any link between the input (NDVI image) and the output (CO~2~ flux)?
 
-### Let's dive into the code
 First we need to load the libraries required for our modelling task. We'll be using the [Keras](https://keras.io) library for the neural networks.
-
 
 ```{r message = FALSE, warning = FALSE}
 # import libraries
@@ -106,11 +101,10 @@ options(repr.plot.width = 10, repr.plot.height = 5)
 
 Before we start on the modelling part, it would be good to check how much data is available at each tower for the desired time (2000-2014). Take a look at the plots in Figure \@ref(fig:tower-data), showing the monthly available data for each tower over the years. Blue shows data is available, while red shows data is unavailable.
 
-```{r tower-data, out.width="49%", fig.show='hold', fig.cap = "Available data for all towers in data set from years 2000 to 2014. On the y- and x-axis with have the year, respectively the month of that year. Each plot denotes one of the total 34 towers in the data set."}
+```{r tower-data, out.width="49%", fig.show='hold', echo=FALSE, fig.cap = "Available data for all towers in data set from years 2000 to 2014. On the y- and x-axis with have the year, respectively the month of that year. Each plot denotes one of the total 34 towers in the data set."}
 knitr::include_graphics(c("./figures/data_available_1.png",
                           "./figures/data_available_2.png"))
 ```
-
 
 #### Read in the Data
 
@@ -120,7 +114,6 @@ We split the data into
 - a test set: this data will be used for model assessment on a held out dataset
 
 We keep 70%, 15% and 15% of the data for training, validation and test set respectively. Note that is essential that we ensure that each tower is represented in each of the datasets to not have skewed or biased results.
-
 
 ```{r}
 # read data of tower features
@@ -149,13 +142,12 @@ cat("Size of training set is ", length(y_train), "\n",
 ```
 
 Let 's have a look at the distribution of CO~2~ flux by tower displayed in Figure \@ref(fig:tower-dist).
-```{r tower-dist, out.width = "75%", fig.cap="Distribution of CO~2~ Flux by Tower."}
+```{r tower-dist, out.width = "75%", echo=FALSE, fig.cap="Distribution of CO~2~ Flux by Tower."}
 knitr::include_graphics("./figures/Distribution_per_Tower.png")
 ```
 
-## Naive models (Old World)
-
-### Linear Model
+### Naive models (Old World)
+#### Linear Model
 
 We first build a linear model, which assumes a linear relationship between *label* (output) and *feature* (input) $ y = f(x) +\epsilon $. That is, $f$ is of the form $f(x) = \beta_1 x + \beta_0$ with $\beta_0,\beta_1 \in \mathbb{R}$.
 
@@ -245,7 +237,7 @@ lm_fit_ <- lm(y~ . ,df_train_)
 summary(lm_fit_)
 ```
 
-### Polynomial Model
+#### Polynomial Model
 
 We can also fit a more complex model keeping the average NDVI value as the only input value. Let's fit polynomial of the 2^nd^ degree.
 
@@ -253,11 +245,8 @@ We can also fit a more complex model keeping the average NDVI value as the only 
 # polynomial model degree 2
 poly_fit <- lm(y ~ poly(avg_ndvi, 2), data = df_train)
 summary(poly_fit)    
-```
 
-And as before, let's plot the model:
-
-```{r}
+# plotting
 df_train %>%
   ggplot(aes(x = avg_ndvi, y = y)) +
   geom_point() +
@@ -266,10 +255,9 @@ df_train %>%
   labs(x = 'Average NDVI', y = y_lab )
 ```
 
+### Neural Networks (New World)
 
-## Neural Networks (New World)
-
-### Feed Forward Neural Network
+#### Feed Forward Neural Network
 Instead of a Linear or Polynomial model, let's see what happens when we approximate $f$ using a Feed Forward Neural Network with two hidden layers. Contrary to beforehand, we don't have to extract statistical information from the NDVI dataset. Instead, we can directly feed every pixel in the function.
 
 The first step and key step as always is preprocessing!
@@ -391,8 +379,9 @@ plot(history$ffnn)
 
 ![ ](./figures/output_46_1.png)
 
-### Convolutional Neural Networks
-#### Building Blocks of a CNN
+#### Convolutional Neural Networks
+**Building Blocks of a CNN**
+
 - `Convolutional Layers`: Layers implementing the actual convolution. Their outputs are feature maps which are then passed through an activation function in order to introduce non-linearities into the system. Convolutional layers can be seen as extracting features that are passed on deeper into the model thus enabling the model to learn higher-level features that make the classification task easier.
 
 - `Pooling Layers`: Downsampling or pooling layers concentrate the information so that deeper layers focus more on abstract/high-level patterns. A common choice is max-pooling, where only the maximum value occurring in a certain region is propagated to the output.
@@ -515,7 +504,7 @@ Can you name a major advantage of a CNN model in comparison with a FFNN model?
 Of course the number of parameters. The CNN model outperforms the FFNN one and with much less trainable parameters.
 
 
-## Mixed Model: CNN Features + Tower Location 
+#### Mixed Model: CNN Features + Tower Location 
 
 One can also use CNN together with other features. In our case, the tower location seems relevant as a predictor. We treat the tower location as a categorical feature with 34 discrete categories (equal to the number of towers in our dataset).
 
@@ -533,7 +522,7 @@ The extracted feature of the CNN model is connected with the categorical tower f
 
 A visual representation of the *mixed model* is given in Figure \@ref(fig:token).
 
-```{r toke, fig.cap="Visualization of adding a tokenization layer to a CNN."}
+```{r toke, echo=FALSE, out.width="150%", fig.cap="Visualization of adding a tokenization layer to a CNN."}
 knitr::include_graphics("./figures/mixed_model.jpeg")
 ```
 
@@ -691,7 +680,7 @@ plot(history$mixed)
 ![ ](./figures/output_60_1.png)
 
 
-## Results
+### Model Comparison
 
 Now we are ready to compare all the different modeling approaches. Namely, we compare the MSE of the validation and test set for each model.
 
@@ -854,7 +843,7 @@ If you were too eager and already pressed *Y* (yes) and enter, don't panic! Just
 keras_model_sequential()
 ```
 
-### Read in the data
+### Load data
 
 ```{r eval = F}
 #read in the data

@@ -1,5 +1,6 @@
-# Supervised Neural Networks II {#ch-09}
+# Supervised Neural Networks I {#ch-09}
 
+## Introduction
 ### Learning objectives
 After this learning unit, you will be able to ...
 * Practice some of the fundamentals of data cleaning.
@@ -25,7 +26,9 @@ After this learning unit, you will be able to ...
 * As compared to regression problems, classification problems require different loss functions and measures of model performance. For example, loss can be measured using cross-entropy and model performance can be measured using accuracy.
 
 
-### Import libraries
+## Tutorial
+### Set-up
+#### Import libraries
 We first need to import some libraries. Most of these will be familiar from previous tutorials, with the exception of `keras`, which uses `TensorFlow` as a backend. For those who may be unfamiliar with the term *backend* this simply refers to a program's code or parts of a computer application that enable it to run but isn't accessed by the user and works in the background.
 
 These packages will be explained in detail later.
@@ -44,7 +47,7 @@ library(IRdisplay)
 options(repr.plot.width = 10, repr.plot.height = 7)
 ```
 
-### Load your data
+#### Load your data
 Load the hourly data from the eddy covariance flux towers. You'll be qite familiar with this by now. 
 
 For this first example, we'll only load one feature (PPFD_IN - incoming photosynthetic photon flux density) and our dependent variable (GPP_NT_VUT_REF - gross primary production). 
@@ -60,7 +63,7 @@ df_data = readRDS(file_path)
 head(df_data)
 ```
 
-### Clean your data
+#### Clean your data
 Looks like the value of PPFD_IN has been set to -9999 in some examples. As you'll recall from previous tutorials, this is a flag to indicate missing data. Let's remove these examples and create a scatterplot of the remaining data.
 
 
@@ -74,7 +77,7 @@ df_data_cleaned %>%
     geom_point()
 ```
 
-### Prepare your data for learning
+#### Prepare your data for learning
 In previous lectures and tutorials, you've been taught the importance of splitting data into training and testing sets. Sometimes we produce a further split of the training data to include a validation set, although that won't be necessary for the purposes of this tutorial.
 
 It is also important to shuffle your data. _Why?_ Imagine you have temporal data that is laid out in chronological order. If you do not shuffle your data, your training set may contain examples from Spring, Summer, and Fall, whereas your testing data will contain examples from Winter. If the phenomena of interest depends on the season, then the patterns you learn in the training data may not be applicable to the patterns inherent in the test data.
@@ -105,7 +108,7 @@ df_train = df_data_cleaned %>% slice(1:breakpoint)
 df_test = df_data_cleaned %>% slice((breakpoint+1):nrow(df_data_cleaned))
 ```
 
-## Build a Keras model for linear regression
+### Keras for linear models
 
 [Keras](https://tensorflow.rstudio.com/guide/keras/) is a powerful API for machine learning. It provides a rich library of easy-to-use functions for building, training, and evaluating artificial neural networks. It interfaces with several backend machine learning libraries. Here we'll use it with the TensorFlow backend, which was developed by Google Brain for deep learning applications. 
 
@@ -203,23 +206,23 @@ build_and_train_model = function(x_train,y_train,learning_rate,num_epochs,batch_
   }
 ```
 
-### A point of comparison: Exact solution of `y = wx + b`
+#### Exact solution of `y = wx + b`
 
 The loss function for the linear regression is the Root Mean Squared Error, given by $L((w,b)) = \frac{1}{n}\sum_{i = 1}^{n} (wx_i + b-y_i)^2$ where $(x_i,y_i)$ are points of the training data. 
-
 Our aim is to retrieve those _w_ and _b_, which minimize the loss function or equivalently to find the line which best fits our training data. In order to minimize this objective function with respect to _w_ and _b_ we need to solve the following system: 
 
+$$
 \begin{align}
  \frac{\partial L}{\partial w} & = 0 \\
  \frac{\partial L}{\partial b} & = 0
 \end{align}
+$$
 
 which gives $\hat{w} = \frac{n \sum_{i = 1}^{n} x_iy_i -\sum_{i = 1}^{n}x_i\sum_{i = 1}^{n}y_i}{n\sum_{i = 1}^{n}x_i^2 - (\sum_{i = 1}^{n}x_i)^2}$ and $\hat{b} = \bar{y}-\hat{w} \bar{x}$. 
 
 This is the so called **exact solution** for the linear regression problem where $\hat{w}$ and $\hat{b}$ denote the _slope_ and the _intercept_ of the line respectively.
 
 As we have already seen in the previous lectures we can also use the `lm` function in order to fit our linear model. The `lm` function uses the exact solution to find the optimal w and b.
-
 
 ```{r}
 lm_fit = lm(GPP_NT_VUT_REF ~ PPFD_IN, data = df_train)
@@ -228,7 +231,7 @@ summary(lm_fit)
 
 In the output above, the intercept corresponds to _b_ and `PPFD_IN` corresponds to _w_.
 
-### Motivation for gradient descent
+#### Gradient descent solution
 
 Not all models have an exact solution. Consequently, we need another way to approximate a sufficient solution of the objective function for any model class. To this end, we use the so called "gradient descent", which you'll recall from lecture 6B (loss and its minimization) is the following algorithm:
 
@@ -238,8 +241,8 @@ Not all models have an exact solution. Consequently, we need another way to appr
     b_t &= b_{t-1}-\gamma \frac{\partial L}{\partial b}(w_{t-1},b_{t-1}) \\
     w_t &= w_{t-1} -\gamma \frac{\partial L}{\partial w}(w_{t-1},b_{t-1})
   \end{align*}
-
-where $\gamma >0$ is the learning rate. 
+  
+  where $\gamma >0$ is the learning rate. 
 
 The partial derivative $\frac{\partial L}{\partial b}(w_{t-1},b_{t-1})$ gives the gradient of the loss function with respect to $b$ at the point in parameter space ($w_{t-1},b_{t-1}$). 
 
@@ -269,8 +272,6 @@ cat('Gradient descent output: x =', round(x_new,5), "\n")
 # As we can see the gradient descent algorithm returns a value very close
 # to zero after 1000 iterations 
 ```
-
-## Fit the model using gradient descent
 
 Let's use the function we wrote above, `build_and_train_model`, to apply gradient descent to the problem of solving `y = wx + b`, using a _learning rate_ of $0.01$. Note that we set the _batch_size_ to 512, which means that each step of the algorithm will use only 512 training examples, rather than the entire training set. We set the maximum number of _epochs_ to 20, which means that training will terminate after 20 full passes through the data. 
 
@@ -325,8 +326,6 @@ save_path = file.path(file_folder,'model_lr_0.01.h5')
 save_model_hdf5(model, save_path)
 ```
 
-### Gradient descent behind the scenes 
-
 Let's build our intuition for how gradient descent works by visualizing the loss function versus the fitting line for each (w,b) pair derived from the gradient descent. This is an advantage of working with a two-parameter problem - we can actually visualize loss across the solution space. This is not easy to do with problems that have more parameters. In fact, it's typically impossible. For example, try to imagine what the surface of a loss function might look like for a four-parameter problem. Not easy right? Now consider that may problems have thousands of parameters - sometimes billions. Good luck wrapping your head around that!
 
 Have a look at Figure \@ref(fig:gradient) - what we actually observe is the fitted line to the data (right plot) for each step of gradient descent (red point of left plot). As the gradient descent update step approaches the minimum of the loss function, the line fits the data better, i.e it minimizes $\sum_{i = 1}^{n} (\hat{y}_i-y_i)^2$. 
@@ -359,7 +358,7 @@ df_train %>%
 
 As we can see by the overlapping of the red and green lines, the gradient descent algorithm sufficiently approximates the exact solution. Although especially at the edges of the plot we can see that it is not a perfect match to the exact solution.
 
-## Tune the learning rate
+### Tuning learning rate
 So far, we've only considered a single learning rate. Recall from lecture 6B (loss and its minimization) that this hyper-parameter has an important influence on the behavior of gradient descent, influencing its rate of convergence and whether it converges at all.
 
 Let's tune the learning rate from 0.001 to 1 to see how this hyper-parameter influences model convergence. The code below calls the `build_and_train_model function` for four different learning rates.
@@ -621,7 +620,6 @@ gg1+gg2
 
 Notice how little loss changes as a function of _b_, relative to _w_. Also notice that we can decrease loss further than what was found in our best model by decreasing b. Why didn't our model find this solution?
 
-## Using our trained model to predict on held-out test data
 Let's use our model to make predictions on our test data. First, let's calculate loss on our test data for a learning rate of 0.01.
 
 
@@ -690,7 +688,7 @@ results
 
 What do you observe? How does the loss compare to that obtained during training? Is the linear model better than the null model?
 
-## Logistic Regression
+### Logistic Regression
 
 So far in this tutorial, we have studied gradient descent in the context of linear regression. Such a linear model is given by the following formula: $y = w_1x_1 +...+ w_nx_n + b$
 
@@ -706,7 +704,7 @@ knitr::include_graphics("./figures/log_fun.jpg")
 
 In a nutshell, logistic regression is just a linear model with the sigmoid activation function applied on the output, which converts the range to a probability. Any values of _t_ below 0 will result in a probability closer to 0 (e.g no cat), while any values of _t_ above 0 will result in a probability closer to 1 (e.g. presence of a cat).
 
-### Prediction
+#### Prediction
 
 The parameters of logistic regression can be estimated using gradient descent, just as we saw in this tutorial for linear regression, albeit with a different loss function. More on that below. 
 
@@ -727,7 +725,7 @@ Here, we also have to highlight that:
 
 The equation $w_1x_1 +...+ w_nx_n + b = 0$ is referred to as the _decision boundary_ (the vertical black line in the figure above where t=0 on the x-axis and crossing the dotted of 0.5 on the y-axis).
 
-### Training and Loss Function
+#### Training and Loss Function
 
 The objective of training is to find a set of weights $w_1...w_n$ and a bias $b$, such that the model estimates high probabilities for positive instances $(y = 1)$ and low probabilities for negative instances $(y=0)$. How well the model performs this task can be quantified using the following loss function, shown here for a single training example $\boldsymbol{x}=x_1...x_n$:
 
@@ -748,7 +746,7 @@ $$
 
 This loss function is called _binary cross-entropy_, as you'll recall from lectures 6B (and will see in 10B). Unfortunately, there is no a closed form solution for this loss function, so we have to use heuristics such as the gradient descent algorithm to minimize it.
 
-### Measures of model performance for classification
+#### Measures of model performance for classification
 In this tutorial, we introduce a common classification metric called _accuracy_, which we will revist in lecture 10B (model performance). The _accuracy_ of a model is defined as 
  
 $$
@@ -885,7 +883,7 @@ cat("Test Accuracy: ",acc,'\n')
 
 Wow, an accuracy of 90%. Sounds good right!? In this case it actually is, but we'll see in the next tutorial where this metric breaks down.
 
-## Exercise: Hands on Logistic Regression
+## Exercise
 
 IMPORTANT NOTE: You have to solve the exercise using the keras library.
 
@@ -907,7 +905,7 @@ You have to solve questions 3-7 with 2 different configurations.
 
 A skeleton code is provided below:
 
-#### Import required libraries
+### Import required libraries
 ```{r eval = F}
 library(tidyverse)
 library(reticulate)
@@ -930,13 +928,13 @@ If you were too eager and already pressed _Y_ (yes) and enter, don't panic! Just
 use_session_with_seed(0)
 ```
 
-#### Read Data
+### Read Data
 ```{r}
 data = read.csv('./data/SLNN_I/exercise/data_iris.csv')
 head(data)
 ```
 
-#### Tokenize Type
+### Tokenize Type
 ```{r eval = F}
 #create a new column with name y where y=1 defines virginica while y=0 defines not_virginica
 
@@ -971,9 +969,9 @@ y_test = df_test$y
  
 ```
 
-#### Configuration a
+### Configuration a
 
-##### Plot the training data
+#### Plot the training data
 
 ```{r eval = F}
 #YOUR SOLUTION HERE: use only the Petal Width as input
@@ -981,7 +979,7 @@ y_test = df_test$y
 
 ```
 
-##### Create the model
+#### Create the model
 
 ```{r eval = F}
 #YOUR SOLUTION HERE
@@ -1002,13 +1000,13 @@ y_test = df_test$y
  w_a = unlist(get_weights(model_a))
 ```
 
-##### Plot the decision boundary
+#### Plot the decision boundary
 
 ```{r eval = F}
 #Your solution
 ```
 
-##### Evaluate the accuracy of the model in the test set
+#### Evaluate the accuracy of the model in the test set
 
 ```{r eval = F}
 #YOUR SOLUTION HERE
@@ -1029,16 +1027,16 @@ cat("Test Accuracy: ",round(accuracy,3),'/n')
 ```
 
 
-##### Plot misclassified predictions in the test data
+#### Plot misclassified predictions in the test data
 
 ```{r eval = F}
 #YOUR SOLUTION
 # HINT: create a new column in the df_test which indicates those points that are misclassified
 ```
 
-#### Configuration b
+### Configuration b
 
-##### Plot the training data
+#### Plot the training data
 
 ```{r eval = F}
 #YOUR SOLUTION HERE: use both the Petal Length and Petal Width as inputs
@@ -1047,7 +1045,7 @@ cat("Test Accuracy: ",round(accuracy,3),'/n')
 
 ```
 
-##### Create the model
+#### Create the model
 
 ```{r eval = F}
 #YOUR SOLUTION HERE
@@ -1070,14 +1068,14 @@ model_b %>% fit(x=as.matrix(x_train),y=y_train,epochs=30,batch_size=32)
 w_b = unlist(get_weights(model_b)) 
 ```
 
-##### Plot the decision boundary
+#### Plot the decision boundary
 
 ```{r eval = F}
 #Your solution
 #HINT: Your desicion boundary now is a line
 ```
 
-##### Evaluate the accuracy of the model in the test set
+#### Evaluate the accuracy of the model in the test set
 
 ```{r eval = F}
 #YOUR SOLUTION HERE
@@ -1099,7 +1097,7 @@ cat("Test Accuracy: ",round(accuracy,3),'\n')
 ```
 
 
-##### Plot misclassified predictions in the test data
+#### Plot misclassified predictions in the test data
 
 ```{r eval = F}
 #YOUR SOLUTION

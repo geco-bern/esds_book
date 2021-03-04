@@ -1,6 +1,6 @@
 # Supervised Machine Learning II {#ch-07}
 
-## Learning objectives
+## Introduction
 
 After this learning unit, you will be able to ...
 
@@ -9,7 +9,7 @@ After this learning unit, you will be able to ...
 - Explain the purpose and the method of cross-validation.
 - Avoid data leakage during model training.
 
-## Key points from the lecture
+### Key points from the lecture
 
 **Testing data** is set aside at the initial split and not "touched" during model training. It is key to test a model’s predictive power or whether it is overfitted. 
 
@@ -23,6 +23,7 @@ To tune a model, you can set *hyperparameters* that determine model structure or
 
 **Data leakage** is when data from the testing dataset creeps into the training data. To avoid this the testing set must be left completely untouched! 
 
+## Tutorial
 ### Model training and the loss function
 
 Model training in supervised ML is guided by the match (or mismatch) between the predicted and observed target variable(s), that is, between $\hat{Y}$ and $Y$. The *loss* function quantifies this mismatch ($L(\hat{Y}, Y)$), and the algorithm takes care of progressively reducing the loss during model training. Let's say the ML model contains two parameters and predictions can be considered a function of the two ($\hat{Y}(w_1, w_2)$). $Y$ is actually constant. Thus, the loss function is effectively a function $L(w_1, w_2)$. Therefore, we can consider the model training as a search of the parameter space of the machine learning model $(w_1, w_2)$ to find the minimum of the loss. Common loss functions are the root mean square error (RMSE), or the mean square error, or the mean absolute error.

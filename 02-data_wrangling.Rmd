@@ -1,4 +1,5 @@
 # Data wrangling {#ch-02}
+## Introduction
 
 In this chapter, you'll learn to efficiently explore your data. This includes understanding how the data is structured, what "dimensions" are in a dataset, how to manipulate the data and visualise it. Efficient data exploration and wrangling are the basis for generating hypotheses, testing them, and repeating the wrangling-visualisation-hypothesis circle over and over. That's science.
 
@@ -48,8 +49,7 @@ ggplot(data = df, aes(x = time, y = temperature)) +
 ```
 
 
-
-## Hands-on
+## Tutorial
 
 ### Dataset 1 (half-hourly flux data)
 
@@ -958,11 +958,11 @@ ddf_ch_lae <- ddf_allsites_nested_joined %>%
 save(ddf_ch_lae, file = "data/ddf_ch_lae.RData")
 ```
 
-#### Exercise
+### Exercise
 
 For this week's exercise open up an Rstudio environment. 
 
-### 1. Outlier removal
+#### Outlier removal
 
 a. Based on the half-hourly dataset for site CH-Lae, aggregated to daily means, **identify outliers** in `GPP_NT_VUT_REF` with respect to the linear relationship between `GPP_NT_VUT_REF` and `PPFD_IN`. To do so, first fit a linear regression model using `lm()`. This function returns a list of objects, one of which is `residuals`. Determine outliers as the "outlying" points in the distribution of residuals. You may use the base-R function `boxplot.stats()` and set the argument `coef` accordingly to our customised threshold definition.
 ```{r}
@@ -1027,7 +1027,7 @@ ddf %>%
   geom_point(aes(y = GPP_NT_VUT_REF_clean), color = "black")  # then overplot cleaned data in black so that remaining red points are outliers
 ```
 
-### 2. Visualising diurnal and seasonal cycles
+#### Visualising diurnal and seasonal cycles
 
 Using the half-hourly dataset for site CH-Lae, visualise how GPP (`GPP_NT_VUT_REF`) varies on two time scales: diurnal (within-day at hourly time scale) and seasonal. To implement this, follow the following steps:
 

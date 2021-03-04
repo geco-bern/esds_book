@@ -43,13 +43,13 @@ y = \sum_{n=0}^N a_n x^n
 $$
 $a_n$ are the coefficients, i.e., model parameters. The goal of the training is to get the coefficients $a_n$. From the above definition, the polynomial of degree 15 has 16 parameters, while the polynomial of degree 1 has two parameters (and corresponds to a simple linear regression). You can imagine that the polynomial of degree 15 is much more flexible and should thus yield the closest fit to the training data. This is indeed the case. 
 
-```{r, echo = FALSE, fig.cap="Comparing model fits on training data set."}
+```{r, echo = FALSE, echo=FALSE, fig.cap="Comparing model fits on training data set."}
 knitr::include_graphics("./figures/training.png")
 ```
 
 We can use the same fitted models on unseen data - the *validation data*. This is what's done below. Again, the same true underlying relationship is used, but we sample a new set of data points in x and add a new sample of errors on top of the true relationship.
 
-```{r, echo = FALSE, fig.cap="Comparing model fits on validation data set."}
+```{r, echo = FALSE, echo=FALSE, fig.cap="Comparing model fits on validation data set."}
 knitr::include_graphics("./figures/validation.png")
 ```
 
@@ -57,7 +57,7 @@ You see that, using the validation set, we find that "poly4" actually performs t
 
 It gets even worse when applying the fitted polynomial models to data that extends beyond the range in $x$ that was used for model training. Here, we're extending just 20% to the right.
 
-```{r, echo = FALSE, fig.cap="Comparing model fits when extrapolating."}
+```{r, echo = FALSE, echo=FALSE, fig.cap="Comparing model fits when extrapolating."}
 knitr::include_graphics("./figures/validation_extrapolation.png")
 ```
 
@@ -65,7 +65,7 @@ You see that the RMSE for "poly15" literally explodes. The model is hopelessly o
 
 The phenomenon of fitting/overfitting as a function of the model "flexibility" is also referred to as *bias vs. variance trade-off*. The bias describes how well a model matches the training set (average error). A model with low bias will match the data set closely and vice versa. The variance describes how much a model changes when you train it using different portions of your data set. "poly15" has a high variance, but much of its variance is the result of misled training on observation errors. On the other extreme, "poly1" has a high bias. It's not affected by the noise in observations, but its predictions are also far off the observations. In ML, we are challenged to balance this trade-off. In Figure \@ref(fig:tradeoff) you can see a schematic illustration of the bias–variance trade-off.
 
-```{r tradeoff, fig.cap="Trade-off between bias and variance"}
+```{r tradeoff, echo=FALSE, fig.cap="Trade-off between bias and variance"}
 knitr::include_graphics("./figures/bias-variance.png")
 ```
 
@@ -81,7 +81,7 @@ Of course, a plethora of algorithms exist that do the job of $Y = f(X)$. Each of
 
 What can you say about the bias and the variance of the following graphs?
 
-```{r simple-complex, fig.cap="Comparison of simple and complex model fits."}
+```{r simple-complex, echo=FALSE, fig.cap="Comparison of simple and complex model fits."}
 knitr::include_graphics("./figures/bias-variance_2.png")
 ```   
     
@@ -336,7 +336,7 @@ df_train_rsample <- training(split_rsample)
 df_test_rsample <- testing(split_rsample)
 ```
 
-```{r sample, fig.cap="Comparison of different methods to split data. Black represent training data splits and red training data splits."}
+```{r sample, echo=FALSE, fig.cap="Comparison of different methods to split data. Black represent training data splits and red training data splits."}
 
 knitr::include_graphics("./figures/datasplitting.png")
 
@@ -351,7 +351,7 @@ df_train_rsample_strat <- training(split_rsample_strat)
 df_test_rsample_strat <- testing(split_rsample_strat)
 ```
 
-```{r rsample, fig.cap="Stratified sampling using `initial_split()` from rsample package."}
+```{r rsample, out.height="50%", echo=FALSE, fig.cap="Stratified sampling using `initial_split()` from rsample package."}
 knitr::include_graphics("./figures/datasplitting_strata.png")
 ```
 
@@ -626,7 +626,7 @@ Visualise the distribution of numeric variables (not including the ones created 
 We have learned in Chapter \@ref(ch-02) that ggplot2 is designed to implement the *grammar of graphics* where variables are mapped onto aesthetics. If we want to create, for example, separate boxplots for each variable, arranged side-by-side along the x-axis, we want to specify the x-axis aesthetics to be the variable identity (something like `aes(x = variable)`). However, in our dataset, we have multiple variables (eleven to be precise) in separate columns. Strictly speaking, this is not entirely *tidy* and therefore, it's not quite straight-forward to create a ggplot graphics with data from multiple separate columns and organise them along one of the available aesthetics (here, x-axis). We have to take an additional step and combine the multiple columns into a single one. The new-rearranged and very *tidy* dataframe then has a new column (e.g., called `value`) that contains all the values of all the variables, and another new column (e.g. called `variable`) that specifies which variable the value belongs to. This re-arrangement can also be described as converting a table in *wide* format (wide because of its large number of columns) to a *long* format (long because of its large number of rows). This transformation is illustrated in Figure \@ref(fig:pivot).
 
 
-```{r pivot, fig.cap='Visualizsation of turning a table from wide format (right) into long format (left). Figure from [R for Data Science](https://cmdlinetips.com/2020/02/r-for-data-science-book-gets-tidyr-1-0-0-friendly/).'}
+```{r pivot, echo=FALSE, fig.cap='Visualizsation of turning a table from wide format (right) into long format (left). Figure from [R for Data Science](https://cmdlinetips.com/2020/02/r-for-data-science-book-gets-tidyr-1-0-0-friendly/).'}
 knitr::include_graphics("./figures/fig_pivot_longer_wide_to_long_tidy.jpg")
 ```
 

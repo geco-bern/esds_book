@@ -1,10 +1,9 @@
 # Application 2: Neural Networks and Hyperparameter Tuning {#ch-11}
 
-## Overview 
 The goal of this application is to put the concepts that we have learnt over all these weeks into practice. The task at hand is to predict the productivity of vegetation (`GPP_NT_VUT_REF`), using an artificial neural network. For this task we will be using the `FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN` data, that we obtained after the data wrangling tutorial 
 
-
-## Learning Goals 
+## Introduction
+### Learning Goals 
 After this exercise session you shall be able to  
 
 - Create training and testing splits (80/20)
@@ -15,7 +14,7 @@ After this exercise session you shall be able to
 - Evaluate feature importance and its effects on the model performance (maybe as bonus?)
 
 
-## Key Points from Previous Lectures  
+### Key Points from Previous Lectures  
 - It is always worthwhile to perform an initial exploratory analysis of your data, e.g. to identify outliers, missing values, etc.
 - To train a statistical model using machine learning, we split our data into training and testing sets. Sometimes we also include a validation set.
 - Testing data is set aside at the initial split and not "touched" during model training. It is key to test a model’s predictive power or whether it is overfitted. 
@@ -31,16 +30,19 @@ After this exercise session you shall be able to
 - To avoid overfitting, model generalisability is desired already during model training. One method to do this is cross validation. 
 - Data leakage is when data from the testing dataset creeps into the training data. To avoid this the testing set must be left completely untouched!
 
-## Problem Statement 
-For this exercise we can use the reduced and cleaned dataset with half-hourly data from exercise session 2 -- data wrangling. The task is to predict the *productivity of vegetation (GPP)*, using all the other features as predictor variables.
+## Application
+### Problem Statement 
+For this exercise we can use the reduced and cleaned dataset with half-hourly data from Chapter \@ref(ch-02). The task is to predict the *productivity of vegetation (GPP)*, using all the other features as predictor variables.
 
 **GPP_NT_VUT_REF** from the dataset is the target variable and rest of the columns can be used as the input predictor variables. For the sake of limiting the task complexity, we assume the data to be IID generated, and treat each row in the dataset as an independent observation.
 
-Using these inputs create a neural network with just one hidden layer. Use cross validation to optimise hyper-parameters such as number of hidden nodes, choice of activation function etc. Using mean squared error (MSE) loss as a metric for monitoring the performance, plot the MSE loss as a function of the number of epochs. Also plot the MSE loss as a funtion of the hyperparameters used. The list of tasks mentioned here are not exhaustive, you'll be guided through the application and asked questions along the way! 
+- Use these inputs to create a neural network with just one hidden layer.
+- Use cross validation to optimise hyper-parameters such as number of hidden nodes, choice of activation function etc.
+- Use mean squared error (MSE) loss as a metric for monitoring the performance, plot the MSE loss as a function of the number of epochs.
+- Plot the MSE loss as a funtion of the hyperparameters used.
+- *The list of tasks mentioned here are not exhaustive, you'll be guided through the application and asked questions along the way!*
 
-
-## Data preparation 
-
+### Data preparation 
 
 ```{r message=FALSE, warning=FALSE}
 ## Loading the required libraries 
@@ -165,7 +167,7 @@ train_data <- train_split %>% select(-one_of(c(target_variable, time_cols)))
 test_data <- test_split %>% select(-one_of(c(target_variable, time_cols)))
 ```
 
-#### Center and scale data chunk
+### Center and scale
 
 Take care to extract the centering and scaling parameters from the training set and use them to center and scale your test data. 
 
@@ -202,7 +204,7 @@ Are all of the columns in the testing set are centered perfectly with a mean = 0
 
 Explanation: This is because the mean of the training set is used to center it, thus that is centered perfectly. Using the statistics of the train data, we centered the test data, thus we can see the data is not exactly centered, but it is normalized enough to bring all features to 1 scale and to not affect the predictions at test time.
 
-## Building a simple model with keras ( SubTask 1)
+### Building a simple model with keras ( SubTask 1)
 
 To train keras models, the input data needs to be as a R matrix or arrays. Since all our featues are numeric, we can safely convert the train and test datasets to matrices. 
 
@@ -497,7 +499,7 @@ build_model <- function(X_train, y_train,
 ```
 
 
-## Cross validation (SubTask 2)
+### Cross validation
 
 In this section you will perform 5-Fold CV, "by - hand"
 
@@ -682,7 +684,7 @@ avg_cv_loss
 
 What is the average cross validation error obtained for this configuration of the network ? 
 
-## Cross Validation for parameter tuning  (SubTask 3)
+### Parameter Tuning
 Here we will write a function that does the cross-validation for paramater tuning. The content of the cross-validation code remains the same as we have seen before. This is the same code written as a function that also takes the hyper-parameter to be tuned as an argument.
 Your task is to optimise the number of hidden units. 
 First we will orgainse all the steps done until now to write the function. 
@@ -859,7 +861,7 @@ As one might suspect network with 100 hidden units gives the minimum loss, but i
 
 Closing remarks: Finally, in practice, when you arrive at the optimal model parameters after cross-validation, you train a new model, using the entire training set, and use the initial held-out test set (20%) to evaluate the model's performance on new data.  
 
-***
+
 
 ```{r}
 # Output of tune_results <- tune_num_units(train_split = train_split, num_units = num_units)

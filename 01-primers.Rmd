@@ -22,7 +22,7 @@ After you've gone through the lecture and solved the exercises you should be abl
 - Apply basic Git commands for version control.
 - Plot data science outputs and write them on the disk.
 
-## Important points from the lecture 
+### Important points from the lecture 
 
 Big data is described by four characteristics: 
 
@@ -42,7 +42,8 @@ Environmental data is retrieved from a diversity of methods, including remote se
 
 At the end of each chapter, you'll sum up the section with a comprehensive exercise using RStudio on Renku. We'll show you how to set up RStudio and Renku at the end of this tutorial.
 
-## Working with Jupyter notebook
+## Tutorial
+### Working with Jupyter notebook
 Most of you have worked with R before, most likely within RStudio. For this course, we're going to work with RStudio and Jupyter notebooks. Each chapter is made of two parts. The first part is a tutorial to learn the basics of data science in an environmental context where we will work with Jupyter notebooks (on Renku). The second part usually consists of a somewhat more extensive exercise in RStudio where the contents of the tutorials are applied.
 
 <!---
@@ -59,7 +60,7 @@ If at some point in this tutorial you get an error it's likely because you've in
 The last thing we've marked in the image is <span style="color:purple">Git</span>. This is essential to save your work permanently. Most of you have never worked with git. In the beginning, it's a bit fiddly but it is an essential skill in data science, the basics of which you're going to master soon. Pay close attention to the next subchapter!
 -->
 
-## Git
+### Using Git for version control
 
 Git is a program which lets you organise your code development and collaborate. The basic unit of a code project is a *repository*, which usually contains multiple source code files that may be orgnised in (sub) directories. It's advisable to only add code to a project, but not data. You'll soon understand why... Multiple edits and additions of new files are grouped into *commits*. The power of Git is that it knows the entire history of all the files in your repository. Therefore, it allows you to recover previous versions (previous commits) and track changes between them. Git also allows you to have multiple versions of your repository (*branches*), but we won't use this here. 
 
@@ -117,7 +118,7 @@ Lastly, we type `git push`. With this command, we upload our changes to the remo
 
 Once you pick up your work again, either stop the environment you're working within Renku and open a new one or start the next session by again opening the terminal within Jupyter and type `git pull`. As its name suggests, with it we can pull changes in our document from the *Git* repository. This might seem like an unnecessary step, which it is if it's just you working on this document. However, especially for the exercise at the end of a tutorial you might be working together with a peer and need to make sure you have her/his changes as well. If you're working together, make sure, that you do not work on the same document at the same time. This might lead to merge conflicts. Just to be clear: You can work on the same document but not on the same copy. E.g. all students work with this tutorial but each one has her/his own copy. Changes in this document won't appear in any other student's document. However, if you work on a document where changes will appear on another student's document, you're working on the same copy. In that case, avoid working at the same time. If at some point you encounter a merge conflict that *Git* cannot resolve automatically you'll have to do so manually. At the [end of this tutorial](#Git-denies-pushing-what-can-I-do?) we show how it's done. However, it's unlikely that you'll encounter such a problem in this course, which is why we don't explain it right here.
 
-## Writing code
+### Basics of R code
 
 You probably all have entered individual statements into the R console. For example:
 
@@ -134,11 +135,9 @@ An R script is basically a text file, named with the suffix `.R` to indicate tha
 source("my_r_script.R")
 ```
 
-If you find this brief explanation for runnnigs scripts too brief, you may find more useful information [here](https://r4ds.had.co.nz/workflow-scripts.html).
+If you find this brief explanation for running scripts too brief, you can find more useful information in the ebook [R for Data Science](https://r4ds.had.co.nz/workflow-scripts.html). How to write good code? Good code is clean, readable, consistent, and extensible (easily modified or adapted). To achieve this, here are a few points to consider - inspired by [best practices for coding](https://www.r-bloggers.com/r-code-best-practices/).
 
-How to write good code? Good code is clean, readable, consistent, and extensible (easily modified or adapted). To achieve this, here are a few points to consider... (Inspired by [https://www.r-bloggers.com/r-code-best-practices/](https://www.r-bloggers.com/r-code-best-practices/))
-
-### Variable naming
+#### Variable naming
 
 Choose concise and descriptive variable names. Different variable naming styles are being used. In this course, we use lowercase letters, and underscores (`_`) to separate words within a name (`_`). Avoid `.` as they are reserved for S3 objects (base R). Also, don't name your objects with  names of common functions and variables since your re-definition will mask already defined object names. 
 
@@ -160,11 +159,11 @@ T <- FALSE # T is an abbreviation of TRUE
 c <- 10 # c() is used to create a vector (example <- c(1, 2, 3))
 ```
 
-### Comments
+#### Comments
 
 Adding comments helps to explain exactly what the code is doing. This makes it easy to understand and modify the code, and can be key when debugging. In R source files, comments are prefixed with a `#`, which means that all what's right of the `#` is not interpreted by R. If written well, anyone new to the code or even yourself returning to it after some time should easily be able to follow what was done and why it was done. 
 
-### Syntax
+#### Syntax
 
 Adding enough white space and line brakes and adding it the right locations greatly helps the legibility of your code. Cramping it up too much leads to an unintellible sequence of characters and you'll not easily understand what parts go together (operators, variable names, brackets). Therefore, consider the following points:
 
@@ -181,7 +180,7 @@ if (temp > 5.0){
 }
 ```
 
-### Structure your source code
+#### Structure your source code
 
 At the beginning of each file add a **header** as a fully commented text section, describing who wrote the code, what it contains, and how it fits into the larger analysis framework. For example:
 
@@ -201,7 +200,6 @@ Next, load all **libraries** needed within the script.
 
 ```{r message=F}
 library(tidyverse)
-
 ```
 
 This loads all the packages of the tidyverse at once (ggplot2, dplyr, tidyr, ...), some of which you will learn more about in Chapter \@ref(ch-02).
@@ -217,7 +215,7 @@ Then, start with the sequence of statements. To visually separate parts, **break
 library("tidyverse")
 ```
 
-### Organise files
+#### Organise files
 
 Often, analyses require so many steps that your script gets excessively long. Over 2000 lines of code in one file are hard to digest. To split your code up, consider the following points:
 
@@ -230,7 +228,7 @@ Often, analyses require so many steps that your script gets excessively long. Ov
 - In RStudio, use the "project" functionality to create a new project. We won't use it in this course. See [here](https://r4ds.had.co.nz/workflow-projects.html) for more information on projects in RStudio.
 - It's advisable to create an separate data directory outside (e.g., `~/data/`) that holds all the data you ever downloaded, or obtained, or gathered. Within such a data directory, you can put files from different sources into separate subdirectories and add a description file (e.g., `~/data/my_experiment/README`) definining who, from where and when the data was obtained and defining data use policy.
 
-## Tidy data
+#### Tidy data
 
 Not just code can be good or not-so-good, also data can be tidy or not. Even if it may look beautiful in Excel, a data file may not be "machine-readable". In the exercises at the end of this chapter, you will make a not-so-good data file tidy and machine readable. But what is [**tidy data**](https://r4ds.had.co.nz/tidy-data.html) exactly? It can be defined by the following rules:
 
@@ -238,13 +236,11 @@ Not just code can be good or not-so-good, also data can be tidy or not. Even if 
 2. Each row is an observation
 3. Each value has its own cell
 
-![](./figures/tidy_data.png)
-
-*Figure from [Grolemund & Hadley](https://r4ds.had.co.nz/tidy-data.html)*
+![Figure from [Grolemund & Hadley](https://r4ds.had.co.nz/tidy-data.html6)](./figures/tidy_data.png)
 
 Having data in a tidy format greatly facilitates all data wrangling steps. The concept can even be taken further by understanding a "value" as any object type. You will learn more about this in Chapter \@ref(ch-02).
 
-## Reading data into R
+### Reading data into R
 
 In the next step, we want to read the data. We're going to work with FLUXNET data from the site "Laegern" ([CH-Lae](https://gl.ethz.ch/infrastructure/sites/laegeren.html)), located close to Zürich. FLUXNET is a global network of sites where ecosystem-atmosphere exchange fluxes are measured (e.g., CO~2~, water vapour). In Switzerland, there is a total of six such sites. Laegern is one of them. The data is stored in a `.csv` file. To import it into the R workspace, we use the function `read_csv()` from the tidyverse packages. In the other R code, you'll also encounter the base R `read.csv()` function. However, `read_csv()` is much faster and reads data into a tidyverse-data frame (a *tibble*) which has some useful additional characteristics, on top of a common R data frame. To tell the function where the data is located, pass the data's path as an argument. You can either enter an *absolute path*, starting from `C:/` on a Windows computer or `~/` on a Mac. Or, alternatively, you can provide a *relative path*, where `./` points to the present working directory and `../` is one level up, or `../../` is two levels up, etc.
 
@@ -280,7 +276,7 @@ class(df)
 
 Fundamentally, `df` is a `data.frame`. In addition, it is also of some other classes (`spec_tbl_df","tbl_df", "tbl"`)
 
-## Understand the data structure
+#### Understand the data structure
 
 We have loaded the data frame `df` into the workspace. Now, we can check the data structure. There are several functions to help you with this. Here is a non-exhaustive list of functions to get a sense of the content and structure of the data.
 
@@ -331,7 +327,7 @@ A description of standardized FLUXNET data variables is available [here](https:/
 - `TS` (deg C): soil temperature
 - `CO2` ($\mu$molCO~2~ mol$^{-1}$): Carbon Dioxide (CO$_2$) mole fraction in moist air
 
-## Selecting data and entering the tidyverse
+#### Selecting data and entering the tidyverse
 
 `df` has two dimensions (rows and columns). If we want to extract specific data from it, we need to specify the "coordinates" of this data. Row numbers come first, columns second.
 
@@ -376,7 +372,7 @@ df_small <- df %>%
 
 Note: In the code above, indentation was used to highlight which parts go together and make the code easily readable. Indentation and line breaks take no effect in R per se (unlike in other programming languages, e.g., Matlab, Python), but help to make the code legible.
  
-### Renaming
+#### Renaming
 
 TIMESTAMP_START, TA_F and PPFD_IN as variable names may be hard to remember and in this section you will have to type them a lot. Therefore we change their names to something more intelligle.
 
@@ -385,9 +381,34 @@ df_small <- df_small %>%
   rename(time = TIMESTAMP_START, temp = TA_F, ppfd = PPFD_IN)
 ```
 
-## R Objects
+#### Writing (saving) data
 
-### Data frames
+A data frame can be written to a CSV file by:
+
+```{r eval = F}
+write_csv(df_small, path = "df_small.csv")
+```
+
+The function `saveRDS()` lets you save individual objects of any form (not just a data frame). `saveRDS()` creates a binary file that is fast to write and read, but only intelligible to R. Such files are commonly identified by the suffix `.rds`. It is recommended to name the `.rds` files according to the single object they contain. For example:
+
+```{r eval=F}
+saveRDS(temp_sum, file = "temp_sum.rds")
+```
+
+This file can then be read into the R workspace. Sometimes, it's practical to give it a new name, e.g.:
+
+```{r eval=F}
+temp_sum2 <- readRDS("temp_sum.rds")
+```
+
+Note that making a file publicly available as a `.rds` file violates the FAIR principles. It's not *interoperable*. Therefore, whenever possible, save your data in a format that is readable across platforms without requiring proprietary software. Hence use `write_csv()` whenever possible. We'll encounter other non-proprietary formats that let you save and share more complex data structures in chapter \@ref(ch-02).
+
+
+
+
+### R Objects
+
+#### Data frames
 
 We have learned that `df` is a data frame. Data frames are the most common format used in R. You can think of them as a table that allows for different data types to be stored in each column. At the same time, all columns need to be of the same length and all values in a column need to be of the same data type. 
 
@@ -402,7 +423,7 @@ The most common data types in R are:
 
 However, there are many more data types. For now, we'll stick to these.
 
-### Vectors and classes
+#### Vectors and classes
 
 The contents of a data frame column is a *vector*. It can be "extracted" from its data frame by `pull`. Next, we're going to extract the values of the column `temp` and return the class of the entries in this vector. This type of sequence of commands (actually, a small workflow) can be implemented as a sequence of pipes:
 
@@ -444,7 +465,7 @@ temperatures < 0
 
 Indeed, the first 10 temperature values are all below freezing.
 
-### Lists
+#### Lists
 
 Lists are extremely flexible. They allow us to store different types of data, even if they are of different lengths. Here's an example where each element of the list is named.
 
@@ -489,7 +510,8 @@ mylist$mean_temperature
 
 This was a very condensed introduction to vectors and lists. A more complete introduction is given [here](https://r4ds.had.co.nz/vectors.html).
 
-## Data visualisation
+
+### Data visualisation
 
 Looking at data is an integral part of any data science workflow. In this chapter, we introduce just the very basics. In later chapters, you'll get introduced to additional methods for visualising data. Our data frame `fluxes_subset` contains three variables, one of which is `time`. In other words, we're dealing with a time series. Let's look at the temporal course of temperature in the first 1440 time steps (corresponding to 30 days) as a line plot (`type = "l"`)
 
@@ -520,9 +542,9 @@ Create a scatter-plot (points) of temperature versus the incoming photosynthetic
 plot(df_small$temp, df_small$ppfd)
 ```
 
-##Loops
+### Example code: Loops
 
-`for` and `while` loops exist in probably all programming languages. We introduce them here because they provide an essential and powerful functionality for solving many common tasks. You will encounter them later again... `for` and `while` loops let us repeatedly execute the same set of commands, while changing an index, or counter variable to take a sequence of different values. The following example calculates a temperature sum of the first ten values, by iteratively adding them together. Of course, this is equivalent to just using the `sum()` function. 
+`for` and `while` loops exist in probably all programming languages. We introduce them here because they provide an essential and powerful functionality for solving many common tasks. You will encounter them later again (see Chapter \@ref(ch-05). `for` and `while` loops let us repeatedly execute the same set of commands, while changing an index, or counter variable to take a sequence of different values. The following example calculates a temperature sum of the first ten values, by iteratively adding them together. Of course, this is equivalent to just using the `sum()` function. 
 
 ```{r}
 temp_sum <- 0
@@ -546,33 +568,12 @@ print(temp_sum)
 print(sum(df_small$temp[1:10]))
 ```
 
-## Writing data
 
-A data frame can be written to a CSV file by:
-
-```{r eval = F}
-write_csv(df_small, path = "df_small.csv")
-```
-
-The function `saveRDS()` lets you save individual objects of any form (not just a data frame). `saveRDS()` creates a binary file that is fast to write and read, but only intelligible to R. Such files are commonly identified by the suffix `.rds`. It is recommended to name the `.rds` files according to the single object they contain. For example:
-
-```{r eval=F}
-saveRDS(temp_sum, file = "temp_sum.rds")
-```
-
-This file can then be read into the R workspace. Sometimes, it's practical to give it a new name, e.g.:
-
-```{r eval=F}
-temp_sum2 <- readRDS("temp_sum.rds")
-```
-
-Note that making a file publicly available as a `.rds` file violates the FAIR principles. It's not *interoperable*. Therefore, whenever possible, save your data in a format that is readable across platforms without requiring proprietary software. Hence use `write_csv()` whenever possible. We'll encounter other non-proprietary formats that let you save and share more complex data structures in chapter \@ref(ch-02).
-
-## Where to find solutions
+### Where to find Help
 
 The material covered in this course will give you a solid basis for your future projects. Even more so, it provides you with code examples that you can adapt to your own purposes. Naturally, you'll face problems we didn't cover in the course and you'll need to learn more as you go. As a beginner, it can feel daunting to write a script from scratch. The good news is, you don't have to. Many people make their code available online and often others have faced similar problems. Modifying existing code might make it easier for you to get started.
 
-### Within R
+#### Within R
 
 "*I know the name of a function that might help solve the problem but I don't know how to use it.*" Typing a `?` in front of the function will open the documentation of the function. Let's say you've learned a lot about plots by now but you don't know how to make a boxplot:
 
@@ -594,21 +595,21 @@ args(boxplot)
 
 Note that it only looks through your installed packages.
 
-### Online
+#### Online
 
 To search in the entire library of R go to the website [rdocumentation.org](https://www.rdocumentation.org/) or turn to a search engine of your choice (ecosia, google, duckduckgo, bing,...). It will send you to the appropriate function documentation or a helpful forum where someone has already asked a similar question. Most of the time you'll end up on [stackoverflow.com](https://stackoverflow.com/), a forum where most questions have already been answered.
 
-### Error messages
+#### Error messages
 
 If you don't understand the error message, start by googling it. However, this is not always useful as developers rely on the error catching provided by R. To be more specific add the name of the function and package you're using.
 
-### Asking for help
+#### Asking for help
 
 If you can't find a solution online, start by asking your friends and colleagues. Someone with more experience than you might be able and willing to help you. When doing so think hard about how you state the problem. The key to receiving help is to make it as easy as possible to understand the issue your facing. Try to reduce what doesn't work to a simple example. Reproduce a problem with a simple data frame instead of one with thousands of rows. Generalize it in a way that people who don't do research in your field can understand the problem. If you're asking a question online in a forum include the output of `sessionInfo()` (it provides information about the R version, packages your using,...) and other information that can be helpful to understand the problem. stackoverflow.com has its own guidelines on how to ask a good question, stick to it. If your question is well crafted and hasn't been answered before you can sometimes get an answer within 5 minutes. [https://stackoverflow.com/help/how-to-ask](https://stackoverflow.com/help/how-to-ask)
 
 Finally, many packages have a mailing list or allow you to open a query on the code repository, where you can ask specific questions. The same is true for R itself. The R-Help mailing list [https://stat.ethz.ch/mailman/listinfo/r-help](https://stat.ethz.ch/mailman/listinfo/r-help) is read by many people. However, the tone of such mailing lists can be pretty dry and unwelcoming to new users. Be sure to use the right terminology or else you might get an answer pointing out your misuse of language instead of your problem. Also, be sure your question is valid. Or else you won't get an answer.
 
-## Further reading
+### Further reading
 
 A great tutorial to using R for Data Science in general is the freely available online-book by [Grolemund & Wickham](https://r4ds.had.co.nz/). The material covered in this chapter should serve as a "primer". That is, its purpose is to get you started with R and git and make sure you know the basics. If you feel that you are still missing some basic concepts of R, a good starting point to fill up your gaps is the [Chapter *Workflow: basics* in Grolemund & Wickham](https://r4ds.had.co.nz/workflow-basics.html). 
 
@@ -632,7 +633,7 @@ Before you go: Git looks a little different in Rstudio but essentially works the
 
 ![](./figures/gitrstudio.png)
 
-## Git denies pushing what can I do? *- supplementary*
+### SI: Git denies pushing what can I do?
 Most of the time when git denies you to push changes, it's because of merge conflicts. If you read the error message git will probably tell you to enter `git pull`. Go ahead and do so. If git cannot resolve a merge conflict automatically, you'll have to do it manually. Here, we show you how it's done.
 ![](./figures/merge1.png)
 

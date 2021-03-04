@@ -1,13 +1,13 @@
 # Data Scraping {#ch-04}
 
-***
+
 ## Introduction
 This chapter covers _data scraping_ in R and yes, this is not a typo. _Scraping_ means to gather or to extract whereas _scrapping_ means to get rid of something. The goal of the sections below is to gather and convert online data into a structured format that can be easily accessed and modified in R. As a case study, we will scrape data from a website containing various information about fish species, called [FishBase](https://www.fishbase.in/search.php).
 
 We will first learn how to access the website and how to extract useful useful information from plain text. Then, we will look at how to access a table that is embedded in the website and how to generate a new table in R which holds all information we want to extract. Next up is cleaning up the scraped data for visualization and analysis. At the end we will conduct a case study where we create a model to make predictions about fish species richness.  
 
-***
-## Theory
+
+### Theory
 
 Let us first have a brief review of the main concept of the lecture. The web is the largest source of information and often free to access. In some cases the information is already presented in a nice format and can be easily copied into an excel spreadsheet. However, this is often not the case and data-sets are only presented in a format that is not easy to download or modify. Manually copying data from different sub pages and sections is a tedious, slow and error prone approach. We therefore need a more automated and efficient technique to access such data.
 
@@ -31,8 +31,8 @@ knitr::include_graphics(rep("./figures/node-tree.png"))
 
 Next, we will demonstrate the principles of web scraping using a simple case study. We will extract fish occurrence data from an online database and perform some basic correlations with the obtained data. 
 
-***
-## Web Scraping Applied
+
+## Tutorial
 ### R-Packages and Functions
 
 We will now load all packages necessary to perform web scraping on FishBase, namely `RCurl` and `XML`. `RCurl` provides functions to allow us to compose general HTTP requests and provides convenient functions to fetch URLs via get and post requests and process the results returned by the web server.
@@ -73,7 +73,7 @@ As an example we can have a look at the cars data where the speed and respective
 df %>% sapply(min)
 df %>% lapply(min)
 ```
-***
+
 ### The FishBase website
 
 [FishBase](https://www.fishbase.in/search.php) is a global species database of fish species. It provides data of various fish species, including information on taxonomy, geographical distribution, biometrics and morphology, behaviour and habitats, ecology and population dynamics as well as reproductive, metabolic and genetic data. Different tools, such as trophic pyramids, identification keys, biogeographical modelling and fishery statistics can be accessed on the website. Furthermore, direct species level links to information in other databases such as LarvalBase, GenBank, the IUCN Red List and the Catalog of Fishes exist. As of November 2018, FishBase included descriptions of 34,000 species and subspecies.
@@ -90,7 +90,7 @@ As shown in Figure \@ref(fig:screen), the website contains lots of information f
 - Pictures and videos (of the species, embedded into HTML code)
 
 For a better understanding of the following R code, you are strongly encouraged to have a look at the [FishBase](https://fishbase.de) website in your browser. In the next sections you will learn how to deal with these different complex data types. A careful approach is required when extracting and downloading such information. Understanding the structure of the website is an important first step and it will save you coding time. So, always identify the relevant information you want to extract first and then write a suitable extraction code which fits the needs of your machine learning algorithm.
-***
+
 ### Accessing FishBase
 
 We are now ready to extract data from the *Coregonus lavaretus* website on [FishBase](https://fishbase.de). For this we first create a string object which holds the name of the fish profile we want to access. Using a variable to do this, adds flexibility in functions as will be shown below. If we want to get data about other species we can simply assign a new value to the object `x`with the desired species name. 
@@ -110,7 +110,7 @@ url
 
 For `url` we could also directly use *http://www.fishbase.de/summary/Coregonus-lavaretus* but then we would loose flexibility if we want to look for information about other species.
 
-***
+
 **Checkpoint**
 Try to do the same for the URL of other species by changing the code above.
 
@@ -122,7 +122,7 @@ x_ex<- "Salvelinus alpinus"
 # Concatenate the URK
 url_ex <- paste("http://www.fishbase.de/summary/",x_ex,".html",sep="")
 ```
-***
+
 
 To access the URL and its HTML documents, we will use various functions from the `XML` package. First, we want to get the URL content using `getURLContent()` which takes a URL as input argument. Then, we use `htmlParse()` to read the HTML document from the URL content into an R object. To get help on functions we can always use `help("htmlParse")`.
 
@@ -158,7 +158,7 @@ knitr::include_graphics(rep("./figures/before.png"))
 ```{r after, echo=FALSE, fig.cap='`fishbase` after the command `getNodeSet()`'}
 knitr::include_graphics(rep("./figures/after.png"))
 ```
-***
+
 ### Scraping Numbers
 
 Next, we now want to extract the maximal body length of *Coregonus lavaretus* out of the list of nodes we created in the previous section. For this, we will use the function `xmlValue()` which allows us to access the text in the nodes by converting them into strings. To proceed further, we briefly have a look at regular expressions.
@@ -205,7 +205,7 @@ To demonstrate fexibility in data reading: This entire approach can also be used
 max_length <- as.double(max_length)
 max_length
 ```
-***
+
 ### Scraping Text Snippetrs
 #### International Union for Conservation of Nature {-}
 
@@ -259,7 +259,7 @@ IUCN_sta <- IUCN_xml %>%
 
 IUCN_sta
 ```
-***
+
 ### Scraping Tables
 
 The next step is to read a table from a website. Here, we are going to get information on the eggs of  *Coregonus lavaretus*. Have a look at its [profile](https://www.fishbase.de/summary/Coregonus-lavaretus.html). In section **Life cycle and mating behavior** you can see that the table for information on eggs is a link and not a table directly. Foruntatley for us, we can use the function `getHTMLLinks()` to retrieve links within an HTML document or the collection of names of external files referenced in an HTML document. In Figure \@ref(fig:eggs), an extract is shown of the list with more than 100 links found on the profile page.
@@ -280,7 +280,7 @@ knitr::include_graphics(rep("./figures/eggs.png"))
 knitr::include_graphics(rep("./figures/outputlink.png"))
 ```
 
-***
+
 **Checkpoint**
 Call the variable *egg_link*, you will notice the link begins with '..' (see above \@ref(fig:outputlink)). Try to remove these dots so that the link begins with '/Reproduction/.. '. As a hint, you can use the function `str_replace()` as was done above. You will need this code later, so make sure that you run it.
 
@@ -293,7 +293,7 @@ Call the variable *egg_link*, you will notice the link begins with '..' (see abo
 egg_link <- egg_link %>% str_replace("..", "" )
 egg_link
 ```
-***
+
 
 As you can see, this is no proper URL yet. Thus, we first need to create a working URL to access its content. Similarly to what we did previously, we do this using the function `getURLContent()`. Since we know that this link leads to a table, we can pipe the URL content into `readHTMLTable()`. The output here is a list and we have access the first object as done below.
 
@@ -326,7 +326,7 @@ species_df <- tibble(Species = "Coregonus-lavaretus", Length = max_length, IUCN 
 species_df
 ```
 
-***
+
 **Checkpoint**
 Try to create and add a new variable *egg_color* to the data frame and feed it with the respective information from our `egg_table` (follow the same process used for 'egg_shape'). 
 
@@ -343,7 +343,7 @@ species_df
 
 ```
 
-***
+
 ### The Fishbase Package
 #### Using an API {-}
 
@@ -362,7 +362,7 @@ In the next step we are interested to get information about the diet of *Coregon
 food <- diet_items("Coregonus lavaretus") %>% as_tibble
 food %>% dplyr::select(FoodI, FoodII) %>% head() # We're using dplyr:: here to avoid package conflicts
 ```
-***
+
 **Checkpoint**
 Now your next task is to get information on predators (hint: the function is exactly named like that).
 
@@ -377,7 +377,7 @@ pre <- predators("Coregonus lavaretus")
 pre %>% dplyr::select(PredatorName) %>% head()
 ```
 
-***
+
 
 #### Limits of APIs {-}
 
@@ -389,14 +389,14 @@ One of the major limitations of an API is that we can only use already implement
 - We saw that this can be done either with web scraping or using APIs. 
 - We saw that web scraping can be tedious, but we learned about some limitations of APIs.
 
-***
+
 ## Case Study: Species Richness and Red List species proportions
 
 *Please note that the code below is written in base R and not tidyverse which makes the codes a bit more difficult to read. But do not worry about this and simply just enjoy the beauty of what R is capable of.*
 
 Next, we look at another case study on species richness and red list species proportions. To proceed with the case study we need to prepare our dataset. First, we need to get a list of species for the dataset. In this subsection we will see how to get all the species in a given family.
 
-***
+
 ### Creating List of Species
 
 In this section, we want to get all the species of the family of *Salmonidae*. As we did above, for flexibility we will create an object _x_ with the name of the family and use `paste()` to get the link.
@@ -423,7 +423,7 @@ sp_per_family <- str_replace(sp_per_family, " ", "-")
 sp_per_family[1]
 ```
 
-***
+
 ### Extracting IUCN Status for all species
 
 In this section, we are going to get the IUCN Status for a given List of species using a 'for loop'. We will extract the IUCN Status of all the species from the Netherlands.
@@ -476,7 +476,7 @@ We can see which IUCN statuses are present in Netherlands by using the `unique()
 unique(subset$IUCN)
 ```
 
-***
+
 ### Proportion of species in Netherlands
 
 We will now plot the proportion of species in each category for the Netherlands. So let us calculate the number of species in each category (from above we just have 2 outputs,* *LC* & *NT*). In general in other countries, we also have other IUCN Status, for example, VU. In this section, we will focus only on the two listed statuses. Using the function `length()` we can obtain the number of species in each category.
@@ -501,7 +501,7 @@ lbls <- c("LC","NT", "NA")
 pie(slices, labels = lbls, font.main = 1, 
 main = "Proportion of species per IUCN Status in Netherlands", col=c("red", "yellow", "grey")) 
 ```
-***
+
 ### Cleaning data with IUCN Status
 
 In this part of the tutorial, we have to clean the data that we will use for the correlations. We have provided the dataset already with the IUCN status since the code needs a lot of time to run, but the procedure is exactly the same as we did in the previous sections. So, let us load the dataset, it's called *datasetIUCN*.
@@ -548,7 +548,7 @@ ggplot() + geom_polygon(data = fort_basin, aes(x = long, y = lat, group = group)
 knitr::include_graphics(rep("./figures/output_186_0.png"))
 ```
 
-***
+
 ### Maps of species richness and Red List species proportions
 #### Preparing data {-}
 
@@ -710,7 +710,7 @@ ylab("Species Richness") +
 theme_classic()
 ```
 
-***
+
 **Checkpoint**
 You have now seen how you can calculate and plot the confidence interval of your data. Based on your model you can also create a so-called **prediction interval** which gives an estimate of the range in which the model will most likely predict the y-values (for a given x-value). In our case the prediction interval would indicate in which range the model would expect the fish richness to be for a given basin surface area. Do you think that these prediction intervals will be broader or narrower than the confidence interval? Try to write the code for calculating and plotting the prediction intervals by yourself.
 
@@ -736,18 +736,14 @@ lines(model_df_prediction$log_area, model_df_prediction$lwr, col='skyblue2', lwd
 lines(model_df_prediction$log_area, model_df_prediction$upr, col='skyblue2', lwd=2, lty=3)
 ```
 
-***
 
-## References
 
-* Automated Data Collection with R, S. Munzert, C. Rubba, P. Meißner and D. Nyhuis
-* XML and Web Technologies for Data Sciences with R, D. Nolan, D. Temple Lang
+### Additional Resources
+
 * http://www.columbia.edu/~cjd11/charles_dimaggio/DIRE/styled-4/styled-6/code-13/
 * https://ourcodingclub.github.io/tutorials/webscraping/
 * https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
 
-
-***
 ## Exercise
 
 For this week's exercise open up the Rstudio environment. Remember to save all your changes to this notebook using git status, git add <filename>, git commit -m "your comment", git push.
@@ -758,7 +754,7 @@ Get in touch with your teaching assistant if you have any further questions.
 
 This exercise is about getting the data from the web. Once you have finished the exercise please 'knit' this document to create an .html file, export it and upload it to moodle. 
 
-## Part 1: Get the data
+### Part 1: Get the data
 
 a. Following the steps described in the tutorial, get the maximal length of the species *Salvelinus alpinus* and the *Salmo trutta* using an API. After fetching the values create a table to store these values in one dataframe. 
 
@@ -773,7 +769,7 @@ b. Get the **IUCN Status** and **eggs shape** for *Salvelinus alpinus* and *Salm
 ```
 
 
-## Part 2: Get all the species in a family and the IUCN status
+### Part 2: Get all the species in a family and the IUCN status
 
 a. Your next task is to get all the species in the family _'Neoscopelidae'_ and print the first 5 elements of the family.
 
@@ -794,7 +790,7 @@ c. Now, use the information you got above to plot the proportion of species in e
 ```
 
 
-## Part 3: Extract the temperature of the species  
+### Part 3: Extract the temperature of the species  
 
 Extract the mean temperature for **Coregonus lavaretus** and **Salvelinus alpinus** using the function `stocks()` from `rfishbase` package and store the values in a new dataframe.
 

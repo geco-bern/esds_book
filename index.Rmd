@@ -4,10 +4,11 @@ author: "Loïc Pellissier, Joshua Payne, Benjamin Stocker"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
-bibliography: [book.bib, packages.bib]
+bibliography: [book.bib] # Packages.bib excluded
 biblio-style: apalike
-link-citations: yes
-description: "Text book and exercises. ETH Zürich"
+link-citations: true
+nocite: '@*'
+description: "Text book and exercises for the course Environmental System Data Science at ETH Zürich."
 ---
 
 # Prerequisites {-}
@@ -17,6 +18,7 @@ Students are introduced to a typical data science workflow using various example
 
 ## Course Objectives {-}
 The students are able to
+
 - frame a data science problem and build a hypothesis
 - describe the steps of a typical data science project workflow
 - conduct selected steps of a workflow on specifically prepared datasets, with a focus on choosing, fitting and evaluating appropriate algorithms and models
@@ -60,5 +62,5 @@ conflict_prefer("mse", "Metrics")
 ```
 
 ```{r global-options, include=FALSE}
-knitr::opts_chunk$set(out.width = "50%", fig.align = "center", echo=FALSE, warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(out.width = "50%", fig.align = "center", warning=FALSE, message=FALSE)
 ```
