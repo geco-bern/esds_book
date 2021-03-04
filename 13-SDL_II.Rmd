@@ -27,7 +27,7 @@ In this tutorial, we will put into practice and apply many of the models seen ea
 
 Using the eddy-covariance technique, it is possible to measure the CO~2~ gas exchange fluxes between the vegetation and the atmosphere at high temporal resolution and throughout the year (see Figure \@ref(fig:eddytower). This is a key scientific measurement, for studying as an example the CO~2~ cycle. Technical details on the measurement can be found [here](https://en.wikipedia.org/wiki/Eddy_covariance).
 
-```{r eddytower, out.width=25% fig.cap="Close-up of measuring device for $CO_2$ and other environmental parameters that is attached to eddy covariance towers . Image taken from [Wikipedia](https://upload.wikimedia.org/wikipedia/commons/5/52/Eddy_Covariance_IRGA_Sonic.jpg)."}
+```{r eddytower, out.width="25%", fig.cap="Close-up of measuring device for $CO_2$ and other environmental parameters that is attached to eddy covariance towers. Image taken from [Wikipedia](https://upload.wikimedia.org/wikipedia/commons/5/52/Eddy_Covariance_IRGA_Sonic.jpg)."}
 knitr::include_graphics("./figures/13_eddytower.jpg")
 ```
 
@@ -149,7 +149,7 @@ cat("Size of training set is ", length(y_train), "\n",
 ```
 
 Let 's have a look at the distribution of CO~2~ flux by tower displayed in Figure \@ref(fig:tower-dist).
-```{r tower-dist, out.width = 75%, fig.cap="Distribution of CO~2~ Flux by Tower."}
+```{r tower-dist, out.width = "75%", fig.cap="Distribution of CO~2~ Flux by Tower."}
 knitr::include_graphics("./figures/Distribution_per_Tower.png")
 ```
 

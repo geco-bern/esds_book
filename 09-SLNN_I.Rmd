@@ -119,7 +119,7 @@ knitr::include_graphics("./figures/Chollet_Fig1.5.jpg")
 
 Below we define a function for building and training the simple model `y = wx + b` using gradient descent. While this task does not require a sophisticated artificial neural network, recall from lecture video 9B (nonlinear problems) that this task can be formulated using a network schematic, so the tools for training sophisticated artificial neural networks are also applicable in this simpler context. Thus, for this example, we only need a single layer of a single unit.
 
-```{r network, echo = F, fig.cap="Visualization of a neural network with one layer and one neuron. Figure from [Deep Learning with Python](https://www.manning.com/books/deep-learning-with-python)."}
+```{r network-ch, echo = F, fig.cap="Visualization of a neural network with one layer and one neuron. Figure from [Deep Learning with Python](https://www.manning.com/books/deep-learning-with-python)."}
 knitr::include_graphics("./figures/network.png")
 ```
 Notice the inputs to `build_and_train_model` function: 
@@ -700,7 +700,7 @@ Recall from lecture 9B (nonlinear problems), that by applying a sigmoid function
 
 Let's consider a hypothetical binary classification example. That is, assume $y$ either takes the value $0$ (no cat) or $1$ (cat). We are interested in modeling the relation between $P(Y=1|x)$ and $x = (x_1,x_2,...,x_n)$. The aforementioned relation can be defined as $P(Y=1|x) = \sigma(w_1x_1 +...+ w_nx_n + b)$, where $\sigma(t) = \frac{1}{1+e^{-t}}$. Figure \@ref(fig:log_fun) shows what such a logistic function looks like.
 
-```{r log_fun, echo = F, fig.cap="Visualization of a logistic function.}
+```{r log_fun, echo = F, fig.cap="Visualization of a logistic function."}
 knitr::include_graphics("./figures/log_fun.jpg")
 ```
 
