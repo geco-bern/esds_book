@@ -347,9 +347,11 @@ This shows that _accuracy_ has its limitations as a model performance metric and
 * `False positives`: The number of negative examples predicted to be positive **(+ / -)**
 * `False negatives`: The number of positive examples predicted to be negative **(- / +)**
 
-These metrics can be summarized in the so-called **_confusion matrix_**.
+These metrics can be summarized in the so-called **_confusion matrix_** displayed in Figure \@ref(fig:confusion).
 
-![](./figures/confusion-matrix.png)
+```{r confusion, echo = F, fig.cap="Visualization of a confusion matrix"}
+knitr::include_graphics("./figures/confusion-matrix.png")
+```
 
 In this toy dataset, we'll call the $\color{blue}{\text{blue}}$ examples $\color{blue}{\text{'positive'}}$ and the $\color{green}{\text{green}}$ examples $\color{green}{\text{'negative'}}$. This terminology makes more sense in more realistic classification problems, such as delineating spam email from non-spam.
 
@@ -389,29 +391,24 @@ c(true_positives, true_negatives, false_positives, false_negatives) %<-% confusi
 ```
 
 ```{r echo = F}
-cat('true positives: 1203 \n')
-cat('true negatives: 0 \n')
-cat('false positives: 796 \n')
-cat('false negatives: 0 \n')
+cat('true positives: 1203 \n',
+    'true negatives: 0 \n',
+    'false positives: 796 \n',
+    'false negatives: 0 \n')
 ```
 
-This reveals a more nuanced picture of model performance. Sure, accuracy is better than a coin toss, but we now see that we do not correctly predict _a single negative example_. 
+This reveals a more nuanced picture of model performance. Sure, accuracy is better than a coin toss, but we now see that we do not correctly predict _a single negative example_. These four metrics are the basis for two additional, commonly used performance metrics (see Figure \@ref(fig:cf-metrics):
 
-These four metrics are the basis for two additional, commonly used performance metrics:
-
-This reveals a more nuanced picture of model performance. Sure, accuracy is better than a coin toss, but we now see that we do not correctly predict _a single negative example_. 
-
-These four metrics are the basis for two additional, commonly used performance metrics:
-
-- **precision**: $\frac{\mbox{TP}}{\mbox{TP + FP}}$
+- **Precision**: $\frac{\mbox{TP}}{\mbox{TP + FP}}$
+  tells us the proportion of positive predictions that were actually correct.
 - **recall**: $\frac{\mbox{TP}}{\mbox{TP + FN}} = \frac{\mbox{TP}}{\mbox{P}}$
+  tells us the proportion of positive examples that were correctly predicted to be positive. 
 
-![](./figures/1200px-Precisionrecall.svg.png)
-
-**_Precision_** tells us the proportion of positive predictions that were actually correct, whereas **_Recall_** tells us the proportion of positive examples that were correctly predicted to be positive. 
+```{r cf-metrics, echo = F, fig.cap = "Difference of Precision and Recall in classification problems."}
+knitr::include_graphics("./figures/1200px-Precisionrecall.svg.png")
+```
 
 Let's define a function that calculates precision and recall.
-
 
 ```{r}
 precision_and_recall <- function(true_positives, true_negatives,false_positives, false_negatives, verbose=T){
@@ -1066,8 +1063,8 @@ cat('Proportion of data in class green: ' , 1 - sum(df_new$y) / length(df_new$y)
 ```
 
 ```{r echo = F}
-cat("Proportion of data in class blue:  0.1817 ")
-cat("Proportion of data in class green:  0.8183 ")
+cat("Proportion of data in class blue:   0.1817 \n",
+    "Proportion of data in class green:  0.8183 ")
 ```
 
 Our data now are now heavily imbalanced with 82% of examples in the negative class. 

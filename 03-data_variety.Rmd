@@ -94,7 +94,7 @@ The second part is the bonus part, there we will discuss trait data and the prin
 
 We'll be starting off this tutorial with an example on using remote sensing data. We'll focus on a Fluxnet site already familiar to you: CH-Lae. The Lägern site is located on a mountain in the Swiss Plateau NW of Zürich and is surrounded by managed mixed deciduous mountain forests. The forest is highly diverse and dominated by beech. In the following figures, you can get an impression of the tower and its surroundings. 
 
-```{r, echo=FALSE, out.width="32%", out.height="49%", fig.show='hold', fig.align='center', fig.cap="Images of Fluxnet sites and measurement station."}
+```{r, echo=FALSE, out.width="32%", out.height="49%", fig.show='hold', fig.cap="Images of Fluxnet sites and measurement station."}
 knitr::include_graphics(c("./figures/site1.jpg",
                           "./figures/site2.jpg",
                           "./figures/site3.jpg"))

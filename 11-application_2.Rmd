@@ -217,7 +217,7 @@ test_target <- as.matrix(test_target)
 Now we can build a sequential model with keras. Define a model with 1 hidden layer with 20 units, and 1 output unit, for the target variable. Remember to specify a non-linear activation such as Sigmoid or ReLU for the hidden layer, and a linear activation function for the output unit (as it is a regression task). If we don't specify a non-linear activation we will just be training a linear mapping! 
 When compliling the model take care to use appropriate optimiser, loss and evaluation metric. Use mean squared error as the loss, and mean absolute error as the evaluation metric 
 
-*Side Note*: Since our model is not very deep in this application (only 1 hidden layer), we can use any of the non-linear activations (tanh, sigmoid, or ReLu), but in practice when we train deep neural networks (with a large number of hidden layers) we prefer to use ReLU as the activation function, as it does not suffer from the problem of Vanishing or Exploding gradients (which happens if we use sigmoid or tanh). In a nutshell : In a network of n hidden layers, n derivatives will be multiplied together. If the derivatives are large then the gradient will increase exponentially as we propagate down the model until they eventually explode, and this is what we call the problem of exploding gradient. Alternatively, if the derivatives are small then the gradient will decrease exponentially as we propagate through the model until it eventually vanishes, and this is the vanishing gradient problem. ![Source for the interested] (https://towardsdatascience.com/the-vanishing-exploding-gradient-problem-in-deep-neural-networks-191358470c11).
+*Side Note*: Since our model is not very deep in this application (only 1 hidden layer), we can use any of the non-linear activations (tanh, sigmoid, or ReLu), but in practice when we train deep neural networks (with a large number of hidden layers) we prefer to use ReLU as the activation function, as it does not suffer from the problem of Vanishing or Exploding gradients (which happens if we use sigmoid or tanh). In a nutshell : In a network of n hidden layers, n derivatives will be multiplied together. If the derivatives are large then the gradient will increase exponentially as we propagate down the model until they eventually explode, and this is what we call the problem of exploding gradient. Alternatively, if the derivatives are small then the gradient will decrease exponentially as we propagate through the model until it eventually vanishes, and this is the vanishing gradient problem. [Source for the interested] (https://towardsdatascience.com/the-vanishing-exploding-gradient-problem-in-deep-neural-networks-191358470c11).
 
 ```{r eval = F}
 ## Define and compile the model 
@@ -290,7 +290,7 @@ plot(history, smooth = getOption("keras.plot.history.smooth", TRUE))
 get_weights(model)
 ```
 
-[ ](./figures/11_output-history.png)
+![ ](./figures/11_output-history.png)
 
 ```{r}
 ## [[1]]
@@ -409,7 +409,7 @@ print(eval_result)
 ## [1] 3.288165
 ```
 
-[ ](./figures/11_output-test.png)
+![ ](./figures/11_output-test.png)
 
 Next we can plot the model predictions with along with the ground truth for the test and training dataset. Check if the model predictions actually follow the trend in the data. 
 
@@ -426,7 +426,7 @@ plt_2
 ## Hint: For both the plots above, edit the alpha value such that the test data observations and the test data predictions both can be seen even with overlap 
 ```
 
-[ ](./figures/11_output-train.png)
+![ ](./figures/11_output-train.png)
 
 Nice! From our domain knowledge we know that the target varible GPP_NT_VUT_REF cannot be negative, but our dataset contains some negative observations because of noisy measurements. From the plot we see that the model learns the trends in the data, without learning the noise.
 
@@ -438,7 +438,7 @@ plt3 <- ggplot(test_split, aes(x = test_target, y=test_data_predictions)) + geom
 plt3
 ```
 
-[ ](./figures/11_output-scatter.png)
+![ ](./figures/11_output-scatter.png)
 
 What is the Pearson's correlation coefficient obtained for this? 
 
@@ -760,10 +760,12 @@ cross_validate_model <- function(train_split, num_units, num_epochs){
     }
 ```
 
-[ ](./figures/11_output-loss1.png)
-[ ](./figures/11_output-loss2.png)
-[ ](./figures/11_output-loss3.png)
-[ ](./figures/11_output-loss4.png)
+
+
+![ ](./figures/11_output-loss1.png)
+![ ](./figures/11_output-loss2.png)
+![ ](./figures/11_output-loss3.png)
+![ ](./figures/11_output-loss4.png)
 
 ```{r eval = F}
 loss_list <- rep(NA, 5)
@@ -775,7 +777,7 @@ loss_list <- rep(NA, 5)
 }
 ```
 
-[ ](./figures/11_output-mse.png)
+![ ](./figures/11_output-mse.png)
 
 Next you need to write a function to iterate over the list of hyper-parameters. In each iteration we iterate over a list of the possible number of hidden units, and compute the average cross-validation error. 
 
@@ -837,7 +839,7 @@ print(tune_results)
 plot(num_units, tune_results, type = "b")
 ```
 
-[ ](./figures/11_output-tune.png)
+![ ](./figures/11_output-tune.png)
 
 ```{r eval = F}
 ## What is the number of hidden units that gives the minimum loss ? 

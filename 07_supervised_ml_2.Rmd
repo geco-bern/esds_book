@@ -25,9 +25,11 @@ To tune a model, you can set *hyperparameters* that determine model structure or
 
 ### Model training and the loss function
 
-You've seen in Video 6A that model training in supervised ML is guided by the match (or mismatch) between the predicted and observed target variable(s), that is, between $\hat{Y}$ and $Y$. The *loss* function quantifies this mismatch ($L(\hat{Y}, Y)$), and the algorithm takes care of progressively reducing the loss during model training. Let's say the ML model contains two parameters and predictions can be considered a function of the two ($\hat{Y}(w_1, w_2)$). $Y$ is actually constant. Thus, the loss function is effectively a function $L(w_1, w_2)$. Therefore, we can consider the model training as a search of the parameter space of the machine learning model $(w_1, w_2)$ to find the minimum of the loss. Common loss functions are the root mean square error (RMSE), or the mean square error, or the mean absolute error.
+Model training in supervised ML is guided by the match (or mismatch) between the predicted and observed target variable(s), that is, between $\hat{Y}$ and $Y$. The *loss* function quantifies this mismatch ($L(\hat{Y}, Y)$), and the algorithm takes care of progressively reducing the loss during model training. Let's say the ML model contains two parameters and predictions can be considered a function of the two ($\hat{Y}(w_1, w_2)$). $Y$ is actually constant. Thus, the loss function is effectively a function $L(w_1, w_2)$. Therefore, we can consider the model training as a search of the parameter space of the machine learning model $(w_1, w_2)$ to find the minimum of the loss. Common loss functions are the root mean square error (RMSE), or the mean square error, or the mean absolute error.
 
-![](./figures/loss_plane.png)
+```{r, echo = FALSE, fig.cap = "Visualization of a loss function as a plane spanned by the two parameters $w_1$ and $w_2$."}
+knitr::include_graphics("./figures/loss_plane.png")
+```
 
 Loss minimization is a general feature of ML model training. Practically all ML algorithms have some "knobs" to turn in order to achieve efficient model training and predictive performance. What these knobs are, depends on the ML algorithm.
 
@@ -39,9 +41,12 @@ Model training is implemented in R for different algorithms in different package
 
 As for practically all ML algorithms, there are free parameters that determine their characteristics and how the learning operates - *hyperparameters*. Turning back to the analogue of the ball and the loss depression, imagine the effect of how fast the ball mentioned before is rolling. If it rolls too fast (that is if the "jump" of the parameter search is too large), it descends into the depression fast but may shoot beyond the minimum and it has to do a "180-degrees turn" and continue the search. That's not very efficient. On the other extreme, a very slowly rolling ball (the parameter space is searched with small jumps) will take much longer to arrive at the bottom of the depression. Hence, there is an optimum in between. This "size of the jump" is called the *learning rate*, and it usually has to be tuned for optimal performance of model training of artificial neural networks. Other ML algorithms have other types of hyperparameters. While some hyperparameters determine the performance of the model training, other hyperparameters are decisive for the model's predictive skills. Hyperparameters are not to be confused with the model coefficients. For example, in linear regression, the number of predictors can be considered a hyperparameter, while the values of $\beta$ are the coefficients. In general, hyperparameters determine the *structure* of the algorithm.
 
-Let's turn to the K-nearest neighbour (KNN) algorithm as an example. In KNN, the hyperparameter is $k$. That is, the number of neighbours to consider taking their mean. With KNN, there is always an optimum $k$. Obviously, if $k = n$, we consider all observations as neighbours and each prediction is simply the mean of all observed target values $Y$, irrespective of the predictor values. This cannot be optimal and such a model will likely underfit. On the other extreme, with $k = 1$, the model will be strongly affected by the noise in the single nearest neighbour and its generalisability will suffer. This should be reflected in a poor performance on the validation data. Indeed, it is, as the figure below illustrates.
+Let's turn to the K-nearest neighbour (KNN) algorithm as an example. In KNN, the hyperparameter is $k$. That is, the number of neighbours to consider taking their mean. With KNN, there is always an optimum $k$. Obviously, if $k = n$, we consider all observations as neighbours and each prediction is simply the mean of all observed target values $Y$, irrespective of the predictor values. This cannot be optimal and such a model will likely underfit. On the other extreme, with $k = 1$, the model will be strongly affected by the noise in the single nearest neighbour and its generalisability will suffer. This should be reflected in a poor performance on the validation data. Indeed, it is, as the Figure \@ref(fig:hyper) illustrates.
 
-![](./figures/knn_hyperparameter_tuning.png)
+```{r hyper, echo = FALSE, fig.cap = "Improvement in RMSE on validation data with increasing number of neighbours."}
+knitr::include_graphics("./figures/knn_hyperparameter_tuning.png")
+```
+
 You will encounter different hyperparameters for neural networks in later chapters.
 
 In **caret**, hyperparameter tuning is implemented as part of the `train()` function. Values of hyperparameters to consider are to be specified by the argument `tuneGrid`, which takes a data frame with column(s) named according to the name(s) of the hyperparameter(s) and rows for each combination of hyperparameters to consider. More explicit examples follow below.
@@ -54,9 +59,9 @@ But how can the generalisability be assessed when the testing set is held out co
 
 The challenge to be met here is that we further reduce the number of data points in the resampled training and validation sets which may lead to evaluation statistics not being sufficiently robust and bears the potential that we're training to some peculiarities in the (relatively small) validation set. In order to control for this, common practice is to do multiple resamples (multiple *folds* of training-validation splits), determine the validation error on each fold of the validation set and consider the mean validation error across all folds. This is called *k-fold cross validation*.
 
-![](../data/images/cv.png)
-
-Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/process.html#k-fold-cross-validation).
+```{r, echo = FALSE, fig.cap = "Example of 5-fold cross validation. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/process.html#k-fold-cross-validation)."}
+knitr::include_graphics("./figures/cv.png")
+```
 
 There is no formal rule about the number of folds and hence the number of data points in each training and testing fold. _Leave-one-out_ cross validation is an extreme variant of k-fold cross validation, where k equals the number of data points in the full set of training data.
 
@@ -100,7 +105,7 @@ Now, we know enough to turn to the implementation of a full model training workf
 
 We've learned about the danger of *data leakage*. It happens when information from the testing data somehow finds its way into the training step. This is relevant not only for leakage from the testing set to the training set determined from the initial split but also for the resampling splits within each resample fold. Therefore, we should apply the pre-processing blueprint independently on each fold. For example, we should do the centering and scaling by subtracting the mean and dividing by the standard deviation, where the mean and standard deviation are calculated separately on each fold of the training resamples (not including the validation resample). This is illustrated in Figure \@ref(fig:leakage).
 
-```{r leakage, fig.cap='Visualization of data leakage. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/engineering.html#proper-implementation)'.}
+```{r leakage, echo = FALSE, fig.cap='Visualization of how data leakage can be avoided. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/engineering.html#proper-implementation).'}
 knitr::include_graphics("./figures/minimize-leakage.png")
 ```
 
@@ -223,9 +228,11 @@ In previous chapters, you have already encountered different metrics that can be
 
 #### Metrics for regression models
 
-Different metrics measure, for example, the correlation between modelled and observed values or the magnitude of the errors. To get an intuitive understanding of their different abilities, compare the following scatterplots and how different aspects of the model-data agreement are measured by different metrics. Their definitions will follow below.
+Different metrics measure, for example, the correlation between modeled and observed values or the magnitude of the errors. To get an intuitive understanding of their different abilities, compare the scatterplots in Figure \@ref(fig:metrics) and how different aspects of the model-data agreement are measured by different metrics. Their definitions will follow below.
 
-![](./figures/correlation_error.png)
+```{r metrics, echo = FALSE, fig.cap = "Comparison of model metrics on different data sets."}
+knitr::include_graphics("./figures/correlation_error.png")
+```
 
 - **MSE**: The mean squared error is defined, as its name suggests, as:
 $$
@@ -583,8 +590,10 @@ For a selected predictor (x)
 
 As the steps explain, PDPs plot the change in the average predicted value ($\hat{y}$) as a function of a specified feature. As you will see in later chapters, PDPs become more useful when non-linear relationships are present. However, PDPs of linear models help illustrate how a fixed change in $x_i$ relates to a fixed linear change in $\hat{y_i}$ while taking into account the average effect of all the other features in the model. For linear regression models, the slope of the PDP is equal to the corresponding coefficient of the model.
 
-Considering the illustration (from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/images/pdp-illustration.png)), to compute the PDP of target variable with respect to Gr_Liv_Area, we modify the values of this variable for all the rows in the data set, for each [j1, j2, ..., j20] in the grid. Feed this modified dataset to the pre-trained model and compute the mean of our target variable (mean taken over all rows). Finally at the end of the algorithm we have 20 mean responses of the target variable for 20 different values of Gr_Liv_Area. Finally we plot the mean response of the target variable with respect to the changing variable Gr_Liv_Area to get the parital dependence plot. 
-![](./figures/pdp-illustration.png)
+Considering Figure \@ref(fig:pdp), to compute the PDP of target variable with respect to Gr_Liv_Area, we modify the values of this variable for all the rows in the data set, for each [j1, j2, ..., j20] in the grid. Feed this modified dataset to the pre-trained model and compute the mean of our target variable (mean taken over all rows). Finally at the end of the algorithm we have 20 mean responses of the target variable for 20 different values of Gr_Liv_Area. Finally we plot the mean response of the target variable with respect to the changing variable Gr_Liv_Area to get the parital dependence plot. 
+```{r pdp, echo = FALSE, fig.cap = "Visualiation of a partial dependence plot (from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/images/pdp-illustration.png))."}
+knitr::include_graphics("./figures/pdp-illustration.png")
+```
 
 Lucky for us, this code has already been implemented in the `pdp` package in R.  We use the `partial()` function to plot the partial dependence plot for a single predictor variable, `PPFD_IN` or `VPD_F`, or for a subset of both these variables. Since our models are linear, we expect the PDP curves to be linear as well. The first curve shows a positive linear relationship between `PPFD_IN` and the target y_hat (`GPP_NT_VUT_REF`), i.e. as the `PPFD_IN` increases, the target increases. Whereas the second curve shows us that there is a negative linear dependence between `VPD_F` and `GPP_NT_VUT_REF`. The final plot shows a 2D partial dependence plot with `PPFD_IN` and `VPD_F`, and this follows a linear relationship too. As expected, we get the highest value for our target variable in the lower right corner and the smallest value in the upper left corner.
 

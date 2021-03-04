@@ -43,23 +43,31 @@ y = \sum_{n=0}^N a_n x^n
 $$
 $a_n$ are the coefficients, i.e., model parameters. The goal of the training is to get the coefficients $a_n$. From the above definition, the polynomial of degree 15 has 16 parameters, while the polynomial of degree 1 has two parameters (and corresponds to a simple linear regression). You can imagine that the polynomial of degree 15 is much more flexible and should thus yield the closest fit to the training data. This is indeed the case. 
 
-![](./figures/training.png)
+```{r, echo = FALSE, fig.cap="Comparing model fits on training data set."}
+knitr::include_graphics("./figures/training.png")
+```
 
 We can use the same fitted models on unseen data - the *validation data*. This is what's done below. Again, the same true underlying relationship is used, but we sample a new set of data points in x and add a new sample of errors on top of the true relationship.
 
-![](./figures/validation.png)
+```{r, echo = FALSE, fig.cap="Comparing model fits on validation data set."}
+knitr::include_graphics("./figures/validation.png")
+```
 
 You see that, using the validation set, we find that "poly4" actually performs the best - it has a much lower RMSE that "poly15". Apparently, "poly15" was overfitted. Apparently, it indeed used its flexibility to fit not only the shape of the true underlying relationship, but also the observation errors on top of it. This has obviously the implication that, when this model is used to make predictions for data that was not used for training (calibration), it will yield misguided predictions that are affected by the errors in the training set. In the above pictures we can also conclude that "poly1" was underfitted.
 
 It gets even worse when applying the fitted polynomial models to data that extends beyond the range in $x$ that was used for model training. Here, we're extending just 20% to the right.
 
-![](./figures/validation_extrapolation.png)
+```{r, echo = FALSE, fig.cap="Comparing model fits when extrapolating."}
+knitr::include_graphics("./figures/validation_extrapolation.png")
+```
 
 You see that the RMSE for "poly15" literally explodes. The model is hopelessly overfitted and completely useless for prediction, although it looked like it fit the data best when we considered at the training results. This is a fundamental challenge in ML - finding the model with the best *generalisability*. That is, a model that not only fits the training data well, but also performs well on unseen data. 
 
-The phenomenon of fitting/overfitting as a function of the model "flexibility" is also referred to as *bias vs. variance trade-off*. The bias describes how well a model matches the training set (average error). A model with low bias will match the data set closely and vice versa. The variance describes how much a model changes when you train it using different portions of your data set. "poly15" has a high variance, but much of its variance is the result of misled training on observation errors. On the other extreme, "poly1" has a high bias. It's not affected by the noise in observations, but its predictions are also far off the observations. In ML, we are challenged to balance this trade-off. In the next figure you can see a schematic illustration of the bias–variance trade-off.
+The phenomenon of fitting/overfitting as a function of the model "flexibility" is also referred to as *bias vs. variance trade-off*. The bias describes how well a model matches the training set (average error). A model with low bias will match the data set closely and vice versa. The variance describes how much a model changes when you train it using different portions of your data set. "poly15" has a high variance, but much of its variance is the result of misled training on observation errors. On the other extreme, "poly1" has a high bias. It's not affected by the noise in observations, but its predictions are also far off the observations. In ML, we are challenged to balance this trade-off. In Figure \@ref(fig:tradeoff) you can see a schematic illustration of the bias–variance trade-off.
 
-![](./figures/bias-variance.png)
+```{r tradeoff, fig.cap="Trade-off between bias and variance"}
+knitr::include_graphics("./figures/bias-variance.png")
+```
 
 This chapter introduces the methods to achieve the best model generalisability and find the sweet spot between high bias and high variance. The steps to get there include the preprocessing of data, splitting the data into training and testing sets, and model training that "steers" the model towards what is considered a good model fit in terms of its generalisation power. 
 
@@ -73,24 +81,13 @@ Of course, a plethora of algorithms exist that do the job of $Y = f(X)$. Each of
 
 What can you say about the bias and the variance of the following graphs?
 
-![](./figures/bias-variance_2.png)   
+```{r simple-complex, fig.cap="Comparison of simple and complex model fits."}
+knitr::include_graphics("./figures/bias-variance_2.png")
+```   
     
 **Solution**
 
-In the righthand figure we can see a low bias and a high variance. While in the left figure we see a high bias and a low variance.
-
-We can now load some packages that we will use in this tutorial.
-
-```{r message=F, warning=F}
-library(tidyverse)
-library(ggplot2)
-library(modelr)
-library(forcats)
-library(yardstick)
-library(recipes)
-library(caret)
-library(broom)
-```
+In Figure \@ref(fig:simple-complex), the right plot shows low bias and high variance. While in the left plot we see a high bias and a low variance.
 
 ### Linear regression
 
@@ -114,6 +111,19 @@ $$
 Note that here, $X$, $Y$, and $\epsilon$ are vectors of length corresponding to the number of observations in our data set ($n$ - as above). Analogously, calibrating the $p$ coefficients $\beta_1, \beta_2, ..., \beta_p$ is to minimize the sum of square errors $\sum_i \epsilon_i^2$. While the regression is a line in two-dimensional space for the univariate case, it is a plane in three-dimensional space for bi-variate regression, and so on. 
 
 **Implementation**
+
+First, let's load some packages that we will use in this tutorial.
+
+```{r message=F, warning=F}
+library(tidyverse)
+library(ggplot2)
+library(modelr)
+library(forcats)
+library(yardstick)
+library(recipes)
+library(caret)
+library(broom)
+```
 
 To fit a univariate linear regression model in R, we can use the `lm()` function. Already in Chapter \@ref(ch-02), we made linear models by doing:
 
@@ -329,6 +339,7 @@ df_test_rsample <- testing(split_rsample)
 ```{r sample, fig.cap="Comparison of different methods to split data. Black represent training data splits and red training data splits."}
 
 knitr::include_graphics("./figures/datasplitting.png")
+
 ```
 
 
@@ -340,8 +351,7 @@ df_train_rsample_strat <- training(split_rsample_strat)
 df_test_rsample_strat <- testing(split_rsample_strat)
 ```
 
-```{r sample, fig.cap="Comparison of different methods to split data. Black represent training data splits and red training data splits."}
-
+```{r rsample, fig.cap="Stratified sampling using `initial_split()` from rsample package."}
 knitr::include_graphics("./figures/datasplitting_strata.png")
 ```
 
@@ -455,7 +465,9 @@ library(skimr)
 skim(df)
 ```
 
-![](./figures/06_output-skim.png)
+```{r}
+knitr::include_graphics("./figures/06_output-skim.png")
+```
 
 We see for example, that typical values of `PPFD_IN` are by a factor 100 larger than values of `VPD_F`. A distance calculated based on these raw values would therefore be strongly dominated by the difference in `PPFD_IN` values, and differences in `VPD_F` would hardly affect the distance. Therefore, the data must be standardized before using it with the KNN algorithm. Standardization is done, for example, by dividing each variable, that is all values in one column, by the standard deviation of that variable, and then subtracting its mean. This way, the resulting standardized values are centered around 0, and scaled such that a value of 1 means that the data point is one standard deviation above the mean of the respective variable (column). When applied to all predictors individually, the absolute values of their variations can be directly compared and only then it can be meaningfully used for determining the distance.
 
@@ -499,8 +511,12 @@ recipe_example <- recipe_example %>%
 
 #### One-hot encoding
 
-For ML algorithms that require that all predictors be numerical (e.g., neural networks, or KNN), categorical predictors have to be pre-processed and converted into new numerical predictors. The most common such transformation is *one-hot encoding*, where a categorical feature (predictor) that has $N$ levels is replaced by $N$ new features that contain either zeros or ones depending whether the value of the categorical feature corresponds to the respective column. This creates perfect collinearity between these new column, we can also drop one of them. This is referred to as *dummy encoding*.
-Check out the Figure from [www.kaggle.com](https://www.kaggle.com/dansbecker/using-categorical-data-with-one-hot-encoding) for a one-hot encoding visualization. Using the recipes package, one-hot encoding is implemented by:
+For ML algorithms that require that all predictors be numerical (e.g., neural networks, or KNN), categorical predictors have to be pre-processed and converted into new numerical predictors. The most common such transformation is *one-hot encoding*, where a categorical feature (predictor) that has $N$ levels is replaced by $N$ new features that contain either zeros or ones depending whether the value of the categorical feature corresponds to the respective column. This creates perfect collinearity between these new column, we can also drop one of them. This is referred to as *dummy encoding*. Check out Figure \@ref(fig:ohe) for a one-hot encoding visualization. Using the recipes package, one-hot encoding is implemented by:
+
+```{r ohe, echo = F, fig.cap="Visualization of one-hot encoding from [Kaggle](https://www.kaggle.com/dansbecker/using-categorical-data-with-one-hot-encoding)."}
+knitr::include_graphics("./figures/06_figure_ohe.png")
+```
+
 
 ```{r}
 recipe(GPP_NT_VUT_REF ~ ., data = df) %>% 
@@ -559,9 +575,13 @@ vis_miss(
 ```
 
 
-![](./figures/missing_data.png)
+```{r, echo = FALSE, fig.cap=""}
+knitr::include_graphics("./figures/missing_data.png")
+```
 
-![](./figures/missing_data_visdat.png)
+```{r, echo = FALSE, fig.cap=""}
+knitr::include_graphics("./figures/missing_data_visdat.png")
+```
 
 The question about what is "bad data" and whether or when it should be removed is often critical. In Chapter \@ref(ch-03), we've encountered quality control information in our data set (e.g., `NEE_VUT_REF_QC`), and removed data that didn't satisfy our own definition of the quality criterion. Such decisions are important to keep track of and should be reported as transparently as possible in publications. In reality, where the data generation process may start in the field with actual human beings writing notes in a lab book, and where the human collecting the data is often not the same as the human writing the paper that contains that data, it's often more difficult to keep track of such decisions. As a general principle, it is advisable to design data records such that decisions made during its process remain transparent throughout all stages of the workflow and that sufficient information be collected to enable later revisions of particularly critical decisions. 
 
@@ -606,7 +626,7 @@ Visualise the distribution of numeric variables (not including the ones created 
 We have learned in Chapter \@ref(ch-02) that ggplot2 is designed to implement the *grammar of graphics* where variables are mapped onto aesthetics. If we want to create, for example, separate boxplots for each variable, arranged side-by-side along the x-axis, we want to specify the x-axis aesthetics to be the variable identity (something like `aes(x = variable)`). However, in our dataset, we have multiple variables (eleven to be precise) in separate columns. Strictly speaking, this is not entirely *tidy* and therefore, it's not quite straight-forward to create a ggplot graphics with data from multiple separate columns and organise them along one of the available aesthetics (here, x-axis). We have to take an additional step and combine the multiple columns into a single one. The new-rearranged and very *tidy* dataframe then has a new column (e.g., called `value`) that contains all the values of all the variables, and another new column (e.g. called `variable`) that specifies which variable the value belongs to. This re-arrangement can also be described as converting a table in *wide* format (wide because of its large number of columns) to a *long* format (long because of its large number of rows). This transformation is illustrated in Figure \@ref(fig:pivot).
 
 
-```{r pivot, fig.cap='Visualizsation of turning a table from wide format (right) into long format (left). Figure from [https://cmdlinetips.com/2020/02/r-for-data-science-book-gets-tidyr-1-0-0-friendly/](https://cmdlinetips.com/2020/02/r-for-data-science-book-gets-tidyr-1-0-0-friendly/).'}
+```{r pivot, fig.cap='Visualizsation of turning a table from wide format (right) into long format (left). Figure from [R for Data Science](https://cmdlinetips.com/2020/02/r-for-data-science-book-gets-tidyr-1-0-0-friendly/).'}
 knitr::include_graphics("./figures/fig_pivot_longer_wide_to_long_tidy.jpg")
 ```
 

@@ -113,12 +113,15 @@ A fundamental object in Keras is the "layer", which contains a number of computa
 
 Each layer except has its own bias term that is connected to all neurons in the successive layer. All edges have associated weights, which we learn during training.
 
-![](./figures/Chollet_Fig1.5.jpg)
+```{r network, echo = F, fig.cap="Visualization of a neural network with four Layers and a multi-classification output. Figure from [Deep Learning with Python](https://www.manning.com/books/deep-learning-with-python)."}
+knitr::include_graphics("./figures/Chollet_Fig1.5.jpg")
+```
 
 Below we define a function for building and training the simple model `y = wx + b` using gradient descent. While this task does not require a sophisticated artificial neural network, recall from lecture video 9B (nonlinear problems) that this task can be formulated using a network schematic, so the tools for training sophisticated artificial neural networks are also applicable in this simpler context. Thus, for this example, we only need a single layer of a single unit.
 
-![](./figures/network.png)
-
+```{r network, echo = F, fig.cap="Visualization of a neural network with one layer and one neuron. Figure from [Deep Learning with Python](https://www.manning.com/books/deep-learning-with-python)."}
+knitr::include_graphics("./figures/network.png")
+```
 Notice the inputs to `build_and_train_model` function: 
 
 The first two are for the training data. The variable _x\_train_ contains our independent variable `PPFD_IN` and _y\_train_ contains our dependent variable `GPP_NT_VUT_REF`. 
@@ -326,9 +329,12 @@ save_model_hdf5(model, save_path)
 
 Let's build our intuition for how gradient descent works by visualizing the loss function versus the fitting line for each (w,b) pair derived from the gradient descent. This is an advantage of working with a two-parameter problem - we can actually visualize loss across the solution space. This is not easy to do with problems that have more parameters. In fact, it's typically impossible. For example, try to imagine what the surface of a loss function might look like for a four-parameter problem. Not easy right? Now consider that may problems have thousands of parameters - sometimes billions. Good luck wrapping your head around that!
 
-![Animated gradient descent: __Left plot__: The gradient descent algorithm (red trace). __Right plot__: The fitting line for the respective step of gradient descent.](https://miro.medium.com/proxy/0*D7zG46WrdKx54pbU.gif)
+Have a look at Figure \@ref(fig:gradient) - what we actually observe is the fitted line to the data (right plot) for each step of gradient descent (red point of left plot). As the gradient descent update step approaches the minimum of the loss function, the line fits the data better, i.e it minimizes $\sum_{i = 1}^{n} (\hat{y}_i-y_i)^2$. 
 
-What we actually observe is the fitted line to the data (right plot) for each step of gradient descent (red point of left plot). As the gradient descent update step approaches the minimum of the loss function, the line fits the data better, i.e it minimizes $\sum_{i = 1}^{n} (\hat{y}_i-y_i)^2$. 
+```{r gradient, echo = F, fig.cap="Animated gradient descent: __Left plot__: The gradient descent algorithm (red trace). __Right plot__: The fitting line for the respective step of gradient descent. Animation taken from [Miro](https://miro.medium.com/proxy/0*D7zG46WrdKx54pbU.gif)."}
+knitr::include_graphics("./figures/09_gradient.gif")
+```
+
 
 We can also observe the convergence (gradient descent update causes tiny changes) of the algorithm by looking at either plot. 
 
@@ -692,13 +698,11 @@ where _y_ is measured on a continuous scale, $x_1$ through $x_n$ are the $n$ fea
 
 Recall from lecture 9B (nonlinear problems), that by applying a sigmoid function to the right-hand side of the above equation, you transition from a linear regression to a logistic regression. Unlike for linear regressions, the outputs or predictions from a logistic regression are not continuous. Logistic regressions can be used to model targets that lie in the range [0,1], such as probabilities. It is also commonly used to model binary targets (e.g., this image does contain a cat (presence) vs. this image does not contain a cat (absence)).
 
-Let's consider a hypothetical binary classification example. That is, assume $y$ either takes the value $0$ (no cat) or $1$ (cat). We are interested in modeling the relation between $P(Y=1|x)$ and $x = (x_1,x_2,...,x_n)$.
+Let's consider a hypothetical binary classification example. That is, assume $y$ either takes the value $0$ (no cat) or $1$ (cat). We are interested in modeling the relation between $P(Y=1|x)$ and $x = (x_1,x_2,...,x_n)$. The aforementioned relation can be defined as $P(Y=1|x) = \sigma(w_1x_1 +...+ w_nx_n + b)$, where $\sigma(t) = \frac{1}{1+e^{-t}}$. Figure \@ref(fig:log_fun) shows what such a logistic function looks like.
 
-The aforementioned relation can be defined as $P(Y=1|x) = \sigma(w_1x_1 +...+ w_nx_n + b)$, where $\sigma(t) = \frac{1}{1+e^{-t}}$
-
-Here is what a logistic function looks like:
-
-![](./figures/log_fun.jpg)
+```{r log_fun, echo = F, fig.cap="Visualization of a logistic function.}
+knitr::include_graphics("./figures/log_fun.jpg")
+```
 
 In a nutshell, logistic regression is just a linear model with the sigmoid activation function applied on the output, which converts the range to a probability. Any values of _t_ below 0 will result in a probability closer to 0 (e.g no cat), while any values of _t_ above 0 will result in a probability closer to 1 (e.g. presence of a cat).
 
@@ -754,7 +758,6 @@ $$
 where _TP_ stands for 'True Positives' and _TN_ stands for 'True Negatives', respectively, and _n_ is the number of examples in the test set. Put simply: accuracy is the number of correct predictions divided by the total number of predictions. This measure ranges from 0 and 1, where 0 means our model never makes a correct prediction and 1 means it always makes correct predictions. This measure comes with caveats, especially for so-called class-imbalanced datasets, where the vast majority of examples have one label, whereas a small minority have another label. We'll revisit this limitation in lecture 10B and tutorial 10. For now, let's just ignore these caveats.
 
 #### Example
-
 For this example we use the R function `glm` in order to fit a logistic regression model. 
 
 Let's first generate some synthetic data. For this example, our data will have only a single feature. The **instances** with label **0** will have their features drawn from a normal distribution with mean 2 and standard deviation 0.5. The **instances** with label **1** will have their features drawn from a normal distribution with mean 6 and standard deviation 1 (we also draw some instances with label 0 from this distribution so that our distributions are not totally separated). These distributions were chosen because they are clearly separable, yet have some overlap in their tails. Also the problem is not totally separable because of the noisy labels.
@@ -968,9 +971,9 @@ y_test = df_test$y
  
 ```
 
-### Configuration a
+#### Configuration a
 
-#### Plot the training data
+##### Plot the training data
 
 ```{r eval = F}
 #YOUR SOLUTION HERE: use only the Petal Width as input
@@ -978,7 +981,7 @@ y_test = df_test$y
 
 ```
 
-#### Create the model
+##### Create the model
 
 ```{r eval = F}
 #YOUR SOLUTION HERE
@@ -999,13 +1002,13 @@ y_test = df_test$y
  w_a = unlist(get_weights(model_a))
 ```
 
-#### Plot the decision boundary
+##### Plot the decision boundary
 
 ```{r eval = F}
 #Your solution
 ```
 
-#### Evaluate the accuracy of the model in the test set
+##### Evaluate the accuracy of the model in the test set
 
 ```{r eval = F}
 #YOUR SOLUTION HERE
@@ -1026,16 +1029,16 @@ cat("Test Accuracy: ",round(accuracy,3),'/n')
 ```
 
 
-#### Plot misclassified predictions in the test data
+##### Plot misclassified predictions in the test data
 
 ```{r eval = F}
 #YOUR SOLUTION
 # HINT: create a new column in the df_test which indicates those points that are misclassified
 ```
 
-### Configuration b
+#### Configuration b
 
-#### Plot the training data
+##### Plot the training data
 
 ```{r eval = F}
 #YOUR SOLUTION HERE: use both the Petal Length and Petal Width as inputs
@@ -1044,7 +1047,7 @@ cat("Test Accuracy: ",round(accuracy,3),'/n')
 
 ```
 
-#### Create the model
+##### Create the model
 
 ```{r eval = F}
 #YOUR SOLUTION HERE
@@ -1067,14 +1070,14 @@ model_b %>% fit(x=as.matrix(x_train),y=y_train,epochs=30,batch_size=32)
 w_b = unlist(get_weights(model_b)) 
 ```
 
-#### Plot the decision boundary
+##### Plot the decision boundary
 
 ```{r eval = F}
 #Your solution
 #HINT: Your desicion boundary now is a line
 ```
 
-#### Evaluate the accuracy of the model in the test set
+##### Evaluate the accuracy of the model in the test set
 
 ```{r eval = F}
 #YOUR SOLUTION HERE
@@ -1096,7 +1099,7 @@ cat("Test Accuracy: ",round(accuracy,3),'\n')
 ```
 
 
-#### Plot misclassified predictions in the test data
+##### Plot misclassified predictions in the test data
 
 ```{r eval = F}
 #YOUR SOLUTION

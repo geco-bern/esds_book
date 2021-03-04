@@ -2,7 +2,7 @@
 
 
 ## Introduction
-In this tutorial, we will put into practice and apply many of the models seen earlier in the course, in order to achieve a simple goal: efficiently extrapolate an environmental dataset. For this, we will use satellite data (specifically NDVI) as an accurate and "*cheap*" predictor of a specific environmental variable (C0~2~ - vegetation fluxes) that is measured scarcely by expensive physical devices (towers). Sit down and relax. This tutorial invites you to take a step back, and reflect on all the knowledge you have acquired on modelling. 
+In this tutorial, we will put into practice and apply many of the models seen earlier in the course, in order to achieve a simple goal: efficiently extrapolate an environmental dataset. For this, we will use satellite data (specifically NDVI) as an accurate and "cheap" predictor of a specific environmental variable (C0~2~ - vegetation fluxes) that is measured scarcely by expensive physical devices (eddy covariance towers, see see Chapters \@ref(ch-02) and \@ref(ch-03)). Sit down and relax. This tutorial invites you to take a step back, and reflect on all the knowledge you have acquired on modelling so far. 
 
 ### Learning objectives
 - Understand the link between research objective, data type and machine learning methods.
@@ -25,17 +25,28 @@ In this tutorial, we will put into practice and apply many of the models seen ea
 ## Tutorial 
 ### Description of the modelling task
 
-Using the eddy-covariance technique, it is possible to measure the CO~2~ gas exchange fluxes between the vegetation and the atmosphere at high temporal resolution and throughout the year. This is a key scientific measurement, for studying as an example the CO~2~ cycle. [Technical details on the measurement can be found here](https://en.wikipedia.org/wiki/File:Eddy_Covariance_IRGA_Sonic.jpg).
+Using the eddy-covariance technique, it is possible to measure the CO~2~ gas exchange fluxes between the vegetation and the atmosphere at high temporal resolution and throughout the year (see Figure \@ref(fig:eddytower). This is a key scientific measurement, for studying as an example the CO~2~ cycle. Technical details on the measurement can be found [here](https://en.wikipedia.org/wiki/Eddy_covariance).
 
-![](https://upload.wikimedia.org/wikipedia/commons/5/52/Eddy_Covariance_IRGA_Sonic.jpg)
+```{r eddytower, out.width=25% fig.cap="Close-up of measuring device for $CO_2$ and other environmental parameters that is attached to eddy covariance towers . Image taken from [Wikipedia](https://upload.wikimedia.org/wikipedia/commons/5/52/Eddy_Covariance_IRGA_Sonic.jpg)."}
+knitr::include_graphics("./figures/13_eddytower.jpg")
+```
 
-Vegetation-atmosphere CO~2~ fluxes are driven by photosynthesis and respiration. The latter is responsible for ecosystem-level CO~2~ uptake, and the latter reverses the uptake flux. Below, as a reminder, is the equation of the reactions that happens during photosynthesis.
+Vegetation-atmosphere CO~2~ fluxes are driven by photosynthesis and respiration. The latter is responsible for ecosystem-level CO~2~ uptake, and the latter reverses the uptake flux. As a reminder, the equation of the reactions that happens during photosynthesis is the following:
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Photosynthesis_equation.svg/640px-Photosynthesis_equation.svg.png)
+$$
+\begin{array}{rcl}
+& 6 \, CO_2 \, &+ \, &6 \, H_2O &\xrightarrow{LIGHT} & C_6H_{12}O_6 \, &+ \,6 \, O_2  \\
+ & Carbon \, Dioxde &+ &Water &\xrightarrow{ } & Sugar &+\, Oxygen
+\end{array}
+$$
 
 Although photosynthesis is performed differently by different species, the process always begins when energy from light is absorbed by proteins called reaction centres that contain green chlorophyll pigments. The pigment absorbs visible light (from 0.4 to 0.7 µm) for use in photosynthesis. The cell structure of the leaves, on the other hand, strongly reflects near-infrared light (from 0.7 to 1.1 µm). 
 
-[The Normalised Difference Vegetation Index](https://en.wikipedia.org/wiki/Normalized_difference_vegetation_index) (NDVI) uses this property, by measuring the difference between the difference in reflectance between red light (*Red*) and near-infrared light (*NIR*) as $NDVI = \frac{NIR - Red}{NIR + Red}$.
+[The Normalised Difference Vegetation Index](https://en.wikipedia.org/wiki/Normalized_difference_vegetation_index) (NDVI) uses this property, by measuring the difference between the difference in reflectance between red light (*Red*) and near-infrared light (*NIR*) as:
+
+$$
+NDVI = \frac{NIR - Red}{NIR + Red}$$
+
 
 NDVI is a measure for live green foliage and is strongly related to the fraction of absorbed photosynthetically active radiation. In other words, it should scale (more or less linearly) with GPP. NDVI is easy to obtain at a fine spatial resolution, through satellite imagery. On the other hand, eddy covariance measurement sites are very scarce, and can only estimate CO~2~ fluxes at a few geographical positions.
 
@@ -50,11 +61,11 @@ We will compare different approaches to find the function $f$ that best captures
 As a first step of any modeling problem, we need to get and process the data to be used. Those steps have been detailed in Tutorial: **Data scraping**.
 
 #### FLUXNET
-We will once again be using the FLUXNET dataset, that you have gotten familiar with in the previous tutorials. We want to try to predict the variable [`NEE_CUT_REF`](https://fluxnet.org/data/fluxnet2015-dataset/fullset-data-product/), which expresses the fluxes in gC $m^{-2} d^{-1}$, using the ndvi value of the corresponding region.
+We will once again be using the FLUXNET dataset, that you have gotten familiar with in the previous tutorials. We want to try to predict the variable [`NEE_CUT_REF`](https://fluxnet.org/data/fluxnet2015-dataset/fullset-data-product/), which expresses the fluxes in gC $m^{-2} d^{-1}$, using the ndvi value of the corresponding region. Figure \@ref(fig:map) shows a map of the locations of all 34 European towers available in our dataset:
 
-Here is the map showing the location of the 34 European towers available in our dataset:
-
-![](./figures/location_of_towers.png)
+```{r map, out.width="50%", fig.cap="Locations of all eddy covariance towers in Europe."}
+knitr::include_graphics("./figures/location_of_towers.png")
+```
 
 #### NDVI (MODIS product)
 
@@ -62,15 +73,16 @@ NASA offers a dataset obtained by the imaging sensor MODIS, which stands for [Mo
 
 Note that the choice for considering such a wide area around the tower is not one made by our scientific understanding of the controls on CO2 gas exchange, but rather one that allows us to apply a large variety methods for data preparation and types of models for predicting fluxes. The "footprint" of eddy covariance towers, that is, the area around each tower that influence the gas exchange at the point of measurements above the canopy, is typically on the order of a few hundred metres (and not 30 km).
 
-Each MODIS product gives a tile with the desired information. From this tile a region around each tower is extracted. The following picture shows you an example of such a tile and the area around the CH Oensingen tower. Extracted Region (black square) around the Tower of CH Oensingen (red cross) for the given Modis tile 
+Each MODIS product gives a tile with the desired information. From this tile a region around each tower is extracted. The following picture shows you an example of such a tile and the area around the CH Oensingen tower. Extracted Region (black square) around the Tower of CH Oensingen (red cross) in the given Modis tile in Figure \@ref(fig:Oe2).
 
-![](./figures/extracted_region_CH_Oe2.jpg)
+```{r Oe2, out.width="49%", fig.show='hold', fig.cap = "Left: MODIS tile with extracted region in black and location of eddy covariance tower in CH Oensingen as red cross. Right: Monthly NDVI vs $CO_{2}$ Flux of CH Oensingen Tower in 2014."}
+knitr::include_graphics(c("./figures/extracted_region_CH_Oe2.jpg",
+                        "./figures/ndvi_vs_CO2.gif"))
+```
 
 The square region around the tower is our model input and the CO~2~ flux value (`NEE_CUT_REF`) of the red cross is our model output.
 
 This might all seems a little abstract, so let's visualise it! The two animations below show (i) our monthly inputs (NDVI images) and (ii) the corresponding monthly outputs (CO~2~ flux plot) for the CH Oensingen tower in the year 2014.
-
-![Monthly NDVI vs $CO_{2}$ Flux of CH Oensingen Tower in 2014](./figures/ndvi_vs_CO2.gif)
 
 What do you observe? Can you see any emerging patterns? Do you see any link between the input (NDVI image) and the output (CO~2~ flux)?
 
@@ -92,12 +104,13 @@ library(tensorflow) # Google API for Machine Learning
 options(repr.plot.width = 10, repr.plot.height = 5)
 ```
 
-Before we start on the modelling part, it would be good to check how much data is available at each tower for the desired time (2000-2014). Take a look at the plots below, showing the monthly available data for each tower over the years. Blue shows data is available, while red shows data is unavailable.
+Before we start on the modelling part, it would be good to check how much data is available at each tower for the desired time (2000-2014). Take a look at the plots in Figure \@ref(fig:tower-data), showing the monthly available data for each tower over the years. Blue shows data is available, while red shows data is unavailable.
 
+```{r tower-data, out.width="49%", fig.show='hold', fig.cap = "Available data for all towers in data set from years 2000 to 2014. On the y- and x-axis with have the year, respectively the month of that year. Each plot denotes one of the total 34 towers in the data set."}
+knitr::include_graphics(c("./figures/data_available_1.png",
+                          "./figures/data_available_2.png"))
+```
 
-Available Data by Tower (2000-2014):
-![](./figures/data_available_1.png)
-![](./figures/data_available_2.png)
 
 #### Read in the Data
 
@@ -131,14 +144,14 @@ ndvi_val   <- readRDS("./data/SDL_II/validation/NDVI/ndvi_val.rds")
 ndvi_test  <- readRDS("./data/SDL_II/test/NDVI/ndvi_test.rds")
 
 # print some statistics of the data
-paste("Size of training set is ", length(y_train))
-paste("Size of validation set is ", length(y_val))
-paste("Size of test set is ", length(y_test))
+cat("Size of training set is ", length(y_train), "\n",
+    "Size of test set is ", length(y_test))
 ```
-Let 's have a look at the distribution of CO~2~ flux by tower.
 
-![Distribution of CO~2~ Flux by Tower](./figures/Distribution_per_Tower.png)
-
+Let 's have a look at the distribution of CO~2~ flux by tower displayed in Figure \@ref(fig:tower-dist).
+```{r tower-dist, out.width = 75%, fig.cap="Distribution of CO~2~ Flux by Tower."}
+knitr::include_graphics("./figures/Distribution_per_Tower.png")
+```
 
 ## Naive models (Old World)
 
@@ -518,9 +531,11 @@ Further, it would be of great interest to insert the month of each sample as a c
 
 The extracted feature of the CNN model is connected with the categorical tower features given by the embedding layer. Those concatenated features are given to a feed-forward neural network (i.e. dense layers) which is in charge to make the prediction.
 
-A visual representation of the *mixed model* is given in the following image:
+A visual representation of the *mixed model* is given in Figure \@ref(fig:token).
 
-![ ](./figures/mixed_model.jpeg)
+```{r toke, fig.cap="Visualization of adding a tokenization layer to a CNN."}
+knitr::include_graphics("./figures/mixed_model.jpeg")
+```
 
 ```{r eval = F}
 # Mixed model : CNN + tower location 

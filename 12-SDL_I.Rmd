@@ -5,7 +5,7 @@
 
 In this tutorial, we'll use convolutional neural networks for image classification. The dataset we'll work with comes from a 2013 Kaggle competition, which you can read about [here](https://www.kaggle.com/c/dogs-vs-cats/overview). Kaggle is an online community for data scientists and machine learning engineers, where they can explore datasets, build models and enter contests to attempt solving data science hurdles.
 
-The dataset contains 25,000 images of dogs and cats. We'll use just a subset of these - 6,000 images to be precise. These we'll break down into a training set of 4,000 images, a validation set of 1000 images, and a testing set of 1000 images. This tutorial is based on Chapter 5 of "Deep learning with Python" by F. Chollet - highly recommended reading!
+The dataset contains 25,000 images of dogs and cats. We'll use just a subset of these - 6,000 images to be precise. These we'll break down into a training set of 4,000 images, a validation set of 1000 images, and a testing set of 1000 images. This tutorial is based on Chapter 5 of [Deep learning with Python](https://www.manning.com/books/deep-learning-with-python#toc) by F. Chollet - highly recommended reading!
 
 ### Learning objectives
 * Use Keras to implement a deep convolutional neural network for image classification
@@ -22,36 +22,31 @@ The dataset contains 25,000 images of dogs and cats. We'll use just a subset of 
 
 
 ## Tutorial
+### Building Blocks of CNNs
 
-![Features extraction from a CNN (convolutional neural network).](./figures/Chollet_Fig5.4.png)
-![Instance classification.](./figures/Chollet_Fig5.2.png)
+You probably already know this or at least guessed it but CNN stands for convolutional neural network. CNNs built for classification tasks typically make use the following types of layers (displayed in Figure \@ref(fig:CNN-blocks):
 
-### Building Blocks of a CNN
-You probably already know this or at least guessed it but CNN stands for convolutional neural network. 
-
-CNNs built for classification tasks typically make use the following types of layers:
-
-- **Convolutional Layers**: Layers implementing the actual convolution . Their outputs are feature maps which are then passed through an activation function in order to introduce non-linearities into the system. Convolutional layers can be seen as extracting features that are passed on deeper into the model thus enabling the model to learn higher-level features that make the classification task easier.
+- **Convolutional Layers**: Layers implementing the actual convolution. Their outputs are feature maps which are then passed through an activation function in order to introduce non-linearities into the system. Convolutional layers can be seen as extracting features that are passed on deeper into the model thus enabling the model to learn higher-level features that make the classification task easier.
 
 - **Pooling Layers**: Downsampling or pooling layers concentrate the information so that deeper layers focus more on abstract/high-level patterns. A common choice is max-pooling, where only the maximum value occurring in a certain region is propagated to the output.
 
 - **Dense Layers**: A dense or fully-connected layer connects every node in the input to every node in the output. This is the type of layer you already used in the previous tutorial. If the input dimension is large, the amount of learnable parameters introduced by using a dense layer can quickly explode. Hence, dense layers are usually added on deeper levels of the model, where the pooling operations have already reduced the dimensionality of the data. Typically, the dense layers are added last in a classification model, performing the actual classification on the features extracted by the convolutional layers.
 
-You can think of a convolution as sliding a window, also called kernel or filter, over each pixel of an image and computing a dot product between the filter's values and the image's values that the window (or filter) is covering. This operation produces one output value for every location on the image over which we slide the filter. 
+```{r CNN-blocks, echo=F, out.width="32%", out.height="75%", fig.show='hold', fig.cap="Building blocks of a CNN. Figures taken from Chapter 5 of [Deep learning with Python](https://www.manning.com/books/deep-learning-with-python#toc). Left: Features extraction from a CNN (convolutional neural network). Right: Instance classification."}
+knitr::include_graphics(c("./figures/Chollet_Fig5.4.png",
+                          "./figures/Chollet_Fig5.2.png"))
+```
 
-![](https://raw.githubusercontent.com/vdumoulin/conv_arithmetic/master/gif/no_padding_no_strides.gif)
+You can think of a convolution as sliding a window, also called kernel or filter, over each pixel of an image and computing a dot product between the filter's values and the image's values that the window (or filter) is covering. This operation produces one output value for every location on the image over which we slide the filter. In Figure \@ref(fig:conv-pool), in blue is the input image and in shaded blue the 3-by-3 filter that we are convolving the input image with and green is the output image. After the convolutional layer usually a max-pooling layer is applied which downsamples the feature map. Through this only certain aspects of information in our original image are extracted.
 
-Here, in blue is the input image, grey (or a darker blue) is the 3-by-3 filter that we are convolving the input image with and green is the output image.
+```{r conv-pool, echo = F, out.height="49%", fig.show='hold', fig.cap="Animation on the left displays the sliding filter across the input feature map ([source](https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png)). The image on the right shows a pooling layer where the highest value of a quadrant is taken as value in a reduced feature map ([source](https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png))."}
+knitr::include_graphics(c("./figures/12_conv.gif",
+                          "./figures/12_maxpool.png"))
 
-
-After the convolutional layer usually a max-pooling layer is applied which downsamples the feature map. Through this only certain aspects of information in our original image are extracted.
-
-![](https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png)
-
+```
 We can stack several convolutional-pooling layers. The final pooling layer output is given to a feed forward neural network (i.e dense layers) which is in charge to make the prediction.
 
 Let's dive into our example for a practical application of this.
-
 
 ```{r message=FALSE, warning=FALSE}
 #import libraries
@@ -136,16 +131,16 @@ To get an overview of our data, we'll start by printing the number cat vs dog im
 
 ```{r}
 #train set
-cat('total training cat images:', length(list.files(file.path(train_dir,'cats'))),"\n")
-cat('total training dog images:', length(list.files(file.path(train_dir,'dogs'))),"\n")
+cat('total training cat images:', length(list.files(file.path(train_dir,'cats'))),"\n", 
+    'total training dog images:', length(list.files(file.path(train_dir,'dogs'))),"\n")
 
 #validation set
-cat('total validation cat images:', length(list.files(file.path(validation_dir,'cats'))),"\n")
-cat('total validation dog images:', length(list.files(file.path(validation_dir,'dogs'))),"\n")
+cat('total validation cat images:', length(list.files(file.path(validation_dir,'cats'))),"\n",
+    'total validation dog images:', length(list.files(file.path(validation_dir,'dogs'))),"\n")
 
 #test set
-cat('total test cat images:', length(list.files(file.path(test_dir,'cats'))),"\n")
-cat('total test dog images:', length(list.files(file.path(test_dir,'dogs'))),"\n")
+cat('total test cat images:', length(list.files(file.path(test_dir,'cats'))),"\n",
+    'total test dog images:', length(list.files(file.path(test_dir,'dogs'))),"\n")
 ```
 
 Note that this data set is class balanced, meaning that accuracy is a useful measure of model performance.
@@ -365,6 +360,7 @@ Take some time to digest this model summary. Make sure you understand and can an
 
 
 **Solutions**
+
 - **A**: Because the size of the filter is 3 x 3 
 - **B**: There are 3x3 = 9 parameters for each filter, times 3 channels (RGB), plus one bias term per filter. Thus: 32 x (9x3+1)
 - **C**: There are no parameters associated with these layers. The max operation is hard-coded.
@@ -468,10 +464,11 @@ It seems that overfitting has been prevented with L2 regularization since valida
 
 _Dropout_ is a simple and effective way to reduce overfitting. The idea behind this method is to add noise to the output of certain layers during training, thereby reducing the chance they memorize spurious (false or fake) correlations in the training data. 
 
-In practice, dropout works by simply changing a certain fraction of outputs in the specified layers to zero, thus 'dropping them out'. This fraction is specified by the _dropout rate_, which is typically set between 0.2 and 0.5. Exactly which neurons get dropped out randomly changes for each example. To compensate for the decreased number of active neurons in layers with dropout, the layer's outputs are scaled by the inverse of the (`1-dropout rate`). This is shown graphically below with the dropout rate being 0.5.
+In practice, dropout works by simply changing a certain fraction of outputs in the specified layers to zero, thus 'dropping them out'. This fraction is specified by the _dropout rate_, which is typically set between 0.2 and 0.5. Exactly which neurons get dropped out randomly changes for each example. To compensate for the decreased number of active neurons in layers with dropout, the layer's outputs are scaled by the inverse of the (`1-dropout rate`). This is shown graphically in Figure \@ref(fig:dropout) with the dropout rate being 0.5.
 
-![](./figures/dropout.png)
-
+```{r dropout, out.width = "75%", fig.cap="Visualization of dropout using a 0.5 dropout rate."}
+knitr::include_graphics("./figures/dropout.png")
+```
 Dropout applied to an activation matrix at training time, with rescaling happening during training. At test time, the activation matrix is unchanged.
 
 ```{r eval = F}
@@ -630,7 +627,7 @@ fig_size(8,8)
 plot(history$augment) + theme_grey(base_size = 20)
 ```
 
-![png](./figures/output_55_1.png)
+![ ](./figures/output_55_1.png)
 
 As you can see clearly above, overfitting is avoided by using the data augmentation technique.
 

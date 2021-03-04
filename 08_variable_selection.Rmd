@@ -8,20 +8,18 @@ In this application session, we'll implement an algorithm that sequentially sear
 
 Let's get started...
 
-***
+
 **Forward stepwise regression**
 
 1. Let $\mathcal{M_0}$ denote the null model, which contains no predictors.
 
 2. For $k=0,..,p-1$:
-  
-    (a) Consider all $p − k$ models that augment $\mathcal{M}_k$ with one additional predictor. 
-
-    (b) Choose the best model among these $p − k$ models, and call it $\mathcal{M}_{k+1}$. Here _best_ is defined as having the highest $R^2$ .
+   (a) Consider all $p − k$ models that augment $\mathcal{M}_k$ with one additional predictor. 
+   (b) Choose the best model among these $p − k$ models, and call it $\mathcal{M}_{k+1}$. Here _best_ is defined as having the highest $R^2$ .
 
 3. Select a single best model from among $\mathcal{M}_0$, . . . , $\mathcal{M}_p$ using cross-validated prediction error, AIC, BIC, or adjusted $R^2$.
 
-***
+
 
 ## Warm-up 1: Nested for-loop
 
