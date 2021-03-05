@@ -16,11 +16,11 @@ conflict_prefer("mse", "Metrics")
 
 ### Overview
 
-In this practical we will look at data variety in environmental sciences. We will start with the data from one eddy covariance measurement site in Switzerland encountered in Chapter \@ref(ch-01), and complement it with remote sensing data. Specifically, we will download remote sensing data that measures vegetation greenness data, quantified by the normalised difference vegetation index, NDVI. We are interested in this data, because we expect ecosystem photosynthesis (gross primary production), measured at the eddy covariance tower, to covary with NDVI. Such covariation can provide powerful information for modelling. For example, we can train a machine learning model with the observed covariation between measured GPP and NDVI at eddy covariance sites and use that model to predict GPP from data obtained in space (NDVI is available for the whole globe, while GPP can only be measured locally.) You will be doing this kind of modelling in session 13. For now, we will focus on working with the spatial aspects of the data (since remote sensing data is inherently spatial) and introduce you to the toolset to work with spatial, in particular, geo-spatial data. 
+In this practical we will look at data variety in environmental sciences. We will start with the data from one eddy covariance measurement site in Switzerland encountered in Chapter 1, and complement it with remote sensing data. Specifically, we will download remote sensing data that measures vegetation greenness data, quantified by the normalised difference vegetation index, NDVI. We are interested in this data, because we expect ecosystem photosynthesis (gross primary production), measured at the eddy covariance tower, to covary with NDVI. Such covariation can provide powerful information for modelling. For example, we can train a machine learning model with the observed covariation between measured GPP and NDVI at eddy covariance sites and use that model to predict GPP from data obtained in space (NDVI is available for the whole globe, while GPP can only be measured locally.) You will be doing this kind of modelling in session 13. For now, we will focus on working with the spatial aspects of the data (since remote sensing data is inherently spatial) and introduce you to the tool set to work with spatial, in particular, geo-spatial data. 
 
-To get you familiar with spatial data types we will use a variety of data from freely accessible sites. We can obtain abiotic and biotic conditions for the tower locations. We will be spatially plotting the eddy towers you have already encountered in Chapters \@ref(ch-01) and \@ref(ch-02) and extracting values for these locations from other data. By doing this we can show that the climate at these sites spans a gradient temperature and landcover. There are also biotic components that could explain variation in productivity among sites, including species composition and functional traits of plants. 
+To get you familiar with spatial data types we will use a variety of data from freely accessible sites. We can obtain abiotic and biotic conditions at the tower locations. We will be spatially plotting the eddy towers you have already encountered in the first two chapters and extracting values for these locations from other data. By doing this we can show that the climate at these sites spans a gradient temperature and landcover. There are also biotic components that could explain variation in productivity among sites, including species composition and functional traits of plants. 
 
-### Learning objectives
+## Learning objectives
 
 After this learning unit, you will be able to ...
 
@@ -86,13 +86,13 @@ In this practical, you will be downloading and getting to know spatial data. The
 * shapefiles;
 * rasters.
 
-The first part of this practical is mandatory and will start with a little introduction on downloading remote sensing data for our tower sites and seeing what kinds of information we can gather from this. Then we will get into the nitty-gritty aspects of the afore mentioned spatial data types. 
+The first part of this practical is mandatory and will start with a little introduction on downloading remote sensing data for our tower sites and seeing what kinds of information we can gather from this. Then we will get into the nitty-gritty aspects of the aforementioned spatial data types. 
 
-The second part is the bonus part, there we will discuss trait data and the principal component analysis (PCA), which is a method to reduce the dimensions of datasets.
+The second part is facultative, there we will discuss trait data and the principal component analysis (PCA), which is a method to reduce the dimensions of datasets.
 
 ### MODIS remote download
 
-We'll be starting off this tutorial with an example on using remote sensing data. We'll focus on a Fluxnet site already familiar to you: CH-Lae. The Lägern site is located on a mountain in the Swiss Plateau NW of Zürich and is surrounded by managed mixed deciduous mountain forests. The forest is highly diverse and dominated by beech. In the following figures, you can get an impression of the tower and its surroundings. 
+We will be starting off this tutorial with an example on using remote sensing data. Let us focus on a fluxnet site already familiar to you: CH-Lae. The Lägern site is located on a mountain in the Swiss Plateau NW of Zürich and is surrounded by managed mixed deciduous mountain forests. The forest is highly diverse and dominated by beech. In the following figures, you can get an impression of the tower and its surroundings.  
 
 ```{r, echo=FALSE, out.width="32%", out.height="49%", fig.show='hold', fig.cap="Images of Fluxnet sites and measurement station."}
 knitr::include_graphics(c("./figures/site1.jpg",
@@ -107,7 +107,7 @@ library(tidyverse)
 df_sites <- read_csv("./data/fluxnet_site_info_reduced.csv")
 ```
 
-Since for this section we will only be working with the Lägern site we can directly extract its latitude and longitude.
+Since we will only be working with the Lägern site for this section, we can extract its latitude and longitude.
 
 ```{r}
 lon_lae <- df_sites %>% 
@@ -139,7 +139,7 @@ bands <- mt_bands(product = "MOD13Q1") %>% as_tibble()
 dates <- mt_dates(product = "MOD13Q1", lat = lat_lae, lon = lon_lae) %>% as_tibble()
 ```
 
-Now, we'll get the NDVI data for 6 years for a square of 2km x 2km around the tower site. We use the function `mt_subset()` for this. The parameters of this function download a subset of data within the chosen product (here 'MOD13Q1'). We specify the location as latitude and longitude, and the band we chose, which is at 250m spatial resolution and 16-day temporal resolution. The time period can be chosen as a subset of “dates” and must be provided in the form of start and end date. We will be looking at the beginning of 2009 to the end of 2014. `km_lr` and `km_ab` define the kilometers to the left and right of the location and kilometers above and below respectively. Since these values are being rounded to the nearest integer, we chose this minimum of 1, corresponding to 2km2. Sitename is used in writing data to file, internal gives the command whether the data should be returned as an internal structure. The progress setting defines whether the download progress should be shown or not.
+Next, we will get the NDVI data for 6 years for a square of 2km x 2km around the tower site. We can use the function `mt_subset()` for this. The parameters of this function download a subset of data within the chosen product (here 'MOD13Q1'). We specify the location as latitude and longitude, and the band we chose, which is at 250m spatial resolution and 16-day temporal resolution. The time period can be chosen as a subset of “dates” and must be provided in the form of start and end date. We are looking at the beginning of 2009 to the end of 2014. `km_lr` and `km_ab` define the kilometers to the left and right of the location and kilometers above and below, respectively. Since these values are being rounded to the nearest integer, we choose this minimum of 1, corresponding to 2km2. Sitename is used in writing data to file, internal gives the command whether the data should be returned as an internal structure. The progress setting defines whether the download progress should be shown or not.
 
 ```{r eval = F}
 df_ndvi <- mt_subset(product = "MOD13Q1",            # the chosen product
@@ -303,7 +303,7 @@ Indeed, R2 increased from 0.5229 to 0.603 when including considering NDVI * PPFD
 Documenting the coordinates of data as it is collected allows us to assign a precise location to that data, which can be important in further analysis when, for example, comparing location. As you all undoubtedly know coordinates come with a latitude (defining the position N or S of the equator) and longitude (defining the position E or W of the meridian). With the coordinates we can already plot our data points, remembering that the latitude is equivalent to the y-axis and longitude to the x-axis.
 
 In this section, we look at the position of the Fluxnet sites. The Fluxnet network measures land-atmosphere exchanges of greenhouse gases and energy for sites across the globe using the eddy covariance technique. High-frequency measurements of vertical wind velocity and a scalar mixing ratio (CO2, H2O, temperature, etc.) provides estimates of the net exchange of the scalar. Eddy covariance is currently the standard method to measure fluxes of trace gases between ecosystems and the atmosphere (sources:
-https://fluxnet.org/about/, https://www.nature.com/articles/s41597-020-0534-3.pdf).
+[Fluxnet](https://fluxnet.org/about/), [Nature Article on Fluxnet Dataset](https://www.nature.com/articles/s41597-020-0534-3.pdf).
 
 Right at the beginning of this tutorial we loaded the dataset containing information on sites in Europe. We treat site locations as a geographical position. So we will extract the name, longitude and latitude of our sites.
 
