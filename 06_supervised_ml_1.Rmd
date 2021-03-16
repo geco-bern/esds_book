@@ -17,13 +17,7 @@ After this learning unit, you will be able to ...
 
 ### Important points from the lecture
 
-Machine learning refers to a class of algorithms that automatically generate statistical models of data.
-    
-There are two main types of machine learning:
-    
-Machine learning refers to a class of algorithms that generate statistical models of data.
-    
-There are two main types of machine learning:
+Machine learning refers to a class of algorithms that automatically generate statistical models of data. There are two main types of machine learning:
     
 **Unsupervised machine learning**: A class of algorithms that automatically detect patterns in data without using labels or ‘learning without a teacher’. Examples are: PCAs, k-means clustering, autoencoders, self-organizing maps, etc.
 
@@ -639,6 +633,7 @@ Load the file `"ddf_ch_lae.RData"` and split the dataset into 70% used for train
 **Hint:**
 
 To evaluate the performance of a fitted model on a dataset `df`, you can use the object returned by the function `train()` (`modl` in the example below) in combination with `predict()` as:
+
 ```{r eval = FALSE}
 values_redicted <- predict(modl, newdata = df)
 ```

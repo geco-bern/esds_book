@@ -20,7 +20,7 @@ In this practical we will look at data variety in environmental sciences. We wil
 
 To get you familiar with spatial data types we will use a variety of data from freely accessible sites. We can obtain abiotic and biotic conditions at the tower locations. We will be spatially plotting the eddy towers you have already encountered in the first two chapters and extracting values for these locations from other data. By doing this we can show that the climate at these sites spans a gradient temperature and landcover. There are also biotic components that could explain variation in productivity among sites, including species composition and functional traits of plants. 
 
-## Learning objectives
+### Learning objectives
 
 After this learning unit, you will be able to ...
 
@@ -166,7 +166,7 @@ head(df_ndvi) %>% select(2:7) # Only displaying 6 of 21 features
 ```
 
 This dataframe takes some effort to make sense of. Let's make our lives a little easier and put this data into a useful spatial context. For that it needs to be converted to a raster. This is a key spatial data type and will be described in more detail in the section Raster below. 
-MODISTools provides a handy integrated function for converting the data to a raster `mt_to_raster()`.
+The `MODISTools` packages provides a handy function, called `mt_to_raster()`, for converting such data frames produced by `mt_subset()` into a raster.
 
 ```{r echo=F, message=FALSE, warning=FALSE}
 library(sf)
@@ -252,7 +252,9 @@ ddf_ch_lae_ndvi <- ddf_ch_lae %>%
   dplyr::select(-year)
 ```
 
-NDVI data is provided every 16 days. In order to predict values at other time steps, we can fit a cubic smoothing spline to our daily values. (Cubic smoothing splines embody a curve fitting technique that blends the ideas of cubic splines and curvature minimization to create an effective data modeling tool for noisy data. Traditional interpolating cubic splines represent the tabulated data as a piece-wise continuous curve which passes through each value in the data table. The curve spanning each data interval is represented by a cubic polynomial, with the requirement that the endpoints of adjacent cubic polynomials match in location and in their first and second derivatives). 
+NDVI data is provided every 16 days. In order to predict values at other time steps, we can fit a cubic smoothing spline to our daily values using `smooth.spline()`. In a nutshell, this is a way to fit a curve between two data points using cubic functions.
+
+(In more detail, for the interested: Cubic smoothing splines embody a curve fitting technique that blends the ideas of cubic splines and curvature minimization to create an effective data modeling tool for noisy data. Traditional interpolating cubic splines represent the tabulated data as a piece-wise continuous curve which passes through each value in the data table. The curve spanning each data interval is represented by a cubic polynomial, with the requirement that the endpoints of adjacent cubic polynomials match in location and in their first and second derivatives. For more, have a look at this [blogpost](https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac)) 
 
 ```{r}
 ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>% 
@@ -261,8 +263,8 @@ ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>%
 df_nona <- ddf_ch_lae_ndvi %>% 
   drop_na()
 
-out_spline <- smooth.spline( df_nona$date_dec, df_nona$mean, spar=0.1 )
-vals_spline <- predict( out_spline, ddf_ch_lae_ndvi$date_dec )$y
+out_spline <- smooth.spline(df_nona$date_dec, df_nona$mean, spar=0.1 )
+vals_spline <- predict(out_spline, ddf_ch_lae_ndvi$date_dec )$y
 
 ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>% 
   mutate(ndvi_splined = vals_spline)

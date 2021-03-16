@@ -4,6 +4,10 @@ author: "Loïc Pellissier, Joshua Payne, Benjamin Stocker"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
+output:
+  bookdown::gitbook: default
+#  pdf_document:
+#    latex_engine: xelatex
 bibliography: [book.bib] # Packages.bib excluded
 biblio-style: apalike
 link-citations: true
@@ -63,4 +67,5 @@ conflict_prefer("mse", "Metrics")
 
 ```{r global-options, include=FALSE}
 knitr::opts_chunk$set(out.width = "50%", fig.align = "center", warning=FALSE, message=FALSE)
+options(tinytex.verbose = TRUE)
 ```

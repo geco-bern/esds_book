@@ -13,7 +13,7 @@
     - Area under the ROC curve 
 - Account for the stochasticity of model training when assessing model performance
 
-**Important points from the lecture**
+### Important points from the lecture
 
 - For binary classification problems, the output node often uses a *sigmoid activation function*.
 - A *classification threshold* is applied to the output of the sigmoid activation function to determine which label is predicted.

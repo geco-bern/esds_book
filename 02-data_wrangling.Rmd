@@ -962,7 +962,7 @@ save(ddf_ch_lae, file = "data/ddf_ch_lae.RData")
 
 For this week's exercise open up an Rstudio environment. 
 
-#### Outlier removal
+x#### Outlier removal
 
 a. Based on the half-hourly dataset for site CH-Lae, aggregated to daily means, **identify outliers** in `GPP_NT_VUT_REF` with respect to the linear relationship between `GPP_NT_VUT_REF` and `PPFD_IN`. To do so, first fit a linear regression model using `lm()`. This function returns a list of objects, one of which is `residuals`. Determine outliers as the "outlying" points in the distribution of residuals. You may use the base-R function `boxplot.stats()` and set the argument `coef` accordingly to our customised threshold definition.
 ```{r}

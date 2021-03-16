@@ -13,7 +13,7 @@ After this learning unit, you will be able to ...
 * Apply logistic regression to a simple classification problem.
 * Recall and apply measures of model performance and loss for classification, specifically accuracy and cross-entropy.
 
-*Important points from the lecture*
+### Important points from the lecture
 
 * It is always worthwhile to perform an initial exploratory analysis of your data, e.g. to identify outliers, missing values, etc.
 * To train a statistical model using machine learning, we split our data into training and testing sets. Sometimes we also include a validation set.
@@ -24,7 +24,6 @@ After this learning unit, you will be able to ...
 * Logistic regression is a classification technique.
 * Logistic regression is similar in model structure to linear regression. It is different in that it can capture non-linearities in data. 
 * As compared to regression problems, classification problems require different loss functions and measures of model performance. For example, loss can be measured using cross-entropy and model performance can be measured using accuracy.
-
 
 ## Tutorial
 ### Set-up

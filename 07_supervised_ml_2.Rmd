@@ -1,7 +1,7 @@
 # Supervised Machine Learning II {#ch-07}
 
 ## Introduction
-
+### Leaerning objectives
 After this learning unit, you will be able to ...
 
 - Explain the effect of hyper-parameter tuning in the context of the K-nearest neighbour algorithm.
@@ -11,9 +11,11 @@ After this learning unit, you will be able to ...
 
 ### Key points from the lecture
 
+** Training data ** is the data that is used to train our model, "to fit a curve to the data points".
+
 **Testing data** is set aside at the initial split and not "touched" during model training. It is key to test a model’s predictive power or whether it is overfitted. 
 
-**Validation data** is used for determining the loss during model training. The reason for distinguishing between testing and validation data is to assure we're not misleading model training by some peculiarities of the validation data and we get an assessment of generalisability based on data that was not seen during model training.
+**Validation data** is used for determining the loss during model training. The reason for distinguishing between testing and validation data is to assure we're not misleading model training by some peculiarities of the training data and we get an assessment of generalisability based on data that was not seen during model training. This distinction might be somewhat confusing for now, have a look at this [blog post](https://machinelearningmastery.com/difference-test-validation-datasets/) for additional explanations.
 
 **Model training** minimises the loss. In other words, it optimises the agreement between predicted and observed values. The loss is most commonly measured by the root mean square error (RMSE).
 
@@ -58,9 +60,13 @@ At the beginning of this tutorial, we demonstrated a case of overfitting. In the
 
 But how can the generalisability be assessed when the testing set is held out completely during the training step? To measure the model's generalisability and "direct" the ML algorithm to minimize the validation error during the training step, we can further split the training set into one or more training and validation sub-set. This is called *resampling*. The model performance determined on this resampled validation set is then a good estimate of the generalisation error we get when evaluated against the testing data that was set aside from the initial split.
 
-The challenge to be met here is that we further reduce the number of data points in the resampled training and validation sets which may lead to evaluation statistics not being sufficiently robust and bears the potential that we're training to some peculiarities in the (relatively small) validation set. In order to control for this, common practice is to do multiple resamples (multiple *folds* of training-validation splits), determine the validation error on each fold of the validation set and consider the mean validation error across all folds. This is called *k-fold cross validation*.
+The challenge to be met here is that we further reduce the number of data points in the resampled training and validation sets which may lead to evaluation statistics not being sufficiently robust and bears the potential that we're training to some peculiarities in the (relatively small) validation set. In order to control for this, common practice is to do multiple resamples (multiple *folds* of training-validation splits) which is the *repeat* part of repeated CV.
 
-```{r, echo = FALSE, fig.cap = "Example of 5-fold cross validation. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/process.html#k-fold-cross-validation)."}
+By repeating cross-validation we are picking different folds for training and validating. For each repetition, we can determine the validation error, i.e., how well the trained model performed on the validation fold. Taking the mean performance across all repetitions gives us the average performance we would expect for the model to have on unseen data. This provides a general assessment of how good the model may perform. To actually check for its performance, we can use the training data set that we excluded from the beginning and was not used in the CV process.
+
+Taking the mean validation error across all repetitions, we can This is called *k-fold cross validation*.
+
+```{r, echo = FALSE, fig.cap = "Example of 5-fold cross validation. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/process.html#k-fold-cross-validation). Note that the orange boxes called *Test* refer to a test fold which we refer to as validation set. Be precise here, this *Test* is not the held-out test data set!}
 knitr::include_graphics("./figures/cv.png")
 ```
 
@@ -634,7 +640,7 @@ We see that by including all predictors, we get the best model performance in te
 
 ### Exploratory modelling
 
-Using the same data set as above (daily data for CH-Lae), find the model with the best performance, measured by evaluation against validation data held out from an initial split (30-70%). Use your own creativity to pre-process features and select variables, and chose between either a KNN or a multivariate linear regression, or any other ML model if you like (see models available with caret [here](https://topepo.github.io/caret/available-models.html)). Use all methods you've learned so far and impress your peers. Who gets the best generalisable model? Document and justify all steps you take.
+Using the same data set as above (daily data for CH-Lae), find the model with the best performance, measured by evaluation against testing data held out from an initial split (30-70%). Use your own creativity to pre-process features and select variables, and chose between either a KNN or a multivariate linear regression, or any other ML model if you like (see models available with caret [here](https://topepo.github.io/caret/available-models.html)). Use all methods you've learned so far and impress your peers. Who gets the best generalisable model? Document and justify all steps you take.
 
 Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
 
