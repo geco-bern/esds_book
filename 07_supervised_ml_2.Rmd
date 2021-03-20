@@ -614,7 +614,7 @@ partial(linmod3, "VPD_F", plot = TRUE)
 partial(linmod3, c("PPFD_IN", "VPD_F"), plot = TRUE)
 ```
 
-The pdp package works with various model classes. For classes that are not available, a prediction wrapper function has to be specified as described for example [here](https://bradleyboehmke.github.io/HOML/iml.html#implementation-6).
+The `pdp` package works with various model classes. For classes that are not available, a prediction wrapper function has to be specified as described for example [here](https://bradleyboehmke.github.io/HOML/iml.html#implementation-6). If you want to learn more about PDP, have a look the online book by [Christoph Molnar](https://christophm.github.io/interpretable-ml-book/).
 
 Note: The computational demand of partial dependence analysis rapidly increases as the number of search grid points (`j` in the algorithm description above) rises. 
 
