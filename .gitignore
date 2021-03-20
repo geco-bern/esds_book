@@ -9,6 +9,7 @@ data/
 _book/
 _bookdown_files/
 esds_book_files/
+figure/
 
 packages.bib
 esds_book.log
