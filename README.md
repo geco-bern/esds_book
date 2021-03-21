@@ -1,6 +1,6 @@
 # Table of contents
-- [Introduction](#introduction)
 - [Table of contents](#table-of-contents)
+- [Introduction](#introduction)
 - [How to use this book](#how-to-use-this-book)
   * [Git](#git)
     + [Set-Up](#set-up)
