@@ -884,10 +884,6 @@ Wow, an accuracy of 90%. Sounds good right!? In this case it actually is, but we
 
 ## Exercise
 
-IMPORTANT NOTE: You have to solve the exercise using the keras library.
-
-Questions:
- 
  1. Read in the data, tokenize the iris type (so that the output is a number) into a new column with name "y". Namely, "virginica" --> 1, "not_virginica" --> 0 
  2. Shuffle your data and create a train and test set with proportions 80% and 20% of the given data respectively.
  3. Plot the training data and give a different color for each type.
@@ -897,208 +893,151 @@ Questions:
  6. Evaluate the accuracy of the model in the test set.
  7. Plot the testing data (use different colors for each Type), include the decision boundary from the fitted model and also use different point type for the misclassified predictions (if any).
 
-You have to solve questions 3-7 with 2 different configurations.
+You have to solve tasks 3-7 with 2 different configurations A and B.
 
  a. Using only the Petal Width as predictor
  b. Using both Petal Length and Petal Width as predictors
 
-A skeleton code is provided below:
+**A skeleton code is provided below to help you out with the coding.**
 
-### Import required libraries
-```{r eval = F}
-library(tidyverse)
-library(reticulate)
-use_condaenv()
-library(keras)
-library(tensorflow)
-```
+***
 
 IMPORTANT NOTE: READ CAREFULLY!
 Do not skip this part or you'll run into issues later on!
 In a moment, after you've read the following instructions carefully, you should:
+
 - run the code chunk immediately below this text (`use_session_with_seed(0)`). 
 - look down in the *Console* it asks if you want to install some packages: ("Would you like to install Miniconda? [Y/n]:"). 
 - write _n_ and press enter. You should see the following code in the console: `Would you like to install Miniconda? [Y/n]: n`. 
-Now, you can normally continue with the exercise.
-
-If you were too eager and already pressed _Y_ (yes) and enter, don't panic! Just close your environment, re-open it and make sure that next time you go with _n_ (no).
+- if you were too eager and already pressed _Y_ (yes) and enter, don't panic! Just close your environment, re-open it and make sure that next time you go with _n_ (no).
 
 ```{r eval = F}
+## Run this to promt miniconda installation request!
 use_session_with_seed(0)
 ```
 
-### Read Data
-```{r}
-data = read.csv('./data/SLNN_I/exercise/data_iris.csv')
-head(data)
-```
-
-### Tokenize Type
 ```{r eval = F}
-#create a new column with name y where y=1 defines virginica while y=0 defines not_virginica
-
-#YOUR SOLUTION HERE 
-#HINT: Use the ifelse function
-data$y = 
+## 1. Read Data
+data <- read.csv('./data/SLNN_I/exercise/data_iris.csv')
 head(data)
-```
 
-```{r eval = F}
-#YOUR SOLUTION HERE -> shuffle the data and make the train,test split
-#shuffle data
+## 2. Tokenize type
+#  Create a new column with name y where y=1 defines virginica while y=0 defines not_virginica
+
+# <ADD CODE HERE>
+# HINT: Use the ifelse function
+data$y <-
+head(data)
+
+# <ADD CODE HERE: shuffle the data and make the train,test split>
+# Shuffle data
 set.seed(42)
-shuffle = 
-data = 
+shuffle <- 
+data <- 
 head(data)
 
-#split data
-breakpoint = 
+# Split data
+breakpoint <- 
 
-#Create train and test set  
-df_train = 
-df_test = 
+# Create train and test set  
+df_train <- 
+df_test <- 
 
-#create input and output
+# Create input and output
+x_train <- df_train[,c('Petal_Length', 'Petal_Width')]
+y_train <- df_train$y
  
-x_train = df_train[,c('Petal_Length', 'Petal_Width')]
-y_train= df_train$y
- 
-x_test = df_test[,c('Petal_Length', 'Petal_Width')]   
-y_test = df_test$y
- 
-```
-
-### Configuration a
-
-#### Plot the training data
-
-```{r eval = F}
-#YOUR SOLUTION HERE: use only the Petal Width as input
-
+x_test <- df_test[,c('Petal_Length', 'Petal_Width')]   
+y_test <- df_test$y
 
 ```
 
-#### Create the model
+***
+**Configuration A for tasks 3-5**
 
 ```{r eval = F}
-#YOUR SOLUTION HERE
-#fill in what is missing
-# you have to use the right activation and loss function for logistic regression
+## A3. Plot training data
+# <ADD CODE HERE: use only the Petal Width as input>
 
- use_session_with_seed(42) 
- model_a = keras_model_sequential()
- 
- model_a %>% layer_dense(units = 1,activation = ) 
- 
- opt = optimizer_adam(lr=0.1)
- 
- model_a %>% compile(loss = ,optimizer = opt, metrics = 'accuracy')
- 
- model_a %>% fit(x= x_train$Petal_Width,y=y_train,epochs=20,batch_size=32)
- 
- w_a = unlist(get_weights(model_a))
-```
+## A4. Create model
+# <FILL IN MISSING PARTS BELOW>
+# HINT: Use right activation and loss functions for logistic regression
 
-#### Plot the decision boundary
-
-```{r eval = F}
-#Your solution
-```
-
-#### Evaluate the accuracy of the model in the test set
-
-```{r eval = F}
-#YOUR SOLUTION HERE
-#fill in what is missing
-
-# take probabilities
-p_nn = predict(model_a,x_test$Petal_Width)
-
-#make decisions
-pred = 
-
-# accuracy
-
-accuracy = 
-
-cat("Test Accuracy: ",round(accuracy,3),'/n')
-
-```
-
-
-#### Plot misclassified predictions in the test data
-
-```{r eval = F}
-#YOUR SOLUTION
-# HINT: create a new column in the df_test which indicates those points that are misclassified
-```
-
-### Configuration b
-
-#### Plot the training data
-
-```{r eval = F}
-#YOUR SOLUTION HERE: use both the Petal Length and Petal Width as inputs
-#HINT your x=Petal_Length,y=Petal_Width
-
-
-```
-
-#### Create the model
-
-```{r eval = F}
-#YOUR SOLUTION HERE
-#fill in what is missing
-# you have to use the right activation and loss function for logistic regression
-
- 
 use_session_with_seed(42) 
- 
-model_b = keras_model_sequential()
- 
-model_b %>% layer_dense(units = 1,activation = ) 
- 
+model_a <- keras_model_sequential()
+
+model_a %>% layer_dense(units = 1, activation = ) 
+
 opt = optimizer_adam(lr=0.1)
+
+model_a %>% compile(loss = ,optimizer = opt, metrics = 'accuracy')
+
+model_a %>% fit(x= x_train$Petal_Width,y=y_train,epochs=20,batch_size=32)
+
+w_b <- unlist(get_weights(model_a))
  
+## A5. Plot decision boundary
+# <ADD CODE HERE>
+# HINT: Decision boundary is now a vertical line
+
+## A6. Evaluate the accuracy on test set
+# <FILL IN MISSING PARTS BELOW>
+
+# Take probabilities
+p_nn <- predict(model_a, x_test$Petal_Width)
+
+# Make decisions
+pred <-
+
+# Accuracy
+accuracy <- 
+cat("Test Accuracy: ", round(accuracy, 3), '/n')
+
+## A7. Plot misclassified predictions in the test data
+# <FILL IN MISSING PARTS BELOW>
+# HINT: Create a new column in the df_test which indicates those points that are misclassified
+```
+
+***
+**Configuration B for tasks 3-5**
+```{r eval = F}
+## B3. Plot training data
+# <ADD CODE HERE: use only the Petal Width as input>
+
+## B4. Create model
+# <FILL IN MISSING PARTS BELOW>
+# HINT: Use right activation and loss functions for logistic regression
+use_session_with_seed(42) 
+model_b <- keras_model_sequential()
+
+model_b %>% layer_dense(units = 1, activation = ) 
+
+opt = optimizer_adam(lr=0.1)
+
 model_b %>% compile(loss = ,optimizer = opt, metrics = 'accuracy')
- 
+
 model_b %>% fit(x=as.matrix(x_train),y=y_train,epochs=30,batch_size=32)
+
+w_b <- unlist(get_weights(model_b))
  
-w_b = unlist(get_weights(model_b)) 
-```
+## B5. Plot decision boundary
+# <ADD CODE HERE>
+# HINT: Decision boundary is now a line with slope and intercept
 
-#### Plot the decision boundary
+## B6. Evaluate the accuracy on test set
+# <FILL IN MISSING PARTS BELOW>
 
-```{r eval = F}
-#Your solution
-#HINT: Your desicion boundary now is a line
-```
+# Take probabilities
+p_nn <- predict(model_b,as.matrix(x_test))
 
-#### Evaluate the accuracy of the model in the test set
+# Make decisions
+pred <-
 
-```{r eval = F}
-#YOUR SOLUTION HERE
-#fill in what is missing
+# Accuracy
+accuracy <-
+cat("Test Accuracy: ", round(accuracy, 3), '/n')
 
-
-# take probabilities
-p_nn = predict(model_b,as.matrix(x_test))
-
-#make decisions
-pred = 
-
-# accuracy
-
-accuracy = 
-
-cat("Test Accuracy: ",round(accuracy,3),'\n')
-
-```
-
-
-#### Plot misclassified predictions in the test data
-
-```{r eval = F}
-#YOUR SOLUTION
-# HINT: create a new column in the df_test which indicates those points that are misclassified
+## B7. Plot misclassified predictions in the test data
+# <FILL IN MISSING PARTS BELOW>
+# HINT: Create a new column in the df_test which indicates those points that are misclassified
 ```

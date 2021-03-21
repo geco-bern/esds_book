@@ -1,341 +1,75 @@
 ---
-title: "Exercise 13 Solution"
+title: "Exercise 01 - Solution"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Intro: What is this file here?
+
+This is a RMarkdown file. It allows you to combine normal text with executable code - much like a Jupyter Notebook. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+summary(cars)
 ```
 
-This exercise has two parts. 
-
-In the __first__ part you have to create a feed forward neural network using only the ndvi image as input. In this case each pixel of the image is considered as a feature.
-
-In the __second__ part you have to create a mixed model. As we have alreday seen in tutorial 13, categorical features can also be incorporated into a neural network model. Namely, in tutorial 13, a mixed model combining the cnn features and the tower location (as a categorical feature) is created.The goal of this part is to also incorporate the corresponding month for each ndvi input image along with the tower location. The reason for such a refinement is because seasonality plays an important role in vegetation metabolism and therefore can affect the CO2 fluxes.
-
-For the __second__ part a sceleton code is provided. You have only to fill in the missing code where is necessary. Is there an improvement in the model performance on validation and test set?
-
-
-
-### Import libraries
-
+You can also embed plots, for example:
 ```{r}
-library(imputeTS) # Library for Imputation
+hist(rnorm(1000))
+```
+
+You can also run individual cells by putting to cursor into it and do command + enter, or in RStudio by clicking the green "play" icon in the top-right corner of the cell. You can also run all cells of the RMarkdown file sequentially by clicking on "Run" in the top right corner of this window. This embeds all output of the cells (be it a plot or text returned to the R console).
+
+# Solution
+
+**1. Manually manipulate the .xls file to make it tidy.**
+After manually editing the file in Excel, we get it into a tidy shape. This should look like the screenshot below.
+
+![](../figures/ex_01_tidyexcel.png)
+
+***
+**2. Save the data as a .csv file (comma-separated-values).**
+This sheet can now be exported into a comma-separated-values (CSV) file. Here, we're exporting it into a file named `""groenigen14sci_database_s1.csv""`. CSV is a file format that is readable across platforms and without relying on proprietary software. 
+
+***
+**3. Read the .csv file into RStudio.**
+After reading it into R we get a data frame that we can now (finally) work with.
+```{r}
 library(tidyverse)
-library(reticulate)
-use_condaenv()
-library(keras) # Python library for deep learning
-library(tensorflow) 
+df_groenigen <- read_csv("../data/groenigen14sci_tidy.csv")
 ```
 
-### Read data
 
+***
+**4. Calculate the logarithmic response ratio as the logarithm of the ratio of soil C contents at elevated CO2 divided by soil C contents at ambient CO2, for each data point (experiment and sample date).**
+
+To define a vector with values of the logarithmic response ratios of each experiment and sample data point, we can work, for example, with the vectors of SOC at elevated and ambient CO2 extracted from the data frame.
 ```{r}
-#read data
-path = "../../data"
-
-##tower features
-train=readRDS(file.path(path,'train','towers_feature','features.rds'))
-val=readRDS(file.path(path,'validation','towers_feature','features.rds'))
-test=readRDS(file.path(path,'test','towers_feature','features.rds'))
-
-# have a look
-head(train)
+rr <- log(df_groenigen$eco2_mean / df_groenigen$aco2_mean)
 ```
 
-
+Alternatively, we could create a new column in the data frame as:
 ```{r}
-## take CO2 flux
-y_train = train$co2
-y_val = val$co2
-y_test =  test$co2
-##ndvi images
-ndvi_train = readRDS(file.path(path,'train','NDVI','ndvi_train.rds')) 
-ndvi_val =  readRDS(file.path(path,'validation','NDVI','ndvi_val.rds'))
-ndvi_test = readRDS(file.path(path,'test','NDVI','ndvi_test.rds'))
-
-#print some statistics of the data
-paste("Size of training set is ",length(y_train))
-paste("Size of validation set is ",length(y_val))
-paste("Size of test set is ",length(y_test))
+df_groenigen <- cbind(df_groenigen, log(df_groenigen$eco2_mean / df_groenigen$aco2_mean))
+names(df_groenigen) <- c(names(df_groenigen)[-ncol(df_groenigen)], "rr")
 ```
-
-### Preprocess ndvi images
-
+This was a annoyingly complicated. Much better to work with tidyverse functions to which you'll be properly introduced in Chapter 4. In the tidyverse, we can create a new column containing logarithmic response ratio using the `mutate()` function as:
 ```{r}
-#specify image size
-IMAGE_WIDTH = dim(ndvi_train)[2]
-IMAGE_HEIGHT = dim(ndvi_train)[3]
-IMAGE_CHANNELS = 1
-IMAGE_SIZE = c(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)
-
-
-#fill missing values , rescale images to [0,1] , reshape to be a valid input for NN
-
-preprocess_images = function(ndvi){
-  
-  min_ndvi = -2000
-  max_ndvi = 10000
-  
-  #fill missing values
-  nd = apply(ndvi,c(2,3),function(i) na_interpolation(i))
-  
-  #rescale to [0,1]
-  nd = (nd-min_ndvi)/(max_ndvi-min_ndvi)
-  
-  #reshape adding an extra dimension
-  nd = array_reshape(nd,dim=c(-1,IMAGE_SIZE))
-  
-  return (nd)
-}
-             
-#take preprocessed images
-ndvi_train_pr = preprocess_images(ndvi_train)
-ndvi_val_pr = preprocess_images(ndvi_val)
-ndvi_test_pr = preprocess_images(ndvi_test)
+df_groenigen <- df_groenigen %>% 
+  mutate(rr = log(eco2_mean / aco2_mean))
 ```
 
-## Part 1
-
-### Create a feed forward neural network using only the ndvi image 
-
-This model should more complex than the one provided in tutorial 13
-
+***
+**5. Visualise the distribution of the response ratio and save the plot as a .pdf file.**
+To visualise the distribution of response ratios, we can plot a histogram. Applied directly to the vector defined above, this can be done as:
 ```{r}
-model=keras_model_sequential()
-model %>% layer_flatten(input_shape = IMAGE_SIZE) %>% 
-  layer_dense(units = 128,activation = 'relu') %>%
-  layer_dense(units = 64,activation = 'relu') %>%
-  layer_dense(units = 32,activation = 'relu') %>%
-  layer_dense(units=1)
-
-summary(model)
+hist(rr, xlab = "Response ratio of SOC: log(aCO2 / eCO2)")
 ```
 
-
-
-### Train the model
-
-Hint: In tutorial 13 can found some ideas how to train the model and which are the proper callbacks
-
+In the tidyverse, we would use the ggplot2 library as:
 ```{r}
-#optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-#file path for ffnn
-dir.create('saved_models')
-dir.create(file.path('saved_models','FFNN'))
-save_path_ffnn = file.path('saved_models','FFNN')
-
-#callbacks for FFNN
-callbacks_ffnn = list(
-  callback_model_checkpoint(file.path(save_path_ffnn,"model_ffnn.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
-)
-
-# train the model
-history_ffnn = fit(model,x = ndvi_train_pr,y = y_train,batch_size = 128,
-                   epochs = 200,shuffle = T,validation_data = list(ndvi_val_pr,y_val),callbacks = callbacks_ffnn)
+library(ggplot2)
+ggplot(data = df_groenigen, aes(x = rr)) +
+  geom_histogram() +
+  labs(x = "Response ratio of SOC: log(aCO2 / eCO2)")
 ```
 
-
-### Plot training history
-
-```{r}
-plot(history_ffnn)
-```
-
-
-
-### Load the trained model and evaluate performance on validation and test set
-
-Hint: In tutorial 13 we have already seen how to retrieve a trained model made by the checkpoint callback.
-
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
-}
-
-#load models
-model_ffnn = load_model_hdf5(file.path(save_path_ffnn,"model_ffnn.h5"))
-
-# Validation Mse
-ffnn_val_mse = mse(model_ffnn,ndvi_val_pr,y_val)
-
-#test mse
-ffnn_test_mse = mse(model_ffnn,ndvi_test_pr,y_test)
-
-#
-cat('Validation MSE: ',ffnn_val_mse,'\n')
-cat('Test MSE: ',ffnn_test_mse,'\n')
-
-```
-
-
-## Part 2
-
-
-### Create mixed model: CNN features + tower location + month
-
-In this model we propose to incorporate the month of the ndvi input image along with cnn features and the tower location. Our goal is to insert categorical features inside a neural network model and to examine if the performance can further improved. As it is obvious, a model which can take into account special informations about the ndvi input image such as the month that the image is taken and the spatial location of it seems more realistic. As a result, further improvement of the model performance can be expected.
-```{r}
-create_mixed = function(){
-  
-  #input --> ndvi images
-  input_1 = layer_input(shape=IMAGE_SIZE)
-  
-  #input --> tower + month
-  input_2 = layer_input(shape=c(2))
-  
-  # cnn layer
-  cnn_layer = layer_conv_2d(input_1,filters = 4, kernel_size = c(3,3), activation = 'relu',padding = 'same')
-  
-  # pool layer
-  pool =  layer_max_pooling_2d(cnn_layer,pool_size = c(3, 3)) 
-  
-  # cnn layer
-  cnn_layer_2 = layer_conv_2d(pool,filters = 16,kernel_size = c(3,3),activation = 'relu', padding = 'same')
-  
-  # pool layer
-  pool_2 =  layer_max_pooling_2d(cnn_layer_2,pool_size = c(3,3))
-  
-  # drop some features to avoid overfitting
-  drop_ft = layer_dropout(pool_2,rate = 0.2)
-  
-  # flatten the features
-  flat = layer_flatten(drop_ft)
-  
-  # mlp of the features --> project to dim 64
-  flat_proj = layer_dense(flat,units = 64,activation = 'relu')
-  
-  
-  # features --> tower , month
-  
-  #tower embedding --> input_dim = 34 (number of discrete towers), output_dim = 10 (number of requested trainable weights)
-  tower_emb = layer_embedding(input_2[,1],input_dim = 34,output_dim = 10)
-  #reshape
-  tower_emb = k_reshape(tower_emb,shape = c(-1,10))
-  
-  #month embedding --> input_dim = 12 (number of discrete months), output_dim = 10 (number of requested trainable weights)
-  month_emb = layer_embedding(input_2[,2],input_dim = 12,output_dim = 10)  
-  #reshape
-  month_emb = k_reshape(month_emb,shape = c(-1,10))
-  
-  #concatenate embeddings
-  emb_concat = k_concatenate(list(tower_emb,month_emb))
-  
-  # ffnn of embedings
-  emb_proj = layer_dense(emb_concat,units = 32,activation = 'relu')
-  
-  # concatenate cnn feautures and embeddings of tower and months
-  ft_concat= k_concatenate(list(flat_proj,emb_proj))
-  
-  #output
-  output =  layer_dense(ft_concat,units = 1, activation = 'linear')
-  
-  #create model
-  model = keras_model(list(input_1,input_2),output)
-  
-  return(model)
-}
-
-
-model = create_mixed()
-
-summary(model)
-```
-
-### Tokenize tower location and month
-
-```{r}
-#create function which tokenizes tower and month
-
-tokenize_data = function(data){
-  
-  #tokenize tower
-  tower_token = rep(NA,length(data$tower))
-  
-  for ( i in 1:length(unique(data$tower))){
-    ind_tow= which(data$tower==unique(data$tower)[i])
-    tower_token[ind_tow]=i-1
-  }
-  
-  #tokenize month
-  month_token = data$month -1
-  
-  return (as.matrix(data.frame(tower_token = tower_token,month_token = month_token)))
-}
-
-
-# take tokens of tower , year , month
-train_tokens = tokenize_data(train)
-val_tokens = tokenize_data(val)
-test_tokens = tokenize_data(test)
-```
-
-### Train the model
-
-```{r}
-# optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#file path for mixed
-dir.create('saved_models')
-dir.create(file.path('saved_models','Mixed'))
-save_path_mixed = file.path('saved_models','Mixed')
-
-# callback for mixed
-callbacks_mixed = list(
-  callback_model_checkpoint(file.path(save_path_mixed,"model_mixed.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
-)
-
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-# train the model
-history_mixed = fit(model,x = list(ndvi_train_pr,train_tokens),y = y_train,batch_size = 128,
-              epochs = 200,shuffle = T,validation_data = list(list(ndvi_val_pr,val_tokens),y_val),
-             callbacks = callbacks_mixed)
-
-```
-
-### Plot training history
-
-```{r}
-#plot mixed history
-plot(history_mixed)
-```
-
-### Load the trained model and evaluate performance on validation and test set
-
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
-}
-
-#load models
-model_mixed = load_model_hdf5(file.path(save_path_mixed,"model_mixed.h5"))
-
-# Validation Mse
-mixed_val_mse = mse(model_mixed,list(ndvi_val_pr,val_tokens),y_val)
-
-#test mse
-mixed_test_mse = mse(model_mixed,list(ndvi_test_pr,test_tokens),y_test)
-
-#
-cat('Validation MSE: ',mixed_val_mse,'\n')
-cat('Test MSE: ',mixed_test_mse,'\n')
-
-```
-
-As we observe if the month is included in the model, the performance is further improved. Namely we can achieve MSE less than 2.

@@ -1,341 +1,299 @@
 ---
-title: "Exercise 13 Solution"
+title: "Exercise 06 - Solution"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Supervised Machine Learning I
 
-This exercise has two parts. 
+**1. Model formulation**
 
-In the __first__ part you have to create a feed forward neural network using only the ndvi image as input. In this case each pixel of the image is considered as a feature.
-
-In the __second__ part you have to create a mixed model. As we have alreday seen in tutorial 13, categorical features can also be incorporated into a neural network model. Namely, in tutorial 13, a mixed model combining the cnn features and the tower location (as a categorical feature) is created.The goal of this part is to also incorporate the corresponding month for each ndvi input image along with the tower location. The reason for such a refinement is because seasonality plays an important role in vegetation metabolism and therefore can affect the CO2 fluxes.
-
-For the __second__ part a sceleton code is provided. You have only to fill in the missing code where is necessary. Is there an improvement in the model performance on validation and test set?
-
-
-
-### Import libraries
-
+**a. Load the file** `"ddf_ch_lae.RData"` and rename the data frame to `df`. First, drop columns `NEE_VUT_REF_QC` and `TIMESTAMP` and then remove any row with missing values. To have all necessary data wrangling functions available, it may be handy to load the "super-package" *tidyverse* (which contains multiple individual packages).
 ```{r}
-library(imputeTS) # Library for Imputation
 library(tidyverse)
-library(reticulate)
-use_condaenv()
-library(keras) # Python library for deep learning
-library(tensorflow) 
+
+## Load daily data and rename for use below
+load("../data/ddf_ch_lae.RData") # loads 'ddf_ch_lae'
+#load("ddf_ch_lae.RData")
+
+df <- ddf_ch_lae %>% 
+  select(-NEE_VUT_REF_QC, -TIMESTAMP) %>%  # not numeric features
+  drop_na()                                # drop rows with missing data
 ```
 
-### Read data
+**b. Train a linear regression model** to predict `GPP_NT_VUT_REF` from  the variables `PPFD_IN`, `PA_F`, `TA_F` in the dataframe `df`, using (a) the suitable base-R function and (b) the caret function `train()` with argument `trControl = trainControl("none")` (This fits one model to the entire training set without resampling. You'll learn more about what this is in Chapter 7).
+
+**c. Questions:** Compare the fitted models with the function `summary()` and answer the following questions:
+
+- What are the values for the intercept $\beta_0$ and the slope $\beta_1$?
+  __Answer:__ Intercept ($\beta_0$) is reported by the summary output ('(Intercept)', Column 'Estimate'). Slope is reported as 'Estimate' for the name of the corresponding predictor.*
+
+- Do the two packages yield identical estimates of the coefficients?
+  __Answer:__ Yes, they should. Compare by doing `summary(<linear_model_fitted_in_caret>)` and `summary(<linear_model_fitted_by_lm>)`. Or by using `coef()`.*.
+
+- What is the root mean square error of the fitted model?
+  __Answer:__ This can be extracted by `sigma(<linear_model_fitted_by_lm>)`*
+
+- Is the relationship between `GPP_NT_VUT_REF` and `PPFD_IN` positive or negative? Is it significant?
+  __Answer:__ hether the relationship is positive (increasing `GPP_NT_VUT_REF` with increasing `PPFD_IN`) or negative, can be determined by looking at the coefficients. It's positive for `PPFD_IN`. The model formulations are implemented as follows:*
 
 ```{r}
-#read data
-path = "../../data"
+library(caret)
 
-##tower features
-train=readRDS(file.path(path,'train','towers_feature','features.rds'))
-val=readRDS(file.path(path,'validation','towers_feature','features.rds'))
-test=readRDS(file.path(path,'test','towers_feature','features.rds'))
+## caret
+linmod_caret <- train(
+  form = GPP_NT_VUT_REF ~ PPFD_IN + PA_F + TA_F, 
+  data = df, 
+  method = "lm",
+  trControl = trainControl("none")
+ )
 
-# have a look
-head(train)
+## base-R
+linmod_baser <- lm(GPP_NT_VUT_REF ~ PPFD_IN + PA_F + TA_F, data = df)
+
+## compare coefficients and model metrics
+summary(linmod_caret)
+summary(linmod_baser)
+
+## They are identical. Well done.
+```
+
+***
+**2. One-hot encoding**
+
+**a. Bake a recipe:** Using the dataset with daily data from multiple sites `ddf_allsites.RData`, apply a One-hot encoding and a dummy encoding on the column containing vegetation type information (`igbp_land_use`), using the recipes package. Execute the recipe by applying the functions `prep()` and `bake()`. You may avoid the data splitting here and apply all functions on the same dataframe.
+
+```{r}
+library(recipes)
+
+## First load and select a subset of variables.
+load("../data/ddf_allsites.RData")
+
+#load("ddf_allsites.RData")
+ddf <- ddf_allsites %>% 
+  unnest(data) %>% 
+  select(igbp_land_use, one_of(names(df))) %>% 
+  mutate(igbp_land_use = as.factor(igbp_land_use))  # to make sure it's interpreted as nominal
+
+## Formulate recipe as a formula and pre-processing step
+myrecipe_onehot <- recipe(GPP_NT_VUT_REF ~ ., data = ddf) %>% 
+  step_dummy(all_nominal(), one_hot = TRUE)
+myrecipe_dummy <- recipe(GPP_NT_VUT_REF ~ ., data = ddf) %>% 
+  step_dummy(all_nominal(), one_hot = FALSE)
+
+## Use prep() to determine the pre-processing parameters based on data 'ddf'
+myprep_onehot <- prep(myrecipe_onehot, training = ddf)  # use the same dataframe as for recipe
+myprep_dummy  <- prep(myrecipe_dummy,  training = ddf)
+
+## Use bake() to transform the data 'ddf' with parameters determined by prep().
+mybake_onehot <- bake(myprep_onehot, new_data = ddf) # use the same dataframe as for recipe
+mybake_dummy  <- bake(myprep_dummy,  new_data = ddf)
+```
+
+**b. Question:** How many columns does the un-processed original data frame have and how many columns are in the freshly "baked" data frames created by the One-hot encoding and how many in the one from the dummy-encoding? Explain the differences.
+```{r}
+## original data has 12 columns
+ncol(ddf)
+
+## igbp_land_use has 9 categories (unique values)
+ddf %>% pull(igbp_land_use) %>% unique() %>% length()
+
+## 12 + 9 - 1 = 20 (minus one because original column is replaced by 9 new ones)
+ncol(mybake_onehot)
+
+## Dummy-encoding drops one because it's obsolete (can be derived from the remaining 8) => 19
+ncol(mybake_dummy)
+```
+
+**c. Comparison:** Determine which column was created by the One-hot-encoding but not by the dummy-encoding.
+```{r}
+names_dummy <- names(mybake_dummy %>% select(starts_with("igbp_land_use")))
+names_onehot <- names(mybake_onehot %>% select(starts_with("igbp_land_use")))
+
+## the following variable is not in the dataframe created with dummy encoding ('mybake_dummy')
+obsolete <- names_onehot[which(!(names_onehot %in% names_dummy))]
+print(obsolete)
+```
+
+***
+**3. Sequential pre-processing**
+
+**a. Question:** You have learned about several pre-processing steps. The implementation of these steps was demonstrated using the recipes package which allows you to be specific about the order in which the pre-processing steps are applied. Does the order matter?
+__Answer:__ Pre-processing steps and their order are specifiec by sequentially adding steps, combined by the pipe operator (`%>%`). It's sensible to drop zero-variance predictors first to avoid later steps are executed on them. The dummy-encoding must come last. Otherwise, 0 and 1 values are re-scaled and are converted to numeric. Whether centering is done before scaling or the other way round is not relevant. Below is the full implementation.*
+
+**b. Daily data:** Apply the following three pre-processing steps on the daily dataset you used above (for the problem on 'One-hot encoding') and make sure that, after all three steps are applied by your specified order, the columns created by the dummy-encoding can be interpreted as logical variables.
+
+- Filter out zero or near-zero variance features.
+- Standardize (center and scale) numeric features.
+- Dummy encode categorical features.
+
+```{r}
+library(recipes)
+
+## First load and select a subset of variables.
+load("../data/ddf_allsites.RData")
+
+ddf <- ddf_allsites %>% 
+  tidyr::unnest(data) %>% 
+  select(igbp_land_use, one_of(names(df))) %>% 
+  mutate(igbp_land_use = as.factor(igbp_land_use))  # to make sure it's interpreted as nominal
+
+myrecipe <- recipe(GPP_NT_VUT_REF ~ ., data = ddf) %>% 
+  
+  ## it's sensible to drop zero-variance predictors first to avoid later steps are executed on them
+  step_zv(all_predictors()) %>%
+  step_center(all_numeric(), -all_outcomes()) %>%
+  step_scale(all_numeric(), -all_outcomes()) %>% 
+  
+  ## the dummy-encoding must come last otherwise, 0 and 1 values are re-scaled and are converted to numeric
+  step_dummy(all_nominal(), one_hot = FALSE)
+```
+
+**c. Visualise the distribution of numeric variables.** Do not include the ones created by the dummy-encoding. Plot the original and pre-processed dataset using an appropriate plot type.
+__Answer:__ To get the standardized values, we first need to apply `prep()` and `bake()` with the recipe specified above (and using the same data as above). For `pivot_longer()`, we need to select the columns that should be gathered into a long format. We can simply do this in two steps: First `select()` the columns 2 to 12 (to drop `igbp_land_use`) and then gather (new) column numbers 1 to 11. The rest is done as described in Chapter 2 for the same example.*
+
+```{r}
+## 3c. 
+library(ggplot2)
+library(tidyr)
+library(ggridges)
+
+myprep <- prep(myrecipe, training = ddf)
+mybake <- bake(myprep, new_data = ddf)
+
+ddf %>% 
+  select(2:12) %>% 
+  pivot_longer(cols = 1:11, names_to = "variable", values_to = "value") %>% 
+  ggplot(aes(x = variable, y = value)) +
+  geom_boxplot() +
+  labs(title = "Before standardization") +
+  ylim(-30,600) +
+  coord_flip()
+# ggsave("fig/boxplots_rawdata.pdf", width = 6, height = 4)
+# ggsave("fig/boxplots_rawdata.png", width = 6, height = 4)
+
+mybake %>% 
+  select(1:11) %>% 
+  pivot_longer(cols = 1:11, names_to = "variable", values_to = "value") %>% 
+  ggplot(aes(x = variable, y = value)) +
+  geom_boxplot() +
+  ylim(-3,3) +
+  labs(title = "After standardization") +
+  coord_flip()
+# ggsave("fig/boxplots_normalised.pdf", width = 6, height = 4)
+# ggsave("fig/boxplots_normalised.png", width = 6, height = 4)
+```
+
+**Hint:**
+We have learned in Chapter two that ggplot2 is designed to implement the *grammar of graphics* where variables are mapped onto aesthetics. If we want to create, for example, separate boxplots for each variable, arranged side-by-side along the x-axis, we want to specify the x-axis aesthetics to be the variable identity (something like `aes(x = variable)`). However, in our dataset, we have multiple variables (eleven to be precise) in separate columns. Strictly speaking, this is not entirely *tidy* and therefore, it's not quite straight-forward to create a ggplot graphics with data from multiple separate columns and organise them along one of the available aesthetics (here, x-axis). We have to take an additional step and combine the multiple columns into a single one. The new-rearranged and very *tidy* dataframe then has a new column (e.g., called `value`) that contains all the values of all the variables, and another new column (e.g. called `variable`) that specifies which variable the value belongs to. This re-arrangement can also be described as converting a table in *wide* format (wide because of its large number of columns) to a *long* format (long because of its large number of rows). This transformation is illustrated below.
+
+```{r pivot, echo=FALSE, fig.cap='Visualizsation of turning a table from wide format (right) into long format (left). Figure from [R for Data Science](https://cmdlinetips.com/2020/02/r-for-data-science-book-gets-tidyr-1-0-0-friendly/).'}
+knitr::include_graphics("../figures/fig_pivot_longer_wide_to_long_tidy.jpg")
+```
+
+In R, this conversion from a wide to a long table (usable with ggplot) is done in one line by `pivot_longer()` from the tidyr package (part of the tidyverse).
+```{r}
+## wide format
+ddf %>% 
+  select(2:4)  # for demonstration
+
+## long format
+ddf %>% 
+  select(2:4) %>%  # for demonstration
+  pivot_longer(cols = 1:3, names_to = "variable", values_to = "value")
 ```
 
 
-```{r}
-## take CO2 flux
-y_train = train$co2
-y_val = val$co2
-y_test =  test$co2
-##ndvi images
-ndvi_train = readRDS(file.path(path,'train','NDVI','ndvi_train.rds')) 
-ndvi_val =  readRDS(file.path(path,'validation','NDVI','ndvi_val.rds'))
-ndvi_test = readRDS(file.path(path,'test','NDVI','ndvi_test.rds'))
+***
+**4. K-nearest neighbours**
 
-#print some statistics of the data
-paste("Size of training set is ",length(y_train))
-paste("Size of validation set is ",length(y_val))
-paste("Size of test set is ",length(y_test))
+**a. Load the file** `"ddf_ch_lae.RData"` and split the dataset into 70% used for training and 30% for testing. Fit three KNN models of the form `GPP_NT_VUT_REF ~ .` with $k = (1, 25, 250)$ on the training set and evaluate the RMSE on the training and on the validation set.
+
+**b. For the model training**, use the caret function `train()` with arguments `trControl = trainControl("none")` and `tuneGrid = data.frame(k = 25)` (in the case of k = 25). Explain your observations. 
+
+**c. Questions:**
+
+- Which case (data set, k) has the lowest RMSE? Why?
+  __Answer:__ The lowest RMSE (zero) is achieved for the model with k=1 on the training set. In this case, the prediction is equal to the observed value of the target variable for the single closest point. This just follows from the definition of the KNN algorithm.*
+- Is there a pattern in the difference between RMSE derived from `df_train` and `df_test`, depending on k?
+  __Answer:__ For low k, the RMSE on the training set tends to zero and to very large numbers (overfitting!) for the validation set. For high k the RMSE on the training set tends to asymptotically increasing values both on the training and validation sets.*
+- How do the three models relatre to the bias-variance trade-off? Regarding their performance on the training set evaluation, which model has the highest bias? Which one has the highest variance?
+  __Answer:__ A low-k model represents high variance, a high-k model represents high-bias.*
+- How does this relate to their performance on the validation set? Please explain.
+  __Answer:__ High variance performs worst on the validation set. This is because it fits errors in the training set and is hence not well generalisable.*
+
+**Hint:**
+
+To evaluate the performance of a fitted model on a dataset `df`, you can use the object returned by the function `train()` (`modl` in the example below) in combination with `predict()` as:
+
+```{r eval = FALSE}
+values_redicted <- predict(modl, newdata = df)
 ```
 
-### Preprocess ndvi images
+This returns a vector of predicted values of the same length as rows in `df`. To get the RMSE of predicted vs. observed values, you can use the function `rmse()` from the tidyverse package *yardstick*. Check `?yardstick::rmse` for more information.
 
 ```{r}
-#specify image size
-IMAGE_WIDTH = dim(ndvi_train)[2]
-IMAGE_HEIGHT = dim(ndvi_train)[3]
-IMAGE_CHANNELS = 1
-IMAGE_SIZE = c(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)
+## using df as above
+library(rsample)
+library(caret)
+set.seed(123)  # for reproducibility - not mandatory
 
+## make initial split for separation into training and testing sets
+split_rsample <- initial_split(df, prop = 0.7)
+df_train <- training(split_rsample)
+df_test <- testing(split_rsample)
 
-#fill missing values , rescale images to [0,1] , reshape to be a valid input for NN
-
-preprocess_images = function(ndvi){
-  
-  min_ndvi = -2000
-  max_ndvi = 10000
-  
-  #fill missing values
-  nd = apply(ndvi,c(2,3),function(i) na_interpolation(i))
-  
-  #rescale to [0,1]
-  nd = (nd-min_ndvi)/(max_ndvi-min_ndvi)
-  
-  #reshape adding an extra dimension
-  nd = array_reshape(nd,dim=c(-1,IMAGE_SIZE))
-  
-  return (nd)
-}
-             
-#take preprocessed images
-ndvi_train_pr = preprocess_images(ndvi_train)
-ndvi_val_pr = preprocess_images(ndvi_val)
-ndvi_test_pr = preprocess_images(ndvi_test)
-```
-
-## Part 1
-
-### Create a feed forward neural network using only the ndvi image 
-
-This model should more complex than the one provided in tutorial 13
-
-```{r}
-model=keras_model_sequential()
-model %>% layer_flatten(input_shape = IMAGE_SIZE) %>% 
-  layer_dense(units = 128,activation = 'relu') %>%
-  layer_dense(units = 64,activation = 'relu') %>%
-  layer_dense(units = 32,activation = 'relu') %>%
-  layer_dense(units=1)
-
-summary(model)
-```
-
-
-
-### Train the model
-
-Hint: In tutorial 13 can found some ideas how to train the model and which are the proper callbacks
-
-```{r}
-#optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-#file path for ffnn
-dir.create('saved_models')
-dir.create(file.path('saved_models','FFNN'))
-save_path_ffnn = file.path('saved_models','FFNN')
-
-#callbacks for FFNN
-callbacks_ffnn = list(
-  callback_model_checkpoint(file.path(save_path_ffnn,"model_ffnn.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
+## train separate models with different k
+modl_knn_1 <- train(
+  form = GPP_NT_VUT_REF ~ ., 
+  data = df_train, 
+  method = "knn",
+  tuneGrid = data.frame(k = 1),
+  trControl = trainControl("none")
+)
+modl_knn_25 <- train(
+  form = GPP_NT_VUT_REF ~ ., 
+  data = df_train, 
+  method = "knn",
+  tuneGrid = data.frame(k = 25),
+  trControl = trainControl("none")
+)
+modl_knn_250 <- train(
+  form = GPP_NT_VUT_REF ~ ., 
+  data = df_train, 
+  method = "knn",
+  tuneGrid = data.frame(k = 250),
+  trControl = trainControl("none")
 )
 
-# train the model
-history_ffnn = fit(model,x = ndvi_train_pr,y = y_train,batch_size = 128,
-                   epochs = 200,shuffle = T,validation_data = list(ndvi_val_pr,y_val),callbacks = callbacks_ffnn)
+## using the trained models, predict values on the training set
+df_train <- df_train %>% 
+  mutate(gpp_pred_k1 = predict(modl_knn_1, newdata = .),
+         gpp_pred_k25 = predict(modl_knn_25, newdata = .),
+         gpp_pred_k250 = predict(modl_knn_250, newdata = .))
+
+## using the trained models, predict values on the validation set
+df_test <- df_test %>% 
+  mutate(gpp_pred_k1 = predict(modl_knn_1, newdata = .),
+         gpp_pred_k25 = predict(modl_knn_25, newdata = .),
+         gpp_pred_k250 = predict(modl_knn_250, newdata = .))
+
+## create a table with RMSE for each k and training/testing sets
+yardstick::rmse(df_train, GPP_NT_VUT_REF, gpp_pred_k1) %>% 
+  mutate(k = 1, data = "df_train") %>% 
+  bind_rows(.,
+            yardstick::rmse(df_train, GPP_NT_VUT_REF, gpp_pred_k25) %>% 
+              mutate(k = 25, data = "df_train")) %>% 
+  bind_rows(.,
+            yardstick::rmse(df_train, GPP_NT_VUT_REF, gpp_pred_k250) %>% 
+              mutate(k = 250, data = "df_train")) %>% 
+  bind_rows(.,
+            yardstick::rmse(df_test, GPP_NT_VUT_REF, gpp_pred_k1) %>% 
+              mutate(k = 1, data = "df_test")) %>% 
+  bind_rows(.,
+            yardstick::rmse(df_test, GPP_NT_VUT_REF, gpp_pred_k25) %>% 
+              mutate(k = 25, data = "df_test")) %>% 
+  bind_rows(.,
+            yardstick::rmse(df_test, GPP_NT_VUT_REF, gpp_pred_k250) %>% 
+              mutate(k = 250, data = "df_test")) %>% 
+  select(data, k, .estimate)
 ```
-
-
-### Plot training history
-
-```{r}
-plot(history_ffnn)
-```
-
-
-
-### Load the trained model and evaluate performance on validation and test set
-
-Hint: In tutorial 13 we have already seen how to retrieve a trained model made by the checkpoint callback.
-
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
-}
-
-#load models
-model_ffnn = load_model_hdf5(file.path(save_path_ffnn,"model_ffnn.h5"))
-
-# Validation Mse
-ffnn_val_mse = mse(model_ffnn,ndvi_val_pr,y_val)
-
-#test mse
-ffnn_test_mse = mse(model_ffnn,ndvi_test_pr,y_test)
-
-#
-cat('Validation MSE: ',ffnn_val_mse,'\n')
-cat('Test MSE: ',ffnn_test_mse,'\n')
-
-```
-
-
-## Part 2
-
-
-### Create mixed model: CNN features + tower location + month
-
-In this model we propose to incorporate the month of the ndvi input image along with cnn features and the tower location. Our goal is to insert categorical features inside a neural network model and to examine if the performance can further improved. As it is obvious, a model which can take into account special informations about the ndvi input image such as the month that the image is taken and the spatial location of it seems more realistic. As a result, further improvement of the model performance can be expected.
-```{r}
-create_mixed = function(){
-  
-  #input --> ndvi images
-  input_1 = layer_input(shape=IMAGE_SIZE)
-  
-  #input --> tower + month
-  input_2 = layer_input(shape=c(2))
-  
-  # cnn layer
-  cnn_layer = layer_conv_2d(input_1,filters = 4, kernel_size = c(3,3), activation = 'relu',padding = 'same')
-  
-  # pool layer
-  pool =  layer_max_pooling_2d(cnn_layer,pool_size = c(3, 3)) 
-  
-  # cnn layer
-  cnn_layer_2 = layer_conv_2d(pool,filters = 16,kernel_size = c(3,3),activation = 'relu', padding = 'same')
-  
-  # pool layer
-  pool_2 =  layer_max_pooling_2d(cnn_layer_2,pool_size = c(3,3))
-  
-  # drop some features to avoid overfitting
-  drop_ft = layer_dropout(pool_2,rate = 0.2)
-  
-  # flatten the features
-  flat = layer_flatten(drop_ft)
-  
-  # mlp of the features --> project to dim 64
-  flat_proj = layer_dense(flat,units = 64,activation = 'relu')
-  
-  
-  # features --> tower , month
-  
-  #tower embedding --> input_dim = 34 (number of discrete towers), output_dim = 10 (number of requested trainable weights)
-  tower_emb = layer_embedding(input_2[,1],input_dim = 34,output_dim = 10)
-  #reshape
-  tower_emb = k_reshape(tower_emb,shape = c(-1,10))
-  
-  #month embedding --> input_dim = 12 (number of discrete months), output_dim = 10 (number of requested trainable weights)
-  month_emb = layer_embedding(input_2[,2],input_dim = 12,output_dim = 10)  
-  #reshape
-  month_emb = k_reshape(month_emb,shape = c(-1,10))
-  
-  #concatenate embeddings
-  emb_concat = k_concatenate(list(tower_emb,month_emb))
-  
-  # ffnn of embedings
-  emb_proj = layer_dense(emb_concat,units = 32,activation = 'relu')
-  
-  # concatenate cnn feautures and embeddings of tower and months
-  ft_concat= k_concatenate(list(flat_proj,emb_proj))
-  
-  #output
-  output =  layer_dense(ft_concat,units = 1, activation = 'linear')
-  
-  #create model
-  model = keras_model(list(input_1,input_2),output)
-  
-  return(model)
-}
-
-
-model = create_mixed()
-
-summary(model)
-```
-
-### Tokenize tower location and month
-
-```{r}
-#create function which tokenizes tower and month
-
-tokenize_data = function(data){
-  
-  #tokenize tower
-  tower_token = rep(NA,length(data$tower))
-  
-  for ( i in 1:length(unique(data$tower))){
-    ind_tow= which(data$tower==unique(data$tower)[i])
-    tower_token[ind_tow]=i-1
-  }
-  
-  #tokenize month
-  month_token = data$month -1
-  
-  return (as.matrix(data.frame(tower_token = tower_token,month_token = month_token)))
-}
-
-
-# take tokens of tower , year , month
-train_tokens = tokenize_data(train)
-val_tokens = tokenize_data(val)
-test_tokens = tokenize_data(test)
-```
-
-### Train the model
-
-```{r}
-# optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#file path for mixed
-dir.create('saved_models')
-dir.create(file.path('saved_models','Mixed'))
-save_path_mixed = file.path('saved_models','Mixed')
-
-# callback for mixed
-callbacks_mixed = list(
-  callback_model_checkpoint(file.path(save_path_mixed,"model_mixed.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
-)
-
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-# train the model
-history_mixed = fit(model,x = list(ndvi_train_pr,train_tokens),y = y_train,batch_size = 128,
-              epochs = 200,shuffle = T,validation_data = list(list(ndvi_val_pr,val_tokens),y_val),
-             callbacks = callbacks_mixed)
-
-```
-
-### Plot training history
-
-```{r}
-#plot mixed history
-plot(history_mixed)
-```
-
-### Load the trained model and evaluate performance on validation and test set
-
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
-}
-
-#load models
-model_mixed = load_model_hdf5(file.path(save_path_mixed,"model_mixed.h5"))
-
-# Validation Mse
-mixed_val_mse = mse(model_mixed,list(ndvi_val_pr,val_tokens),y_val)
-
-#test mse
-mixed_test_mse = mse(model_mixed,list(ndvi_test_pr,test_tokens),y_test)
-
-#
-cat('Validation MSE: ',mixed_val_mse,'\n')
-cat('Test MSE: ',mixed_test_mse,'\n')
-
-```
-
-As we observe if the month is included in the model, the performance is further improved. Namely we can achieve MSE less than 2.

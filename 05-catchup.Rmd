@@ -1,5 +1,4 @@
 # Catch-up {#ch-05}
-
 This chapter is a review of various applications and functions of the code we have covered so far.
 
 ## Loops in R

@@ -6,19 +6,7 @@ In Chapter \@ref(ch-07), we noted that the coefficient of determination $R^2$ ma
 
 In this application session, we'll implement an algorithm that sequentially searches the best additional predictor to be included in our model, starting from a single one. This is called *stepwise-forward* regression (see definition below). There is also *stepwise-backward* regression where predictors are sequentially removed from a model that includes them all. The challenge is that we often lack the possibility to confidently assess generalisability. The effect of spuriously increasing $R^2$ by adding uninformative predictors can be mitigated, as we noted in Chapter \@ref(ch-07), by considering alternative metrics that penalize the number of predictors in a model. They balance the tradeoff between model complexity (number of variables in the linear regression case) and goodness of fit. Such metrics include the *adjusted-*$R^2$,the Akaike Information Criterion (AIC), or the Bayesian Information Criterion (BIC). In cases, where sufficient data is available, also cross-validation can be used for assessing the generalisability of alternative models. Here, we'll assess how these different metrics behave for a sequence of linear regression models with an increasing number of predictors. You'll learn to write code that implements an algorithm determining the order in which variables enter the model, starting from one and going up to fourteen predictors. You'll write your own stepwise-forward regression code.
 
-Let's get started...
-
-
-**Forward stepwise regression**
-
-1. Let $\mathcal{M_0}$ denote the null model, which contains no predictors.
-
-2. For $k=0,..,p-1$:
-   (a) Consider all $p − k$ models that augment $\mathcal{M}_k$ with one additional predictor. 
-   (b) Choose the best model among these $p − k$ models, and call it $\mathcal{M}_{k+1}$. Here _best_ is defined as having the highest $R^2$ .
-
-3. Select a single best model from among $\mathcal{M}_0$, . . . , $\mathcal{M}_p$ using cross-validated prediction error, AIC, BIC, or adjusted $R^2$.
-
+Let's get started!
 
 ## Application
 ### Warm-up 1: Nested for-loop
@@ -71,6 +59,17 @@ summ
 
 
 ### Warm-up 2: Find the best single predictor
+
+**The math behind forward stepwise regression:**
+
+1. Let $\mathcal{M_0}$ denote the null model, which contains no predictors.
+
+2. For $k=0,..,p-1$:
+   (a) Consider all $p − k$ models that augment $\mathcal{M}_k$ with one additional predictor. 
+   (b) Choose the best model among these $p − k$ models, and call it $\mathcal{M}_{k+1}$. Here _best_ is defined as having the highest $R^2$ .
+
+3. Select a single best model from among $\mathcal{M}_0$, . . . , $\mathcal{M}_p$ using cross-validated prediction error, AIC, BIC, or adjusted $R^2$.
+
 
 The first step of a stepwise forward regression is to find the single most powerful predictor in a univariate linear regression model for the target variable `GPP_NT_VUT_REF` among all fourteen available predictors in our data set (all except those of type `date` or `character`). Implement this first part of the search, using the definition of the stepwise-forward algorithm above. Remove all rows with at least one missing value before starting the predictor search.
 
@@ -426,3 +425,128 @@ ggplot() +
   labs(title = "BIC")+ 
   coord_flip()
 ```
+
+### Bonus: Best Subset Selection
+
+First we generate our data.
+
+```{r}
+set.seed(41)
+
+#data size
+n = 500
+
+#predictors
+x1 = rnorm(n)
+x2 = rnorm(n)
+x3 = rnorm(n)
+
+#generate output
+y = 4*x1 + 3*x3 + rnorm(n)
+
+df_data = data.frame(y = y, x1 = x1,x2 = x2, x3 = x3)
+head(df_data)
+```
+The true underline model uses as predictors the variables x1 and x3. However in practise we do not know this information. What we really see is the df_data file. For this exercise we want to find those variables that are most informatives. Since we have 3 available predictors we can create 7 different models using all possible combinations of predictors. This type of variable selection is reffered as _Best Subset Selection_.
+
+```{r}
+formulas = c('y~x1','y~x2','y~x3','y~x1+x2','y~x1+x3','y~x2+x3','y~x1+x2+x3')
+cat("All possible models \n",paste(formulas,collapse = ' , '),'\n')
+
+```
+
+In order to find the optimal model we will use two methods:
+ 
+ a. BIC
+ b. Cross Validated MSE
+
+We note here that the BIC criterion uses all the available data while the MSE uses the cross validated test data.
+
+#### BIC
+```{r}
+#create vector that stores the BIC results for all the models
+bic_s = rep(NA,length(formulas))
+
+#iterate over the models
+for (i in 1:length(formulas)){
+  #construct formula
+  formula = as.formula(formulas[i])
+  
+  #fit linear model
+  lm_fit = lm(formula,data = df_data)
+  
+  #calculate bic
+  bic_s[i] = BIC(lm_fit)
+}
+
+```
+
+find the optimal model according to BIC
+```{r}
+#find the optimal model according to BIC
+cat("Optimal Model BIC: ",formulas[which.min(bic_s)])
+```
+
+#### Cross Validated MSE
+```{r}
+#shuffle the data
+shuffled_id = sample(x = 1:n, size = n)
+df_data = df_data[shuffled_id,]
+
+#specify the number of folds
+n_folds = 5
+
+#folds assignments (in which folder each point is assigned)
+folds = cut(1:n,breaks = n_folds,labels = FALSE)
+
+#create matrix to store the MSE from each test folder for all models : dimension 7 x n_folds
+mse_s = matrix(NA,nrow = length(formulas),ncol = n_folds)
+
+#iterate over the models
+for (i in 1:length(formulas)){
+  #construct formula
+  formula = as.formula(formulas[i])
+  
+  #cross validation for the i-th model
+  for(j in 1:n_folds){
+    #take train indixes for all folders except j
+    train_ind = (folds != j)
+    #take test indexes for folder j
+    test_ind = (folds == j)
+    
+    #train data that contains all the points that do not belong in folder j
+    train_data = df_data[train_ind,]
+    #test data that contains all the points that belong to folder j
+    test_data = df_data[test_ind,]
+    
+    #fit linear model using the training data
+    lm_fit = lm(formula, data = train_data)
+    
+    # calculate mse on test data
+    ## make predictions
+    y_pred = predict(lm_fit,test_data)
+    #calculate mse of test folder --> jth folder
+    mse = mean((y_pred - test_data$y)^2)
+    
+    mse_s[i,j] = mse
+  }
+}  
+```
+
+Check the MSE error for each test folder for every model.
+```{r}
+mse_s
+```
+
+Calculate Cross Validated MSE for every model.
+```{r}
+cv_mse = rowMeans(mse_s)
+cv_mse
+```
+
+Find the optimal model according to Cross Validated MSE.
+```{r}
+#find the optimal model according to CV 
+cat("Optimal Model CV_MSE: ",formulas[which.min(cv_mse)])
+```
+

@@ -1,341 +1,174 @@
 ---
-title: "Exercise 13 Solution"
+title: "Exercise 04 - Solution"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Data Scraping
 
-This exercise has two parts. 
-
-In the __first__ part you have to create a feed forward neural network using only the ndvi image as input. In this case each pixel of the image is considered as a feature.
-
-In the __second__ part you have to create a mixed model. As we have alreday seen in tutorial 13, categorical features can also be incorporated into a neural network model. Namely, in tutorial 13, a mixed model combining the cnn features and the tower location (as a categorical feature) is created.The goal of this part is to also incorporate the corresponding month for each ndvi input image along with the tower location. The reason for such a refinement is because seasonality plays an important role in vegetation metabolism and therefore can affect the CO2 fluxes.
-
-For the __second__ part a sceleton code is provided. You have only to fill in the missing code where is necessary. Is there an improvement in the model performance on validation and test set?
-
-
-
-### Import libraries
+**1. Get the data** a. Following the steps described in the tutorial, get the maximal length of the species *Salvelinus alpinus* and the *Salmo trutta* using an API. After fetching the values create a table to store these values in one dataframe. b. Get the IUCN Status and eggs shape for *Salvelinus alpinus* and *Salmo trutta* using web scraping. Again follow the same steps you learned in the tutorial. In the end, add the new information to the dataframe.
 
 ```{r}
-library(imputeTS) # Library for Imputation
-library(tidyverse)
-library(reticulate)
-use_condaenv()
-library(keras) # Python library for deep learning
-library(tensorflow) 
+## 1a.
+# We start by loading the packages.
+lib_vect <- c("RCurl", "XML", "raster", "rfishbase", "rgdal")
+sapply(lib_vect,library,character.only=TRUE)
+
+# First, we will directly fetch the maximum length using package rfishbase and calling function species.
+
+# Maximum length of Salvelinus alpinus.
+data_SA <- species("Salvelinus alpinus")
+length_max_SA <- species("Salvelinus alpinus", fields=c("Length"))
+length_max_SA <- length_max_SA$Length
+length_max_SA
+
+# Maximum length of Salmo trutta.
+data_ST <- species("Salmo trutta") 
+length_max_ST <- species("Salmo trutta", fields=c("Length"))
+length_max_ST <- length_max_ST$Length
+length_max_ST
+
+# Now we will store the values in a dataframe.
+table_SA_ST <- data.frame(length_max_SA,length_max_ST)
+table_SA_ST
+
+## 1b.
+# To get the IUCN status and egg shape we will name our variables same as the species().
+x <- "Salvelinus-alpinus"
+y <- "Salmo-trutta"
+
+# Next, we use the function paste() to convert its arguments to character strings and concatenate them to get the link of the webpage from which we are going to extract the data.
+url1 <- paste("http://www.fishbase.de/summary/",x,".html",sep="")
+url2 <- paste("http://www.fishbase.de/summary/",y,".html",sep="")
+
+# We will use getURLContent() to retrieve the source of a webpage, which is especially useful for retrieving pages for data processing. We will apply the function htmlParse() to obtain an R object.
+fishbase_SA <- htmlParse(getURLContent(url1, followlocation=TRUE)) 
+fishbase_ST <- htmlParse(getURLContent(url2, followlocation=TRUE)) 
+
+# get the information in the nodes "//div " and //span 
+fishbase_div_SA <-getNodeSet(fishbase_SA, "//div ")  
+fishbase_span_SA <- getNodeSet(fishbase_SA, "//span ") 
+fishbase_div_ST <-getNodeSet(fishbase_ST, "//div ") 
+fishbase_span_ST <- getNodeSet(fishbase_ST, "//span ")
+
+# Now we are ready to fetch the IUCN status. We will first get the IUCN Status of Salvelinus-alpinus. Function ‘which()’ is used to find the position of the elements we are looking for and then use regexec() to search for matches to the argument pattern within each element of a character vector.
+
+SA_IUCN  <-which(sapply(lapply(fishbase_div_SA,xmlValue),function(x)
+  {regexec(pattern="IUCN", x)[[1]][1]})>0) # look for the pattern IUCN
+
+if(length(SA_IUCN)==0){ # run the loop to get the IUCN status if non-empty otherwise set it to NA
+  IUCN_status="NA"
+} else {
+  d1_IUCN_SA <- xmlValue(fishbase_div_SA[[SA_IUCN[length(SA_IUCN)]]])
+} 
+d1_IUCN_SA 
+
+# From above we only need an IUCN status which is VU. So we are going to use unlist() to produce a vector which contains all the atomic components that occurs in the pattern (the pattern [[:alpha:]]+ is used to get the alphabetic characters) and regmatches() is used to extract or replace matched substrings from data obtained by gregexpr(). As already mentioned in the tutorial, the function gregexpr() does the same thing as regexec(), except that its returned object is a list rather than a vector.
+IUCN_SA <- unlist(regmatches(d1_IUCN_SA,gregexpr(pattern= "[[:alpha:]]+)",   d1_IUCN_SA)))
+IUCN_status_SA <- sub(pattern="[[:punct:]]",replacement="",IUCN_SA[1] ) 
+IUCN_status_SA
+
+# Next we do the same for IUCN Status of Salmo-trutta.
+ST_IUCN  <-which(sapply(lapply(fishbase_div_ST,xmlValue),function(y)
+  {regexec(pattern="IUCN", y)[[1]][1]})>0)
+if(length(ST_IUCN)==0){ 
+  IUCN_status="NA"
+} else {
+  d1_IUCN_ST <- xmlValue(fishbase_div_ST[[ST_IUCN[length(ST_IUCN)]]])
+} 
+IUCN_ST <- unlist(regmatches(d1_IUCN_ST,gregexpr(pattern= "[[:alpha:]]+)",  d1_IUCN_ST)))
+IUCN_status_ST <- sub(pattern="[[:punct:]]",replacement="",IUCN_ST[1] ) 
+IUCN_status_ST
+
+# Now, We will get the egg shape of Salvelinus-alpinus. We will use the function getHTMLLinks() to retrieve either the links within an HTML document or the collection of names of external files referenced in an HTML document. Next we need to look for the pattern FishEggInfoSummary and to do that we use the function grep().
+link_list_SA <- getHTMLLinks(fishbase_SA, externalOnly = TRUE, xpQuery = "//a/@href"
+, baseURL = docName(fishbase_SA)) 
+eggs_link_SA <- link_list_SA[grep("FishEggInfoSummary",link_list_SA)]
+eggs_link_SA <-eggs_link_SA[1]  # here we assign first object from the two fetched objects in the FishEggInfoSummary (in the tutorial you saw that both the objects are identical and we can assign any one of them arbitrarly) 
+eggs_link_SA
+
+# get rid of two dots ".."
+eggs_link_SA <- gsub("..","",eggs_link_SA,fixed=T)
+eggs_link_SA
+
+# Similarly to what we did previously, we will get the content of the webpage with the function getURLContent(). We will use readHTMLTable() to read in the table in the document. Then we can extract information from the table. Again, function which() is used to find the information. As we are looking for the shape of the egg, we will pass this value.
+
+url_egg_SA <- paste ("http://www.fishbase.org/",eggs_link_SA,sep="")
+egg_content_SA <- getURLContent(url_egg_SA, followlocation=TRUE, .encoding="CE_UTF8")
+
+# readHTMLTable() to read in the table in the document.
+egg_table_SA <- readHTMLTable(egg_content_SA,header=TRUE,colClasses=NULL,skip.rows=integer(),
+                       stringsAsFactors=FALSE,trim=TRUE,elFun=xmlValue,
+                       as.data.frame=TRUE,which=integer())[[1]]
+
+egg_shape_SA = egg_table_SA[which(egg_table_SA[,1] == "Shape of Egg"),2] # Shape of Egg
+if(egg_shape_SA == "") {egg_shape_SA = "NA"} # no information about the shape- set it to NA
+egg_shape_SA
+
+# To get the egg shape of Salmo-trutta, we follow the same steps as above.
+link_list_ST <- getHTMLLinks(fishbase_ST, externalOnly = TRUE, xpQuery = "//a/@href"
+, baseURL = docName(fishbase_ST))
+eggs_link_ST <- link_list_ST[grep("FishEggInfoSummary",link_list_ST)]
+eggs_link_ST <-eggs_link_ST[1]
+eggs_link_ST <- gsub("..","",eggs_link_ST,fixed=T)
+url_egg_ST <- paste ("http://www.fishbase.org/",eggs_link_ST,sep="")
+egg_content_ST <- getURLContent(url_egg_ST, followlocation=TRUE, .encoding="CE_UTF8")
+egg_table_ST <- readHTMLTable(egg_content_ST,header=TRUE,colClasses=NULL,skip.rows=integer(),
+                       stringsAsFactors=FALSE,trim=TRUE,elFun=xmlValue,
+                       as.data.frame=TRUE,which=integer())[[1]]
+egg_shape_ST = egg_table_ST[which(egg_table_ST[,1] == "Shape of Egg"),2]   # Shape of Egg
+if(egg_shape_ST == "") {egg_shape_ST = "NA"}
+egg_shape_ST
+
+# We can see that there is no data about the shape of the egg for both the species. We will store this information in a dataframe.
+table_IUCN_Egg_Shape <- data.frame(IUCN_status_SA,IUCN_status_ST,egg_shape_SA,  egg_shape_ST)
+table_IUCN_Egg_Shape
 ```
 
-### Read data
+------------------------------------------------------------------------
+
+**2. Get all the species in a family and the IUCN status** a. Your next task is to get all the species in the family *'Neoscopelidae'* and print the first 5 elements of the family. b. Extract the 'Native Exotic Status' of all the species from France. Then end get the unique values of the Native Exotic Status. For this task you will need to use the file *'ex02_data.csv'*. c. Now, use the information you got above to plot the proportion of species in each category for France.
 
 ```{r}
-#read data
-path = "../../data"
+## 2a.
+# We start by naming our vector same as the family ‘Neoscopelidae’.
+neo <- "Neoscopelidae"
+url_neo <- paste("http://www.fishbase.org/Nomenclature/FamilySearchList.php?Family=", neo,sep="") # get the url content
+Content_Neo <- getURLContent(url_neo, followlocation=TRUE) 
+# create a dataframe of the fetched content above using readHTMLTable()
+neo_df <- data.frame(readHTMLTable(Content_Neo,header=NA,colClasses=NULL,skip.rows=integer()
+,trim =TRUE,elFun=xmlValue,as.data.frame=TRUE,which=integer()))
+# change the values in the dataframe to charcater values 
+sp_per_family_Neo <- as.character(neo_df[,1])
+sp_per_family_Neo <- gsub(" ","-",sp_per_family_Neo) # fill the gap with "-"
+sp_per_family_Neo[1:5] # call the first five elements
 
-##tower features
-train=readRDS(file.path(path,'train','towers_feature','features.rds'))
-val=readRDS(file.path(path,'validation','towers_feature','features.rds'))
-test=readRDS(file.path(path,'test','towers_feature','features.rds'))
+## 2b. 
+# We will first read the data set and then fetch the all the data related to France and then we will look for the Native-Exotic status.
+dataset <- read.csv("../data/ex02_data.csv")  # read the table 
+subset <- dataset[grep("France", dataset$Country),] # extract the data related to France
+sp_france <- subset$X3.Native.Exotic.Status # extract the Native-Exotic status
+unique(sp_france)
 
-# have a look
-head(train)
+# Now, we plot the proprortion of exotic and native species in France.
+number_nv <- length(which(subset$X3.Native.Exotic.Status == "native"))
+number_ex <- length(which(subset$X3.Native.Exotic.Status == "exotic"))
+slices <- c(number_nv, number_ex)
+lbls <- c("native","exotic")
+pie(slices, labels = lbls,font.main = 1, 
+main = "Proportion of exotic and native species in France", col=c("green", "yellow"))
 ```
 
+------------------------------------------------------------------------
+
+**3. Extract the mean temperature for *Coregonus lavaretus* and *Salvelinus alpinus* using the function `stocks()` from `rfishbase` package and store the values in a new dataframe.**
 
 ```{r}
-## take CO2 flux
-y_train = train$co2
-y_val = val$co2
-y_test =  test$co2
-##ndvi images
-ndvi_train = readRDS(file.path(path,'train','NDVI','ndvi_train.rds')) 
-ndvi_val =  readRDS(file.path(path,'validation','NDVI','ndvi_val.rds'))
-ndvi_test = readRDS(file.path(path,'test','NDVI','ndvi_test.rds'))
+## 3.
+# We first get the minimun and maximum temperature of species Coregonus lavaretus and Salvelinus alpinus. To fetch the temperatures we call the function stocks(). Then we take the mean of the fetched temperatures.
+temperature_CL <- rowMeans(stocks("Coregonus lavaretus", c("TempMin", "TempMax")))
+temperature_SA <- rowMeans(stocks("Salvelinus alpinus", c("TempMin", "TempMax")))
 
-#print some statistics of the data
-paste("Size of training set is ",length(y_train))
-paste("Size of validation set is ",length(y_val))
-paste("Size of test set is ",length(y_test))
+# store the data in a table
+table_CL_SA <- data.frame(temperature_CL,temperature_SA)
+table_CL_SA
 ```
-
-### Preprocess ndvi images
-
-```{r}
-#specify image size
-IMAGE_WIDTH = dim(ndvi_train)[2]
-IMAGE_HEIGHT = dim(ndvi_train)[3]
-IMAGE_CHANNELS = 1
-IMAGE_SIZE = c(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)
-
-
-#fill missing values , rescale images to [0,1] , reshape to be a valid input for NN
-
-preprocess_images = function(ndvi){
-  
-  min_ndvi = -2000
-  max_ndvi = 10000
-  
-  #fill missing values
-  nd = apply(ndvi,c(2,3),function(i) na_interpolation(i))
-  
-  #rescale to [0,1]
-  nd = (nd-min_ndvi)/(max_ndvi-min_ndvi)
-  
-  #reshape adding an extra dimension
-  nd = array_reshape(nd,dim=c(-1,IMAGE_SIZE))
-  
-  return (nd)
-}
-             
-#take preprocessed images
-ndvi_train_pr = preprocess_images(ndvi_train)
-ndvi_val_pr = preprocess_images(ndvi_val)
-ndvi_test_pr = preprocess_images(ndvi_test)
-```
-
-## Part 1
-
-### Create a feed forward neural network using only the ndvi image 
-
-This model should more complex than the one provided in tutorial 13
-
-```{r}
-model=keras_model_sequential()
-model %>% layer_flatten(input_shape = IMAGE_SIZE) %>% 
-  layer_dense(units = 128,activation = 'relu') %>%
-  layer_dense(units = 64,activation = 'relu') %>%
-  layer_dense(units = 32,activation = 'relu') %>%
-  layer_dense(units=1)
-
-summary(model)
-```
-
-
-
-### Train the model
-
-Hint: In tutorial 13 can found some ideas how to train the model and which are the proper callbacks
-
-```{r}
-#optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-#file path for ffnn
-dir.create('saved_models')
-dir.create(file.path('saved_models','FFNN'))
-save_path_ffnn = file.path('saved_models','FFNN')
-
-#callbacks for FFNN
-callbacks_ffnn = list(
-  callback_model_checkpoint(file.path(save_path_ffnn,"model_ffnn.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
-)
-
-# train the model
-history_ffnn = fit(model,x = ndvi_train_pr,y = y_train,batch_size = 128,
-                   epochs = 200,shuffle = T,validation_data = list(ndvi_val_pr,y_val),callbacks = callbacks_ffnn)
-```
-
-
-### Plot training history
-
-```{r}
-plot(history_ffnn)
-```
-
-
-
-### Load the trained model and evaluate performance on validation and test set
-
-Hint: In tutorial 13 we have already seen how to retrieve a trained model made by the checkpoint callback.
-
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
-}
-
-#load models
-model_ffnn = load_model_hdf5(file.path(save_path_ffnn,"model_ffnn.h5"))
-
-# Validation Mse
-ffnn_val_mse = mse(model_ffnn,ndvi_val_pr,y_val)
-
-#test mse
-ffnn_test_mse = mse(model_ffnn,ndvi_test_pr,y_test)
-
-#
-cat('Validation MSE: ',ffnn_val_mse,'\n')
-cat('Test MSE: ',ffnn_test_mse,'\n')
-
-```
-
-
-## Part 2
-
-
-### Create mixed model: CNN features + tower location + month
-
-In this model we propose to incorporate the month of the ndvi input image along with cnn features and the tower location. Our goal is to insert categorical features inside a neural network model and to examine if the performance can further improved. As it is obvious, a model which can take into account special informations about the ndvi input image such as the month that the image is taken and the spatial location of it seems more realistic. As a result, further improvement of the model performance can be expected.
-```{r}
-create_mixed = function(){
-  
-  #input --> ndvi images
-  input_1 = layer_input(shape=IMAGE_SIZE)
-  
-  #input --> tower + month
-  input_2 = layer_input(shape=c(2))
-  
-  # cnn layer
-  cnn_layer = layer_conv_2d(input_1,filters = 4, kernel_size = c(3,3), activation = 'relu',padding = 'same')
-  
-  # pool layer
-  pool =  layer_max_pooling_2d(cnn_layer,pool_size = c(3, 3)) 
-  
-  # cnn layer
-  cnn_layer_2 = layer_conv_2d(pool,filters = 16,kernel_size = c(3,3),activation = 'relu', padding = 'same')
-  
-  # pool layer
-  pool_2 =  layer_max_pooling_2d(cnn_layer_2,pool_size = c(3,3))
-  
-  # drop some features to avoid overfitting
-  drop_ft = layer_dropout(pool_2,rate = 0.2)
-  
-  # flatten the features
-  flat = layer_flatten(drop_ft)
-  
-  # mlp of the features --> project to dim 64
-  flat_proj = layer_dense(flat,units = 64,activation = 'relu')
-  
-  
-  # features --> tower , month
-  
-  #tower embedding --> input_dim = 34 (number of discrete towers), output_dim = 10 (number of requested trainable weights)
-  tower_emb = layer_embedding(input_2[,1],input_dim = 34,output_dim = 10)
-  #reshape
-  tower_emb = k_reshape(tower_emb,shape = c(-1,10))
-  
-  #month embedding --> input_dim = 12 (number of discrete months), output_dim = 10 (number of requested trainable weights)
-  month_emb = layer_embedding(input_2[,2],input_dim = 12,output_dim = 10)  
-  #reshape
-  month_emb = k_reshape(month_emb,shape = c(-1,10))
-  
-  #concatenate embeddings
-  emb_concat = k_concatenate(list(tower_emb,month_emb))
-  
-  # ffnn of embedings
-  emb_proj = layer_dense(emb_concat,units = 32,activation = 'relu')
-  
-  # concatenate cnn feautures and embeddings of tower and months
-  ft_concat= k_concatenate(list(flat_proj,emb_proj))
-  
-  #output
-  output =  layer_dense(ft_concat,units = 1, activation = 'linear')
-  
-  #create model
-  model = keras_model(list(input_1,input_2),output)
-  
-  return(model)
-}
-
-
-model = create_mixed()
-
-summary(model)
-```
-
-### Tokenize tower location and month
-
-```{r}
-#create function which tokenizes tower and month
-
-tokenize_data = function(data){
-  
-  #tokenize tower
-  tower_token = rep(NA,length(data$tower))
-  
-  for ( i in 1:length(unique(data$tower))){
-    ind_tow= which(data$tower==unique(data$tower)[i])
-    tower_token[ind_tow]=i-1
-  }
-  
-  #tokenize month
-  month_token = data$month -1
-  
-  return (as.matrix(data.frame(tower_token = tower_token,month_token = month_token)))
-}
-
-
-# take tokens of tower , year , month
-train_tokens = tokenize_data(train)
-val_tokens = tokenize_data(val)
-test_tokens = tokenize_data(test)
-```
-
-### Train the model
-
-```{r}
-# optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#file path for mixed
-dir.create('saved_models')
-dir.create(file.path('saved_models','Mixed'))
-save_path_mixed = file.path('saved_models','Mixed')
-
-# callback for mixed
-callbacks_mixed = list(
-  callback_model_checkpoint(file.path(save_path_mixed,"model_mixed.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
-)
-
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-# train the model
-history_mixed = fit(model,x = list(ndvi_train_pr,train_tokens),y = y_train,batch_size = 128,
-              epochs = 200,shuffle = T,validation_data = list(list(ndvi_val_pr,val_tokens),y_val),
-             callbacks = callbacks_mixed)
-
-```
-
-### Plot training history
-
-```{r}
-#plot mixed history
-plot(history_mixed)
-```
-
-### Load the trained model and evaluate performance on validation and test set
-
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
-}
-
-#load models
-model_mixed = load_model_hdf5(file.path(save_path_mixed,"model_mixed.h5"))
-
-# Validation Mse
-mixed_val_mse = mse(model_mixed,list(ndvi_val_pr,val_tokens),y_val)
-
-#test mse
-mixed_test_mse = mse(model_mixed,list(ndvi_test_pr,test_tokens),y_test)
-
-#
-cat('Validation MSE: ',mixed_val_mse,'\n')
-cat('Test MSE: ',mixed_test_mse,'\n')
-
-```
-
-As we observe if the month is included in the model, the performance is further improved. Namely we can achieve MSE less than 2.

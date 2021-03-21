@@ -1,12 +1,5 @@
 # Primers {#ch-01}
 
-
-<!-- ```{r include=FALSE} -->
-<!-- ## link datasets -->
-<!-- system("mkdir data") -->
-<!-- system("ln -svf  ~/polybox/Shared/Data\ Science\ Lecture\ Planning\ -\ shared\ folder/4\ Datasets/* ./data/") -->
-<!-- ``` -->
-
 ## Introduction
 In this section, we'll show you how to structure a project and how to work with version control (git). You will learn how to read data into your workspace, get to know how different data is structured and what data types are, conduct simple data explorations and visualisations, and write data to files. You will also learn where you can turn to for help.
 
@@ -117,6 +110,39 @@ Lastly, we type `git push`. With this command, we upload our changes to the remo
 **Whenever you interrupt your work or finish a session, go through these commands!** Else your changes will be lost. Renku has an autosave function in case you forget but it can lead to conflicts when picking up your work again.
 
 Once you pick up your work again, either stop the environment you're working within Renku and open a new one or start the next session by again opening the terminal within Jupyter and type `git pull`. As its name suggests, with it we can pull changes in our document from the *Git* repository. This might seem like an unnecessary step, which it is if it's just you working on this document. However, especially for the exercise at the end of a tutorial you might be working together with a peer and need to make sure you have her/his changes as well. If you're working together, make sure, that you do not work on the same document at the same time. This might lead to merge conflicts. Just to be clear: You can work on the same document but not on the same copy. E.g. all students work with this tutorial but each one has her/his own copy. Changes in this document won't appear in any other student's document. However, if you work on a document where changes will appear on another student's document, you're working on the same copy. In that case, avoid working at the same time. If at some point you encounter a merge conflict that *Git* cannot resolve automatically you'll have to do so manually. At the [end of this tutorial](#Git-denies-pushing-what-can-I-do?) we show how it's done. However, it's unlikely that you'll encounter such a problem in this course, which is why we don't explain it right here.
+
+#### Supplementary: Git denies pushing what can I do?
+Most of the time when git denies you to push changes, it's because of merge conflicts. If you read the error message git will probably tell you to enter `git pull`. Go ahead and do so. If git cannot resolve a merge conflict automatically, you'll have to do it manually. Here, we show you how it's done.
+![](./figures/merge1.png)
+
+Once you've reached this point you will notice that if you close your file and want to reopen it, it won't work. Jupyter will prompt this warning:
+![](./figures/merge2.png)
+
+To resolve the problem you have to open the terminal and open your file with an editor:
+
+```{r eval=F}
+nano notebooks/01_primers.ipynb
+```
+
+This will open your file in an editor. Scroll through the file until you reach a section that is highlighted as a merge conflict (we've marked it <span style="color:red">red</span> for you). Merge conflicts are highlighted with <<<<<<<, ======= and >>>>>>>.
+
+![](./figures/merge3.png)
+
+In the next step, you'll have to manually remove the lines you want to get rid of and keep those you want to keep. You can also add something new like we did here.
+![](./figures/merge4.png)
+
+Once you've fixed the merge conflict within the editor, type `ctrl O`. It should prompt something like this at the bottom of the editor:
+
+![](./figures/merge6.png)
+
+If the file name is correct, hit `ctrl x`.
+
+Back in the terminal, type `git status`, `git add notebooks/01_primers.ipyn` (or the name of the document where your merge conflict appeared), type again `git status`, make a commit `git commit -m "resolved merge conflict"` and finally `git push`.
+
+![](./figures/merge5.png)
+
+Open your document and see if the conflict has been resolved. This is quite a bit of work! If you've not managed to resolve the conflict by yourself or feel intimidated or unsure about resolving a conflict, get in touch with a teaching assistant.
+
 
 ### Basics of R code
 
@@ -510,7 +536,6 @@ mylist$mean_temperature
 
 This was a very condensed introduction to vectors and lists. A more complete introduction is given [here](https://r4ds.had.co.nz/vectors.html).
 
-
 ### Data visualisation
 
 Looking at data is an integral part of any data science workflow. In this chapter, we introduce just the very basics. In later chapters, you'll get introduced to additional methods for visualising data. Our data frame `fluxes_subset` contains three variables, one of which is `time`. In other words, we're dealing with a time series. Let's look at the temporal course of temperature in the first 1440 time steps (corresponding to 30 days) as a line plot (`type = "l"`)
@@ -617,50 +642,29 @@ A great tutorial to using R for Data Science in general is the freely available 
 
 Congratulations, you've reached the end of the first tutorial! 
 
-This exercise will have you working on an Excel file and then in Renku's Rstudio.
-You'll need to download the provided datafile from moodle. Your task will be to tidy the data and then read it into Renku's Rstudio.
+This exercise will have you working on an Excel file and then in Renku's Rstudio. You'll need to download the provided datafile from moodle. Your task will be to tidy the data and then read it into Renku's Rstudio.
 
-Follow the steps outlined below to get a more detailed instruction on your task:
+Download data from Groenigen et al., 2014, containing soil organic matter content data from a meta analysis of CO2 experiments, and available on Moodle. Open the file in Excel and navigate to the tab 'Database S1'. You'll find a short description in the top-left cell: "Database S1. Overview of CO2 enrichment studies reporting soil C contents that were used in our analysis.". There is an issue with this dataset. Of course, .xls files are not easily readable into R without an extra package. What's more is that even after saving the tab 'Database S1' as a CSV file, the table you get is not **machine-readable** into a data frame that we can work with in R. The way the data is organised into cells doesn't follow the structure of a dataframe and is not tidy. Recall the **tidy data** rules from the 01_primers.ipynb tutorial.
+
+Your task is to:
+
+1. Manually manipulate the .xls file to make it tidy.
+2. Save the data as a .csv file (comma-separated-values).
+3. Read the .csv file into RStudio.
+4. Calculate the logarithmic response ratio as the logarithm of the ratio of soil C contents at elevated CO2 divided by soil C contents at ambient CO2, for each data point (experiment and sample date).
+5. Visualise the distribution of the response ratio and save the plot as a .pdf file.
+
+Implement steps 3.-5. in an RMarkdown (.Rmd), applying some of the points for good coding practices. For the peer review round, share your code and the figure file (as html file via the `knit` button at the top, left of the git menu, see Figure below) with your partner.
+
+<!-- Follow the steps outlined below to get a more detailed instruction on your task: 
 
 For the final exercise, you will move to RStudio on Renku. Since you're doing this for the first time, we'll quickly remind you how to get there:
 - Save all your changes to this file using git (git status, git add, git commit, git push)
 - Close this tab and go back to the [Renku](https://renkulab.io/) website.
 - Navigate to your environments and stop the environment.
 - Create a new environment, select `/rstudio` instead of `/lab`
-- Connect to the environment, navigate to the folder `/exercise/scripts/` and open the R file called 'exercise_01.R'
+- Connect to the environment, navigate to the folder `/exercise/scripts/` and open the R file called 'exercise_01.R' -->
 
 Before you go: Git looks a little different in Rstudio but essentially works the same way. Instead of typing the commands, you use a graphical user interface. Click on git (highlighted red in the following image), there you'll find the three options you're familiar with. `git status` and `git add` are not needed.
 
 ![](./figures/gitrstudio.png)
-
-### SI: Git denies pushing what can I do?
-Most of the time when git denies you to push changes, it's because of merge conflicts. If you read the error message git will probably tell you to enter `git pull`. Go ahead and do so. If git cannot resolve a merge conflict automatically, you'll have to do it manually. Here, we show you how it's done.
-![](./figures/merge1.png)
-
-Once you've reached this point you will notice that if you close your file and want to reopen it, it won't work. Jupyter will prompt this warning:
-![](./figures/merge2.png)
-
-To resolve the problem you have to open the terminal and open your file with an editor:
-
-```{r eval=F}
-nano notebooks/01_primers.ipynb
-```
-
-This will open your file in an editor. Scroll through the file until you reach a section that is highlighted as a merge conflict (we've marked it <span style="color:red">red</span> for you). Merge conflicts are highlighted with <<<<<<<, ======= and >>>>>>>.
-
-![](./figures/merge3.png)
-
-In the next step, you'll have to manually remove the lines you want to get rid of and keep those you want to keep. You can also add something new like we did here.
-![](./figures/merge4.png)
-
-Once you've fixed the merge conflict within the editor, type `ctrl O`. It should prompt something like this at the bottom of the editor:
-
-![](./figures/merge6.png)
-
-If the file name is correct, hit `ctrl x`.
-
-Back in the terminal, type `git status`, `git add notebooks/01_primers.ipyn` (or the name of the document where your merge conflict appeared), type again `git status`, make a commit `git commit -m "resolved merge conflict"` and finally `git push`.
-
-![](./figures/merge5.png)
-
-Open your document and see if the conflict has been resolved. This is quite a bit of work! If you've not managed to resolve the conflict by yourself or feel intimidated or unsure about resolving a conflict, get in touch with a teaching assistant.

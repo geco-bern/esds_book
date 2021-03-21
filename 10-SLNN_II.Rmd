@@ -1209,7 +1209,7 @@ For this exercise your task is to create 3 neural network models and to compare 
 The required libraries and some useful functions are already imported in the following chunks. For the ROC curve you can also use the `pROC` package.
 
 **Import libraries**
-```{r eval = F}
+```{r}
 library(tidyverse)
 library(reticulate)
 library(pROC)

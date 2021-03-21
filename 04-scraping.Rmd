@@ -340,7 +340,6 @@ egg_color = egg_tab[which(egg_tab[, 1] == "Color of Eggs"), 2]  # extract inform
 if(egg_color == ""){egg_color = "NA"}                           # set missing information to NA
 species_df <- tibble(species_df, Color = egg_color)             # Add new variable to data frane
 species_df
-
 ```
 
 
@@ -352,7 +351,7 @@ species_df
 Let us get some information on *Coregonus lavaretus* with this new package! We see that the super short code `species("Coregonus lavaretus")`provides us with 101 variables with entries for our fish species - think about the hand-written web scraping code this would require! To directly asses the maximal length of the species, we can directly use the `$` notation. As you might recall, this is the same length as we got above.
 
 ```{r}
-CL <- species("Coregonus lavaretus")
+CL <- species("Coregonus avaretus")
 CL$Length
 ```
 
@@ -389,8 +388,13 @@ One of the major limitations of an API is that we can only use already implement
 - We saw that this can be done either with web scraping or using APIs. 
 - We saw that web scraping can be tedious, but we learned about some limitations of APIs.
 
+**Additional Resources:**
 
-## Case Study: Species Richness and Red List species proportions
+* http://www.columbia.edu/~cjd11/charles_dimaggio/DIRE/styled-4/styled-6/code-13/
+* https://ourcodingclub.github.io/tutorials/webscraping/
+* https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
+
+## Case Study
 
 *Please note that the code below is written in base R and not tidyverse which makes the codes a bit more difficult to read. But do not worry about this and simply just enjoy the beauty of what R is capable of.*
 
@@ -493,7 +497,6 @@ paste0("NA:", " ", number_na)
 ```
 
 We are ready to plot this as pie chart.
-
 
 ```{r}
 slices <- c(number_lc, number_vu, number_na)
@@ -736,64 +739,15 @@ lines(model_df_prediction$log_area, model_df_prediction$lwr, col='skyblue2', lwd
 lines(model_df_prediction$log_area, model_df_prediction$upr, col='skyblue2', lwd=2, lty=3)
 ```
 
-
-
-### Additional Resources
-
-* http://www.columbia.edu/~cjd11/charles_dimaggio/DIRE/styled-4/styled-6/code-13/
-* https://ourcodingclub.github.io/tutorials/webscraping/
-* https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
-
 ## Exercise
 
-For this week's exercise open up the Rstudio environment. Remember to save all your changes to this notebook using git status, git add <filename>, git commit -m "your comment", git push.
-    
-Today's exercise is about getting data from the web and extracting useful insights from it. 
-    
-Get in touch with your teaching assistant if you have any further questions.
+Today's exercise is about getting data from the web and extracting useful insights from it. This exercise is about getting the data from the web. Once you have finished the exercise please `knit` this document to create an .html file, export it and upload it to moodle. 
 
-This exercise is about getting the data from the web. Once you have finished the exercise please 'knit' this document to create an .html file, export it and upload it to moodle. 
-
-### Part 1: Get the data
-
-a. Following the steps described in the tutorial, get the maximal length of the species *Salvelinus alpinus* and the *Salmo trutta* using an API. After fetching the values create a table to store these values in one dataframe. 
-
-```{r eval = F}
-# enter your solution here
-```
-
-b. Get the **IUCN Status** and **eggs shape** for *Salvelinus alpinus* and *Salmo trutta* using web scraping. Again follow the same steps you learned in the tutorial. In the end, add the new information to the dataframe.
-
-```{r eval = F}
-# enter your solution here
-```
-
-
-### Part 2: Get all the species in a family and the IUCN status
-
-a. Your next task is to get all the species in the family _'Neoscopelidae'_ and print the first 5 elements of the family.
-
-```{r eval = F}
-# enter your solution here
-```
-
-b. Extract the 'Native Exotic Status' of all the species from France. Then end get the unique values of the Native Exotic Status. For this task you will need to use the csv file _'dataset2'_.
-
-```{r eval = F}
-# enter your solution here
-```
-
-c. Now, use the information you got above to plot the proportion of species in each category for France.
-
-```{r eval = F}
-# enter your solution here
-```
-
-
-### Part 3: Extract the temperature of the species  
-
-Extract the mean temperature for **Coregonus lavaretus** and **Salvelinus alpinus** using the function `stocks()` from `rfishbase` package and store the values in a new dataframe.
-
-```{r eval = F}
-# enter your solution here
-```
+1. Get the data
+    a. Following the steps described in the tutorial, get the maximal length of the species _Salvelinus alpinus_ and the *Salmo trutta* using an API. After fetching the values create a table to store these values in one dataframe. 
+    b. Get the IUCN Status and eggs shape for _Salvelinus alpinus_ and _Salmo trutta_ using web scraping. Again follow the same steps you learned in the tutorial. In the end, add the new information to the dataframe.
+2. Get all the species in a family and the IUCN status
+    a. Your next task is to get all the species in the family _'Neoscopelidae'_ and print the first 5 elements of the family.
+    b. Extract the 'Native Exotic Status' of all the species from France. Then end get the unique values of the Native Exotic Status. For this task you will need to use the file _'ex02_data.csv'_.
+    c. Now, use the information you got above to plot the proportion of species in each category for France.
+3. Extract the mean temperature for **Coregonus lavaretus** and **Salvelinus alpinus** using the function `stocks()` from `rfishbase` package and store the values in a new dataframe.

@@ -1,6 +1,5 @@
 # Supervised Deep Learning I {#ch-12}
 
-
 ## Introduction
 
 In this tutorial, we'll use convolutional neural networks for image classification. The dataset we'll work with comes from a 2013 Kaggle competition, which you can read about [here](https://www.kaggle.com/c/dogs-vs-cats/overview). Kaggle is an online community for data scientists and machine learning engineers, where they can explore datasets, build models and enter contests to attempt solving data science hurdles.
@@ -48,8 +47,8 @@ We can stack several convolutional-pooling layers. The final pooling layer outpu
 
 Let's dive into our example for a practical application of this.
 
-```{r message=FALSE, warning=FALSE}
-#import libraries
+```{r}
+# import libraries
 library(reticulate)
 use_condaenv()
 library(keras)

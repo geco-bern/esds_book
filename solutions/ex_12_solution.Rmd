@@ -1,4 +1,200 @@
 ---
-title: "Exercise XX Solution"
+title: "Exercise 12 - Solution"
 output: html_document
 ---
+
+# Supervised Deep Learning I
+
+## Import libraries
+```{r, eval = F}
+library(reticulate)
+use_condaenv()
+library(keras)
+library(tensorflow)
+library(tidyverse)
+library(rsample)
+```
+
+## Load mnist dataset 
+
+```{r, eval = F}
+mnist = dataset_mnist()
+
+# take train and test set
+train = mnist$train
+test = mnist$test
+```
+
+
+## Plot an image
+```{r, eval = F}
+index_image = 5 ## change this index to see different image.
+input_matrix = train$x[index_image,,]
+output_matrix <- apply(input_matrix, 2, rev)
+output_matrix <- t(output_matrix)
+image(output_matrix, col=gray.colors(256), xlab=paste('Image for digit ', train$y[index_image]), ylab="")
+```
+
+## Specify image size and number of classes
+```{r, eval = F}
+img_size = dim(train$x)[2:3]
+img_channels = 1
+n_classes = length(unique(train$y))
+cat('Image size: ',c(img_size,img_channels),"\n")
+cat('Total classes: ',n_classes)
+```
+
+## Create validation set using stratified split and rescale input to [0,1]
+
+```{r, eval = F}
+#make stratified split
+split = initial_split(data.frame('y'=train$y),prop = 0.8,strata = 'y')
+
+#train set
+x_train = train$x[split$in_id,,]
+##rescale to [0,1]
+x_train = x_train/255
+y_train = train$y[split$in_id]
+
+#validation set
+x_val = train$x[-split$in_id,,]
+##rescale to [0,1]
+x_val = x_val/255
+y_val = train$y[-split$in_id]
+
+#test set
+x_test = test$x
+##rescale to [0,1]
+x_test = x_test/255
+y_test = test$y
+
+```
+
+
+## Encode classes to one-hot vectors
+```{r, eval = F}
+y_train = to_categorical(y_train, n_classes)
+y_val =  to_categorical(y_val,n_classes)
+y_test = to_categorical(y_test, n_classes)
+
+head(y_train)
+```
+
+## Create and train Baseline model
+
+A simple approach would be to create a vector (flatten the 2d input matrix) from the input image and then to apply a feed forward neural network (i.e dense layers). You are already provided with a trained model (because it takes a long time to train it from scratch). You do not have to run the fit function. You have just to load the model.
+
+You do not have to run the following chunk. However, have a look on this model.
+
+```{r eval=F}
+ffnn_model = keras_model_sequential()
+
+ffnn_model %>% layer_flatten(input_shape = img_size) %>%
+          layer_dense(units = 1024,activation = 'relu')%>%
+          layer_dense(units = 512,activation = 'relu')%>%
+          layer_dense(units = 256,activation = 'relu') %>%
+          layer_dense(units = 128,activation = 'relu') %>%
+          layer_dense(units = 10,activation = 'softmax')
+
+ffnn_model %>% compile(
+  loss = 'categorical_crossentropy',
+  optimizer = optimizer_adam(lr = 0.001),
+  metrics = c('accuracy')
+)
+
+dir.create(file.path('saved_models'))
+save_ffnn = file.path('saved_models','baseline.h5') 
+  
+callbacks_ffnn = list(callback_early_stopping(monitor='val_loss',patience = 5,mode = 'min'),
+                      callback_model_checkpoint(save_ffnn,monitor='val_loss',save_best_only = T,mode = 'min'))
+
+#history_ffnn = fit(ffnn_model,x_train, y_train, epochs = 20, batch_size = 128,
+#                  validation_data = list(x_val,y_val),callbacks = callbacks_ffnn)
+```
+## Load the saved Baseline model and evaluate the performance on validation and test set
+
+```{r, eval = F}
+save_ffnn = file.path('saved_models','baseline.h5')
+model_ffnn = load_model_hdf5(save_ffnn)
+
+#evalute accuracy
+val_acc = evaluate(model_ffnn,x_val,y_val)$acc
+test_acc = evaluate(model_ffnn,x_test,y_test)$acc
+
+cat('Validation Accuracy: ',val_acc,'\n')
+cat('Test Accuracy: ',test_acc,'\n')
+```
+
+
+## Create a CNN architecture
+
+We create a cnn architecture with 2 convolutional layers of 32 and 64 filter respectively.After each layer we apply a max-pooling operation.The final layers of the model is a feed forward neural network.We also add 2 dropouts layers to avoid overfitting.
+
+```{r, eval = F}
+cnn_model = keras_model_sequential()
+
+cnn_model %>% layer_conv_2d(filters = 32,kernel_size = c(3,3),activation = 'relu',
+                            input_shape = c(img_size,img_channels)) %>%
+              layer_max_pooling_2d(pool_size = c(2,2)) %>%
+              layer_conv_2d(filters = 64,kernel_size = c(3,3),activation = 'relu') %>%
+              layer_max_pooling_2d(pool_size = c(2,2)) %>%
+              layer_flatten()%>%
+              layer_dropout(rate = 0.5)%>%
+              layer_dense(units = 512,activation = 'relu')%>%
+              layer_dropout(rate = 0.5)%>%
+              layer_dense(units = n_classes,activation = 'softmax')
+```
+          
+### Train the model
+
+```{r, eval = F}
+#compile the model
+cnn_model %>% compile(
+  loss = 'categorical_crossentropy',
+  optimizer = optimizer_adam(lr = 0.001),
+  metrics = c('accuracy')
+)
+
+save_cnn = file.path('saved_models','cnn.h5') 
+  
+callbacks_cnn = list(callback_early_stopping(monitor='val_loss',patience = 5,mode = 'min'),
+                      callback_model_checkpoint(save_cnn,monitor='val_loss',save_best_only = T,mode = 'min'))
+
+#reshape input
+x_train_cnn = array_reshape(x_train,dim = c(-1,img_size,img_channels))
+x_val_cnn = array_reshape(x_val,dim = c(-1,img_size,img_channels))
+x_test_cnn = array_reshape(x_test,dim = c(-1,img_size,img_channels))
+
+#fit the model
+history_cnn = fit(cnn_model,x_train_cnn, y_train, epochs = 10, batch_size = 128,
+             validation_data = list(x_val_cnn,y_val),callbacks = callbacks_cnn)
+
+```
+
+
+### Evaluate performance on validation and test set
+```{r, eval = F}
+save_cnn = file.path('saved_models','cnn.h5')
+model_cnn = load_model_hdf5(save_cnn)
+
+#evalute accuracy
+val_acc = evaluate(model_cnn,x_val_cnn,y_val)$acc
+test_acc = evaluate(model_cnn,x_test_cnn,y_test)$acc
+
+cat('Validation Accuracy: ',val_acc,'\n')
+cat('Test Accuracy: ',test_acc,'\n')
+```
+
+### Print summary of both models and comment on the number of parameters
+
+```{r, eval = F}
+model_ffnn
+```
+
+```{r, eval = F}
+model_cnn
+```
+
+
+The CNN model outperforms the FFNN model even with less parameters. Namely, with almost 50% less parameters.That is a very important result because first with less trainable parameters overfitting is reduced and second it demands less computational time.
+

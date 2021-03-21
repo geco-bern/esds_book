@@ -1,341 +1,359 @@
 ---
-title: "Exercise 13 Solution"
+title: "Exercise 10 - Solution"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-This exercise has two parts. 
-
-In the __first__ part you have to create a feed forward neural network using only the ndvi image as input. In this case each pixel of the image is considered as a feature.
-
-In the __second__ part you have to create a mixed model. As we have alreday seen in tutorial 13, categorical features can also be incorporated into a neural network model. Namely, in tutorial 13, a mixed model combining the cnn features and the tower location (as a categorical feature) is created.The goal of this part is to also incorporate the corresponding month for each ndvi input image along with the tower location. The reason for such a refinement is because seasonality plays an important role in vegetation metabolism and therefore can affect the CO2 fluxes.
-
-For the __second__ part a sceleton code is provided. You have only to fill in the missing code where is necessary. Is there an improvement in the model performance on validation and test set?
-
-
-
-### Import libraries
-
+# Supervised Learning Neural Networks II
+## Import libraries
 ```{r}
-library(imputeTS) # Library for Imputation
 library(tidyverse)
 library(reticulate)
 use_condaenv()
-library(keras) # Python library for deep learning
-library(tensorflow) 
+library(keras)
+library(rsample)
 ```
 
-### Read data
-
+## Import functions
 ```{r}
-#read data
-path = "../../data"
 
-##tower features
-train=readRDS(file.path(path,'train','towers_feature','features.rds'))
-val=readRDS(file.path(path,'validation','towers_feature','features.rds'))
-test=readRDS(file.path(path,'test','towers_feature','features.rds'))
-
-# have a look
-head(train)
-```
-
-
-```{r}
-## take CO2 flux
-y_train = train$co2
-y_val = val$co2
-y_test =  test$co2
-##ndvi images
-ndvi_train = readRDS(file.path(path,'train','NDVI','ndvi_train.rds')) 
-ndvi_val =  readRDS(file.path(path,'validation','NDVI','ndvi_val.rds'))
-ndvi_test = readRDS(file.path(path,'test','NDVI','ndvi_test.rds'))
-
-#print some statistics of the data
-paste("Size of training set is ",length(y_train))
-paste("Size of validation set is ",length(y_val))
-paste("Size of test set is ",length(y_test))
-```
-
-### Preprocess ndvi images
-
-```{r}
-#specify image size
-IMAGE_WIDTH = dim(ndvi_train)[2]
-IMAGE_HEIGHT = dim(ndvi_train)[3]
-IMAGE_CHANNELS = 1
-IMAGE_SIZE = c(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)
-
-
-#fill missing values , rescale images to [0,1] , reshape to be a valid input for NN
-
-preprocess_images = function(ndvi){
-  
-  min_ndvi = -2000
-  max_ndvi = 10000
-  
-  #fill missing values
-  nd = apply(ndvi,c(2,3),function(i) na_interpolation(i))
-  
-  #rescale to [0,1]
-  nd = (nd-min_ndvi)/(max_ndvi-min_ndvi)
-  
-  #reshape adding an extra dimension
-  nd = array_reshape(nd,dim=c(-1,IMAGE_SIZE))
-  
-  return (nd)
-}
-             
-#take preprocessed images
-ndvi_train_pr = preprocess_images(ndvi_train)
-ndvi_val_pr = preprocess_images(ndvi_val)
-ndvi_test_pr = preprocess_images(ndvi_test)
-```
-
-## Part 1
-
-### Create a feed forward neural network using only the ndvi image 
-
-This model should more complex than the one provided in tutorial 13
-
-```{r}
-model=keras_model_sequential()
-model %>% layer_flatten(input_shape = IMAGE_SIZE) %>% 
-  layer_dense(units = 128,activation = 'relu') %>%
-  layer_dense(units = 64,activation = 'relu') %>%
-  layer_dense(units = 32,activation = 'relu') %>%
-  layer_dense(units=1)
-
-summary(model)
-```
-
-
-
-### Train the model
-
-Hint: In tutorial 13 can found some ideas how to train the model and which are the proper callbacks
-
-```{r}
-#optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-#file path for ffnn
-dir.create('saved_models')
-dir.create(file.path('saved_models','FFNN'))
-save_path_ffnn = file.path('saved_models','FFNN')
-
-#callbacks for FFNN
-callbacks_ffnn = list(
-  callback_model_checkpoint(file.path(save_path_ffnn,"model_ffnn.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
-)
-
-# train the model
-history_ffnn = fit(model,x = ndvi_train_pr,y = y_train,batch_size = 128,
-                   epochs = 200,shuffle = T,validation_data = list(ndvi_val_pr,y_val),callbacks = callbacks_ffnn)
-```
-
-
-### Plot training history
-
-```{r}
-plot(history_ffnn)
-```
-
-
-
-### Load the trained model and evaluate performance on validation and test set
-
-Hint: In tutorial 13 we have already seen how to retrieve a trained model made by the checkpoint callback.
-
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
+#Area Under Curve
+simple_auc <- function(x, y){
+  #Revert order
+  x = rev(x)
+  y = rev(y)  
+  #Define rectangles, calculate area and add those
+  dx <- c(diff(x), 0)
+  dy <- c(diff(y), 0)
+  sum(y * dx) + sum(dy * dx)/2
 }
 
-#load models
-model_ffnn = load_model_hdf5(file.path(save_path_ffnn,"model_ffnn.h5"))
-
-# Validation Mse
-ffnn_val_mse = mse(model_ffnn,ndvi_val_pr,y_val)
-
-#test mse
-ffnn_test_mse = mse(model_ffnn,ndvi_test_pr,y_test)
-
-#
-cat('Validation MSE: ',ffnn_val_mse,'\n')
-cat('Test MSE: ',ffnn_test_mse,'\n')
-
-```
-
-
-## Part 2
-
-
-### Create mixed model: CNN features + tower location + month
-
-In this model we propose to incorporate the month of the ndvi input image along with cnn features and the tower location. Our goal is to insert categorical features inside a neural network model and to examine if the performance can further improved. As it is obvious, a model which can take into account special informations about the ndvi input image such as the month that the image is taken and the spatial location of it seems more realistic. As a result, further improvement of the model performance can be expected.
-```{r}
-create_mixed = function(){
-  
-  #input --> ndvi images
-  input_1 = layer_input(shape=IMAGE_SIZE)
-  
-  #input --> tower + month
-  input_2 = layer_input(shape=c(2))
-  
-  # cnn layer
-  cnn_layer = layer_conv_2d(input_1,filters = 4, kernel_size = c(3,3), activation = 'relu',padding = 'same')
-  
-  # pool layer
-  pool =  layer_max_pooling_2d(cnn_layer,pool_size = c(3, 3)) 
-  
-  # cnn layer
-  cnn_layer_2 = layer_conv_2d(pool,filters = 16,kernel_size = c(3,3),activation = 'relu', padding = 'same')
-  
-  # pool layer
-  pool_2 =  layer_max_pooling_2d(cnn_layer_2,pool_size = c(3,3))
-  
-  # drop some features to avoid overfitting
-  drop_ft = layer_dropout(pool_2,rate = 0.2)
-  
-  # flatten the features
-  flat = layer_flatten(drop_ft)
-  
-  # mlp of the features --> project to dim 64
-  flat_proj = layer_dense(flat,units = 64,activation = 'relu')
-  
-  
-  # features --> tower , month
-  
-  #tower embedding --> input_dim = 34 (number of discrete towers), output_dim = 10 (number of requested trainable weights)
-  tower_emb = layer_embedding(input_2[,1],input_dim = 34,output_dim = 10)
-  #reshape
-  tower_emb = k_reshape(tower_emb,shape = c(-1,10))
-  
-  #month embedding --> input_dim = 12 (number of discrete months), output_dim = 10 (number of requested trainable weights)
-  month_emb = layer_embedding(input_2[,2],input_dim = 12,output_dim = 10)  
-  #reshape
-  month_emb = k_reshape(month_emb,shape = c(-1,10))
-  
-  #concatenate embeddings
-  emb_concat = k_concatenate(list(tower_emb,month_emb))
-  
-  # ffnn of embedings
-  emb_proj = layer_dense(emb_concat,units = 32,activation = 'relu')
-  
-  # concatenate cnn feautures and embeddings of tower and months
-  ft_concat= k_concatenate(list(flat_proj,emb_proj))
-  
-  #output
-  output =  layer_dense(ft_concat,units = 1, activation = 'linear')
-  
-  #create model
-  model = keras_model(list(input_1,input_2),output)
-  
-  return(model)
+#ROC CURVE
+ROC = function(fpr, recall, viz = T){
+     
+    #Calculate the area under the ROC
+    auc = simple_auc(fpr,recall)
+     
+    #Visualize the ROC
+    if (viz){
+        
+        x = seq(0,1,length.out = 100)
+        g = ggplot() +
+        geom_line(aes(x = fpr, y = recall,color='Model') , lty =2,lwd = 1.2)+
+        geom_line(aes(x=x,y=x,color = 'Baseline'),inherit.aes = F,lty=2,alpha=0.8)+
+        labs(x = 'False Positive Rate',
+             y = 'Recall',
+             color='',
+             title='Area Under The curve ROC',
+            subtitle=paste("AUC : ",round(auc,2)))+
+        theme_grey(base_size = 20)
+    }
+    else{
+        g = NA
+    }
+    
+    return (list(plot = g,value = auc))
 }
 
-
-model = create_mixed()
-
-summary(model)
-```
-
-### Tokenize tower location and month
-
-```{r}
-#create function which tokenizes tower and month
-
-tokenize_data = function(data){
+confusion = function(y_true, pred_out, threshold = 0.5, verbose = T){
   
-  #tokenize tower
-  tower_token = rep(NA,length(data$tower))
+  true_positives = sum((pred_out >= threshold) & (y_true == 1))
+  true_negatives = sum((pred_out < threshold) & (y_true == 0))
+  false_positives = sum((pred_out >= threshold) & (y_true == 0))
+  false_negatives = sum((pred_out < threshold) & (y_true == 1))
   
-  for ( i in 1:length(unique(data$tower))){
-    ind_tow= which(data$tower==unique(data$tower)[i])
-    tower_token[ind_tow]=i-1
+  if (verbose) {
+    cat('true positives: ',true_positives,'\n')
+    cat('true negatives: ',true_negatives,'\n')
+    cat('false positives: ',false_positives,'\n')
+    cat('false negatives: ',false_negatives,'\n')
+  }
+  return (list(tp = true_positives, tn = true_negatives, fp = false_positives, fn = false_negatives))
+}
+
+precision_and_recall = function(true_positives, true_negatives,false_positives, false_negatives, verbose=T){
+  
+  #Protect against division by zero
+  if ((true_positives + false_positives) > 0){
+    precision = true_positives /(true_positives + false_positives)
+  }
+  else{
+    precision = 1
   }
   
-  #tokenize month
-  month_token = data$month -1
+  if ((true_positives + false_negatives) > 0){    
+    recall = true_positives / (true_positives + false_negatives)
+  }
+  else{
+      recall = 0
+  }
   
-  return (as.matrix(data.frame(tower_token = tower_token,month_token = month_token)))
+  if (verbose){
+    cat("Precision: " ,precision,"\n")
+    cat("Recall: ",recall,"\n")
+  }
+  
+  return (list(precision = precision, recall = recall))
 }
 
-
-# take tokens of tower , year , month
-train_tokens = tokenize_data(train)
-val_tokens = tokenize_data(val)
-test_tokens = tokenize_data(test)
-```
-
-### Train the model
-
-```{r}
-# optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#file path for mixed
-dir.create('saved_models')
-dir.create(file.path('saved_models','Mixed'))
-save_path_mixed = file.path('saved_models','Mixed')
-
-# callback for mixed
-callbacks_mixed = list(
-  callback_model_checkpoint(file.path(save_path_mixed,"model_mixed.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
-)
-
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-# train the model
-history_mixed = fit(model,x = list(ndvi_train_pr,train_tokens),y = y_train,batch_size = 128,
-              epochs = 200,shuffle = T,validation_data = list(list(ndvi_val_pr,val_tokens),y_val),
-             callbacks = callbacks_mixed)
-
-```
-
-### Plot training history
-
-```{r}
-#plot mixed history
-plot(history_mixed)
-```
-
-### Load the trained model and evaluate performance on validation and test set
-
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
+f_score = function(precision,recall,verbose=T){
+    
+    #Calculate F
+    f = 2*precision*recall/(precision+recall)
+    
+    #If the user has requested verbose output, provide it
+    if(verbose){
+        cat("F-score: ",f,"\n")
+    }
+    
+    #Return F
+    return(f)
 }
+```
 
-#load models
-model_mixed = load_model_hdf5(file.path(save_path_mixed,"model_mixed.h5"))
 
-# Validation Mse
-mixed_val_mse = mse(model_mixed,list(ndvi_val_pr,val_tokens),y_val)
+## Read data
+```{r}
+df_data = read_csv('../data/ex10_data.csv')
+head(df_data)
+```
 
-#test mse
-mixed_test_mse = mse(model_mixed,list(ndvi_test_pr,test_tokens),y_test)
+## Visualize data and print proportion of data belongs to each class
+```{r}
+#visualize the data
+df_data %>% 
+    ggplot(aes(x = x1 , y = x2, color = as.factor(y)))+
+    geom_point()+
+    scale_color_manual(name = 'Class',labels = c('0','1'),values = c('0'="green",'1'='blue'))+
+    labs(linetype='')+
+    theme_grey(base_size = 15)
 
-#
-cat('Validation MSE: ',mixed_val_mse,'\n')
-cat('Test MSE: ',mixed_test_mse,'\n')
+
+#print some summary statistics about these data
+cat('Proportion of data in class blue: ' , sum(df_data$y)/length(df_data$y),'\n')
+cat('Proportion of data in class green: ' , 1-sum(df_data$y)/length(df_data$y),'\n')
+```
+
+## Split into training and test set (Stratified split)
+```{r}
+split <- initial_split(df_data, prop = 0.8, strata = 'y')
+df_train <- training(split)
+df_test <- testing(split)
+```
+
+## Create models
+```{r}
+models = list()
+#Create models
+num_epochs = 100
+learning_rate = 0.01
+batch_size = 512
+# 1 hidden layer 5 units
+model_1 = keras_model_sequential()
+model_1 = model_1 %>% 
+          layer_dense(units = 5, activation="relu") %>%
+          layer_dense(units=1, activation="sigmoid") 
+          
+#Specify the learning rate for stochastic gradient descent
+opt = optimizer_adam(lr = learning_rate)
+
+#Compile the model, using binary cross-entropy to define loss. Measure accuracy during training.
+model_1 %>% compile(optimizer=opt, loss='binary_crossentropy', metrics= list('accuracy'))         
+
+#Fit the model
+model_1 %>% fit(x = as.matrix(df_train[,c('x1','x2')]),
+                y = df_train$y,
+                epochs=num_epochs,
+                batch_size=batch_size,
+                )  
+
+#add to list 
+models[[1]] = model_1
+
+# 2 hidden layer 1st 10 units and 2nd 5 units
+model_2 = keras_model_sequential()
+model_2 = model_2 %>% 
+          layer_dense(units = 10, activation="relu") %>%
+          layer_dense(units = 5, activation="relu") %>%
+          layer_dense(units=1, activation="sigmoid") 
+          
+#Specify the learning rate for stochastic gradient descent
+opt = optimizer_adam(lr = learning_rate)
+
+#Compile the model, using binary cross-entropy to define loss. Measure accuracy during training.
+model_2 %>% compile(optimizer=opt, loss='binary_crossentropy', metrics= list('accuracy'))         
+
+#Fit the model
+model_2 %>% fit(x = as.matrix(df_train[,c('x1','x2')]),
+                y = df_train$y,
+                epochs=num_epochs,
+                batch_size=batch_size,
+                )  
+
+#add to list 
+models[[2]] = model_2
+
+# 4 hidden layer 1st 10 units, 2nd 10, 3nd 10 units and 4rd 5 units
+model_3 = keras_model_sequential()
+model_3 = model_3 %>% 
+          layer_dense(units = 10, activation="relu") %>%
+          layer_dense(units = 10, activation="relu") %>%
+          layer_dense(units = 10, activation="relu") %>%
+          layer_dense(units = 5, activation="relu") %>%
+          layer_dense(units=1, activation="sigmoid") 
+          
+#Specify the learning rate for stochastic gradient descent
+opt = optimizer_adam(lr = learning_rate)
+
+#Compile the model, using binary cross-entropy to define loss. Measure accuracy during training.
+model_3 %>% compile(optimizer=opt, loss='binary_crossentropy', metrics= list('accuracy'))         
+
+#Fit the model
+model_3 %>% fit(x = as.matrix(df_train[,c('x1','x2')]),
+                y = df_train$y,
+                epochs=num_epochs,
+                batch_size=batch_size,
+                )  
+
+#add to list 
+models[[3]] = model_3
+```
+
+## Calculate output and make decisions for each model on test set
+```{r}
+#Predict on test data. Note how easy this is to do in Keras.
+preds = matrix(NA,ncol = 3 , nrow = nrow(df_test))
+
+for (i in 1:length(models)){
+  
+  #retrieve model
+  model = models[[i]]
+  
+  preds[,i] = predict(model,as.matrix(df_test[,c('x1','x2')]))
+} 
+
+#Set the classification threshold to 0.5
+threshold = 0.5
+
+#Make label predictions based on the classification threshold
+y_preds = (preds >= threshold)*1
 
 ```
 
-As we observe if the month is included in the model, the performance is further improved. Namely we can achieve MSE less than 2.
+
+### Visualize test predictions for each model
+```{r}
+df_test %>%
+    ggplot(aes(x = x1, y = x2))+
+    geom_point(color = ifelse(y_preds[,1]==1,'blue','green'))+
+    labs(title = 'Model 1')
+df_test %>%
+    ggplot(aes(x = x1, y = x2))+
+    geom_point(color = ifelse(y_preds[,2]==1,'blue','green'))+
+    labs(title = 'Model 2')
+df_test %>%
+    ggplot(aes(x = x1, y = x2))+
+    geom_point(color = ifelse(y_preds[,3]==1,'blue','green'))+
+    labs(title = 'Model 3')
+```
+
+## Calculate metrics for each model on test set
+```{r}
+accs = rep(NA,length(models))
+precisions = rep(NA,length(models))
+recalls = rep(NA,length(models))
+f_scores = rep(NA,length(models))
+
+for(i in 1:length(models)){
+  c(true_positives, true_negatives,false_positives, false_negatives) %<-% confusion(df_test$y, preds[,i], threshold,verbose = F)
+  c(precisions[i], recalls[i]) %<-% precision_and_recall(true_positives, true_negatives,false_positives, false_negatives)
+  f_scores[i] = f_score(precisions[i],recalls[i])
+  accs[i] = mean(df_test$y == y_preds[,i])
+}
+cat("Accuracy: ",accs,"\n Precision: ",precisions,"\n Recalls: ",recalls,"\n F-scores: ",f_scores)
+```
+
+## Calculate ROC and AUC for the best model
+```{r}
+#Consider 100 thresholds between 0 and 1
+num_thresholds = 100
+thresholds = seq(0,1,length.out = num_thresholds)
+
+#Allocate space for the four metrics of the confusion matrix,
+#as well as for precision and recall
+fp = rep(NA,num_thresholds)
+fn = rep(NA,num_thresholds)
+tp = rep(NA,num_thresholds)
+tn = rep(NA,num_thresholds)
+precision = rep(NA,num_thresholds)
+recall = rep(NA,num_thresholds)
+
+#Loop over the thresholds, calculate the confusion matrix as well as precision and recall
+for (i in 1:num_thresholds){
+    
+    c(tp[i], tn[i],fp[i], fn[i]) %<-% confusion(df_test$y, preds[,3], thresholds[i],verbose = F)
+    c(precision[i], recall[i]) %<-% precision_and_recall(tp[i], tn[i],fp[i], fn[i],verbose = F)
+    }
+```
+
+## ROC Curve
+```{r}
+fpr = fp/(fp+tn)
+auc = ROC(fpr, recall, viz = T)
+auc$plot
+auc$value
+```
+
+## Train 5 times the best model
+
+```{r}
+n_init = 5
+
+preds_model_3 = matrix(NA,nrow = nrow(df_test),ncol = n_init)
+
+for (i in 1:n_init){
+  
+model = keras_model_sequential()
+model = model %>% 
+          layer_dense(units = 10, activation="relu") %>%
+          layer_dense(units = 10, activation="relu") %>%
+          layer_dense(units = 10, activation="relu") %>%
+          layer_dense(units = 5, activation="relu") %>%
+          layer_dense(units=1, activation="sigmoid") 
+          
+#Specify the learning rate for stochastic gradient descent
+opt = optimizer_adam(lr = learning_rate)
+
+#Compile the model, using binary cross-entropy to define loss. Measure accuracy during training.
+model %>% compile(optimizer=opt, loss='binary_crossentropy', metrics= list('accuracy'))         
+
+#Fit the model
+model %>% fit(x = as.matrix(df_train[,c('x1','x2')]),
+                y = df_train$y,
+                epochs=num_epochs,
+                batch_size=batch_size,
+                )  
+preds_model_3[,i] = predict(model,as.matrix(df_test[,c('x1','x2')]))
+}
+```
+
+## Average over the models output and then make decisions. Print metrics
+```{r}
+#average over the models
+avg_preds = rowMeans(preds_model_3)
+
+#make decisions
+y_pred = (avg_preds >= threshold)*1
+
+#calculate matrics
+c(true_positives, true_negatives,false_positives, false_negatives) %<-% confusion(df_test$y, avg_preds, threshold,verbose = F)
+c(precision, recall) %<-% precision_and_recall(true_positives, true_negatives,false_positives, false_negatives)
+f = f_score(precision,recall)
+acc = mean(df_test$y == y_pred)
+
+cat("Accuracy: ",acc,"\n",
+    "Precision: ",precision,'\n',
+    "Recall: ",recall,"\n",
+    "f-score: ",f)
+```
+
+

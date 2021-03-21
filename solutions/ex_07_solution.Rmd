@@ -1,341 +1,231 @@
 ---
-title: "Exercise 13 Solution"
+title: "Exercise 07 - Solution"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Supervised Machine Learning II
 
-This exercise has two parts. 
+To start off, let's load all packages and data that will be needed:
 
-In the __first__ part you have to create a feed forward neural network using only the ndvi image as input. In this case each pixel of the image is considered as a feature.
-
-In the __second__ part you have to create a mixed model. As we have alreday seen in tutorial 13, categorical features can also be incorporated into a neural network model. Namely, in tutorial 13, a mixed model combining the cnn features and the tower location (as a categorical feature) is created.The goal of this part is to also incorporate the corresponding month for each ndvi input image along with the tower location. The reason for such a refinement is because seasonality plays an important role in vegetation metabolism and therefore can affect the CO2 fluxes.
-
-For the __second__ part a sceleton code is provided. You have only to fill in the missing code where is necessary. Is there an improvement in the model performance on validation and test set?
-
-
-
-### Import libraries
-
-```{r}
-library(imputeTS) # Library for Imputation
+```{r message=FALSE}
 library(tidyverse)
-library(reticulate)
-use_condaenv()
-library(keras) # Python library for deep learning
-library(tensorflow) 
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(patchwork)
+library(caret)
+library(recipes)
+library(broom)
+
+load("../data/ddf_allsites.RData")
 ```
 
-### Read data
+**1. Adjusted-$R^2$**
+
+a. Implement the formula for the adjusted-$R^2$ using simple "low-level" functions and $R^2$ defined as the coefficient of determination and, alternatively, the square of the Pearson's correlation coefficient. Compare the values of the two with what is returned by `summary(lm(..))$adj.r.squared`. Which one of the two is used by `summary(lm(..))`? For your investigations, generate correlated random data and apply functions on it.
 
 ```{r}
-#read data
-path = "../../data"
+## 1. Generate random data
+df_demo <- tibble(x = rnorm(100)) %>% 
+  mutate(y_obs = x + rnorm(100),
+         y_pred = x)
 
-##tower features
-train=readRDS(file.path(path,'train','towers_feature','features.rds'))
-val=readRDS(file.path(path,'validation','towers_feature','features.rds'))
-test=readRDS(file.path(path,'test','towers_feature','features.rds'))
+## 1a. Implement low-level functions
 
-# have a look
-head(train)
-```
-
-
-```{r}
-## take CO2 flux
-y_train = train$co2
-y_val = val$co2
-y_test =  test$co2
-##ndvi images
-ndvi_train = readRDS(file.path(path,'train','NDVI','ndvi_train.rds')) 
-ndvi_val =  readRDS(file.path(path,'validation','NDVI','ndvi_val.rds'))
-ndvi_test = readRDS(file.path(path,'test','NDVI','ndvi_test.rds'))
-
-#print some statistics of the data
-paste("Size of training set is ",length(y_train))
-paste("Size of validation set is ",length(y_val))
-paste("Size of test set is ",length(y_test))
-```
-
-### Preprocess ndvi images
-
-```{r}
-#specify image size
-IMAGE_WIDTH = dim(ndvi_train)[2]
-IMAGE_HEIGHT = dim(ndvi_train)[3]
-IMAGE_CHANNELS = 1
-IMAGE_SIZE = c(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)
-
-
-#fill missing values , rescale images to [0,1] , reshape to be a valid input for NN
-
-preprocess_images = function(ndvi){
-  
-  min_ndvi = -2000
-  max_ndvi = 10000
-  
-  #fill missing values
-  nd = apply(ndvi,c(2,3),function(i) na_interpolation(i))
-  
-  #rescale to [0,1]
-  nd = (nd-min_ndvi)/(max_ndvi-min_ndvi)
-  
-  #reshape adding an extra dimension
-  nd = array_reshape(nd,dim=c(-1,IMAGE_SIZE))
-  
-  return (nd)
+calc_myrsq_determination <- function(mod, obs){
+  result <- 1 - sum((mod - obs)^2) / sum((obs - mean(obs))^2)
+  return(result)
 }
-             
-#take preprocessed images
-ndvi_train_pr = preprocess_images(ndvi_train)
-ndvi_val_pr = preprocess_images(ndvi_val)
-ndvi_test_pr = preprocess_images(ndvi_test)
+
+calc_myrsq_pearsons <- function(mod, obs){
+  result <- (sum((mod - mean(mod))*(obs - mean(obs))))^2/
+    (sum((obs - mean(obs))^2)*sum((mod - mean(mod))^2)) 
+  return(result)
+}
+
+calc_myrsq_adjusted <- function(rsq, ndata, npred){
+  result <- 1 - (1 - rsq) * (ndata - 1)/(ndata - npred - 1)
+  return(result)
+}
+
+## 1b. Comparison of our own functions to *`summary()`
+## output of summary
+summary(lm(y_obs ~ y_pred, data = df_demo))$adj.r.squared
+
+## using own function based on squared pearson's
+myrsq_pearsons <- calc_myrsq_pearsons(df_demo$y_pred, df_demo$y_obs)
+calc_myrsq_adjusted(myrsq_pearsons, ndata = nrow(df_demo), npred = 1)
+
+## using own function based on coef of determination
+myrsq_determination <- calc_myrsq_determination(df_demo$y_pred, df_demo$y_obs)
+calc_myrsq_adjusted(myrsq_determination, ndata = nrow(df_demo), npred = 1)
 ```
 
-## Part 1
+*__Important:__ The output of `summary()` for the adjusted R2 is based on the squared Pearson's correlation coefficient, not the coefficient of determination.*
 
-### Create a feed forward neural network using only the ndvi image 
+***
+**2. Cross validation**
 
-This model should more complex than the one provided in tutorial 13
+Assess the generalisability of three alternatives of a linear regression model for `GPP_NT_VUT_REF`:
 
+a. with one predictor (`PPFD_IN`),
+b. three predictors (`PPFD_IN`, `VPD_F`, and `TA_F,`),
+c. all available predictors.
+
+Which model works best in terms of its generalisability, assessed by 5-fold cross-validation and using the RMSE as the loss function?
+
+Use the caret function `train()` with RMSE as the loss function and use the data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors!).
+
+**Hint:**
+
+To get the generalisation performance assessed during cross-validation (and not on the data held out from an initial split - which is not done here), you can use `summary(resamples(list(model1 = output_train1, ...)))`, where `output_train1` is the ouput of a `train()` function call with resampling. We see that by including all predictors, we get the best model performance in terms of it cross-validation results, i.e., the lowest root mean square error (RMSE) and the highest $R^2$, averaged across folds.
+
+*We implement the model training as follows.*
 ```{r}
-model=keras_model_sequential()
-model %>% layer_flatten(input_shape = IMAGE_SIZE) %>% 
-  layer_dense(units = 128,activation = 'relu') %>%
-  layer_dense(units = 64,activation = 'relu') %>%
-  layer_dense(units = 32,activation = 'relu') %>%
-  layer_dense(units=1)
+library(caret)
 
-summary(model)
-```
+## Load daily data and rename for use below
+load("../data/ddf_ch_lae.RData") # user-set path
+df <- ddf_ch_lae %>% 
+  select(-NEE_VUT_REF_QC, -TIMESTAMP) %>% 
+  drop_na() 
 
+set.seed(123)  # for reproducibility
 
-
-### Train the model
-
-Hint: In tutorial 13 can found some ideas how to train the model and which are the proper callbacks
-
-```{r}
-#optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-#file path for ffnn
-dir.create('saved_models')
-dir.create(file.path('saved_models','FFNN'))
-save_path_ffnn = file.path('saved_models','FFNN')
-
-#callbacks for FFNN
-callbacks_ffnn = list(
-  callback_model_checkpoint(file.path(save_path_ffnn,"model_ffnn.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
+## single predictor
+cv_model1 <- train(
+  GPP_NT_VUT_REF ~ PPFD_IN, 
+  data = df, 
+  method = "lm",
+  metric = "RMSE",
+  trControl = trainControl(method = "cv", number = 5)
 )
 
-# train the model
-history_ffnn = fit(model,x = ndvi_train_pr,y = y_train,batch_size = 128,
-                   epochs = 200,shuffle = T,validation_data = list(ndvi_val_pr,y_val),callbacks = callbacks_ffnn)
-```
-
-
-### Plot training history
-
-```{r}
-plot(history_ffnn)
-```
-
-
-
-### Load the trained model and evaluate performance on validation and test set
-
-Hint: In tutorial 13 we have already seen how to retrieve a trained model made by the checkpoint callback.
-
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
-}
-
-#load models
-model_ffnn = load_model_hdf5(file.path(save_path_ffnn,"model_ffnn.h5"))
-
-# Validation Mse
-ffnn_val_mse = mse(model_ffnn,ndvi_val_pr,y_val)
-
-#test mse
-ffnn_test_mse = mse(model_ffnn,ndvi_test_pr,y_test)
-
-#
-cat('Validation MSE: ',ffnn_val_mse,'\n')
-cat('Test MSE: ',ffnn_test_mse,'\n')
-
-```
-
-
-## Part 2
-
-
-### Create mixed model: CNN features + tower location + month
-
-In this model we propose to incorporate the month of the ndvi input image along with cnn features and the tower location. Our goal is to insert categorical features inside a neural network model and to examine if the performance can further improved. As it is obvious, a model which can take into account special informations about the ndvi input image such as the month that the image is taken and the spatial location of it seems more realistic. As a result, further improvement of the model performance can be expected.
-```{r}
-create_mixed = function(){
-  
-  #input --> ndvi images
-  input_1 = layer_input(shape=IMAGE_SIZE)
-  
-  #input --> tower + month
-  input_2 = layer_input(shape=c(2))
-  
-  # cnn layer
-  cnn_layer = layer_conv_2d(input_1,filters = 4, kernel_size = c(3,3), activation = 'relu',padding = 'same')
-  
-  # pool layer
-  pool =  layer_max_pooling_2d(cnn_layer,pool_size = c(3, 3)) 
-  
-  # cnn layer
-  cnn_layer_2 = layer_conv_2d(pool,filters = 16,kernel_size = c(3,3),activation = 'relu', padding = 'same')
-  
-  # pool layer
-  pool_2 =  layer_max_pooling_2d(cnn_layer_2,pool_size = c(3,3))
-  
-  # drop some features to avoid overfitting
-  drop_ft = layer_dropout(pool_2,rate = 0.2)
-  
-  # flatten the features
-  flat = layer_flatten(drop_ft)
-  
-  # mlp of the features --> project to dim 64
-  flat_proj = layer_dense(flat,units = 64,activation = 'relu')
-  
-  
-  # features --> tower , month
-  
-  #tower embedding --> input_dim = 34 (number of discrete towers), output_dim = 10 (number of requested trainable weights)
-  tower_emb = layer_embedding(input_2[,1],input_dim = 34,output_dim = 10)
-  #reshape
-  tower_emb = k_reshape(tower_emb,shape = c(-1,10))
-  
-  #month embedding --> input_dim = 12 (number of discrete months), output_dim = 10 (number of requested trainable weights)
-  month_emb = layer_embedding(input_2[,2],input_dim = 12,output_dim = 10)  
-  #reshape
-  month_emb = k_reshape(month_emb,shape = c(-1,10))
-  
-  #concatenate embeddings
-  emb_concat = k_concatenate(list(tower_emb,month_emb))
-  
-  # ffnn of embedings
-  emb_proj = layer_dense(emb_concat,units = 32,activation = 'relu')
-  
-  # concatenate cnn feautures and embeddings of tower and months
-  ft_concat= k_concatenate(list(flat_proj,emb_proj))
-  
-  #output
-  output =  layer_dense(ft_concat,units = 1, activation = 'linear')
-  
-  #create model
-  model = keras_model(list(input_1,input_2),output)
-  
-  return(model)
-}
-
-
-model = create_mixed()
-
-summary(model)
-```
-
-### Tokenize tower location and month
-
-```{r}
-#create function which tokenizes tower and month
-
-tokenize_data = function(data){
-  
-  #tokenize tower
-  tower_token = rep(NA,length(data$tower))
-  
-  for ( i in 1:length(unique(data$tower))){
-    ind_tow= which(data$tower==unique(data$tower)[i])
-    tower_token[ind_tow]=i-1
-  }
-  
-  #tokenize month
-  month_token = data$month -1
-  
-  return (as.matrix(data.frame(tower_token = tower_token,month_token = month_token)))
-}
-
-
-# take tokens of tower , year , month
-train_tokens = tokenize_data(train)
-val_tokens = tokenize_data(val)
-test_tokens = tokenize_data(test)
-```
-
-### Train the model
-
-```{r}
-# optimizer
-opt=optimizer_adam(lr=0.01) 
-
-#file path for mixed
-dir.create('saved_models')
-dir.create(file.path('saved_models','Mixed'))
-save_path_mixed = file.path('saved_models','Mixed')
-
-# callback for mixed
-callbacks_mixed = list(
-  callback_model_checkpoint(file.path(save_path_mixed,"model_mixed.h5"),monitor='val_loss',save_best_only = T,mode = 'min'),
-  callback_reduce_lr_on_plateau(monitor = "val_loss",patience = 5 ,factor = 0.1),
-  callback_early_stopping(monitor='val_loss',patience = 10,mode = 'min')
+## three predictors
+cv_model2 <- train(
+  GPP_NT_VUT_REF ~ PPFD_IN + VPD_F + TA_F, 
+  data = df, 
+  method = "lm",
+  metric = "RMSE",
+  trControl = trainControl(method = "cv", number = 5)
 )
 
-#compile
-compile(model,loss = 'mse',optimizer = opt,metrics=list('mse'))
-
-# train the model
-history_mixed = fit(model,x = list(ndvi_train_pr,train_tokens),y = y_train,batch_size = 128,
-              epochs = 200,shuffle = T,validation_data = list(list(ndvi_val_pr,val_tokens),y_val),
-             callbacks = callbacks_mixed)
-
+# all available predictors
+cv_model3 <- train(
+  GPP_NT_VUT_REF ~ ., 
+  data = df, 
+  method = "lm",
+  metric = "RMSE",
+  trControl = trainControl(method = "cv", number = 5)
+)
 ```
 
-### Plot training history
-
+*You're  asked to assess generalisability based on the cross validation results. As indicated by the hint, we use the objects returned by the `train()` function as:*
 ```{r}
-#plot mixed history
-plot(history_mixed)
+# Extract out of sample performance measures
+summary(resamples(list(
+  model1 = cv_model1, 
+  model2 = cv_model2, 
+  model3 = cv_model3
+)))
 ```
 
-### Load the trained model and evaluate performance on validation and test set
+*We see that by including all predictors, we get the best model performance in terms of it cross-validation results, i.e., the lowest root mean square error (RMSE) and the highest $R^2$, averaged across folds. This exercise it to demonstrate the application of the function `train()` and how to get results from the validation averaged resamples. The results shown above may not correspond to yours exactly. This is due to randomness. However, by setting the same seed (`set.seed()`), you should be able to get the exact same numbers. Do you?*
 
-```{r}
-# define mse
-mse = function(model,x,y){
-  pr = predict(model,x)
-  return (round(mean((pr-y)^2),2))
+***
+**3. Exploratory modelling**
+
+Using the same data set as above (daily data for CH-Lae), find the model with the best performance, measured by evaluation against testing data held out from an initial split (30-70%). Use your own creativity to pre-process features and select variables, and chose between either a KNN or a multivariate linear regression, or any other ML model if you like (see models available with caret [here](https://topepo.github.io/caret/available-models.html)). Use all methods you've learned so far and impress your peers. Who gets the best generalisable model? Document and justify all steps you take. Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
+
+*No example solution provided.*
+
+***
+**4. Resampling - Bonus problem**
+
+a. Define a resampling function of the form `my_resample_folds_nested(df, k)` generating $k$ folds and taking a data frame `df` as arguments. This function should return a nested data frame with $k$ rows and two columns `train` and `test` that contain nested dataframes for training and testing data with each fold. Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
+b. Print the dimensions of the whole data frame and run head() of fold two of the column 'train' of the nested data frame (this is just to make the peer review easier).
+
+*"Relief option:"* You may create two separate flat data frames, one with testing, and one with training data, where one column specifies which fold each row belongs to. 
+
+**Steps:**
+
+1. Use the caret function `createFolds` to split a vector of row indices into a list of length corresponding to the number of folds, where each list element cotains the indices of the training resamples for the respective fold.
+2. Use the dplyr function `slice()` to subset a dataframe by row numbers.
+3. Use `group_by()` in combination with `nest()` for nesting data frames for each of the $k$ folds and end up with a dataframe that has $k$ rows.
+
+```{r message=FALSE}
+library(tidyverse)
+library(caret)
+
+# ## get df (should be made available directly on Renku as dataset for this session)
+# load("04_data_wrangling/ddf_ch_lae.RData")
+# df <- ddf_ch_lae
+
+my_resample_folds_nested <- function(df, k){
+  idx_test <- createFolds(1:nrow(df), k)
+  purrr::map(as.list(seq(k)), ~slice(df, idx_test[[.]])) %>% 
+    bind_rows(.id = "fold") %>% 
+    group_by(fold) %>% 
+    nest() %>% 
+    rename(test = data) %>% 
+    left_join(
+      map(as.list(seq(k)), ~slice(df, -idx_test[[.]])) %>% 
+        bind_rows(.id = "fold") %>% 
+        group_by(fold) %>% 
+        nest() %>% 
+        rename(train = data),
+      by = "fold"
+    )
 }
 
-#load models
-model_mixed = load_model_hdf5(file.path(save_path_mixed,"model_mixed.h5"))
-
-# Validation Mse
-mixed_val_mse = mse(model_mixed,list(ndvi_val_pr,val_tokens),y_val)
-
-#test mse
-mixed_test_mse = mse(model_mixed,list(ndvi_test_pr,test_tokens),y_test)
-
-#
-cat('Validation MSE: ',mixed_val_mse,'\n')
-cat('Test MSE: ',mixed_test_mse,'\n')
-
+## check if it works
+my_resample_folds_nested(df, 5)
 ```
 
-As we observe if the month is included in the model, the performance is further improved. Namely we can achieve MSE less than 2.
+4. Fit a linear model of the form `GPP_NT_VUT_REF ~ PPFD_IN`
+    - directly on all the data in `df` and
+    - on the resampled **training** folds. 
+5. Evaluate the models by calculating metrics (squared Pearson's correlation coefficient, and RMSE) of predictions made
+    - for the full dataframe `df`
+    - for each respective **testing** fold separately. For this, report the mean across metrics calculated on each testing fold.
+
+**Hints:**
+*Feel free to come up with a solution that doesn't make use of these hints.*
+
+- You may use `mutate( newcol = purrr::map( nested_col, ~function_name(.)) )` to apply a function `function_name()` on each of the nested data frames in column `nested_col`. The `.` refers to the position at which the argument `nested_col` goes.
+- You may use the broom function `augment()` to add a column `.fitted` to a data frame, given a model object that was generated using predictors that are available as columns in the respective data frame.
+- You may use `mutate( newcol = purrr::map2( arg1, arg2, ~function_name(.x, .y)) )` to apply a function `function_name()` that takes two arguments from other columns in the same data frame. The `.x` and `.y` refer to the position at which the two arguments go.
+
+```{r message=FALSE}
+library(yardstick)
+library(broom)
+library(purrr)
+
+set.seed(123)
+
+## (i) directly on all data
+df <- lm(GPP_NT_VUT_REF ~ SW_IN_F, data = df) %>% 
+  augment(., newdata = df)
+
+## (ii) on resampling folds separately
+## fit model on training and predict on testing (complementing the testing df with augment)
+df_metrics_resampled <- my_resample_folds_nested(df, 5) %>% 
+  mutate(linmod_train = purrr::map(train, ~lm(GPP_NT_VUT_REF ~ PPFD_IN, data = .))) %>%
+  mutate(test = purrr::map2(linmod_train, test, ~augment(.x, newdata = .y))) %>% 
+  select(fold, test) %>% 
+  unnest(test) %>% 
+  group_by(fold) %>% 
+  metrics(GPP_NT_VUT_REF, .fitted) %>% 
+  group_by(.metric) %>% 
+  summarise(.estimate = mean(.estimate))
+
+df_metrics <- metrics(df, GPP_NT_VUT_REF, .fitted)
+
+df_metrics_resampled
+df_metrics
+
+# df %>% analyse_modobs(".fitted", "GPP_NT_VUT_REF") # optional, to look at results, source the function defined in the tutorial 7
+```
+
+*Note that the cross-validation results and the metrics quantified directly on all the data (which is used for both training and testing), are quite similar. This is because linear regression models are on the "high bias" side of the bias-variance trade-off and therefore not strongly prone to overfitting. Cross validation results would deviate between (i) and (ii) if the model for (ii) is overfitted.*

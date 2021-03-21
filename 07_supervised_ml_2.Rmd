@@ -66,7 +66,7 @@ By repeating cross-validation we are picking different folds for training and va
 
 Taking the mean validation error across all repetitions, we can This is called *k-fold cross validation*.
 
-```{r, echo = FALSE, fig.cap = "Example of 5-fold cross validation. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/process.html#k-fold-cross-validation). Note that the orange boxes called *Test* refer to a test fold which we refer to as validation set. Be precise here, this *Test* is not the held-out test data set!}
+```{r, echo = FALSE, fig.cap = "Example of 5-fold cross validation. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/process.html#k-fold-cross-validation). Note that the orange boxes called *Test* refer to a test fold which we refer to as validation set. Be precise here, this *Test* is not the held-out test data set!"}
 knitr::include_graphics("./figures/cv.png")
 ```
 
@@ -112,7 +112,7 @@ Now, we know enough to turn to the implementation of a full model training workf
 
 We've learned about the danger of *data leakage*. It happens when information from the testing data somehow finds its way into the training step. This is relevant not only for leakage from the testing set to the training set determined from the initial split but also for the resampling splits within each resample fold. Therefore, we should apply the pre-processing blueprint independently on each fold. For example, we should do the centering and scaling by subtracting the mean and dividing by the standard deviation, where the mean and standard deviation are calculated separately on each fold of the training resamples (not including the validation resample). This is illustrated in Figure \@ref(fig:leakage).
 
-```{r leakage, echo = FALSE, fig.cap='Visualization of how data leakage can be avoided. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/engineering.html#proper-implementation).'}
+```{r leakage, echo = FALSE, fig.cap= "Visualization of how data leakage can be avoided. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/engineering.html#proper-implementation)."}
 knitr::include_graphics("./figures/minimize-leakage.png")
 ```
 
@@ -394,7 +394,6 @@ In order to interpret a ML model and understand its inner workings, we have to "
 
 #### Variable importance
 
-
 **Model specific approach (for linear regression)**
 
 Some of the approaches for evaluating feature importances are _model-specific_. For instance, the absolute value of *t*-statistic, in case of linear models, as a measure of feature importance. Such model-specific interpretation tools are limited to their respective model classes. There can be some advantages to using these model-specific approaches as they are more closely linked to the model and its performance, and can thus directly use parameters (coefficients) of the fitted model. 
@@ -622,50 +621,61 @@ Note: The computational demand of partial dependence analysis rapidly increases 
 
 ## Exercise
 
-### Adjusted-$R^2$
+**1. Adjusted-$R^2$**
 
-Implement the formula for the adjusted-$R^2$ using simple "low-level" functions and $R^2$ defined as (i) the coefficient of determination and then as (ii) the square of the Pearson's correlation coefficient. Compare the values of the two with what is returned by `summary(lm(..))$adj.r.squared`. Which one of the two is used by `summary(lm(..))`? For your investigations, generate correlated random data and apply functions on it.
+a. Implement the formula for the adjusted-$R^2$ using simple "low-level" functions and $R^2$ defined as
 
-### Cross validation
+  - the coefficient of determination and then
+  - as the square of the Pearson's correlation coefficient.
 
-Assess the generalisability of three alternatives of a linear regression model for `GPP_NT_VUT_REF`: with one predictor (`PPFD_IN`), three predictors (`PPFD_IN`, `VPD_F`, and `TA_F,`), and all available predictors. Which model works best in terms of its generalisability, assessed by 5-fold cross-validation and using the RMSE as the loss function? Use the caret function `train()` with RMSE as the loss function.
+b. Compare the values of the two with what is returned by `summary(lm(..))$adj.r.squared`. Which one of the two is used by `summary(lm(..))`? For your investigations, generate correlated random data and apply functions on it.
 
-Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
+***
+**2. Cross validation**
+
+Assess the generalisability of three alternatives of a linear regression model for `GPP_NT_VUT_REF`:
+
+a. with one predictor (`PPFD_IN`),
+b. three predictors (`PPFD_IN`, `VPD_F`, and `TA_F,`),
+c. all available predictors.
+
+Which model works best in terms of its generalisability, assessed by 5-fold cross-validation and using the RMSE as the loss function?
+
+Use the caret function `train()` with RMSE as the loss function and use the data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors!).
 
 **Hint**
 
-- To get the generalisation performance assessed during cross-validation (and not on the data held out from an initial split - which is not done here), you can use `summary(resamples(list(model1 = output_train1, ...)))`, where `output_train1` is the ouput of a `train()` function call with resampling.
+To get the generalisation performance assessed during cross-validation (and not on the data held out from an initial split - which is not done here), you can use `summary(resamples(list(model1 = output_train1, ...)))`, where `output_train1` is the ouput of a `train()` function call with resampling. We see that by including all predictors, we get the best model performance in terms of it cross-validation results, i.e., the lowest root mean square error (RMSE) and the highest $R^2$, averaged across folds.
 
-We see that by including all predictors, we get the best model performance in terms of it cross-validation results, i.e., the lowest root mean square error (RMSE) and the highest $R^2$, averaged across folds.
+***
+**3. Exploratory modelling**
 
-### Exploratory modelling
+Using the same data set as above (daily data for CH-Lae), find the model with the best performance, measured by evaluation against testing data held out from an initial split (30-70%). Use your own creativity to pre-process features and select variables, and chose between either a KNN or a multivariate linear regression, or any other ML model if you like (see models available with caret [here](https://topepo.github.io/caret/available-models.html)). Use all methods you've learned so far and impress your peers. Who gets the best generalisable model? Document and justify all steps you take. Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
 
-Using the same data set as above (daily data for CH-Lae), find the model with the best performance, measured by evaluation against testing data held out from an initial split (30-70%). Use your own creativity to pre-process features and select variables, and chose between either a KNN or a multivariate linear regression, or any other ML model if you like (see models available with caret [here](https://topepo.github.io/caret/available-models.html)). Use all methods you've learned so far and impress your peers. Who gets the best generalisable model? Document and justify all steps you take.
+***
+**4. Resampling - Bonus problem**
 
-Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
-
-**Bonus problem below**
-
-### Resampling
-
-Define a resampling function of the form `my_resample_folds_nested(df, k)` generating $k$ folds and taking a data frame `df` as arguments. This function should return a nested data frame with $k$ rows and two columns `train` and `test` that contain nested dataframes for training and testing data with each fold. Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
-Please print the dimensions of the whole data frame and run head() of fold two of the column 'train' of the nested data frame (this is just to make the peer review easier).
+a. Define a resampling function of the form `my_resample_folds_nested(df, k)` generating $k$ folds and taking a data frame `df` as arguments. This function should return a nested data frame with $k$ rows and two columns `train` and `test` that contain nested dataframes for training and testing data with each fold. Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
+b. Print the dimensions of the whole data frame and run head() of fold two of the column 'train' of the nested data frame (this is just to make the peer review easier).
 
 *"Relief option:"* You may create two separate flat data frames, one with testing, and one with training data, where one column specifies which fold each row belongs to. 
 
-*Hints:*
+**Steps:**
 
-- Use the caret function `createFolds` to split a vector of row indices into a list of length corresponding to the number of folds, where each list element cotains the indices of the training resamples for the respective fold.
-- Use the dplyr function `slice()` to subset a dataframe by row numbers.
-- Use `group_by()` in combination with `nest()` for nesting data frames for each of the $k$ folds and end up with a dataframe that has $k$ rows.
-
-Fit a linear model of the form `GPP_NT_VUT_REF ~ PPFD_IN` (i) directly on all the data in `df`, and (ii) on the resampled **training** folds. 
-
-Evaluate the models by calculating metrics (squared Pearson's correlation coefficient, and RMSE) of predictions made for (i) on the full dataframe `df`, and for (ii) on each respective **testing** fold separately. For (ii), report the mean across metrics calculated on each testing fold. 
+1. Use the caret function `createFolds` to split a vector of row indices into a list of length corresponding to the number of folds, where each list element cotains the indices of the training resamples for the respective fold.
+2. Use the dplyr function `slice()` to subset a dataframe by row numbers.
+3. Use `group_by()` in combination with `nest()` for nesting data frames for each of the $k$ folds and end up with a dataframe that has $k$ rows.
+4. Fit a linear model of the form `GPP_NT_VUT_REF ~ PPFD_IN`
+    - directly on all the data in `df` and
+    - on the resampled **training** folds. 
+5. Evaluate the models by calculating metrics (squared Pearson's correlation coefficient, and RMSE) of predictions made
+    - for the full dataframe `df`
+    - for each respective **testing** fold separately. For this, report the mean across metrics calculated on each testing fold. 
 
 If this sounds confusing: Just implement a k-fold cross-validation as described also in the tutorial and report the cross-validation metrics.
 
-*Hints:* (Feel free to come up with a solution that doesn't make use of these hints.)
+**Hints:**
+*Feel free to come up with a solution that doesn't make use of these hints.*
 
 - You may use `mutate( newcol = purrr::map( nested_col, ~function_name(.)) )` to apply a function `function_name()` on each of the nested data frames in column `nested_col`. The `.` refers to the position at which the argument `nested_col` goes.
 - You may use the broom function `augment()` to add a column `.fitted` to a data frame, given a model object that was generated using predictors that are available as columns in the respective data frame.

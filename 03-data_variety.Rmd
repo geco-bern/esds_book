@@ -1,7 +1,7 @@
 # Data variety {#ch-03}
 
 ```{r include=FALSE}
-# Preferences for conflicting packages
+# Preferences definition for conflicting packages when building bookdown
 library(conflicted)
 conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
@@ -1285,10 +1285,9 @@ points(df_sp_sites$lon, df_sp_sites$lat, col=datColleaves,cex=leaf_t/18, pch = 1
 
 The distribution of leaf thickness seems to depend on latitude. In Southern regions, leaves are generally thinner than in Northern regions. To confirm this we would have to make a model and test our observation.
 
-## Exercise: Using Spatial Data 
+## Exercise
 
 ### Part 1: Plotting Elevation differences
-
 
 In this first part of the exercise, we consider elevation data from the ETOPO dataset. ETOPO is a 1 arc-minute global relief model of the Earth's surface that integrates land topography and ocean bathymetry. Since it is modelled date there is a certain level of uncertainty associated with it. In this exercise, you will look at the differences between the elevations from the tower data, which is directly measured at the site, and the values you will extract from this modelled ETOPO data.
 

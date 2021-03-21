@@ -3,23 +3,18 @@ title: "Exercise 13 Solution"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Supervised Deep Learning II
 
-This exercise has two parts. 
-
-In the __first__ part you have to create a feed forward neural network using only the ndvi image as input. In this case each pixel of the image is considered as a feature.
+In the __first__ part of this exercise you have to create a feed forward neural network using only the ndvi image as input. In this case each pixel of the image is considered as a feature.
 
 In the __second__ part you have to create a mixed model. As we have alreday seen in tutorial 13, categorical features can also be incorporated into a neural network model. Namely, in tutorial 13, a mixed model combining the cnn features and the tower location (as a categorical feature) is created.The goal of this part is to also incorporate the corresponding month for each ndvi input image along with the tower location. The reason for such a refinement is because seasonality plays an important role in vegetation metabolism and therefore can affect the CO2 fluxes.
 
 For the __second__ part a sceleton code is provided. You have only to fill in the missing code where is necessary. Is there an improvement in the model performance on validation and test set?
 
-
-
+## Set-up
 ### Import libraries
 
-```{r}
+```{r, eval = F}
 library(imputeTS) # Library for Imputation
 library(tidyverse)
 library(reticulate)
@@ -30,31 +25,27 @@ library(tensorflow)
 
 ### Read data
 
-```{r}
-#read data
-path = "../../data"
-
-##tower features
-train=readRDS(file.path(path,'train','towers_feature','features.rds'))
-val=readRDS(file.path(path,'validation','towers_feature','features.rds'))
-test=readRDS(file.path(path,'test','towers_feature','features.rds'))
+```{r, eval = F}
+# read data
+train <- readRDS("../data/SDL_II/train/towers_feature/features.rds")
+val   <- readRDS("../data/SDL_II/validation/towers_feature/features.rds")
+test <- readRDS("../data/SDL_II/test/towers_feature/features.rds")
 
 # have a look
 head(train)
 ```
 
-
-```{r}
+```{r, eval = F}
 ## take CO2 flux
 y_train = train$co2
 y_val = val$co2
 y_test =  test$co2
-##ndvi images
-ndvi_train = readRDS(file.path(path,'train','NDVI','ndvi_train.rds')) 
-ndvi_val =  readRDS(file.path(path,'validation','NDVI','ndvi_val.rds'))
-ndvi_test = readRDS(file.path(path,'test','NDVI','ndvi_test.rds'))
+# ndvi images
+ndvi_train <- readRDS("../data/SDL_II/train/NDVI/ndvi_train.rds")
+ndvi_val   <- readRDS("../data/SDL_II/validation/NDVI/ndvi_val.rds")
+ndvi_test  <- readRDS("../data/SDL_II/test/NDVI/ndvi_test.rds")
 
-#print some statistics of the data
+# print some statistics of the data
 paste("Size of training set is ",length(y_train))
 paste("Size of validation set is ",length(y_val))
 paste("Size of test set is ",length(y_test))
@@ -62,7 +53,7 @@ paste("Size of test set is ",length(y_test))
 
 ### Preprocess ndvi images
 
-```{r}
+```{r, eval = F}
 #specify image size
 IMAGE_WIDTH = dim(ndvi_train)[2]
 IMAGE_HEIGHT = dim(ndvi_train)[3]
@@ -101,7 +92,7 @@ ndvi_test_pr = preprocess_images(ndvi_test)
 
 This model should more complex than the one provided in tutorial 13
 
-```{r}
+```{r, eval = F}
 model=keras_model_sequential()
 model %>% layer_flatten(input_shape = IMAGE_SIZE) %>% 
   layer_dense(units = 128,activation = 'relu') %>%
@@ -118,7 +109,7 @@ summary(model)
 
 Hint: In tutorial 13 can found some ideas how to train the model and which are the proper callbacks
 
-```{r}
+```{r, eval = F}
 #optimizer
 opt=optimizer_adam(lr=0.01) 
 
@@ -145,7 +136,7 @@ history_ffnn = fit(model,x = ndvi_train_pr,y = y_train,batch_size = 128,
 
 ### Plot training history
 
-```{r}
+```{r, eval = F}
 plot(history_ffnn)
 ```
 
@@ -155,7 +146,7 @@ plot(history_ffnn)
 
 Hint: In tutorial 13 we have already seen how to retrieve a trained model made by the checkpoint callback.
 
-```{r}
+```{r, eval = F}
 # define mse
 mse = function(model,x,y){
   pr = predict(model,x)
@@ -184,7 +175,7 @@ cat('Test MSE: ',ffnn_test_mse,'\n')
 ### Create mixed model: CNN features + tower location + month
 
 In this model we propose to incorporate the month of the ndvi input image along with cnn features and the tower location. Our goal is to insert categorical features inside a neural network model and to examine if the performance can further improved. As it is obvious, a model which can take into account special informations about the ndvi input image such as the month that the image is taken and the spatial location of it seems more realistic. As a result, further improvement of the model performance can be expected.
-```{r}
+```{r, eval = F}
 create_mixed = function(){
   
   #input --> ndvi images
@@ -253,7 +244,7 @@ summary(model)
 
 ### Tokenize tower location and month
 
-```{r}
+```{r, eval = F}
 #create function which tokenizes tower and month
 
 tokenize_data = function(data){
@@ -281,7 +272,7 @@ test_tokens = tokenize_data(test)
 
 ### Train the model
 
-```{r}
+```{r, eval = F}
 # optimizer
 opt=optimizer_adam(lr=0.01) 
 
@@ -309,14 +300,14 @@ history_mixed = fit(model,x = list(ndvi_train_pr,train_tokens),y = y_train,batch
 
 ### Plot training history
 
-```{r}
+```{r, eval = F}
 #plot mixed history
 plot(history_mixed)
 ```
 
 ### Load the trained model and evaluate performance on validation and test set
 
-```{r}
+```{r, eval = F}
 # define mse
 mse = function(model,x,y){
   pr = predict(model,x)

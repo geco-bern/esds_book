@@ -1,6 +1,5 @@
 # Supervised Deep Learning II {#ch-13}
 
-
 ## Introduction
 In this tutorial, we will put into practice and apply many of the models seen earlier in the course, in order to achieve a simple goal: efficiently extrapolate an environmental dataset. For this, we will use satellite data (specifically NDVI) as an accurate and "cheap" predictor of a specific environmental variable (C0~2~ - vegetation fluxes) that is measured scarcely by expensive physical devices (eddy covariance towers, see see Chapters \@ref(ch-02) and \@ref(ch-03)). Sit down and relax. This tutorial invites you to take a step back, and reflect on all the knowledge you have acquired on modelling so far. 
 
@@ -818,7 +817,7 @@ For the **second** part a skeleton code is provided. You have only to fill in th
 
 ### Import libraries
 
-```{r eval = F}
+```{r}
 library(imputeTS) # Library for Imputation
 library(tidyverse)
 library(reticulate)
@@ -846,7 +845,7 @@ keras_model_sequential()
 ### Load data
 
 ```{r eval = F}
-#read in the data
+# read in the data
 train <- readRDS("./data/SDL_II/train/towers_feature/features.rds")
 val   <- readRDS("./data/SDL_II/validation/towers_feature/features.rds")
 test <- readRDS("./data/SDL_II/test/towers_feature/features.rds")
@@ -857,16 +856,16 @@ head(train)
 
 
 ```{r eval = F}
-## take CO2 flux
+#  take CO2 flux
 y_train = train$co2
 y_val = val$co2
 y_test =  test$co2
-##ndvi images
+# ndvi images
 ndvi_train <- readRDS("./data/SDL_II/train/NDVI/ndvi_train.rds")
 ndvi_val   <- readRDS("./data/SDL_II/validation/NDVI/ndvi_val.rds")
 ndvi_test  <- readRDS("./data/SDL_II/test/NDVI/ndvi_test.rds")
 
-#print some statistics of the data
+# print some statistics of the data
 paste("Size of training set is ",length(y_train))
 paste("Size of validation set is ",length(y_val))
 paste("Size of test set is ",length(y_test))

@@ -8,7 +8,7 @@ output:
   bookdown::gitbook: default
 #  pdf_document:
 #    latex_engine: xelatex
-bibliography: [book.bib] # Packages.bib excluded
+bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: true
 nocite: '@*'
@@ -46,16 +46,31 @@ The students are able to
 - 401-6217-00L Using R for Data Analysis and Graphics (Part II)
 - 701-0105-00L Mathematik VI: Angewandte Statistik für Umweltnaturwissenschaften
 
-```{r include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown'
-), 'packages.bib')
-```
 
 ```{r include=FALSE}
+## Set-Up for bookdown build
+
+# Load all packages and install if needed
+# Newer rfishbase versions cause troubles, thus install:
+if(packageVersion("rfishbase") > "3.0.4"){
+  remove.packages("rfishbase")
+  require(devtools)
+  install_version("rfishbase", version = "3.0.4", repos = "http://cran.us.r-project.org")
+}
+
+all_pkg <- c('base', 'bookdown', 'broom', 'caret', 'conflicted', 'datasets', 'dplyr', 'forcats', 'ggfortify', 'ggplot2', 'ggridges', 'graphics', 'grDevices', 'imputeTS', 'IRdisplay', 'keras', 'lattice', 'latticeExtra', 'leaps', 'lubridate', 'knitr', 'maptools', 'methods', 'Metrics', 'modelr', 'MODISTools', 'patchwork', 'pdp', 'pROC', 'purrr', 'raster', 'rasterVis', 'RColorBrewer', 'RCurl', 'readr', 'recipes', 'reticulate', 'rfishbase', 'rgbif', 'rgdal', 'rgeos', 'rjson', 'rmarkdown', 'rsample', 'sf', 'sp', 'spData', 'stats', 'stringr', 'tensorflow', 'terra', 'tibble', 'tidyr', 'tidyverse', 'utils', 'vip', 'visdat', 'XML', 'yardstick')
+
+package.check <- lapply(
+  all_pkg,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
+
 # Preferences for conflicting packages
-library(conflicted)
 conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
 conflict_prefer("levelplot", "rasterVis")
@@ -63,9 +78,13 @@ conflict_prefer("origin", "raster")
 conflict_prefer("extract", "raster")
 conflict_prefer("partial", "pdp")
 conflict_prefer("mse", "Metrics")
-```
+conflict_prefer("near", "dplyr")
+conflict_prefer("resample", "raster")
+conflict_prefer("train", "caret")
 
-```{r global-options, include=FALSE}
-knitr::opts_chunk$set(out.width = "50%", fig.align = "center", warning=FALSE, message=FALSE)
-options(tinytex.verbose = TRUE)
+# Write packages bibliography
+knitr::write_bib(all_pkg, "packages.bib")
+
+# Set global chunk options
+knitr::opts_chunk$set(out.width = "50%", fig.align = "center", warning = FALSE, message = FALSE)
 ```
