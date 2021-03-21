@@ -1,8 +1,3 @@
-# Introduction
-
-- This document holds inputs and ideas on how to further structure and format the ESDS bookdown document.
-- This [Google Sheet](https://docs.google.com/spreadsheets/d/1H0F2ZLbEkt5nRRLzCFapwYDbXwXQozB7j-nAjd1eQYY/edit#gid=1623479706) holds a visual overview of the book's progress.
-
 # Table of contents
 - [Introduction](#introduction)
 - [Table of contents](#table-of-contents)
@@ -22,6 +17,12 @@
   * [Chapters](#chapters)
   * [Exercises, Applications and Solutions](#exercises--applications-and-solutions)
   * [Code](#code)
+  
+# Introduction
+
+- This document holds inputs and ideas on how to further structure and format the ESDS bookdown document.
+- This [Google Sheet](https://docs.google.com/spreadsheets/d/1H0F2ZLbEkt5nRRLzCFapwYDbXwXQozB7j-nAjd1eQYY/edit#gid=1623479706) holds a visual overview of the book's progress.
+- The repository holds all content (text and figures), exercises and solutions. Data is stored on polybox.
 
 # How to use this book
 
@@ -128,8 +129,6 @@
         - [https://stackoverflow.com/questions/63220597/python-in-r-error-could-not-find-a-python-environment-for-usr-bin-python](https://stackoverflow.com/questions/63220597/python-in-r-error-could-not-find-a-python-environment-for-usr-bin-python)
         - [https://stackoverflow.com/questions/56010733/error-installation-of-tensorflow-not-found](https://stackoverflow.com/questions/56010733/error-installation-of-tensorflow-not-found)
 
-***
-
 # Open tasks
 
 *The list below holds inputs and ideas from the lecture evaluation (see pdf on polybox) and moodle feedbacks (final feedback, exercise forum, lecture forum). As for now (early 2021), the book is ready for usage but not proof-read. There is still need for proof-reading theory, improve wording, condense content, improve code style, etc. Have a look at the [shared excel](https://docs.google.com/spreadsheets/d/1H0F2ZLbEkt5nRRLzCFapwYDbXwXQozB7j-nAjd1eQYY/edit#gid=1623479706) to see what tasks are still open and for a rough estimate how many hours it will take to get a final first version of the book ready. Below is a collection of tasks for further improving the book.*
@@ -176,7 +175,7 @@
 
 ## Exercises, Applications and Solutions
 
-- ÏAll exercises are added to the end of each chapter. The respective solutions as RMarkdown files can be found on the repository.
+- All exercises are added to the end of each chapter. The respective solutions as RMarkdown files can be found on the repository.
     - There is no consistent style and formatting of the exercise defined. Exercises are only added as text with some provision of pseudo-code as for now. It would be nice to have a consistent style of structuring the task description (using headings, bold face, horizontal lines, etc.) and have the same done for the format of the solutions.
     - Most exercsie and solutions are in tidyverse style but not all yet (e.g. 04)
         - **Solution 04** is not yet in tidyverse but can easily be rewritten using the tutorial code.
