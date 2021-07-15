@@ -1,9 +1,9 @@
 # Primers {#ch-01}
 
 ## Introduction
-In this section, we'll show you how to structure a project and how to work with version control (git). You will learn how to read data into your workspace, get to know how different data is structured and what data types are, conduct simple data explorations and visualisations, and write data to files. You will also learn where you can turn to for help.
+In this tutorial, we will learn how to structure a project and how to work with version control (git). You will also learn how to read data into your workspace, get to know how different data is structured and understand different types of data. [As regard to analyses] conduct simple data explorations and visualisations, and write data to files. A key skill of data science and programming is to know where to get information when faced with a problem. No data scientist has solutions to every problem, but they all know where to find support.
 
-After you've gone through the lecture and solved the exercises you should be able to:
+After you've gone through the lecture and solved the exercises, you should be able to:
 
 - Understand the definition of data science.
 - Identify the different steps of a data science workflow.
@@ -13,27 +13,27 @@ After you've gone through the lecture and solved the exercises you should be abl
 - List sources of environmental data and explain the methodological difference in their collection.
 - Execute R and load a dataset for data analyses.
 - Apply basic Git commands for version control.
-- Plot data science outputs and write them on the disk.
+- Plot data analysis outputs and write them on the disk.
 
-### Important points from the lecture 
+### Important elements from the lecture 
 
-Big data is described by four characteristics: 
+Generally, data can be described by four overarching characteristics: 
 
-- Volume: A data volume is simply the amount of data in a file or database.
-- Velocity: Data velocity is the lag between time of observation observation and data ingest for analysis.
+- Volume: Data volume is simply the amount of data in a file or database.
+- Velocity: Data velocity is the lag between time of observation and data ingest for analysis.
 - Variety: Data variety is the diversity of data in a data collection or problem space.
-- Veracity: Data veracity is the degree to which data is accurate and precise.  
+- Veracity: Data veracity is the degree to which data is accurate and precise in comparison with a measured phenomenon  
 
-FAIR data criteria are:
+An increasing number of research organisations support the FAIR criteria for data use and sharing. They are as follows:
 
-- **F**indable: Easy to find and well documented
-- **A**ccessible: Long term storage and accessible with standard protocols
-- **I**nteroperatable: Exchangeable and correctly cited
-- **R**eusable: Sufficiently documented and clear legal terms
+- **F**indable: Easy to find and well documented.
+- **A**ccessible: Long term storage and accessible with standard protocols.
+- **I**nteroperatable: Exchangeable and correctly cited.
+- **R**eusable: Sufficiently documented and clear legal terms.
 
-Environmental data is retrieved from a diversity of methods, including remote sensing, continuous site scale measurements (e.g., meteorological variables, hydrological variables, ecosystem-atmosphere exchange fluxes of water vapour and CO~2~), episodic observations (e.g., forest inventories, biodiversity assessments), field campaigns, or experiments in the field or under laboratory conditions. Data from these sources come in different shapes and formats. In this course, you'll learn to handle this diversity efficiently to answer research questions that you will likely encounter in the future. In many of the exercises, we will focus on data from continuous site scale observations, where meteorological variables are measured in parallel with ecosystem-atmosphere exchange fluxes of water vapour and CO~2~, collected from Eddy covariance technique. In addition, you will learn to tap into large environmental data repositories to complement your site-scale data.
+Environmental data is retrieved from a diversity of methods, including remote sensing, continuous site-scale measurements (e.g., meteorological variables, hydrological variables, ecosystem-atmosphere exchange fluxes of water vapour and CO~2~), episodic observations (e.g., forest inventories, biodiversity assessments), field campaigns, or experiments in the field or under laboratory conditions. Data from these sources come in different shapes and formats. In this course, we will learn to handle this diversity efficiently to answer research questions that you will likely encounter in the future. In many of the exercises, we will focus on data from continuous site scale observations, where meteorological variables are measured in parallel with ecosystem-atmosphere exchange fluxes of water vapour and CO~2~, collected by the Eddy covariance technique. In addition, you will learn to tap into large environmental data repositories to complement your site-scale data.
 
-At the end of each chapter, you'll sum up the section with a comprehensive exercise using RStudio on Renku. We'll show you how to set up RStudio and Renku at the end of this tutorial.
+At the end of each chapter, a comprehensive exercise using RStudio on Renku is proposed. We will show you how to set up RStudio and Renku at the end of this tutorial.
 
 ## Tutorial
 ### Working with Jupyter notebook
