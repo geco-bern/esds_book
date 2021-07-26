@@ -18,6 +18,23 @@
   * [Exercises, Applications and Solutions](#exercises--applications-and-solutions)
   * [Code](#code)
   
+# Quick guide
+
+1. Clone the repo.
+```sh
+git clone https://gitlab.ethz.ch/usys_lectures/esds_book
+```
+
+2. Create the data directory and link files from the shared polybox folder into it.
+```sh
+cd esds_book
+mkdir data
+ln -s ~/polybox/Shared/Data\ Science\ Lecture\ Planning\ -\ shared\ folder/4\ Datasets/* ./data/
+```
+
+3. Build the book.  
+  
+  
 # Introduction
 
 - This document holds inputs and ideas on how to further structure and format the ESDS bookdown document.

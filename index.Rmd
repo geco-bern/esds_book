@@ -8,7 +8,7 @@ output:
   bookdown::gitbook: default
 #  pdf_document:
 #    latex_engine: xelatex
-bibliography: [book.bib, packages.bib]
+bibliography: [book.bib] # packages.bib
 biblio-style: apalike
 link-citations: true
 nocite: '@*'
