@@ -48,8 +48,7 @@ Remember also that `dplyr` functions (sometimes, referred to as "verbs") all wor
 In the same video (2c), we learned about data visualisation with the tidyverse package ggplot2.
 Remember the steps for creating a figure with ggplot2:
 
-We will start by calling the function `ggplot()`: 
-- The first argument to enter is the data frame, that contains the values that are to be displayed in a figure.
+We will start by calling the function `ggplot()`: - The first argument to enter is the data frame, that contains the values that are to be displayed in a figure.
 - The second argument is the "mapping" argument and always comes in the form of `aes(...)`.
 Inside the brackets of `aes(...)`, we usually indicate the column (variable) that specifies the coordinate of a visualisation element (e.g., a point) along the x-axis with `x = ...`, and along the y-axis with `y = ...`.
 
@@ -72,7 +71,7 @@ After learning about some basic concepts and functions for data wrangling and vi
 As in previous exercises, we will be using the time series data from eddy covariance flux measurements and meteorological variables measured in parallel.
 In this sub-section, we start with half-hourly data from a flux tower near Zürich ([CH-Lae](https://gl.ethz.ch/research/bage/fluxnet-ch.html), located on the Lägern mountain between Regensberg and Baden and run by our colleagues here at ETH).
 The data covers years 2004-2014 at a half-hourly time step.
-That is a large amount of data which can be tricky to work with in Excel. 
+That is a large amount of data which can be tricky to work with in Excel.
 In this course, you will learn to do your data wrangling completely outside of Excel and you will see how it improves your life as a (data) scientist considerably.
 
 Every research project starts with a broad overall question.
@@ -101,11 +100,15 @@ hhdf
 You have already inspected the size and dimensions of this data frame in Chapter \@ref(ch-01) with functions, such as `dim()`, `nrow()`, `ncol()`, `head()`, `names()` etc.
 
 For our further data exploration, we will select certain variables to reduce the data frame we are working with.
-Such a selection should be guided by our understanding of the data and our own judgments. We need to select the variables that are expected to influence the phenomena that we are investigating based on the existing knowledge which forms our hypothesis. This knowledge is generally obtained from the scientific literature. The selection we decide upon must be documented for publications to aid reproducibility.
+Such a selection should be guided by our understanding of the data and our own judgments.
+We need to select the variables that are expected to influence the phenomena that we are investigating based on the existing knowledge which forms our hypothesis.
+This knowledge is generally obtained from the scientific literature.
+The selection we decide upon must be documented for publications to aid reproducibility.
 Many of the variables in the original file record the same information but are derived with slightly different assumptions and gap-filling techniques.
 This is indicated by the suffices of the variable names.
 See [Pastorello et al. (2020)](https://www.nature.com/articles/s41597-020-0534-3) for a comprehensive description of this.
-To help the further steps in this chapter we will now subset our original data. We select the following variables:
+To help the further steps in this chapter we will now subset our original data.
+We select the following variables:
 
 -   The time information (`TIMESTAMP`)
 -   All meteorological variables following the final gap-filled method (suffix `_F`)
@@ -256,11 +259,14 @@ Multiple filtering criteria can be combined with logical (Boolean) operators:
 -   `!` logical not
 
 We want to check whether a variable takes any of a larger set of values.
-For example, if we wanted to check whether a date, given by the month of the year, is in meteorological spring, we could write something like `filter(df, month == 3 | month == 4 | month == 5)`. 
-When writing code there are often several different ways to write commands that will output the same result. The just mentioned command line is a little complicated. Through shortening it becomes a simpler and much more powerful syntax `filter(df, month %in% c(3,4,5))`.
+For example, if we wanted to check whether a date, given by the month of the year, is in meteorological spring, we could write something like `filter(df, month == 3 | month == 4 | month == 5)`.
+When writing code there are often several different ways to write commands that will output the same result.
+The just mentioned command line is a little complicated.
+Through shortening it becomes a simpler and much more powerful syntax `filter(df, month %in% c(3,4,5))`.
 The `%in%` operator takes each element of what is on its left-hand-side and evaluates whether it is equal to any element of what is on its right-hand-side.
 
-Now, we can apply those different functions to our dataset. We will begin by filtering some GPP data based on its corresponding data quality information.
+Now, we can apply those different functions to our dataset.
+We will begin by filtering some GPP data based on its corresponding data quality information.
 This type of information is crucial as it allows us, e.g., to avoid using "bad" data for training a machine learning algorithm.
 In our dataset, the quality control flag for `GPP_NT_VUT_REF` is provided by `NEE_VUT_REF_QC`.
 Its corresponding codes are:
@@ -268,7 +274,8 @@ Its corresponding codes are:
 0 = measured\
 1 = good quality gap-filled\
 2 = medium\
-3 = poor
+3 = po
+or
 
 To take only actually measured or good quality gap-filled GPP data (0 and 1), we can do:
 
@@ -285,8 +292,13 @@ hhdf %>%
 ```
 
 `filter()` completely removes rows (note the information about number of rows printed above).
-In some cases this is undesired and it is preferred to replace bad-quality values with `NA`. `NA` is a widely used term to indicate when information has not been provided and stands for "*not available*", "*not applicable*" or "*no answer*". Its use will depend on the context and type of data being worked on. For example, in a questionaire an `NA` could mean the parciticpant did not answer the question or that the question does not apply to them. In a data set containing measurements from a sensor it may mean the sensor was not working at that point meaning there is no data available. Replacing missing values with `NA` is a method to avoid empty cells in a data set. In R,
-`NA` is a "code" that lets R understand that the value is missing.
+In some cases this is undesired and it is preferred to replace bad-quality values with `NA`.
+`NA` is a widely used term to indicate when information has not been provided and stands for "*not available*", "*not applicable*" or "*no answer*".
+Its use will depend on the context and type of data being worked on.
+For example, in a questionaire an `NA` could mean the parciticpant did not answer the question or that the question does not apply to them.
+In a data set containing measurements from a sensor it may mean the sensor was not working at that point meaning there is no data available.
+Replacing missing values with `NA` is a method to avoid empty cells in a data set.
+In R, `NA` is a "code" that lets R understand that the value is missing.
 Almost all operations on values where at least one value is `NA` also return `NA`.
 For example:
 
@@ -330,7 +342,7 @@ hhdf %>%
 
 We just made this statement: "*If our data has `NA` values and we choose to drop the entire row if it contains an `NA`, you can use another useful function `drop_na()`.*"
 
-It is important to understand what functions such as `drop_na()` do to the data set. 
+It is important to understand what functions such as `drop_na()` do to the data set.
 Convert the matrix below to a dataframe and use `drop_na()`.
 Note the differences the output information and parts of the matrix that are kept and compare it to the results of other functions such as `is.na()`, `complete.cases()`, `na.omit()`.
 
@@ -363,8 +375,8 @@ NA_matrix %>% na.omit()
 
 Whenever possible, we should combine multiple processing steps that naturally belong together.
 Specifically, the same sequence of steps may be applied to multiple datasets that have the same structure (variable names, etc.).
-We can combine the set of operations presented above in into a single function. Once such a function is created, we can apply it to the data in one go, instead of repeating the successive steps
-We will now write our first function and implement the data cleaning steps we described above.
+We can combine the set of operations presented above in into a single function.
+Once such a function is created, we can apply it to the data in one go, instead of repeating the successive steps We will now write our first function and implement the data cleaning steps we described above.
 The function consists of multiple sequences of code as it contains the different steps presented above and applies them sequentially.
 
 ```{r}
@@ -434,6 +446,7 @@ This was a very condensed introduction to functions.
 You will find more information [here](https://r4ds.had.co.nz/functions.html).
 
 #### Data ...
+
 After we have done the data cleaning by imputing `NA` for bad quality data, we should check again, how much data we are now left with and how big the data gaps for different variables are.
 Knowing this is particularly important when using the data later in combination with machine learning algorithms that cannot deal with missing data.
 In such cases, rows where at least one value is missing (`NA`), have to be discarded entirely.
@@ -447,7 +460,7 @@ hhdf %>%
   t()
 ```
 
-We can see, that \>20% of all values for `SWC_F_MDS_4` and `USTAR` are missing, which can be problematic for further analyses. 
+We can see, that \>20% of all values for `SWC_F_MDS_4` and `USTAR` are missing, which can be problematic for further analyses.
 We can remove those variables from the data frame.
 
 ```{r}
@@ -456,7 +469,8 @@ hhdf <- hhdf %>%
 ```
 
 We can also visualise the fraction of missing data after applying our data cleaning step, using the `vis_miss` from the **visdat** package.
-Since applying this function on such a large dataframe can be time consuming, we will apply it on a randomly selected subset. For this, we randomly select 5'000 entries from `hhdf` to get a feeling for how much of which data is missing.
+Since applying this function on such a large dataframe can be time consuming, we will apply it on a randomly selected subset.
+For this, we randomly select 5'000 entries from `hhdf` to get a feeling for how much of which data is missing.
 
 ```{r}
 library(visdat)
@@ -639,8 +653,10 @@ This is an insight we would never have gotten by just looking at the naked value
 Data visualisations are essential for guiding analyses and processing throughout all steps.
 Having learned this, we now have a justification for applying further data filtering criteria.
 
-In our intial research question, we want to know not only about variations in GPP, but also what controls it. 
-We want to know the environmental factors that determine the variations in GPP. The environmental factors that influence GPP are known as the covariates of GPP. In a machine learning context, we call them "predictors" or "features".
+In our intial research question, we want to know not only about variations in GPP, but also what controls it.
+We want to know the environmental factors that determine the variations in GPP.
+The environmental factors that influence GPP are known as the covariates of GPP.
+In a machine learning context, we call them "predictors" or "features".
 To answer this question, we will have to turn to modelling.
 Here, we refer to modelling in the wider sense of predicting observed variations in a target variable based on empirical relationships with a set of predictors.
 Often, you will start delving into your research question with some *a priori* understanding of the system from which you have observational data.
@@ -661,7 +677,8 @@ ddf %>%
   ylim(-10, 25)
 ```
 
-We observe a clear trend of increasing GPP with increasing PPFD, and it looks largely linear. Data collected in the field often has a substantial amount of scatter. 
+We observe a clear trend of increasing GPP with increasing PPFD, and it looks largely linear.
+Data collected in the field often has a substantial amount of scatter.
 Since we previously added a column to the data frame containing the data quality, the next step is to see if the data quality explains some of the scatter in the data.
 To investiagte this, we can "map" the data quality dimension onto the color aesthetic of the plot.
 
@@ -675,9 +692,12 @@ ddf %>%
 ```
 
 The high values of GPP we already found to be associated with low fractions of underlying measured data in the time series plot is not explained by simultaneously high PPFD.
-In the plot we see a core cluster of points with fewer points outside this denser area. These outlying points are lighter and do not fit the linear relationship as well.
+In the plot we see a core cluster of points with fewer points outside this denser area.
+These outlying points are lighter and do not fit the linear relationship as well.
 
-Despite scattered data points, there is a positive linear relationship between GPP and PPFD. To find the best fit of this linear relationship, meaning the straight line that best fits our data points, we will move on to modelling using a univariate linear regression. This will serve as a brief introduction, as later chapters will go into more detail on modelling.
+Despite scattered data points, there is a positive linear relationship between GPP and PPFD.
+To find the best fit of this linear relationship, meaning the straight line that best fits our data points, we will move on to modelling using a univariate linear regression.
+This will serve as a brief introduction, as later chapters will go into more detail on modelling.
 
 We start by making a simple linear model using the function `lm()` and adding in our desired variables:
 
@@ -685,7 +705,8 @@ We start by making a simple linear model using the function `lm()` and adding in
 linmod <- lm(GPP_NT_VUT_REF ~ PPFD_IN, data = ddf)
 ```
 
-We can also directly plot the fitted linear regression line over the scatter plot using `geom_smooth(method = "lm")`. Rather than first making a linear model and then plotting it onto the data.
+We can also directly plot the fitted linear regression line over the scatter plot using `geom_smooth(method = "lm")`.
+Rather than first making a linear model and then plotting it onto the data.
 
 ```{r}
 ddf %>%
@@ -698,7 +719,8 @@ ddf %>%
 
 Based on our previous finding that the data quality is associated with GPP values, which is reflected in their relationship with PPFD, we can fit separate linear regression models for data where `f_measured` is greater than versus less than 0.5.
 For this, we can create a new variable with `mutate(more_measured = as.factor(f_measured > 0.5))`).
-The new variable `more_measured` contains binary information as the data is either greater or less than 0.5. By adding new factors we can add another previously "hidden" dimension to our data.
+The new variable `more_measured` contains binary information as the data is either greater or less than 0.5.
+By adding new factors we can add another previously "hidden" dimension to our data.
 And because it is a categorical variable and not a continuous one, R treats it as a *factor*.
 We can plot this new variable `more_measured` onto the color aesthetic as we did before.
 Since we specify this aesthetic below in the `ggplot()` function call, all subsequent visualisation layers will respect it, also `geom_smooth()`.
@@ -718,7 +740,8 @@ Note also that in the above `ggplot()` call, we specified the aesthetics as `aes
 This triggers all subsequent additions of visualisation layers (here: `geom_piont()` and `geom_smooth`) to use the same aesthetics for plotting.
 The distinction by the same colors is applied both to the points and to the smoothing lines.
 
-Scatter plots can appear overcrowded. In this example, particularly in the low PPFD range, many points are plotted over each other, which may hide some information.
+Scatter plots can appear overcrowded.
+In this example, particularly in the low PPFD range, many points are plotted over each other, which may hide some information.
 To avoid obscuring important details in the plot, we may want to visualise the *density* of points.
 We want to plot how many points fall within bins of a certain range values in GPP and PPFD, this creates grid cells in the GPP-PPFD-space.
 We can create such a raster plot that measures the density using `stat_density_2d()`:
@@ -738,7 +761,8 @@ ddf %>%
 
 We detect an interesting "separation" of points, where the increase in GPP with increasing PPFD is steeper than in others.
 Again, we can use our *a priori* understanding of the system to formulate hypotheses and test them by finding the appropriate visualisation type.
-Here, one hypothesis could be that the slope is steeper in some months than in others. This is actually more than just a vague guess.
+Here, one hypothesis could be that the slope is steeper in some months than in others.
+This is actually more than just a vague guess.
 
 To test this hypothesis we will visuallise the slopes of each month by fitting separate linear regression models.
 Note that each month encompasses data from multiple years, so clear trends will only become clear if there is a commonality between the same months of different years.
@@ -754,7 +778,9 @@ ddf %>%
 ```
 
 The plot verifies that the relationships indeed differ slightly between months.
-In spring months (3 = March, 4 = April), light levels can be already quite high, but GPP remains much lower than in summer months. A reason for this may be that GPP is not influenced by PPFD alone. There are other environmental variables, such as temperature or moisture levels, etc., that influence GPP and may not yet be at the levels reached during the summer months.
+In spring months (3 = March, 4 = April), light levels can be already quite high, but GPP remains much lower than in summer months.
+A reason for this may be that GPP is not influenced by PPFD alone.
+There are other environmental variables, such as temperature or moisture levels, etc., that influence GPP and may not yet be at the levels reached during the summer months.
 
 ### Functional programming
 
@@ -799,7 +825,8 @@ list_df <- purrr::map(as.list(vec_files), ~read_csv(.))
 Note that `map()` applies the function `read_csv()` to elements of a *list*.
 Hence, we first have to convert the vector `vec_files` to a list.
 The list is always the first argument within the function.
-Note two new symbols (`~` and `.`) in the command. The `~` always goes before the function that is applied, or mapped, to elements of the list.
+Note two new symbols (`~` and `.`) in the command.
+The `~` always goes before the function that is applied, or mapped, to elements of the list.
 The `.` indicates where the elements of the list would go if spelled out (e.g., `read_csv(.)` would here be `read_csv("./data/FLX_BE-Bra_FLUXNET2015_FULLSET_DD_1996-2014_2-3.csv")` for the first iteration).
 The output of `map()` is again a list.
 There are many variants of the function `map()` that each have a specific use.
@@ -855,7 +882,8 @@ list_df <- purrr::map(list_df, ~clean_fluxnet_dd(.))
 ```
 
 Have different data frames as elements of a list may be impractical.
-Upon closer examination, the data frames read in here all have similar shapes, meaning they share the same columns. They only differ by the number of rows, and the data values they contain.
+Upon closer examination, the data frames read in here all have similar shapes, meaning they share the same columns.
+They only differ by the number of rows, and the data values they contain.
 This suggests that we can "stack" each data frame along its rows.
 This can be done using `bind_rows()` and we can automatically create a new column `"siteid"` in the stacked data frame that takes the name of the corresponding list element.
 
@@ -889,7 +917,9 @@ We see that `PPFD_IN` is often missing.
 #### Strings
 
 The column `siteid` now contains strings specifying the full paths of the files that were read.
-We would like to extract the site name from these strings. The file names follow a clear pattern. Naming files wisely can often make life a lot simpler.
+We would like to extract the site name from these strings.
+The file names follow a clear pattern.
+Naming files wisely can often make life a lot simpler.
 
 ```{r}
 ddf_allsites$siteid %>% head()
@@ -956,7 +986,7 @@ The file contains information on many more sites (844 rows for 844 sites) than w
 The key variable that combines the two is the standard site ID name that is commonly used for FLUXNET sites.
 In the sites table (`df_sites`), the key is called `fluxnetid`.
 In the temporal dataset `ddf_allsites`, the site key column is called `siteid`.
-To combine ("join") the two data frames, the joining "key" ID has to be named the same way (here `"siteid"`) and should  contain the same set of different values (site names in our case).
+To combine ("join") the two data frames, the joining "key" ID has to be named the same way (here `"siteid"`) and should contain the same set of different values (site names in our case).
 Hence, we have to rename the respective column in one of our data frames in order to join them.
 
 ```{r}
@@ -991,7 +1021,7 @@ head(ddf_allsites_joined)
 head(ddf_allsites)
 ```
 
-
+```{=html}
 <!-- 
 **Everything below this box is Bonus Material**
 
@@ -1316,3 +1346,4 @@ hhdf_meanseason %>%
 ...
 ```
 -->
+```

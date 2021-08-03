@@ -1,7 +1,8 @@
 # Primers {#ch-01}
 
 ## Introduction
-In this tutorial, we will learn how to structure a project and how to work with version control (*Git*). You will also learn how to read data into your workspace, get to know how different data is structured and understand different types of data. [As regard to analyses] conduct simple data explorations and visualisations, and write data to files. A key skill of data science and programming is to know where to get information when faced with a problem. No data scientist has solutions to every problem, but they all know where to find support.
+
+This tutorial gets you started to working with *R* and *Git* for a data science project. This chapter also includes some basics for programming in R (reading and writing data, types of objects, simple vizualisations). If you've had previous experience with R, you may skip this part. 
 
 After you've gone through the lecture and solved the exercises, you should be able to:
 
@@ -12,32 +13,34 @@ After you've gone through the lecture and solved the exercises, you should be ab
 - Define data, understand the structure of data, and list examples of environmental data.
 - List sources of environmental data and explain the methodological difference in their collection.
 - Execute R and load a dataset for data analyses.
-- Apply basic *Git* commands for version control.
+- Apply basic Git commands for version control.
 - Plot data analysis outputs and write them on the disk.
 
 ### Important elements from the lecture 
 
-Generally, data can be described by four overarching characteristics: 
+The four 'Vs' of *Big Data*: 
 
 - Volume: Data volume is simply the amount of data in a file or database.
 - Velocity: Data velocity is the lag between time of observation and data ingest for analysis.
 - Variety: Data variety is the diversity of data in a data collection or problem space.
 - Veracity: Data veracity is the degree to which data is accurate and precise in comparison with a measured phenomenon  
 
-An increasing number of research organisations support the FAIR criteria for data use and sharing. They are as follows:
+*Open Science* is enabled by the *FAIR* criteria for data use and sharing:
 
 - **F**indable: Easy to find and well documented.
 - **A**ccessible: Long term storage and accessible with standard protocols.
 - **I**nteroperatable: Exchangeable and correctly cited.
 - **R**eusable: Sufficiently documented and clear legal terms.
 
-Environmental data is retrieved from a diversity of methods, including remote sensing, continuous site-scale measurements (e.g., meteorological variables, hydrological variables, ecosystem-atmosphere exchange fluxes of water vapour and CO~2~), episodic observations (e.g., forest inventories, biodiversity assessments), field campaigns, or experiments in the field or under laboratory conditions. Data from these sources come in different shapes and formats. In this course, we will learn to handle this diversity efficiently to answer research questions that you will likely encounter in the future. In many of the exercises, we will focus on data from continuous site scale observations, where meteorological variables are measured in parallel with ecosystem-atmosphere exchange fluxes of water vapour and CO~2~, collected by the Eddy covariance technique. In addition, you will learn to tap into large environmental data repositories to complement your site-scale data.
+Environmental data is collected from a diversity of methods, including remote sensing, continuous site-scale measurements (e.g., meteorological variables, hydrological variables, ecosystem-atmosphere exchange fluxes of water vapour and CO~2~), episodic observations (e.g., forest inventories, biodiversity assessments), field campaigns, or experiments in the field or under laboratory conditions. Data from these sources come in different shapes and formats. In this course, we will learn to handle this diversity efficiently to answer research questions that you will likely encounter in the future. In many of the exercises, we will focus on data from continuous site scale observations, where meteorological variables are measured in parallel with ecosystem-atmosphere exchange fluxes of water vapour and CO~2~, collected by the eddy covariance technique. In addition, you will learn to tap into large environmental data repositories to complement your site-scale data.
 
-At the end of each chapter, a comprehensive exercise using RStudio on Renku is proposed. We will show you how to set up RStudio and Renku at the end of this tutorial.
+At the end of each chapter, you will find an exercise that you can complete using the [Renku](https://datascience.ch/renku/) cloud computing environment and the [RStudio](https://www.rstudio.com/) integrated development environment.
 
 ## Tutorial
+
 ### Working with RStudio on Renku
-Most of you have worked with R during previous lectures, most likely within RStudio. For this course, we are going to work with RStudio. Each chapter is made of two parts. The first part is a tutorial to learn the basics of data science in an environmental context where we will work on Renku. The second part usually consists of a somewhat more extensive exercise in RStudio where the contents of the tutorials are applied.
+
+XXX 
 
 <!---
 Right now your browser should look something like this:
@@ -53,17 +56,17 @@ If at some point in this tutorial you get an error it is likely because you've i
 The last thing we've marked in the image is <span style="color:purple">*Git*</span>. This is essential to save your work permanently. Most of you have never worked with *Git*. In the beginning, it is a bit fiddly but it is an essential skill in data science, the basics of which you are going to master soon. Pay close attention to the next subchapter!
 -->
 
-### Using *Git* for version control
+### Git
 
-*Git* is a program which enables the organisation of code development and collaboration. The basic unit of a code project is a *repository*, which usually contains multiple source code files that may be organised in (sub) directories. It is advisable to only add code to a repository, but not data. Multiple edits and additions of new files are grouped into *commits*. The power of *Git* is that it knows the entire history of all the files in your repository. Therefore, it allows you to recover previous versions (previous commits) and track changes between them. *Git* also allows you to have multiple versions of your repository (*branches*), but we will not use this features. 
+*Git* is a program for code version control and managing collaborative code development. The basic unit of a Git project is a *repository*, which usually contains multiple source code files that may be organised in (sub) directories. Git keeps track of the entire history of a repository in steps of *commits*. A commit is a "bundle" of multiple edits and additions of new files and is specified by the user. Since Git knows the entire history of all the files that have ever been added or removed to and from a repository, it allows you to recover previous versions of files (previous commits) and track changes between them. Git also allows you to have multiple versions of your repository (*branches*) for parallel developments on the same code base, but we will not use this feature. Since Git stores the entire history, the content of a Git repository should always be kept light. For example, it is advisable to only add code and other (small, <10 MB) plain text files to a repository, but not data, and no other outputs that is created by the code of the repository. 
 
-Your *Git* repository exists locally, that is, on your computer. But the power of *Git* only plays out when your local repository has its counterpart in the cloud. Different services exist to host a copy of your repository remotely (e.g., *Git*Hub or *Git*Lab). *Git* lets you *push* (upload) your commits to this *remote* copy and *pull* (download) changes that have been uploaded by your collaborator(s) or yourself from a different *clone* (local copy) of your repository.
+A Git repository exists locally, that is, on your computer. But the power of Git plays out when your local repository has a counterpart in the cloud, for example on [GitHub](https://github.com), or on ETH's [GitLab](https://gitlab.ethz.ch). Git lets you *push* (upload) your commits to your repository's *remote* copy, and *pull* (download) changes that have been uploaded by your collaborator(s) or yourself from a different *clone* (local copy) of your repository.
 
-We can follow a simple *Git* workflow. We will start by making a change to this document: add a cell at the beginning of the entire document and enter your name. Then save your changes by clicking on the floppy disk icon on the left or hit command + s.
+The following shows these steps. Start by making a change to this document: add a cell at the beginning of the entire document and enter your name. Then save your changes by clicking on the floppy disk icon on the left or hit command + s.
 
 Read the entire section before trying out any of these commands.
 
-Click on *Git* and chose "Open *Git* Repository in Terminal"
+Click on Git and chose "Open Git Repository in Terminal"
 
 ![](./figures/opengit.png)
 
@@ -71,7 +74,7 @@ A new tab will pop up with the terminal.
 
 ![](./figures/terminal.png)
 
-The first line shows the current working directory. In the second line, ywe can add your *Git* statements. Only five main commands are necessary to benefit from the advantages of *Git*:
+The first line shows the current working directory. In the second line, ywe can add your Git statements. Only five main commands are necessary to benefit from the advantages of Git:
 
 ```{r eval=F}
 git status
@@ -109,10 +112,11 @@ Lastly, we can type `git push`. With this command, we upload our changes to the 
 
 **Whenever you interrupt your work or finish a session, go through these commands.** Else your changes will be lost. Renku has an autosave function in case you forget but it can lead to conflicts when picking up your work again.
 
-Once you start your work again, either stop the environment in which you are working within Renku and open a new one or start the next session by again opening the terminal within Jupyter and type `git pull`. As its name suggests, with it we can pull changes in our document from the Git repository. This might seem like an unnecessary step, when you are working alone on the document. However, in projects where you might be working together with a peer and need to make sure you integrate her/his changes as well. If you are working together, make sure, that you do not work on the same document at the same time, which could lead to merge conflicts. If at some point you encounter a merge conflict that *Git* cannot resolve automatically you will have to do so manually. At the [end of this tutorial](#Git-denies-pushing-what-can-I-do?) we show how this is done. However, it is unlikely that you will encounter such a problem in this course, which is why we do not explain it here.
+Once you start your work again, either stop the environment in which you are working within Renku and open a new one or start the next session by again opening the terminal within Jupyter and type `git pull`. As its name suggests, with it we can pull changes in our document from the Git repository. This might seem like an unnecessary step, when you are working alone on the document. However, in projects where you might be working together with a peer and need to make sure you integrate her/his changes as well. If you are working together, make sure, that you do not work on the same document at the same time, which could lead to merge conflicts. If at some point you encounter a merge conflict that Git cannot resolve automatically you will have to do so manually. At the [end of this tutorial](#Git-denies-pushing-what-can-I-do?) we show how this is done. However, it is unlikely that you will encounter such a problem in this course, which is why we do not explain it here.
 
-#### Supplementary: *Git* denies pushing what can I do?
-Most of the time when *Git* denies you to push changes, it is because of merge conflicts. If you read the error message *Git* will probably tell you to enter `git pull`. Go ahead and do so. If *Git* cannot resolve a merge conflict automatically, you will have to do it manually. Here, we show you how it is done.
+#### Supplementary: Git denies pushing what can I do?
+
+Most of the time when Git denies you to push changes, it is because of merge conflicts. If you read the error message Git will probably tell you to enter `git pull`. Go ahead and do so. If Git cannot resolve a merge conflict automatically, you will have to do it manually. Here, we show you how it is done.
 ![](./figures/merge1.png)
 
 Once you have reached this point you will notice that if you close your file and want to reopen it, it will not work. Jupyter will prompt this warning:
@@ -144,15 +148,15 @@ Back in the terminal, type `git status`, `git add notebooks/01_primers.ipyn` (or
 Open your document and see if the conflict has been resolved.  Avoid this if you have not managed to resolve the conflict by yourself or feel intimidated or unsure about resolving a conflict, you can ask a teaching assistant for help.
 
 
-### Basics of R code
+### Programming in R
 
-Since you are likely not new to R, you already have entered individual statements into the R console. For example:
+A single statement can be entered in the R console. For example, to calculate the mean of 1, 2, and 3, we enter:
 
 ```{r}
-print(mean(c(1,2,3)))
+mean(c(1,2,3))
 ```
 
-This is relatively simple command line is the beginning of coding. Usually, multiple statments are needed to get, e.g., from the raw data read into R to final numbers and figures that make up a further analysis. Together, these multiple statments constitute a *workflow*. It is essential that all workflows that underlie results of publications are *reproducible*. To achieve this, you can write multiple statements into an R script, save it, and enable your peers to reproduce the same workflow. This will be the objective of an exercise at the end of this session.
+Usually, multiple statments are needed to get, e.g., from reading data into R to final numbers and figures that make up a further analysis. Together, these multiple statments constitute a *workflow*. It is essential that all workflows that underlie results of publications are *reproducible*. To achieve this, you can write multiple statements into an R script, save it, and enable your peers to reproduce the same workflow. This will be the objective of an exercise at the end of this session.
 
 An R script is basically a text file, named with the suffix `.R` to indicate that it is executable by R. Executing the script is running each statement, line-by-line, starting from the top, and can be done in R by:
 
@@ -160,13 +164,15 @@ An R script is basically a text file, named with the suffix `.R` to indicate tha
 source("my_r_script.R")
 ```
 
-If you find this brief explanation for running scripts too brief, you can find more useful information in the ebook [R for Data Science](https://r4ds.had.co.nz/workflow-scripts.html). In data science, we strive to write good code. Good code is clean, readable, consistent, and extensible (easily modified or adapted). To achieve this, here are a few points to consider - inspired by [best practices for coding](https://www.r-bloggers.com/r-code-best-practices/).
+If you find this brief explanation for running scripts too brief, you can find more useful information in the ebook [R for Data Science](https://r4ds.had.co.nz/workflow-scripts.html). We should always strive to write nice scripts and good code. Good code is clean, readable, consistent, and extensible (easily modified or adapted). To achieve this, here are a few points to consider - inspired by [best practices for coding](https://www.r-bloggers.com/r-code-best-practices/).
 
 #### Variable naming
 
 It is preferable to use concise and descriptive variable names. Different variable naming styles are being used. In this course, we use lowercase letters, and underscores (`_`) to separate words within a name (`_`). Avoid (`.`) as they are reserved for S3 objects (base R). Also, you should avoid naming your objects with names of common functions and variables since your re-definition will mask already defined object names. 
 
 For example, `df_daily` is a data frame with data at a daily resolution. Or `clean_daily` is a function that cleans daily data. Note that a verb is used as a name for a function and an underscore (`_`) is used to separate words. 
+
+It is also recommendable, to avoid variable names consisting of only one character. This makes it practically impossible to search for that variable.
 
 ```{r eval=F}
 # Good
@@ -179,23 +185,29 @@ first_day_of_the_mont
 djm1
 
 # Do nots
-mean <- function(x) min(x) # mean() itself is already a function
+mean <- function(x) sum(x)/length(x) # mean() itself is already a function
 T <- FALSE # T is an abbreviation of TRUE
 c <- 10 # c() is used to create a vector (example <- c(1, 2, 3))
 ```
 
 #### Comments
 
-Adding comments in the code helps to explain exactly what the code is doing. This makes it easy to understand and modify the code, and can be key when debugging. In R source files, comments are prefixed with a `#`, which means that all what is right of the `#` is not interpreted by R. If written well, anyone new to the code or even yourself returning to it after some time should easily be able to follow what was done and why it was done. 
+Adding comments in the code helps to explain exactly what the code is doing and why. This makes it easy to understand and modify the code, and can be key when debugging. In R source files, comments are prefixed with a `#`, which means that all what is right of the `#` is not interpreted by R. Avoid obsolete comments like
 
-#### Syntax
+```{r eval=F}
+## take the mean 
+myvar_mean <- mean(myvar)
+```
 
-Adding enough white space and line brakes and adding it the right locations greatly helps the legibility of your code. Cramping it up too much leads to an unintellible sequence of characters and you will not easily understand what parts go together (operators, variable names, brackets). Therefore, consider the following points:
+
+#### Add space and breaks
+
+Adding enough white space and line brakes and adding it the right locations greatly helps the legibility of your code. Cramping it up too much leads to an unintelligible sequence of characters and you will not easily understand what parts go together (operators, variable names, brackets). Therefore, consider the following points:
 
 - Use spaces around operators (`=`, `+`, `-`, `<-`, `>`, etc.).
 - Use `<-`, not `=`, for allocating a value to a variable.
 - An opening curly bracket (`{`) should be followed by a line break and never stand alone on a line. A closing curly bracket (`}`) should stand alone on a line unless followed by `else`.
-- Code inside curly brackets should be *indented* (recommended: two white spaces at the beginning of each line for each indentation level).
+- Code inside curly brackets should be *indented* (recommended: two white spaces at the beginning of each line for each indentation level - don't use tabs).
 
 For example, well written code looks like this:
 
@@ -207,27 +219,26 @@ if (temp > 5.0){
 
 #### Structure your source code
 
-At the beginning of each file add a **header** as a fully commented text section, describing who wrote the code, what it contains, and how it fits into the larger analysis framework. For example:
+At the beginning of each file add a **header** as a fully commented text section, describing what the code contains, and how it fits into the larger analysis framework. For example:
 
 ```{r}
 ##////////////////////////////////////////
 ## ESDS Primers
-## Author: Harry Belafonte
 ## Purpose: Getting up to speed with R.
 ##---------------------------------------
 ```
 
+Note that Git stores all meta information about the file, including who created it, who modified it and when. This information should not be added to the header.
+
 Next, load all **libraries** needed within the script. 
 
-(For this chapter, we will mostly work with functions already integrated into R directly, also known as *base R*. Additionally, you will work with functions from *tidyverse*. *tidyverse* is a collection of packages specifically designed for writing efficient data science workflows.)
+For this chapter, we will mostly work with functions already integrated into R directly, also known as *base R*. Additionally, you will work with functions from the [*tidyverse*](https://www.tidyverse.org/). *tidyverse* is a collection of packages specifically designed for writing efficient data science workflows. Code written for the tidyverse follows its own "dialect" within the R langague. It will be introduced in \@ref(ch-02).
 
 <!-- Go ahead and click the "play" icon to run on the next cell. -->
 
 ```{r message=F}
 library(tidyverse)
 ```
-
-This loads all the packages of the tidyverse at once (ggplot2, dplyr, tidyr, ...), some of which you will learn more about in Chapter \@ref(ch-02).
 
 Next, **source** any scripts and **load** data.
 
@@ -242,16 +253,16 @@ library("tidyverse")
 
 #### Organise files
 
-Often, analyses require so many steps that your script gets excessively long. Over 2000 lines of code in one file are hard to digest. To split your code up, consider the following points:
+Often, analyses require many steps and your script gets excessively long. Over 2000 lines of code in one file are hard to digest. To split your code up, consider the following points:
 
-- Avoid duplicating code. If the same sequence of multiple statements or functions are to be applied repeatedly to different objects, then it is usually advisable to "package" them up into a new function and apply this single function to each object. This may sound abstract now, but you will encounter this again in later chapters.
-- Functions can be saved in separate source files. It is advised to save all functions that belong to a project or workflow in a subdirectory (e.g., named `R/`. To use these functions in your script, you have to load them into the workspace, e.g., by `source("./R/my_function.R")`.
-- Always use relative paths to load or write files. E.g., `"./R/my_function.R"` points to a file named `my_function.R` that sits in a subdirectory `R` of the current working directory (`.`).
-- Write figures into a separate subdirectory (e.g., `./fig/`), and processed data files into a different one (e.g., `./data/`).
-- Keep your script and all these subdirectories from/to which it loads/writes files together in a main directory - the project directory. All code of a project directory, including its subdirectories, make up a *Git* repository.
+- Avoid duplicating code. If the same sequence of multiple statements or functions are to be applied repeatedly to different objects, then it is usually advisable to bundle into a new function and apply this single function to each object. This may sound abstract now, but you will encounter this again in later chapters.
+- Functions can be saved in separate source files. It is advised to save all functions that belong to a project or workflow in a sub-directory (e.g., named `R/`. To use these functions in your script, you have to load them into the workspace, e.g., by `source("./R/my_function.R")`.
+- Always use relative paths to load or write files. E.g., `"./R/my_function.R"` points to a file named `my_function.R` that sits in a sub-directory `R` of the current working directory (`.`).
+- Write figures into a separate sub-directory (e.g., `./fig/`), and processed data files into a different one (e.g., `./data/`).
+- Keep your script and all these sub-directories from/to which it loads/writes files together in a main directory - the project directory. All code of a project directory, including its sub-directories, make up a Git repository.
 - Keep original data (e.g., the raw data files that you created when collecting the data in the field, or data files you downloaded from the web) outside the project directory. They are independent of the workflow of your own particular project and can be used also in other projects. 
 - In RStudio, use the "project" functionality to create a new project. We will not use it in this course. See [here](https://r4ds.had.co.nz/workflow-projects.html) for more information on projects in RStudio.
-- It is advisable to create an separate data directory outside (e.g., `~/data/`) that holds all the data you ever downloaded, or obtained, or gathered. Within such a data directory, you can put files from different sources into separate subdirectories and add a description file (e.g., `~/data/my_experiment/README`) definining who, from where and when the data was obtained and defining data use policy.
+- It is advisable to create an separate data directory outside (e.g., `~/data/`) that holds all the data you ever downloaded, or obtained, or gathered. Within such a data directory, you can put files from different sources into separate sub-directories and add a description file (e.g., `~/data/my_experiment/README`) definining who, from where and when the data was obtained and defining data use policy.
 
 #### Tidy data
 
@@ -669,7 +680,7 @@ Finally, many packages have a mailing list or allow you to open a query on the c
 
 ### Further reading
 
-A complete tutorial to using R for Data Science in general is the freely available online-book by [Grolemund & Wickham](https://r4ds.had.co.nz/). The material covered in this chapter should serve as a "primer". That is, its purpose is to get you started with R and *Git* and make sure you know the basics. If you feel that you are still missing some basic concepts of R, a good starting point to fill up your gaps is the [Chapter *Workflow: basics* in Grolemund & Wickham](https://r4ds.had.co.nz/workflow-basics.html). 
+A complete tutorial to using R for Data Science in general is the freely available online-book by [Grolemund & Wickham](https://r4ds.had.co.nz/). The material covered in this chapter should serve as a "primer". That is, its purpose is to get you started with R and Git and make sure you know the basics. If you feel that you are still missing some basic concepts of R, a good starting point to fill up your gaps is the [Chapter *Workflow: basics* in Grolemund & Wickham](https://r4ds.had.co.nz/workflow-basics.html). 
 
 ## Exercise
 
@@ -685,17 +696,17 @@ Your task is to:
 4. Calculate the logarithmic response ratio as the logarithm of the ratio of soil C contents at elevated CO2 divided by soil C contents at ambient CO2, for each data point (experiment and sample date).
 5. Visualise the distribution of the response ratio and save the plot as a .pdf file.
 
-Implement steps 3.-5. in an RMarkdown (.Rmd), applying some of the points for good coding practices. For the peer review round, share your code and the figure file (as html file via the `knit` button at the top, left of the *Git* menu, see Figure below) with your partner.
+Implement steps 3.-5. in an RMarkdown (.Rmd), applying some of the points for good coding practices. For the peer review round, share your code and the figure file (as html file via the `knit` button at the top, left of the Git menu, see Figure below) with your partner.
 
 <!-- Follow the steps outlined below to get a more detailed instruction on your task: 
 
 For the final exercise, you will move to RStudio on Renku. Since you are doing this for the first time, we will quickly remind you how to get there:
-- Save all your changes to this file using *Git* (git status, git add, git commit, git push)
+- Save all your changes to this file using Git (git status, git add, git commit, git push)
 - Close this tab and go back to the [Renku](https://renkulab.io/) website.
 - Navigate to your environments and stop the environment.
 - Create a new environment, select `/rstudio` instead of `/lab`
 - Connect to the environment, navigate to the folder `/exercise/scripts/` and open the R file called 'exercise_01.R' -->
 
-Before you go: *Git* looks a little different in Rstudio but essentially works the same way. Instead of typing the commands, you use a graphical user interface. Click on *Git* (highlighted red in the following image), there you will find the three options you are familiar with. `git status` and `git add` are not needed.
+Before you go: Git looks a little different in Rstudio but essentially works the same way. Instead of typing the commands, you use a graphical user interface. Click on Git (highlighted red in the following image), there you will find the three options you are familiar with. `git status` and `git add` are not needed.
 
 ![](./figures/gitrstudio.png)
