@@ -148,7 +148,7 @@ Back in the terminal, type `git status`, `git add notebooks/01_primers.ipyn` (or
 Open your document and see if the conflict has been resolved.  Avoid this if you have not managed to resolve the conflict by yourself or feel intimidated or unsure about resolving a conflict, you can ask a teaching assistant for help.
 
 
-### Programming in R
+### R scripts
 
 A single statement can be entered in the R console. For example, to calculate the mean of 1, 2, and 3, we enter:
 
@@ -156,7 +156,22 @@ A single statement can be entered in the R console. For example, to calculate th
 mean(c(1,2,3))
 ```
 
-Usually, multiple statments are needed to get, e.g., from reading data into R to final numbers and figures that make up a further analysis. Together, these multiple statments constitute a *workflow*. It is essential that all workflows that underlie results of publications are *reproducible*. To achieve this, you can write multiple statements into an R script, save it, and enable your peers to reproduce the same workflow. This will be the objective of an exercise at the end of this session.
+The output of a statement can be saved as a new *object*:
+
+```{r}
+my_new_object <- mean(c(1,2,3))
+```
+
+The value of an object can be accessed or printed by referring to its name:
+```{r}
+my_new_object
+```
+
+You will learn more about different types of objects in R further below. The set of objects defined during an R session are referred to as the *environment*.
+
+Usually, multiple statements are needed to get, e.g., from reading data into R to final numbers and figures that make up a further analysis. Together, these multiple statments constitute a *workflow*. It is essential that all workflows that underlie results of publications are *reproducible*.
+
+After closing an existing R session (e.g. after quitting RStudio), the environment defined by the user during that session, will not be saved automatically and will be lost. To make a workflow reproducible, the sequence of statements that you needed to carry out your analysis and produce outputs can be saved as an R *script*. Instead of saving the environment, we should save the steps (i.e. the script) to reproduce the same environment - starting from reading in the (raw) data. This will be the objective of an exercise at the end of this session.
 
 An R script is basically a text file, named with the suffix `.R` to indicate that it is executable by R. Executing the script is running each statement, line-by-line, starting from the top, and can be done in R by:
 
@@ -164,7 +179,9 @@ An R script is basically a text file, named with the suffix `.R` to indicate tha
 source("my_r_script.R")
 ```
 
-If you find this brief explanation for running scripts too brief, you can find more useful information in the ebook [R for Data Science](https://r4ds.had.co.nz/workflow-scripts.html). We should always strive to write nice scripts and good code. Good code is clean, readable, consistent, and extensible (easily modified or adapted). To achieve this, here are a few points to consider - inspired by [best practices for coding](https://www.r-bloggers.com/r-code-best-practices/).
+You can find more useful information about scripts and workflows in [R for Data Science XXXrefXXX](https://r4ds.had.co.nz/workflow-scripts.html). 
+
+We should always strive to write nice scripts and good code. Good code is clean, readable, consistent, and extensible (easily modified or adapted). To achieve this, here are a few points to consider - inspired by [best practices for coding](https://www.r-bloggers.com/r-code-best-practices/) and by the [Tidyverse style guide XXXrefXXX](https://style.tidyverse.org/).
 
 #### Variable naming
 
@@ -181,10 +198,10 @@ day_01
 # Bad
 DayOne
 day.one
-first_day_of_the_mont
+first_day_of_the_month
 djm1
 
-# Do nots
+# Very bad
 mean <- function(x) sum(x)/length(x) # mean() itself is already a function
 T <- FALSE # T is an abbreviation of TRUE
 c <- 10 # c() is used to create a vector (example <- c(1, 2, 3))
@@ -217,7 +234,7 @@ if (temp > 5.0){
 }
 ```
 
-#### Structure your source code
+#### Structure your script
 
 At the beginning of each file add a **header** as a fully commented text section, describing what the code contains, and how it fits into the larger analysis framework. For example:
 
@@ -248,8 +265,35 @@ Then, start with the sequence of statements. To visually separate parts, **break
 ##----------------------------------------
 ## Load libraries
 ##----------------------------------------
-library("tidyverse")
+library(tidyverse)
 ```
+
+
+### Tidy data
+
+Similarly as code, data can be tidy or not. Even if a data file (for example an Excel spreadsheet) may look visually appealing, its structure determines how easy it is to perform further processing steps and calculations on it. The concept of [**tidy data**](https://r4ds.had.co.nz/tidy-data.html) can be defined by the following rules ([Wickham, 2014 XXXrefXXX](http://www.jstatsoft.org/v59/i10/paper)):
+
+1. Each column is a variable.
+2. Each row is an observation.
+3. Each value has its own cell.
+
+![Tidy data is defined by organising variables by columns, observations by rows, and each cell containing one value. Figure from Grolemund & Wickham XXXrefXXX](https://r4ds.had.co.nz/tidy-data.html)](./figures/tidy_data.png)
+
+Having data in a tidy format greatly facilitates all steps of data wrangling. When creating a spreadsheet, remember to design it in a tidy structure from the beginning. For example, put variable names in the first row, avoid merged cells, create separate tabs for each table, and make it *machine readable*. For example, avoid entries like ">10 g m-2 s-1". A cell should only contain one value. Here, this is "10". Create a separate column for units, and enter the information there as a character string ("g m-2 s-1"). The information conveyed by the greater-than (">") symbol should be encoded in a machine readable manner. This may not be straight forward. A possibility could be to add a column "is_minimum" and add the entry "TRUE" in the respective cell. 
+
+The concept of tidy data can even be taken further by understanding a "value" as any object type, e.g. a list. This leads to a list "nested" within a data frame. You will learn more about this in Chapter \@ref(ch-02).
+
+In the exercises at the end of this chapter, you will transform a visually appealing but poorly formatted data file into tidy and machine readable data. 
+
+
+### R projects
+
+Using R *projects* in combination with Git is the essence of efficient workspace management in R. All files that belong together are organised in a single directory. This can be regarded as the project directory and is typically congruent with what belongs to the respective Git repository. When working in RStudio, you can create a new R project or switch to an existing project by navigating the drop-down menu in the top right corner of RStudio.
+
+![](figures/new_project.png)
+
+When making a new project, a file `<project_name.Rproj>` is created, sitting in the project directory. This stores your last session, and optionally (not recommended) the entire *environment* of that session. 
+
 
 #### Organise files
 
@@ -263,18 +307,6 @@ Often, analyses require many steps and your script gets excessively long. Over 2
 - Keep original data (e.g., the raw data files that you created when collecting the data in the field, or data files you downloaded from the web) outside the project directory. They are independent of the workflow of your own particular project and can be used also in other projects. 
 - In RStudio, use the "project" functionality to create a new project. We will not use it in this course. See [here](https://r4ds.had.co.nz/workflow-projects.html) for more information on projects in RStudio.
 - It is advisable to create an separate data directory outside (e.g., `~/data/`) that holds all the data you ever downloaded, or obtained, or gathered. Within such a data directory, you can put files from different sources into separate sub-directories and add a description file (e.g., `~/data/my_experiment/README`) definining who, from where and when the data was obtained and defining data use policy.
-
-#### Tidy data
-
-Code can be good or not-so-good, but in addition data can be tidy or not. Even if it may look appropriate in Excel, a data file may not be "machine-readable". In the exercises at the end of this chapter, you will transform a poorly formatted data file into tidy and machine readable data. But what is [**tidy data**](https://r4ds.had.co.nz/tidy-data.html) exactly? It can be defined by the following rules:
-
-1. Each column is a variable.
-2. Each row is an observation.
-3. Each value has its own cell.
-
-![Figure from [Grolemund & Hadley](https://r4ds.had.co.nz/tidy-data.html)](./figures/tidy_data.png)
-
-Having data in a tidy format greatly facilitates the various steps of data wrangling. The concept can even be taken further by understanding a "value" as any object type. You will learn more about this in Chapter \@ref(ch-02).
 
 ### Reading data into R
 
@@ -469,8 +501,6 @@ temp_sum2 <- readRDS("temp_sum.rds")
 ```
 
 Note that making a file publicly available as a `.rds` file violates the FAIR principles. It is not *interoperable*. Therefore, whenever possible, save your data in a format that is readable across platforms without requiring proprietary software. Hence use `write_csv()` whenever possible. We will encounter other non-proprietary formats that let you save and share more complex data structures in chapter \@ref(ch-02).
-
-
 
 
 ### R Objects
