@@ -38,6 +38,18 @@ At the end of each chapter, you will find an exercise that you can complete usin
 
 ## Tutorial
 
+### Libraries
+
+This tutorial uses a set of libraries. Libraries provide a set of functions and/or other objects targeted for specific applications and are not available through *base R*. To run commands of this tutorial, make sure to install and load all packages on your computer. This can be done by:
+
+```{r eval=TRUE}
+list_pkgs <- c("tidyverse")
+new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
+if (length(new_pkgs) > 0) install.packages(new_pkgs)
+```
+
+In each chapter of this tutorial, you'll find a similar statement to specify which package the respective chapter's tutorial will use and to install them if not available.
+
 ### Working with RStudio on Renku
 
 XXX 
@@ -236,37 +248,81 @@ if (temp > 5.0){
 
 #### Structure your script
 
-At the beginning of each file add a **header** as a fully commented text section, describing what the code contains, and how it fits into the larger analysis framework. For example:
+At the beginning of each file add a **header** as a fully commented text section, describing what the code contains, and how it fits into the larger analysis framework.
 
-```{r}
+Note that Git stores all meta information about the file, including who created it, who modified it and when. This information should not be added to the header. Then, load all libraries needed within the script. Then, source any scripts and load data, and only then, start with the sequence of statements. To visually separate parts, break up your code using, commented lines.
+
+For example, a script could look like this:
+
+<!-- For this chapter, we will mostly work with functions already integrated into R directly, also known as *base R*. Additionally, you will work with functions from the [*tidyverse*](https://www.tidyverse.org/). *tidyverse* is a collection of packages specifically designed for writing efficient data science workflows. Code written for the tidyverse follows its own "dialect" within the R langague. It will be introduced in \@ref(ch-02). -->
+
+```{r eval=FALSE, message=F}
 ##////////////////////////////////////////
-## ESDS Primers
-## Purpose: Getting up to speed with R.
+## Demonstrating script structure
 ##---------------------------------------
-```
-
-Note that Git stores all meta information about the file, including who created it, who modified it and when. This information should not be added to the header.
-
-Next, load all **libraries** needed within the script. 
-
-For this chapter, we will mostly work with functions already integrated into R directly, also known as *base R*. Additionally, you will work with functions from the [*tidyverse*](https://www.tidyverse.org/). *tidyverse* is a collection of packages specifically designed for writing efficient data science workflows. Code written for the tidyverse follows its own "dialect" within the R langague. It will be introduced in \@ref(ch-02).
-
-<!-- Go ahead and click the "play" icon to run on the next cell. -->
-
-```{r message=F}
 library(tidyverse)
+source("R/my_functions.R")
+my_df <- read_csv("data/my_df.csv")
+
+##---------------------------------------
+## Main part
+##---------------------------------------
+## convert units
+my_df$temp <- my_df$temp + 273.15  # deg C -> K
+
+##---------------------------------------
+## Writing output
+##---------------------------------------
+filn <- "data/my_df_kelvin.csv"
+print(paste("Writing file", filn, "..."))
+write_csv(my_df, filn)
 ```
 
-Next, **source** any scripts and **load** data.
+### RMarkdown
 
-Then, start with the sequence of statements. To visually separate parts, **break up your code** using, commented lines. For example:
+[RMarkdown](https://rmarkdown.rstudio.com/) files are an enhanced version of scripts. They combine formatted text and executable code chunks. They can either be compiled (*knitted*) into an HTML or PDF output, where code chunks are executed upon compilation and visualization outputs are directly placed into the output, or they can be run like a script entirely or each code chunk separately. When run (not knitted), objects defined by the executed code are available in the environment.
 
-```{r eval=F}
-##----------------------------------------
-## Load libraries
-##----------------------------------------
-library(tidyverse)
+Text can be formatted using the [Markdown syntax](https://rmarkdown.rstudio.com/authoring_pandoc_markdown.html). For example, a top-level section title is specified by `#` and a title of a section one level lower by `##`.
+
+RMarkdown documents are also the basis of this book, with each chapter written in a separate RMarkdown file. This lets you use the book in an interactive fashion. 
+
+When opened in RStudio, you can knit an RMarkdown document by clicking the "Knit" button:
+
+![](figures/knit.png)
+
+You can run all chunks by selecting clicking "Run All" from the drop-down menu available under "Run":
+
+![](figures/run_rmarkdown.png)
+
+Individual chunks can be executed by clicking the green right-pointing triangle in the upper right corner of the chunk:
+
+![](figures/rmarkdown_chunk.png)
+
+### Functions
+
+Often, analyses require many steps and your scripts may get excessively long. Over 2000 lines of code in one file are hard to digest. An important aspect of good programming is to avoid duplicating code. If the same sequence of multiple statements or functions are to be applied repeatedly to different objects, then it is usually advisable to bundle them into a new *function* and apply this single function to each object. This also has the advantage that if some requirement or variable name changes, it has to be edited only in one place. A further advantage of writing functions is that you can give the function an intuitively understandable name, so that your code reads like a sequence of orders given to a human, 
+
+For example, the following code, converting temperature values provided in Fahrenheit to degrees Celsius, could be made into a function.
+```{r eval=FALSE}
+## NOT ADVISABLE
+my_df$temp_soil <- (my_df$temp_soil - 32) * 5 / 9
+my_df$temp_air  <- (my_df$temp_air  - 32) * 5 / 9
+my_df$temp_leaf <- (my_df$temp_leaf - 32) * 5 / 9
 ```
+
+The same, but using our own function `convert_fahrenheit_to_celsius()`:
+```{r eval=FALSE}
+## ADVISABLE
+convert_fahrenheit_to_celsius <- function(temp_f){
+  temp_c <- (temp_f - 32) * 5 / 9
+}
+
+my_df$temp_soil <- convert_fahrenheit_to_celsius(my_df$temp_soil)
+my_df$temp_air  <- convert_fahrenheit_to_celsius(my_df$temp_air)
+my_df$temp_leaf <- convert_fahrenheit_to_celsius(my_df$temp_leaf)
+```
+
+Functions (particularly long ones) can be written to separate source file (text files containing executable code).
 
 
 ### Tidy data
@@ -288,40 +344,42 @@ In the exercises at the end of this chapter, you will transform a visually appea
 
 ### R projects
 
-Using R *projects* in combination with Git is the essence of efficient workspace management in R. All files that belong together are organised in a single directory. This can be regarded as the project directory and is typically congruent with what belongs to the respective Git repository. When working in RStudio, you can create a new R project or switch to an existing project by navigating the drop-down menu in the top right corner of RStudio.
+Using R *projects* in combination with Git is the essence of efficient workspace management in R. All files that belong together are organised within one directory. This can be regarded as the *project directory* and is typically congruent with what belongs to the respective Git repository. When working in RStudio, you can create a new R project or switch to an existing project by navigating the drop-down menu in the top right corner of RStudio.
 
 ![](figures/new_project.png)
 
-When making a new project, a file `<project_name.Rproj>` is created, sitting in the project directory. This stores your last session, and optionally (not recommended) the entire *environment* of that session. 
+When starting a new project, a file `<project_name.Rproj>` is created. It sits in the project directory and stores information about your last session (settings, open files, etc.) and optionally (not recommended) the *environment* of that session. The use of R projects also automatically enables useful features in RStudio for easy package, website, or book building and lets you manage Git for the repository corresponding to the project.
 
-
-#### Organise files
-
-Often, analyses require many steps and your script gets excessively long. Over 2000 lines of code in one file are hard to digest. To split your code up, consider the following points:
-
-- Avoid duplicating code. If the same sequence of multiple statements or functions are to be applied repeatedly to different objects, then it is usually advisable to bundle into a new function and apply this single function to each object. This may sound abstract now, but you will encounter this again in later chapters.
-- Functions can be saved in separate source files. It is advised to save all functions that belong to a project or workflow in a sub-directory (e.g., named `R/`. To use these functions in your script, you have to load them into the workspace, e.g., by `source("./R/my_function.R")`.
-- Always use relative paths to load or write files. E.g., `"./R/my_function.R"` points to a file named `my_function.R` that sits in a sub-directory `R` of the current working directory (`.`).
-- Write figures into a separate sub-directory (e.g., `./fig/`), and processed data files into a different one (e.g., `./data/`).
-- Keep your script and all these sub-directories from/to which it loads/writes files together in a main directory - the project directory. All code of a project directory, including its sub-directories, make up a Git repository.
-- Keep original data (e.g., the raw data files that you created when collecting the data in the field, or data files you downloaded from the web) outside the project directory. They are independent of the workflow of your own particular project and can be used also in other projects. 
-- In RStudio, use the "project" functionality to create a new project. We will not use it in this course. See [here](https://r4ds.had.co.nz/workflow-projects.html) for more information on projects in RStudio.
-- It is advisable to create an separate data directory outside (e.g., `~/data/`) that holds all the data you ever downloaded, or obtained, or gathered. Within such a data directory, you can put files from different sources into separate sub-directories and add a description file (e.g., `~/data/my_experiment/README`) definining who, from where and when the data was obtained and defining data use policy.
-
-### Reading data into R
-
-In the next step, we want to read in the data. We are going to work with FLUXNET data from the site "Laegern" ([CH-Lae](https://gl.ethz.ch/infrastructure/sites/laegeren.html)), located close to Zürich. FLUXNET is a global network of sites where ecosystem-atmosphere exchange fluxes are measured (e.g., CO~2~, water vapour). In Switzerland, there is a total of six such sites. Laegern is one of them. The data is stored in a `.csv` file. To import it into the R workspace, we use the function `read_csv()` from the tidyverse packages. In the other R code, you will also encounter the base R `read.csv()` function. However, `read_csv()` is much faster and reads data into a tidyverse-data frame (a *tibble*) which has some useful additional characteristics, on top of a common R data frame. To tell the function where the data is located, pass the data's path as an argument. You can either enter an *absolute path*, starting from `C:/` on a Windows computer or `~/` on a Mac. Or, alternatively, you can provide a *relative path*, where `./` points to the present working directory and `../` is one level up, or `../../` is two levels up, etc.
-
+It's advisable to write files, created by the code of your project, to sub-directories within the project directory. For example, keep source files where R functions are defined in `./R` (where `.` refers to the project directory), data files in `./data` and visualizations in `./fig`. To read and write from/to files should be done using relative paths: 
 ```{r eval=F}
-# set working directory
-setwd("~/Documents/ETH/ESDS")
+source("./R/my_r_script.R")
 ```
 
-Now, we can try to load a data set which is save in our data folder and can be accesses using the relative path below.
+or equivalently:
+```{r eval=F}
+source("R/my_r_script.R")
+```
 
-```{r message=F}
+A project directory should only contain code and outputs that belong to this one project. Stuff that may belong to multiple projects should be kept somewhere else. For example, keep original data (e.g., the raw data files that you created when collecting the data in the field, or data files you downloaded from the web) outside the project directory.
+
+It is advisable to create a separate data directory outside (e.g., `~/data/`) that holds all the original data you ever downloaded, or obtained from peers, or gathered yourself. Within such a data directory, you can put files from different sources into separate sub-directories and add a description file (e.g., `~/data/some_data_source/README`) defining who, from where and when the data was obtained and defining data use policy.
+
+
+### Working with data frames
+
+Now, let's get our hands on actual data for demonstrating how data is read and written. As most of the code displayed in this book, the code chunks below are executable. You can try it out by opening the the book's R project in RStudio. 
+
+We are going to work with data from ecosystem flux measurements, taken by the eddy covariance technique, and provided as part of the FLUXNET2015 dataset (XXXrefXXX, cite https://www.nature.com/articles/s41597-020-0534-3). The data we're using below comes from a flux tower near Zürich ([CH-Lae](https://gl.ethz.ch/research/bage/fluxnet-ch.html), located on the Laegern mountain between Regensberg and Baden and run by our colleagues here at ETH.
+
+The data is stored as a Comma Separated Values file (`.csv`). This is a plain-text, and therefore a non-proprietary format. To follow the FAIR data principles, distribute your data in a format that is non-proprietary and readable across platforms and applications. For example, avoid distributing your data as an *Excel* spreadsheat (`.xlsx`), or a *Matlab* data object (`.mat`), or an R data object (`.RData`, or `.rds`). 
+
+#### Reading data
+
+To import the data into the R workspace (environment), we use the function `read_csv()` from the tidyverse package. In other R code, you will also encounter the base R `read.csv()` function. However, `read_csv()` is much faster and reads data into a tidyverse-data frame (a *tibble*) which has some useful additional characteristics, on top of a common R data frame. To tell the function where the data is located, pass the data's path as an argument. You can either use an *absolute path*, starting from `C:/` on a Windows computer or `~/` on a Mac or Linux. Or, alternatively, you can provide a *relative path*, where `./` points to the present working directory and `../` is one level up, or `../../` is two levels up, etc.
+
+```{r message=FALSE}
 # use a relative path to read the data
-df <- read_csv("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3.csv")
+df <- read_csv("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_DD_2004-2014_1-3.csv")
 print(df) # to print an overview of the data frame
 ```
 
@@ -329,7 +387,6 @@ The file is automatically machine-readable because we have:
 
 - Only one header row, containing the column (variable) names.
 - Variables organised by columns, and observations by rows.
-- All columns have the same length.
 - Each column consists of a single data type (e.g., character, numeric, logical; see below for more info) - Here, all columns are interpreted as numeric (`<dbl>').
 - One value per cell.
 - No merged cells.
@@ -342,39 +399,34 @@ To understand the sort of object we work with, i.e. the *class*, we can do:
 class(df)
 ```
 
-Fundamentally, `df` is a `data.frame`. In addition, it is also of some other classes (`spec_tbl_df","tbl_df", "tbl"`)
+Fundamentally, `df` is a `data.frame`. In addition, it is also of some other classes (`spec_tbl_df","tbl_df", "tbl"`) which gives it additional features. 
 
-#### Understand the data structure
+#### Understanding the data structure
 
-We have loaded the data frame `df` into the workspace. Now, we can check the data structure. There are several functions to help you with this. Here is a non-exhaustive list of functions to get a sense of the content and structure of the data.
+There are several base R functions to help you understand the structure of a data frame. Here is a non-exhaustive list of of them:
 
 - Size
-  - `dim()`  - returns the size of the dimensions of an object (here: number of rows and columns)
-  - `nrow()` - returns the number of rows of an object
-  - `ncol()` - returns the number of columns of an object
+  - `dim()`  - Returns the size of the dimensions of an object (here: number of rows and columns).
+  - `nrow()` - Returns the number of rows of an object.
+  - `ncol()` - Returns the number of columns of an object.
 - Content
-  - `head()` - returns the first 6 rows
-  - `tail()` - returns the last 6 rows
-  - `View()` - look at the entire data set in the form of a table (It is not supported by the Jupyter environment. In RStudio however, it works)
+  - `head()` - Returns the first 6 rows.
+  - `tail()` - Returns the last 6 rows.
+  - `View()` - look at the entire data set in the form of a table (It is not supported by the Jupyter environment. In RStudio however, it works).
 - Names
-  - `names()` - returns the column names (for `data.frame`-objects it is synonymous to `colnames()`)
-  - `rownames()` - returns the row names
+  - `names()` - Returns the column names (for `data.frame`-objects it is synonymous to `colnames()`).
+  - `rownames()` - Returns the row names.
 - Summary
-  - `class()` - returns the class of an object
-  - `str()` - returns the structure of an object and information about the class, length and content of each column
-  - `summary()` - returns summary statistics for each column
+  - `class()` - Returns the class of an object.
+  - `str()` - Returns the structure of an object and information about the class, length and content of each column.
+  - `summary()` - Returns generic statistics information, depending on the class of the object.
   
-The size of the data is quite large:
+For example, the data frame `df` has 4018 rows and 334 columns:
 
 ```{r}
 dim(df)
 ```
 
-We can still have a look at the variable names:
-
-```{r}
-colnames(df)
-```
 
 A description of standardized FLUXNET data variables is available [here](https://fluxnet.org/data/aboutdata/data-variables/). A selection of available variables that we will use in subsequent chapters are:
 
@@ -397,30 +449,17 @@ A description of standardized FLUXNET data variables is available [here](https:/
 
 #### Selecting data and entering the tidyverse
 
-`df` has two dimensions (rows and columns). If we want to extract specific data from it, we need to specify the "coordinates" of this data. Row numbers come first, columns second so essentially `df[rows,columns]`.
-
-By specifiying `df[1]` the first column of a data frame (tibble) is output.
-
+`df` is a data frame. This is similar to a matrix and has two dimensions (rows and columns). If we want to extract specific data from it, we specify the indices, i.e. the "coordinates", of the data. For two-dimensional objects (data frames, matrices), the first index refers to rows and the second to columns. For example, to refer to the element on the third row in the first column, we write:
 ```{r}
-# Selecting data in base R  ================================
-df[1] 
-```
-If the first row and column of a data frame (tibble) are required, `df[1,1]` will do this. The first number in the bracket gives the desired row number, the number after the comma gives the column number.
-```{r}
-df[1, 1] 
+df[3,1]
 ```
 
-Reducing a data frame (tibble) to only the first column can be done as shown below or equivalently using `df[1]`.
+Reducing a data frame (tibble) to only the first columns can be done by:
 ```{r}
 df[, 1]
 ```
 
-Equally, by specifiying only a value for the rows will reduce a data frame (tibble) to chosen row only.
-```{r}
-df[1, ] 
-```
-
-This method of selecting parts of a data frame (tibble), can also be a little more complex. For example, we may require the information in the third column for the first three rows. Putting a colon between two numbers, e.g. `[1:3,]`, indicates we want to select the rows numbers starting at the first and ending with the second number. So here `[1:3,]` will give us rows one, two and three.
+The method of selecting parts of a data frame by index is quite flexible. For example, we may require the information in the third column for the first three rows. Putting a colon between two numbers, e.g. `[1:3,]`, indicates we want to select the rows numbers starting at the first and ending with the second number. So here `[1:3,]` will give us rows one, two and three.
 ```{r}
 df[1:3, 3] # reduces the data frame (tibble) to its first three rows and the 3rd column
 ```
@@ -430,28 +469,18 @@ To reduce the data frame (tibble) to several columns, the function `c()` is used
 df[, c(1,4,7)]
 ```
 
-**Checkpoint**
-How would you choose rows one to seven and columns one to three, seven and nine to twelve?
-
-Hint: try to combine concatenate and the use of the colon.
-
-**Solution:** 
-```{r}
-df[1:7, c(1:3,7,9:12)]
-```
-   
 Another method is to select the columns by column names, i.e. giving as input a string vector with the name of each column we want to select (again, this is Base R notation). This is especially useful if the columns we want to select are not contiguous. For example:
 
 ```{r}
 # Selecting data by name in base R  ================================
-df[,c("TIMESTAMP_START", "TIMESTAMP_END", "TA_F_MDS", "TA_F_MDS_QC")]
+df[,c("TIMESTAMP", "TA_F_MDS", "TA_F_MDS_QC")]
 ```
 
-In this tutorial, we will use the [tidyverse](https://www.tidyverse.org/), which is a set of R packages designed for working with tidy data and writing code in such a way as to emphasize and better understand the "workflow aspect" of it. A code chunk which does the same as above, but is written for the tidyverse can read as follows.
+In Chapter \@ref(ch-02) of this tutorial tutorial, we will use the [tidyverse](https://www.tidyverse.org/), which is a set of R packages designed for working with tidy data and writing code in such a way as to emphasize and better understand the "workflow aspect" of it. A code chunk which does the same as above, but is written for the tidyverse can read as follows.
 
 ```{r}
 select(df, 1) # reduces the data frame (tibble) to its first column
-select(df, TIMESTAMP_START, TIMESTAMP_END, TA_F_MDS, TA_F_MDS_QC)  # reduces the data frame to columns specified by names
+select(df, TIMESTAMP, TA_F_MDS, TA_F_MDS_QC)  # reduces the data frame to columns specified by names
 ```
 
 As a further shortcut in tidyverse, we can use the pipe `%>%` operator. The data frame is still reduced to its first column:
@@ -460,13 +489,13 @@ As a further shortcut in tidyverse, we can use the pipe `%>%` operator. The data
 df %>% select(1)
 ```
 
-Probably this code does not need much explanation, as it reads very intuitively. We *pipe* the object `df` into the `select()` function with argument `1`. Note that the `%>%` operator can be used on any function. It tells the function to interpret what's coming from the left of `%>%` as its **first** argument.
+We *pipe* the object `df` into the `select()` function with argument `1`. Note that the `%>%` operator can be used on any function. It tells the function to interpret what's coming from the left of `%>%` as its **first** argument.
 
 For the remainder of the tutorial several variables will be required. The methods of variable selection demonstrated above will be utilised below to get the desired variables.
 
 ```{r}
 df_small <- df %>% 
-  select(TIMESTAMP_START, TA_F, PPFD_IN)
+  select(TIMESTAMP, TA_F, PPFD_IN)
 ```
 
 Note: In the code above, an indentation was used to highlight which parts go together and make the code easy to understand. Indentations and line breaks take no effect in R per se (unlike in other programming languages, e.g., Matlab, Python), but help to make the code easier to read.
@@ -477,46 +506,51 @@ TIMESTAMP_START, TA_F and PPFD_IN as variable names may be hard to remember and 
 
 ```{r}
 df_small <- df_small %>% 
-  rename(time = TIMESTAMP_START, temp = TA_F, ppfd = PPFD_IN)
+  rename(time = TIMESTAMP, temp = TA_F, ppfd = PPFD_IN)
 ```
 
-#### Writing (saving) data
+#### Writing data
 
 A data frame can be written to a CSV file by:
 
 ```{r eval = F}
-write_csv(df_small, path = "df_small.csv")
+write_csv(df_small, path = "data/df_small.csv")
 ```
 
 The function `saveRDS()` allows you save individual objects of any form (not just a data frame). `saveRDS()` creates a binary file that is fast to write and read, but only intelligible to R. Such files are commonly identified by the suffix `.rds`. It is recommended to name the `.rds` files according to the single object they contain. For example:
 
 ```{r eval=F}
-saveRDS(temp_sum, file = "temp_sum.rds")
+saveRDS(temp_sum, file = "data/temp_sum.rds")
 ```
 
 This file can then be read into the R workspace. Sometimes, it is useful to give it a new name, e.g.:
 
 ```{r eval=F}
-temp_sum2 <- readRDS("temp_sum.rds")
+temp_sum <- readRDS("data/temp_sum.rds")
 ```
 
 Note that making a file publicly available as a `.rds` file violates the FAIR principles. It is not *interoperable*. Therefore, whenever possible, save your data in a format that is readable across platforms without requiring proprietary software. Hence use `write_csv()` whenever possible. We will encounter other non-proprietary formats that let you save and share more complex data structures in chapter \@ref(ch-02).
 
 
-### R Objects
+### R objects
 
-#### Data frames
+Each object in R is of a certain *class*, specifying some attributes and how functions act upon it. The most basic classes are:
 
-We have learned that `df` is a data frame. Data frames are the most common format used in R. You can think of them as a table that allows for different data types to be stored in each column. At the same time, all columns need to be of the same length and all values in a column need to be of the same data type. 
-
-The most common data types in R are:
-
-- `numeric` (num) - any number (except complex numbers) -> 2.375
+XXX needs revision: formatting, better explanation, more info on factor, add lists,  XXX
+- `numeric`. any number (except complex numbers) -> 2.375
 - `integer` (int) - integer numbers -> 2
 - `character` (chr) - any string -> "fluxes"
 - `logical` (logi) - boolean -> TRUE FALSE
 - `factor` (Factor) - categorical data, the variable can only be one of a defined amount of options -> female/male/other
 - `function` (function) - a set of statements organized to perform a specific task -> sum()
+
+#### Data frames
+
+We have learned that the object `df` is a data frame. That is, it is of class `"data.frame"`. You can think of a data frame as a table. Columns need to be of the same length and all values in a column need to be of the same data type. 
+
+The most common data types in R are:
+
+
 
 However, there are many more data types. For now, we will mainly consider those mentioned above.
 
@@ -548,7 +582,7 @@ Writing each function command on a separate line, connected with the pipe operat
 as.character(as.integer(df_small[1,"temp"]))
 ```
 
-The sequence of pipes is much more intuitively intellible.
+Arguably, a sequence of pipes is more easily legible than a complex nesting of brackets.
 
 An object of class **logical** can only be `TRUE` or `FALSE`. If I ask which `temperatures < 0` for example, R will return a vector of class logical.
 
@@ -639,9 +673,22 @@ Create a scatter-plot (points) of temperature versus the incoming photosynthetic
 plot(df_small$temp, df_small$ppfd)
 ```
 
-### Example code: Loops
+### Conditionals
 
-Loops are an essential feature of programming. `for` and `while` loops exist in probably all programming languages. We introduce them here because they provide an essential and powerful functionality for solving many common tasks. You will encounter them later again (see Chapter \@ref(ch-05). `for` and `while` loops let us repeatedly execute the same set of commands, while changing an index, or counter variable to take a sequence of different values. The following example calculates a temperature sum of the first ten values, by iteratively adding them together. Of course, this is equivalent to just using the `sum()` function. 
+In cases where certain statements are executed or not, depending on a criterion, we can use conditional statements `if`, `else if`, and `else`. Conditionals are an essential feature of programming and available in all languages. The R syntax for conditionals looks like this:
+```{r eval=FALSE}
+if (temp < 0.0){
+  is_frozen <- TRUE
+} else {
+  is_frozen <- FALSE
+}
+```
+
+The evaluation of the criterion (here `(temp < 0.0)`) has to return either `TRUE` or `FALSE`.
+
+### Loops
+
+Loops are another essential essential feature of programming. `for` and `while` loops exist in probably all programming languages. We introduce them here because they provide an essential and powerful functionality for solving many common tasks. You will encounter them later again (see Chapter \@ref(ch-05). `for` and `while` loops let us repeatedly execute the same set of commands, while changing an index, or counter variable to take a sequence of different values. The following example calculates a temperature sum of the first ten values, by iteratively adding them together. Of course, this is equivalent to just using the `sum()` function. 
 
 ```{r}
 temp_sum <- 0
@@ -696,11 +743,11 @@ Note that it only looks through your installed packages.
 
 #### Online
 
-To search in the entire library of R go to the website [rdocumentation.org](https://www.rdocumentation.org/) or turn to a search engine of your choice (ecosia, google, duckduckgo, bing,...). It will send you to the appropriate function documentation or a helpful forum where someone has already asked a similar question. Most of the time you will end up on [stackoverflow.com](https://stackoverflow.com/), a forum where most questions have already been answered.
+To search in the entire library of R go to the website [rdocumentation.org](https://www.rdocumentation.org/) or turn to a search engine of your choice. It will send you to the appropriate function documentation or a helpful forum where someone has already asked a similar question. Most of the time you will end up on [stackoverflow.com](https://stackoverflow.com/), a forum where most questions have already been answered.
 
 #### Error messages
 
-If you do not understand the error message, start by googling it. Be aware, that this is not always useful as developers rely on the error catching provided by R. To be more specific add the name of the function and package you are using, to get a more detailed answer.
+If you do not understand the error message, start by searching the web. Be aware, that this is not always useful as developers rely on the error catching provided by R. To be more specific add the name of the function and package you are using, to get a more detailed answer.
 
 #### Asking for help
 

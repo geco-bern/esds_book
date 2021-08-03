@@ -51,45 +51,25 @@ The students are able to
 - 701-0105-00L Mathematik VI: Angewandte Statistik für Umweltnaturwissenschaften
 
 
-<!-- ```{r include=FALSE} -->
-<!-- ## Set-Up for bookdown build -->
+```{r include=FALSE}
+## Set-Up for bookdown build
 
-<!-- # Load all packages and install if needed -->
-<!-- # Newer rfishbase versions cause troubles, thus install: -->
-<!-- if(packageVersion("rfishbase") > "3.0.4"){ -->
-<!--   remove.packages("rfishbase") -->
-<!--   require(devtools) -->
-<!--   install_version("rfishbase", version = "3.0.4", repos = "http://cran.us.r-project.org") -->
-<!-- } -->
+# Preferences for conflicting packages
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("levelplot", "rasterVis")
+conflict_prefer("origin", "raster")
+conflict_prefer("extract", "raster")
+conflict_prefer("partial", "pdp")
+conflict_prefer("mse", "Metrics")
+conflict_prefer("near", "dplyr")
+conflict_prefer("resample", "raster")
+conflict_prefer("train", "caret")
 
-<!-- all_pkg <- c('base', 'bookdown', 'broom', 'caret', 'conflicted', 'datasets', 'dplyr', 'forcats', 'ggfortify', 'ggplot2', 'ggridges', 'graphics', 'grDevices', 'imputeTS', 'IRdisplay', 'keras', 'lattice', 'latticeExtra', 'leaps', 'lubridate', 'knitr', 'maptools', 'methods', 'Metrics', 'modelr', 'MODISTools', 'patchwork', 'pdp', 'pROC', 'purrr', 'raster', 'rasterVis', 'RColorBrewer', 'RCurl', 'readr', 'recipes', 'reticulate', 'rfishbase', 'rgbif', 'rgdal', 'rgeos', 'rjson', 'rmarkdown', 'rsample', 'sf', 'sp', 'spData', 'stats', 'stringr', 'tensorflow', 'terra', 'tibble', 'tidyr', 'tidyverse', 'utils', 'vip', 'visdat', 'XML', 'yardstick') -->
+# Write packages bibliography
+knitr::write_bib(all_pkg, "packages.bib")
 
-<!-- package.check <- lapply( -->
-<!--   all_pkg, -->
-<!--   FUN = function(x) { -->
-<!--     if (!require(x, character.only = TRUE)) { -->
-<!--       install.packages(x, dependencies = TRUE) -->
-<!--       library(x, character.only = TRUE) -->
-<!--     } -->
-<!--   } -->
-<!-- ) -->
-
-<!-- # Preferences for conflicting packages -->
-<!-- conflict_prefer("select", "dplyr") -->
-<!-- conflict_prefer("filter", "dplyr") -->
-<!-- conflict_prefer("levelplot", "rasterVis") -->
-<!-- conflict_prefer("origin", "raster") -->
-<!-- conflict_prefer("extract", "raster") -->
-<!-- conflict_prefer("partial", "pdp") -->
-<!-- conflict_prefer("mse", "Metrics") -->
-<!-- conflict_prefer("near", "dplyr") -->
-<!-- conflict_prefer("resample", "raster") -->
-<!-- conflict_prefer("train", "caret") -->
-
-<!-- # Write packages bibliography -->
-<!-- knitr::write_bib(all_pkg, "packages.bib") -->
-
-<!-- # Set global chunk options -->
-<!-- knitr::opts_chunk$set(out.width = "50%", fig.align = "center", warning = FALSE, message = FALSE) -->
-<!-- ``` -->
+# Set global chunk options
+knitr::opts_chunk$set(out.width = "50%", fig.align = "center", warning = FALSE, message = FALSE)
+```
 

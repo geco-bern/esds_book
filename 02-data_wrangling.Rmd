@@ -1,32 +1,19 @@
----
-editor_options: 
-  markdown: 
-    wrap: sentence
----
-
 # Data wrangling {#ch-02}
 
 ## Introduction
 
-In this chapter, you will learn to efficiently explore your data.
-This includes understanding how the data is structured, what "dimensions" are in a dataset, how to manipulate the data and how visualise it.
-Efficient data exploration and wrangling are the basis for generating hypotheses, testing them, and repeating the wrangling-visualisation-hypothesis circle over and over.
-That is science.
+In this chapter, you will learn to efficiently explore data. This includes understanding how the data is structured, what "dimensions" are in a dataset, how to manipulate the data and how to visualise it. Efficient data exploration and wrangling are the basis for generating hypotheses, testing them, and repeating the wrangling-visualisation-hypothesis circle over and over. This is science.
 
-R offers great functionalities for achieving efficient data wrangling and visualisation, particularly using functions from the [tidyverse](https://www.tidyverse.org/).
-You have already used some of the functions of tidyverse.
-This chapter will introduce some more of the basic and most important tidyverse functions, including [ggplot](https://ggplot2.tidyverse.org/).
-The contents of this tutorial are inspired by the (freely available online-) book [*R for Data Science* by Grolemund & Wickham](https://r4ds.had.co.nz/).
+R offers very useful functionalities for achieving efficient data wrangling and visualisation, particularly using functions from the [tidyverse](https://www.tidyverse.org/). You have already used some of them in the previous chapter. This chapter will introduce some more of the basic and most important tidyverse functions, including [ggplot](https://ggplot2.tidyverse.org/). The contents of this tutorial are inspired by the (freely available online) book [*R for Data Science* by Grolemund & Wickham](https://r4ds.had.co.nz/).
 
-After you have gone through the lecture and solved the exercises you should be able to: - Define data, understand the structure of data and list examples of environmental data.
-- List the various possible data types and formats.
-- Explain the possible sources of data in environmental data science.
-- Define metadata.
-- List the various possible data pre-processing methods.
-- Understandtidy data and data dimensions.
-- Learn how to plot data.
-- Apply data aggregation.
-- Apply data cleaning and gapfilling.
+After you have gone through the lecture and solved the exercises you should be able to:
+
+-   Define data, understand the structure of data and list examples of environmental data.
+-   Implement common pre-processing steps.
+-   Understand tidy data and data dimensions.
+-   Visualise the multiple dimensions of data.
+
+The videos for this chapter introduced the basics of data transformation with *dplyr* and data visualisation with *ggplot2*. The following is a recap of the most important points. The tutorial below provides an introduction to implementing them with example data.
 
 ### Data transformation with dplyr
 
@@ -45,17 +32,12 @@ Remember also that `dplyr` functions (sometimes, referred to as "verbs") all wor
 
 ### Data visualisation with ggplot2
 
-In the same video (2c), we learned about data visualisation with the tidyverse package ggplot2.
-Remember the steps for creating a figure with ggplot2:
+In the same video (2c), we learned about data visualisation with the tidyverse package ggplot2. Remember the steps for creating a figure with ggplot2:
 
-We will start by calling the function `ggplot()`: - The first argument to enter is the data frame, that contains the values that are to be displayed in a figure.
-- The second argument is the "mapping" argument and always comes in the form of `aes(...)`.
-Inside the brackets of `aes(...)`, we usually indicate the column (variable) that specifies the coordinate of a visualisation element (e.g., a point) along the x-axis with `x = ...`, and along the y-axis with `y = ...`.
+We will start by calling the function `ggplot()`. The first argument is the data frame that contains the values that are to be displayed in a figure. The second argument is the aesthetics "mapping" argument and always comes in the form of `aes(...)`. Inside the brackets of `aes(...)`, we usually indicate the column (variable) that specifies the coordinate of a visualisation element (e.g., a point) along the x-axis with `x = ...`, and along the y-axis with `y = ...`.
 
-Then, add an additional function call to the initial `ggplot()`, with a `+` to specify the type of visualisation element (e.g., points, or lines, etc.) that maps the variable values to the plot coordinate space (for example x-y).
-The ggplot-`+` works a bit like the pipe operator `%>%`.
-This function call now specifies the type of plot to create.
-The name of this function starts with `geom_`.
+Then, add an additional function call to the initial `ggplot()`, with a `+` to specify the type of visualisation element (e.g., points, or lines, etc.) that maps the variable values to the plot coordinate space (for example x-y). The ggplot-`+` works a bit like the pipe operator `%>%`. This function call now specifies the type of plot to create. The name of this function starts with `geom_`. 
+
 For example, to plot points of temperature at a given time from a data frame `df` into x-y space (a scatterplot), we would write something like:
 
 ```{r eval=FALSE}
@@ -65,31 +47,45 @@ ggplot(data = df, aes(x = time, y = temperature)) +
 
 ## Tutorial
 
-### Dataset 1 (half-hourly flux data)
+After learning about some basic concepts and functions for data wrangling and visualisation, we will apply some of the tidyverse functions on the data. As in Chapter \@ref(ch-01), we will be using the time series data from eddy covariance flux measurements and meteorological variables measured in parallel. In this sub-section, we start with half-hourly data from a flux tower near Zürich ([CH-Lae](https://gl.ethz.ch/research/bage/fluxnet-ch.html), located on the Lägern mountain between Regensberg and Baden and run by our colleagues here at ETH). The data covers years 2004-2014 at a half-hourly time step. That is a large amount of data which can be tricky to work with in Excel. In this course, you will learn to do your data wrangling completely outside of Excel and you will see how it improves your life as a (data) scientist considerably.
 
-After learning about some basic concepts and functions for data wrangling and visualisation, we will apply some of the tidyverse functions on the data.
-As in previous exercises, we will be using the time series data from eddy covariance flux measurements and meteorological variables measured in parallel.
-In this sub-section, we start with half-hourly data from a flux tower near Zürich ([CH-Lae](https://gl.ethz.ch/research/bage/fluxnet-ch.html), located on the Lägern mountain between Regensberg and Baden and run by our colleagues here at ETH).
-The data covers years 2004-2014 at a half-hourly time step.
-That is a large amount of data which can be tricky to work with in Excel.
-In this course, you will learn to do your data wrangling completely outside of Excel and you will see how it improves your life as a (data) scientist considerably.
+Every research project starts with a broad overall question. In this tutorial, our aim to investigate the variations and controls of ecosystem-level gross primary production (GPP). GPP is the gross carbon assimilation by photosynthesis of all plants in the "footprint" of an eddy covariance tower and can be derived from the measurement of the vertical turbulent net flux of CO<sub>2</sub> (on the basis of vertical air movement and parallel CO<sub>2</sub> concentration measurements). "Gross" because plants simultaneously respire CO<sub>2</sub> as they assimilate it. Several assumptions have to be made to get from raw measurements (simultaneous measurements of CO<sub>2</sub> concentration and velocities of air movement in vertical direction, typically taken at 50 Hz) to the final GPP time series. In our dataset, different GPP time series are available and are derived using different assumptions. Below, we will work with the one called `GPP_NT_VUT_REF`. See Pastorello et al. (2020) (XXXrefXXX https://www.nature.com/articles/s41597-020-0534-3) for a comprehensive description of GPP estimation methods.
 
-Every research project starts with a broad overall question.
-In this course, aim to investigate the variations and controls of ecosystem-level gross primary production (GPP).
-GPP is the gross carbon assimilation by photosynthesis of all plants in the "footprint" of an eddy covariance tower and can be derived from the measurement of the vertical turbulent net flux of CO<sub>2</sub> (on the basis of vertical air movement and parallel CO<sub>2</sub> concentration measurements).
-"Gross" because plants simultaneously respire CO<sub>2</sub> as they assimilate it and this also during the night.
-Several assumptions have to be made to get to the final GPP time series.
-In our dataset, different GPP time series are available and are derived using different assumptions.
-Below, we will work with the one called `GPP_NT_VUT_REF`.
+Now that we roughly know what to expect from the contents of our dataset and we have a research question in mind (controls and variations of GPP), we can start searching for answers by reading, transforming, visualising, and modelling our data. Based on what we learn from this initial exploratory data analysis, we will refine our research question, re-focus it, and follow it up with the next level of data analysis and modelling in later chapters.
 
-Now that we roughly know what to expect from the contents of our dataset and we have a research question in mind (controls and variations of GPP), we can start searching for answers by reading, transforming, visualising, and modelling our data.
-Based on what we learn from this initial exploratory data analysis, we will refine our research question, focus it, and follow it up with the next level of data analysis and modelling in later chapters.
+### Libraries
 
-#### Variables in a data frame
+Install missing packages for this tutorial.
+```{r eval=TRUE}
+list_pkgs <- c("tidyverse", "conflicted")
+new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
+if (length(new_pkgs) > 0) install.packages(new_pkgs)
 
-We will start by reading in the half-hourly data from the eddy-covariance site CH-Lae again (as we did already in Chapter \@ref(ch-01)) and start to explore the data.
-We use the function `read_csv()` from the `readr` package here for reading the CSV since it is faster than the base-R `read.csv()` and generates a nicely readable output when printing the object.
-You can find more information about reading data with `read_csv()` [here](https://r4ds.had.co.nz/data-import.html).
+library(tidyverse)
+library(conflicted)
+```
+
+[**tidyverse**](https://www.tidyverse.org/) is a collection of packages and `library(tidyverse)` loads them all. For this tutorial we use in particular:
+
+XXXrefXXX for all packages
+
+- dplyr
+- tidyr
+- purrr
+- readr
+- lubridate
+- stringr
+- ggplot2
+
+It can happen that different functions with the same name are available from different packages. To avoid conflicts and make sure we use the preferred ones, we can use the *conflicted* package XXXrefXXX and specify:
+```{r}
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+```
+
+### Variables in a data frame
+
+We will start by reading in the half-hourly data from the eddy-covariance site CH-Lae again (as we did already in Chapter \@ref(ch-01)) and start to explore the data. We use the function `read_csv()` from the **readr** package (part of tidyverse) here for reading the CSV since it is faster than the base-R `read.csv()` and generates a nicely readable output when printing the object. You can find more information about reading data with `read_csv()` [here](https://r4ds.had.co.nz/data-import.html).
 
 ```{r, message=FALSE}
 library(tidyverse)
@@ -99,28 +95,25 @@ hhdf
 
 You have already inspected the size and dimensions of this data frame in Chapter \@ref(ch-01) with functions, such as `dim()`, `nrow()`, `ncol()`, `head()`, `names()` etc.
 
-For our further data exploration, we will select certain variables to reduce the data frame we are working with.
-Such a selection should be guided by our understanding of the data and our own judgments.
-We need to select the variables that are expected to influence the phenomena that we are investigating based on the existing knowledge which forms our hypothesis.
-This knowledge is generally obtained from the scientific literature.
-The selection we decide upon must be documented for publications to aid reproducibility.
-Many of the variables in the original file record the same information but are derived with slightly different assumptions and gap-filling techniques.
-This is indicated by the suffices of the variable names.
-See [Pastorello et al. (2020)](https://www.nature.com/articles/s41597-020-0534-3) for a comprehensive description of this.
-To help the further steps in this chapter we will now subset our original data.
-We select the following variables:
+For our further data exploration, we will reduce the data frame we are working with and select only certain variables. Reducing the dataset can have the advantage of speeding up further processing steps, especially when the data is large.
 
--   The time information (`TIMESTAMP`)
--   All meteorological variables following the final gap-filled method (suffix `_F`)
+Variable selection is not only a matter of improving processing efficiency, but is an important step for analysis and modelling and should be guided by our understanding of the data. I general, we select the variables that are expected to influence the phenomena that we are investigating based on the existing knowledge. The selection we decide upon must be documented for publications to aid reproducibility. More on variable selection will be taught in Chapter \@ref(#ch-08).
+
+Here, many of the variables in the data frame record the same information, but are derived with slightly different assumptions and gap-filling techniques. This is indicated by the suffices of the variable names. See [Pastorello et al. (2020)](https://www.nature.com/articles/s41597-020-0534-3) for a comprehensive description of alternative methods. For the further steps in this chapter we will now subset our original data. We select the following variables:
+
+-   Time of the measurement (all variables with names starting with `TIMESTAMP`)
+-   All meteorological variables following the final gap-filled method (all variables with names ending with `_F`)
 -   A gap-filled version of the CO2 concentration (`CO2_F_MDS`)
 -   The incoming photosynthetic photon flux density (`PPFD_IN`). This variable strongly covaries, but is not equal, to the shortwave incoming radiation (`SW_IN`)
 -   GPP estimates are based on the nighttime decomposition method, using the "most representative" of different gap-filling versions, after having applied the variable u-star filtering method (`GPP_NT_VUT_REF`)
 -   Soil water measured at different depths (variables starting with `SWC_F_MDS`)
 -   Quality flag of the CO2 flux measurement (`NEE_VUT_REF_QC`, for half-hourly data: 0 = measured, 1 = good quality gap-fill, 2 = medium, 3 = poor; for daily data: the fraction of good quality gap-filled half-hourly data is used for aggregation to daily data.)
 -   Other variables: Wind speed (`WS`), wind direction (`WD`), friction velocity (`USTAR`), relative humidity (`RH`)
--   All quality flags (suffix `QC`)
--   Do not use any radiation variables derived with the "JSBACH" algorithm (suffix `JSB`)
+-   Quality flags for different variables: (ending with `QC`)
+-   Do not use any radiation variables derived with the "JSBACH" algorithm (not with a name that contains the string `JSB`)
 -   Flag indicating whether a time step is at night (`NIGHT`)
+
+This is implemented by:
 
 ```{r}
 hhdf <- hhdf %>% 
@@ -139,25 +132,20 @@ hhdf <- hhdf %>%
     )
 ```
 
-This reduces our dataset from 235 to 68 variables.
-As you can see, `select()` is a powerful tool to apply multiple selection criteria on your data frame at the same time and formulate criteria based on the variable names (e.g., `starts_with()` ).
-Note that the selection criteria are evaluated in the order we write them in the `select()` function call.
-You can find the complete reference for selecting variables [here](https://dplyr.tidyverse.org/reference/select.html).
+This reduces our dataset from 235 to 68 variables. As you can see, `select()` is a powerful tool to apply multiple selection criteria on your data frame in one step and formulate criteria based on the variable names (e.g., `starts_with()` ). Note also that the selection criteria are evaluated in the order we write them in the `select()` function call. You can find the complete reference for selecting variables [here](https://dplyr.tidyverse.org/reference/select.html).
 
-#### Time objects
+### Time objects
 
 The automatic interpretation of the variables `TIMESTAMP_START` and `TIMESTAMP_END` by the function `read_csv()` is not optimal:
 
 ```{r}
-typeof(hhdf$TIMESTAMP_START[[1]])
+class(hhdf$TIMESTAMP_START[[1]])
 as.character(hhdf$TIMESTAMP_START[[1]])
 ```
 
-As we can see, it is considered by R as a numeric variable with 12 digits ("double-precision", occupying 64 bits in computer memory).
-After printing the variable as a string, we can infer that the format is: YYYYMMDDhhmm.
+As we can see, it is considered by R as a numeric variable with 12 digits ("double-precision", occupying 64 bits in computer memory). After printing the variable as a string, we can guess that the format is: YYYYMMDDhhmm.
 
-**Lubridate** is a package designed to help processing date and time data.
-Knowing the format of the timestamp variables in our dataset, we can use `ymd_hm()` to convert them to actual date-time objects.
+The **lubridate** XXXrefXXX is a package designed to help processing date and time objects Knowing the format of the timestamp variables in our dataset, we can use `ymd_hm()` to convert them to actual date-time objects.
 
 ```{r, message=FALSE}
 library(lubridate)
@@ -165,8 +153,7 @@ dates <- ymd_hm(hhdf$TIMESTAMP_START)
 head(dates)
 ```
 
-Working with such date-time objects greatly facilitates typical operations on time series.
-For example, adding one day can be done by:
+Working with such date-time objects greatly facilitates typical operations on time series. For example, adding one day can be done by:
 
 ```{r}
 nextday <- dates + days(1)
@@ -180,38 +167,13 @@ month_of_year <- month(dates)
 head(month_of_year)
 ```
 
-The number 1 stands for the month of the year, i.e.
-January.
+The number 1 stands for the month of the year, i.e. January.
 
 You can find more information on formatting dates and time within the **tidyverse** [here](https://r4ds.had.co.nz/dates-and-times.html), and a complete reference of the **lubridate** package is available [here](https://lubridate.tidyverse.org/).
 
-**Checkpoint**
+### Variable (re-) definition
 
-What is the month of the 10'000th value in the column 'dates'?
-
-What is the date of the 14'000th value?
-
-What is the date 100 days after that?
-Are we still in the same year?
-
-**Solution**
-
-```{r}
-month(dates[10000])
-
-myday <- dates[14000]
-myday
-
-new_day <- myday + days(100)
-new_day
-```
-
-No, it is not the same year!
-
-#### Variable (re-) definition
-
-We have not applied the conversion of the timestamp columns to date-time objects in our data frame `hhdf` yet.
-In base-R, with the package `lubridate` loaded, we would do this by:
+We have not applied the conversion of the timestamp columns to date-time objects in our data frame `hhdf` yet. In base-R, we would do this by:
 
 ```{r eval=FALSE}
 hhdf$TIMESTAMP_START <- ymd_hm(hhdf$TIMESTAMP_START)
@@ -224,26 +186,18 @@ hhdf %>%
   mutate(TIMESTAMP_START = ymd_hm(TIMESTAMP_START))
 ```
 
-Mutating both our timestamp variables could be written as `mutate(TIMESTAMP_START = ymd_hm(TIMESTAMP_START), TIMESTAMP_END = ymd_hm(TIMESTAMP_END))`.
-Sometimes, such multiple-variable mutate statements can get quite long.
-A nice short version of this can be implemented using `mutate_at()` which applies a condition to the variable name on which the mutating is to be applied:
+Mutating both our timestamp variables could be written as `mutate(TIMESTAMP_START = ymd_hm(TIMESTAMP_START), TIMESTAMP_END = ymd_hm(TIMESTAMP_END))`. Sometimes, such multiple-variable mutate statements can get quite long. A nice short version of this can be implemented using `across()`:
 
 ```{r}
 hhdf %>% 
-  mutate_at(vars(starts_with("TIMESTAMP_")), ymd_hm)
+  mutate(across(starts_with("TIMESTAMP_"), ymd_hm))
 ```
 
 A complete reference to `mutate()` is available [here](https://r4ds.had.co.nz/transform.html#add-new-variables-with-mutate).
 
-#### Selecting, cleaning and gap-filling
+### Selecting, cleaning and gap-filling
 
-For many applications, we want to filter the data so that the values of particular variables satisfy certain conditions.
-For example, if we have a good reason for excluding certain data points, we should do so.
-The `dplyr` function which should be used for such tasks is `filter()`.
-As a first argument, it takes the data frame to which the filtering is applied.
-Remember that when using pipes (`%>%`), the first argument is not spelled out, but is taken from what is coming from the left of `%>%`.
-The second and subsequent arguments are the expressions that specify the criterion for filtering.
-R provides the standard suite:
+For many applications, we want to filter the data so that the values of particular variables satisfy certain conditions. For example, if we have a good reason for excluding certain data points, we should do so. The function used for such tasks is `filter()`. As a first argument, it takes the data frame to which the filtering is applied. Remember that when using pipes (`%>%`), the first argument is not spelled out, but is taken from what is coming from the left of `%>%`. The second and subsequent arguments are the expressions that specify the criterion for filtering. The following operators relate to values to each other and evaluate to either `TRUE` or `FALSE`:
 
 -   `>` greater than
 -   `>=` greater or equal than
@@ -252,30 +206,29 @@ R provides the standard suite:
 -   `!=`: not equal
 -   `==`: equal
 
-Multiple filtering criteria can be combined with logical (Boolean) operators:
+Multiple filtering criteria can be combined with logical (boolean) operators:
 
 -   `&`: logical and
 -   `|`: logical or
 -   `!` logical not
 
-We want to check whether a variable takes any of a larger set of values.
-For example, if we wanted to check whether a date, given by the month of the year, is in meteorological spring, we could write something like `filter(df, month == 3 | month == 4 | month == 5)`.
-When writing code there are often several different ways to write commands that will output the same result.
-The just mentioned command line is a little complicated.
-Through shortening it becomes a simpler and much more powerful syntax `filter(df, month %in% c(3,4,5))`.
-The `%in%` operator takes each element of what is on its left-hand-side and evaluates whether it is equal to any element of what is on its right-hand-side.
+Here, we want to check whether a variable takes any of a larger set of values. For example, if we wanted to check whether a date, given by the month of the year, is in meteorological spring, we could write something like:
 
-Now, we can apply those different functions to our dataset.
-We will begin by filtering some GPP data based on its corresponding data quality information.
-This type of information is crucial as it allows us, e.g., to avoid using "bad" data for training a machine learning algorithm.
-In our dataset, the quality control flag for `GPP_NT_VUT_REF` is provided by `NEE_VUT_REF_QC`.
-Its corresponding codes are:
+```{r eval=FALSE}
+filter(df, month == 3 | month == 4 | month == 5)
+``` 
 
-0 = measured\
-1 = good quality gap-filled\
-2 = medium\
-3 = po
-or
+When writing code there are often several different ways to write commands that will output the same result. The just mentioned command is a little complicated. A much more powerful syntax to implement the same is: 
+```{r eval=FALSE}
+filter(df, month %in% c(3, 4, 5))
+```
+
+The `%in%` operator takes each element of what is on its left-hand-side and evaluates whether it is equal to any element of what is on its right-hand-side. Now, we can apply those different functions to our dataset. We will begin by filtering some GPP data based on its corresponding data quality information. This type of information is crucial as it allows us, e.g., to avoid using "bad" data for training a machine learning algorithm. In our dataset, the quality control flag for `GPP_NT_VUT_REF` is provided by `NEE_VUT_REF_QC`. Its corresponding codes are:
+
+- 0 = measured
+- 1 = good quality gap-filled
+- 2 = medium
+- 3 = poor
 
 To take only actually measured or good quality gap-filled GPP data (0 and 1), we can do:
 
@@ -284,46 +237,35 @@ hhdf %>%
   filter(NEE_VUT_REF_QC == 0 | NEE_VUT_REF_QC == 1)
 ```
 
-As previously explained, we can also write:
+Or, as previously explained, we can also write:
 
 ```{r eval=FALSE}
 hhdf %>% 
   filter(NEE_VUT_REF_QC %in% c(0,1))
 ```
 
-`filter()` completely removes rows (note the information about number of rows printed above).
-In some cases this is undesired and it is preferred to replace bad-quality values with `NA`.
-`NA` is a widely used term to indicate when information has not been provided and stands for "*not available*", "*not applicable*" or "*no answer*".
-Its use will depend on the context and type of data being worked on.
-For example, in a questionaire an `NA` could mean the parciticpant did not answer the question or that the question does not apply to them.
-In a data set containing measurements from a sensor it may mean the sensor was not working at that point meaning there is no data available.
-Replacing missing values with `NA` is a method to avoid empty cells in a data set.
-In R, `NA` is a "code" that lets R understand that the value is missing.
-Almost all operations on values where at least one value is `NA` also return `NA`.
-For example:
+Note that `filter()` completely removes rows (note the information about the number of rows printed above). In some cases this is undesired and it is preferred to replace bad quality values with `NA`. `NA` is a widely used term to mark missing data and stands for "*not available*", "*not applicable*" or "*no answer*". It is important to note that specifying a value as missing is information. Dropping an entire row leads to the loss of this information. In R, `NA` is a "code" that lets R understand that the value is missing. Almost all operations on vectors where at least one value is `NA` also return `NA`. For example:
 
 ```{r}
-mean(c(1,2,NA))
+mean(c(1, 2, NA))
 ```
 
-To remove all missing values before evaluating the function, the common argument to set in the respective function call is `na.rm`.
-By default, it is usually set to `FALSE`, but we can do:
+To remove all missing values before evaluating the function, the common argument to set in the respective function call is `na.rm`. By default, it is usually set to `FALSE`, but we can do:
 
 ```{r}
-mean(c(1,2,NA), na.rm = TRUE)
+mean(c(1, 2, NA), na.rm = TRUE)
 ```
 
-For cases where we do not want to drop entire rows, but just replace certain values with `NA`, we can use `mutate()` instead and apply the function `ifelse()` which takes a logical expression that evaluates to either `TRUE` or `FALSE` as the first argument, and returns the second argument if the expression evaluates to `TRUE` or the third argument if it evaluates to `FALSE`.
-In our case, we can apply:
+For cases where we do not want to drop entire rows when applying `filter()`, but just replace certain values with `NA`, we can use `mutate()` instead and apply the function `ifelse()`. 
+
+`ifelse()` takes a logical expression that evaluates to either `TRUE` or `FALSE` as the first argument, and returns the second argument if the expression evaluates to `TRUE` or the third argument if it evaluates to `FALSE`. In our case, we can do this by:
 
 ```{r eval=FALSE}
 hhdf %>% 
   mutate(GPP_NT_VUT_REF = ifelse(NEE_VUT_REF_QC %in% c(0,1), GPP_NT_VUT_REF, NA))
 ```
 
-Some values in our data frame are -9999.
-When reading the documentation of this specific dataset, we learn that this is the code for missing data.
-We can replace such values in any column (except the columns starting with `"TIMESTAMP_"`) with `NA` using the function `na_if()`.
+Some values in our data frame are -9999. When reading the documentation of this specific dataset, we learn that this is the code for missing data. We can replace such values in any column (except the columns starting with `"TIMESTAMP_"`) with `NA` using the function `na_if()`.
 
 ```{r}
 hhdf %>% 
@@ -338,46 +280,11 @@ hhdf %>%
   drop_na()
 ```
 
-**Checkpoint**
+### Functions
 
-We just made this statement: "*If our data has `NA` values and we choose to drop the entire row if it contains an `NA`, you can use another useful function `drop_na()`.*"
+Whenever possible, we should combine multiple processing steps that naturally belong together. Specifically, the same sequence of steps may be applied to multiple datasets that have the same structure (variable names, etc.). We can combine the set of operations presented above in into a single function. Once such a function is created, we can apply it to the data in one go, instead of repeating the successive steps.
 
-It is important to understand what functions such as `drop_na()` do to the data set.
-Convert the matrix below to a dataframe and use `drop_na()`.
-Note the differences the output information and parts of the matrix that are kept and compare it to the results of other functions such as `is.na()`, `complete.cases()`, `na.omit()`.
-
-```{r}
-### Run this code
-a1 <- c(2,20,NA,2000)
-a2 <- c(1,3,5,NA)
-a3 <- c(22,33,44,55)
-NA_matrix <- rbind(a1,a2,a3)
-```
-
-**Solution**
-
-```{r}
-# You can ignore paste0(), we just added it to help you keep track of the solution to each function.
-paste0("drop_na():")
-data.frame(NA_matrix) %>% drop_na()
-
-paste0("complete.cases():")
-NA_matrix %>% complete.cases()
-
-paste0("is.na():")
-NA_matrix %>% is.na()
-
-paste0("na.omit():")
-NA_matrix %>% na.omit()
-```
-
-#### Functions
-
-Whenever possible, we should combine multiple processing steps that naturally belong together.
-Specifically, the same sequence of steps may be applied to multiple datasets that have the same structure (variable names, etc.).
-We can combine the set of operations presented above in into a single function.
-Once such a function is created, we can apply it to the data in one go, instead of repeating the successive steps We will now write our first function and implement the data cleaning steps we described above.
-The function consists of multiple sequences of code as it contains the different steps presented above and applies them sequentially.
+We will now write our first function and implement the data cleaning steps we described above. The function consists of multiple sequences of code as it contains the different steps presented above and applies them sequentially.
 
 ```{r}
 clean_fluxnet_hh <- function(df){
@@ -429,9 +336,7 @@ clean_fluxnet_hh <- function(df){
 }
 ```
 
-The cell above contained only the function definition.
-That is, it defines what the function does when applied.
-Next, we can apply it to our object, the data frame `hhdf`:
+The cell above contained only the function definition. That is, it defines what the function does when applied. Next, we can apply it to our object, the data frame `hhdf`:
 
 ```{r message=FALSE}
 ## apply our cleaning function
@@ -439,18 +344,11 @@ hhdf <- hhdf %>%
   clean_fluxnet_hh()
 ```
 
-Now that we created a function that lives comfortably in the tidyverse.
-The function takes a data frame as its first (and here only) argument, and it returns a data frame as its output.
-That is why we can write it in combination with the pipe operator as we did above.
-This was a very condensed introduction to functions.
-You will find more information [here](https://r4ds.had.co.nz/functions.html).
+Now that we created a function that lives comfortably in the tidyverse. The function takes a data frame as its first (and here only) argument, and it returns a data frame as its output. That is why we can write it in combination with the pipe operator as we did above. This was a very condensed introduction to functions. You will find more information [here](https://r4ds.had.co.nz/functions.html).
 
-#### Data ...
+### Data overview
 
-After we have done the data cleaning by imputing `NA` for bad quality data, we should check again, how much data we are now left with and how big the data gaps for different variables are.
-Knowing this is particularly important when using the data later in combination with machine learning algorithms that cannot deal with missing data.
-In such cases, rows where at least one value is missing (`NA`), have to be discarded entirely.
-This may not be desirable if it reduces the number of rows too drastically.
+After we have done the data cleaning by imputing `NA` for bad quality data, we should check again, how much data we are now left with and how big the data gaps for different variables are. Knowing this is particularly important when using the data later in combination with machine learning algorithms that cannot deal with missing data. In such cases, rows where at least one value is missing (`NA`), have to be discarded entirely. This may not be desirable if it reduces the number of rows too drastically.
 
 We can calculate the percentage of missing data for each column with the following code:
 
@@ -460,17 +358,14 @@ hhdf %>%
   t()
 ```
 
-We can see, that \>20% of all values for `SWC_F_MDS_4` and `USTAR` are missing, which can be problematic for further analyses.
-We can remove those variables from the data frame.
+We can see, that \>20% of all values for `SWC_F_MDS_4` and `USTAR` are missing, which can be problematic for further analyses. We can remove those variables from the data frame.
 
 ```{r}
 hhdf <- hhdf %>% 
   select(-USTAR, -SWC_F_MDS_4)
 ```
 
-We can also visualise the fraction of missing data after applying our data cleaning step, using the `vis_miss` from the **visdat** package.
-Since applying this function on such a large dataframe can be time consuming, we will apply it on a randomly selected subset.
-For this, we randomly select 5'000 entries from `hhdf` to get a feeling for how much of which data is missing.
+We can also visualise the fraction of missing data after applying our data cleaning step, using the `vis_miss` from the **visdat** package. Since applying this function on such a large dataframe can be time consuming, we will apply it on a randomly selected subset. For this, we randomly select 5'000 entries from `hhdf` to get a feeling for how much of which data is missing.
 
 ```{r}
 library(visdat)
@@ -481,50 +376,22 @@ vis_miss(
   )
 ```
 
-This looks reasonable now.
-Let's save this as a RData file for later use.
+This looks reasonable now. Let's save this as a CSV file for later use.
 
 ```{r}
-save(hhdf, file = "./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN.RData")
+write_csv(hhdf, file = "./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN.csv")
 ```
 
-**Checkpoint**
 
-Try writing a simple function that will calculate the sum, maximum and minimum of the vector *some_numbers*.
-(As a bonus have the result print out a sentence saying: "The sum is: x , the maximum is: y and the minimum is: z.")
+### Data visualisation I
 
-```{r}
-# Run this code:
-some_numbers <-c(10,15, 436, 728, 1111)
-```
-
-**Solution**
-
-```{r}
-function_exercise <- function(x) {
-    sum <- sum(x)
-    max <- max(x)
-    min <- min(x)
-    
-    cat("The sum is:", sum, ", the maximum is:", max, " and the minimum is:", min, ".\n")
-}
-
-function_exercise(some_numbers)
-```
-
-#### Data visualisation I
-
-Plotting and visualizing data is an integral part of data processing.
-We previously created a simple x-y line plot, using base-R, in Chapter \@ref(ch-01).
-Here, we will be working with the same time series **(rexplain the time series, take some lines from previously)**.
-A natural first visualisation step is therefore to plot our variables against time, for example, `GPP_NT_VUT_REF` versus `TIMESTAMP_START`:
+Plotting and visualizing data is an integral part of data processing. We previously created a simple x-y line plot, using base-R, in Chapter \@ref(ch-01). Here, we will be working with the same time series **(rexplain the time series, take some lines from previously)**. A natural first visualisation step is therefore to plot our variables against time, for example, `GPP_NT_VUT_REF` versus `TIMESTAMP_START`:
 
 ```{r}
 plot(hhdf$TIMESTAMP_START, hhdf$GPP_NT_VUT_REF, type = "l")
 ```
 
-**ggplot2** offers a powerful and (at least after an initial brain-effort) intuitive syntax for building data visualisations in a versatile, elegant, and efficient way.
-It defines a complete ["grammar of graphics"](https://ggplot2.tidyverse.org/reference/) (thus the name ggplot), which allows you to consistently apply the same syntax for different purposes.
+**ggplot2** offers a powerful and (at least after an initial brain-effort) intuitive syntax for building data visualisations in a versatile, elegant, and efficient way. It defines a complete ["grammar of graphics"](https://ggplot2.tidyverse.org/reference/) (thus the name ggplot), which allows you to consistently apply the same syntax for different purposes.
 
 We create the same line plot as done above with `geom_line()`:
 
@@ -534,9 +401,7 @@ ggplot(data = hhdf, aes(x = TIMESTAMP_START, y = GPP_NT_VUT_REF)) +
   geom_line()
 ```
 
-This is a dense plot and we cannot distinguish patterns because variations in GPP happen at time scales that are too narrow for displaying 14 years in one plot.
-GPP varies throughout a day just as much as it varies throughout a season.
-To see this, we can focus on a narrower time span and make the plot easier to read:
+This is a dense plot and we cannot distinguish patterns because variations in GPP happen at time scales that are too narrow for displaying 14 years in one plot. GPP varies throughout a day just as much as it varies throughout a season. To see this, we can focus on a narrower time span and make the plot easier to read:
 
 ```{r}
 hhdf %>% 
@@ -547,21 +412,11 @@ hhdf %>%
   theme_classic()
 ```
 
-We can observe a variation in the measured values fluctuating between high and low values during one day.
-Hence, we see that we have GPP variations at the sub-daily (diurnal) time scale, as well as at the seasonal time scale.
-This is very typical for environmental time series data.
-Sometimes, we even observe a long-term trend on top of the daily signal.
-Dealing with such multiple scales of variations and "hidden dimensions" something you will have to deal with a lot as an "Environmental Systems Data Scientist".
+We can observe a variation in the measured values fluctuating between high and low values during one day. Hence, we see that we have GPP variations at the sub-daily (diurnal) time scale, as well as at the seasonal time scale. This is very typical for environmental time series data. Sometimes, we even observe a long-term trend on top of the daily signal. Dealing with such multiple scales of variations and "hidden dimensions" something you will have to deal with a lot as an "Environmental Systems Data Scientist".
 
 Above, we have first selected rows of the data frame with the dplyr function `slice()` and then piped its output (which is again a data frame) into `ggplot()`, which takes the data frame as the first argument.
 
-The second type of visualisation that allows one to quickly understand the data better and that often comes early in the exploratory data analysis phase is a histogram.
-It shows the count of how many points of a certain variable (here, `GPP_NT_VUT_REF`) fall into a discrete set of bins.
-When normalising (scaling) the "bars" of the histogram to unity, we get a density histogram.
-Histograms can be created with ggplot2 using the `geom_histogram()` function.
-In the example below, values of the variable of interest (`GPP_NT_VUT_REF`) are plotted along the x-axis (as is common for histograms).
-To specify the y-axis position of the upper end of the histogram bar as the density, use `y = ..density..` in the `aes()` call.
-To show counts, use `y = ..count..`
+The second type of visualisation that allows one to quickly understand the data better and that often comes early in the exploratory data analysis phase is a histogram. It shows the count of how many points of a certain variable (here, `GPP_NT_VUT_REF`) fall into a discrete set of bins. When normalising (scaling) the "bars" of the histogram to unity, we get a density histogram. Histograms can be created with ggplot2 using the `geom_histogram()` function. In the example below, values of the variable of interest (`GPP_NT_VUT_REF`) are plotted along the x-axis (as is common for histograms). To specify the y-axis position of the upper end of the histogram bar as the density, use `y = ..density..` in the `aes()` call. To show counts, use `y = ..count..`
 
 ```{r}
 hhdf %>%
@@ -570,25 +425,13 @@ hhdf %>%
   geom_density(color = "red")
 ```
 
-We added two visualisation layers above.
-First just the histogram (the dark grey bars), and second the continuous density plot as a red line.
-Both share the same aesthetics specification with `aes()`.
+We added two visualisation layers above. First just the histogram (the dark grey bars), and second the continuous density plot as a red line. Both share the same aesthetics specification with `aes()`.
 
-Find a complete reference to ggplot [here](https://ggplot2.tidyverse.org/).
-More complete tutorials data visualization are available [there](https://r4ds.had.co.nz/data-visualisation.html) or even more complete [here](https://clauswilke.com/dataviz/).
+Find a complete reference to ggplot [here](https://ggplot2.tidyverse.org/). More complete tutorials data visualization are available [there](https://r4ds.had.co.nz/data-visualisation.html) or even more complete [here](https://clauswilke.com/dataviz/).
 
-#### Aggregating
+### Aggregating
 
-All data frames have two dimensions, rows and columns.
-Our data frame is organised along half-hourly time steps in rows.
-These time steps belong to different days, months, and years, although these "dimensions" are not reflected by the structure of the data frame and we do not have columns that indicate the day, month or year of each half-hourly time step.
-This would actually be redundant information since the date-time objects of columns `TIMESTAMP_*` contain this information.
-The tidyverse makes it very easy to work with such "hidden dimensions" of a data frame.
-Let's say we want to calculate the mean of half-hourly GPP across each data.
-That is, to aggregate our half-hourly data to daily data by taking a sum.
-You see, there are two pieces of information needed for an aggregation step: The factor (or "hidden dimension") that groups a vector of values for collapsing it into a single value, and the function used for collapsing values.
-This function should take a vector as an argument and return a single value as an output.
-These two steps are implemented by the dplyr functions `group_by()` and `summarise()` and the nice and intuitive code that solves our problem of aggregating to daily values by summing looks like this:
+All data frames have two dimensions, rows and columns. Our data frame is organised along half-hourly time steps in rows. These time steps belong to different days, months, and years, although these "dimensions" are not reflected by the structure of the data frame and we do not have columns that indicate the day, month or year of each half-hourly time step. This would actually be redundant information since the date-time objects of columns `TIMESTAMP_*` contain this information. The tidyverse makes it very easy to work with such "hidden dimensions" of a data frame. Let's say we want to calculate the mean of half-hourly GPP across each data. That is, to aggregate our half-hourly data to daily data by taking a sum. You see, there are two pieces of information needed for an aggregation step: The factor (or "hidden dimension") that groups a vector of values for collapsing it into a single value, and the function used for collapsing values. This function should take a vector as an argument and return a single value as an output. These two steps are implemented by the dplyr functions `group_by()` and `summarise()` and the nice and intuitive code that solves our problem of aggregating to daily values by summing looks like this:
 
 ```{r message=FALSE}
 ddf <- hhdf %>% 
@@ -610,11 +453,7 @@ ddf %>%
   labs(title = "Gross primary productivity", subtitle = "Site: CH-Lae", x = "Time", y = expression(paste("GPP (gC m"^-2, "s"^-1, ")")))
 ```
 
-We observe high outlying values sometime in May.
-What do you think could be the reason for these?
-Maybe they are based on poorly gap-filled data?
-To learn more, it is interesting to know how many of the half-hourly data points in each (aggregated) day are based on "problematic" data and how many are missing (`NA`).
-To get this information, we can use again two aggregation functions `group_by()` and `summarise()`, now with multiple functions for summarising different variables.
+We observe high outlying values sometime in May. What do you think could be the reason for these? Maybe they are based on poorly gap-filled data? To learn more, it is interesting to know how many of the half-hourly data points in each (aggregated) day are based on "problematic" data and how many are missing (`NA`). To get this information, we can use again two aggregation functions `group_by()` and `summarise()`, now with multiple functions for summarising different variables.
 
 ```{r}
 ddf <- hhdf %>% 
@@ -629,14 +468,9 @@ ddf <- hhdf %>%
     mutate(f_measured = n_measured / n_datapoints) # calculate the fraction of measured values over total observations
 ```
 
-#### Data visualisation II
+### Data visualisation II
 
-After completing the aggregation above, we now have a new "hidden dimension" in our data frame: Each GPP measurement is located not only along a time axis, but also along a "data quality axis", measured by the fraction of actually measured (not gap-filled) half-hourly data points per day (`f_measured`).
-We can use this additional axis and visualise it by using colors of our points according to `f_measured`.
-In other words, we "map" `f_measured` to the color axis, similar to how we "mapped" time and GPP to the x and y axes before.
-When adding such an additional mapping to visualisation dimensions ("aesthetics"), we have to specify it using `aes()`.
-Now, this only affects the points and color of points, while the lines and points and their position in x-y space is shared.
-Hence, we write `aes(x = date, y = GPP_NT_VUT_REF)` in the `ggplot()` function call (indicating that all subsequent additions of `geom_` layers share this x-y mapping); while `aes(color = f_measured)` is specified only in the `geom_point()` layer.
+After completing the aggregation above, we now have a new "hidden dimension" in our data frame: Each GPP measurement is located not only along a time axis, but also along a "data quality axis", measured by the fraction of actually measured (not gap-filled) half-hourly data points per day (`f_measured`). We can use this additional axis and visualise it by using colors of our points according to `f_measured`. In other words, we "map" `f_measured` to the color axis, similar to how we "mapped" time and GPP to the x and y axes before. When adding such an additional mapping to visualisation dimensions ("aesthetics"), we have to specify it using `aes()`. Now, this only affects the points and color of points, while the lines and points and their position in x-y space is shared. Hence, we write `aes(x = date, y = GPP_NT_VUT_REF)` in the `ggplot()` function call (indicating that all subsequent additions of `geom_` layers share this x-y mapping); while `aes(color = f_measured)` is specified only in the `geom_point()` layer.
 
 ```{r}
 ddf %>% 
@@ -648,26 +482,11 @@ ddf %>%
   scale_color_viridis_c(direction = -1)  # "viridis" continuous color scale in inverse direction
 ```
 
-We observe that the points with particularly low GPP during summer months are predominantly based on gap-filled half-hourly data.
-This is an insight we would never have gotten by just looking at the naked values in our data frames.
-Data visualisations are essential for guiding analyses and processing throughout all steps.
-Having learned this, we now have a justification for applying further data filtering criteria.
+We observe that the points with particularly low GPP during summer months are predominantly based on gap-filled half-hourly data. This is an insight we would never have gotten by just looking at the naked values in our data frames. Data visualisations are essential for guiding analyses and processing throughout all steps. Having learned this, we now have a justification for applying further data filtering criteria.
 
-In our intial research question, we want to know not only about variations in GPP, but also what controls it.
-We want to know the environmental factors that determine the variations in GPP.
-The environmental factors that influence GPP are known as the covariates of GPP.
-In a machine learning context, we call them "predictors" or "features".
-To answer this question, we will have to turn to modelling.
-Here, we refer to modelling in the wider sense of predicting observed variations in a target variable based on empirical relationships with a set of predictors.
-Often, you will start delving into your research question with some *a priori* understanding of the system from which you have observational data.
-Such an understanding may be informed by previous observations and their interpretations, or by theory.
+In our intial research question, we want to know not only about variations in GPP, but also what controls it. We want to know the environmental factors that determine the variations in GPP. The environmental factors that influence GPP are known as the covariates of GPP. In a machine learning context, we call them "predictors" or "features". To answer this question, we will have to turn to modelling. Here, we refer to modelling in the wider sense of predicting observed variations in a target variable based on empirical relationships with a set of predictors. Often, you will start delving into your research question with some *a priori* understanding of the system from which you have observational data. Such an understanding may be informed by previous observations and their interpretations, or by theory.
 
-Here, we want to understand what controls GPP.
-We are not the first ones to ask this question and powerful theory is available to understand and predict variations of GPP.
-We have probably learned that photosynthesis requires sunlight in middle school already and it shouldn't come as a surprise that the more sunlight there is, say in a day, the higher the GPP.
-Such a presumed positive (maybe even monotonically increasing) relationship is also consistent with the apparent agreement between the scales of variation in GPP and the scales of variation in incoming solar radiation (dark night, bright day; dark winter, bright summer).
-In our dataset, `PPFD_IN` is the incoming photosynthetic photon flux density, measured in mol photons (that come in the right wavelength to be used for photosynthesis).
-We can plot this relationship to vizualise how it correlates with GPP using the daily data.
+Here, we want to understand what controls GPP. We are not the first ones to ask this question and powerful theory is available to understand and predict variations of GPP. We have probably learned that photosynthesis requires sunlight in middle school already and it shouldn't come as a surprise that the more sunlight there is, say in a day, the higher the GPP. Such a presumed positive (maybe even monotonically increasing) relationship is also consistent with the apparent agreement between the scales of variation in GPP and the scales of variation in incoming solar radiation (dark night, bright day; dark winter, bright summer). In our dataset, `PPFD_IN` is the incoming photosynthetic photon flux density, measured in mol photons (that come in the right wavelength to be used for photosynthesis). We can plot this relationship to vizualise how it correlates with GPP using the daily data.
 
 ```{r}
 ddf %>%
@@ -677,10 +496,7 @@ ddf %>%
   ylim(-10, 25)
 ```
 
-We observe a clear trend of increasing GPP with increasing PPFD, and it looks largely linear.
-Data collected in the field often has a substantial amount of scatter.
-Since we previously added a column to the data frame containing the data quality, the next step is to see if the data quality explains some of the scatter in the data.
-To investiagte this, we can "map" the data quality dimension onto the color aesthetic of the plot.
+We observe a clear trend of increasing GPP with increasing PPFD, and it looks largely linear. Data collected in the field often has a substantial amount of scatter. Since we previously added a column to the data frame containing the data quality, the next step is to see if the data quality explains some of the scatter in the data. To investiagte this, we can "map" the data quality dimension onto the color aesthetic of the plot.
 
 ```{r}
 ddf %>%
@@ -691,13 +507,9 @@ ddf %>%
   ylim(-10, 25)
 ```
 
-The high values of GPP we already found to be associated with low fractions of underlying measured data in the time series plot is not explained by simultaneously high PPFD.
-In the plot we see a core cluster of points with fewer points outside this denser area.
-These outlying points are lighter and do not fit the linear relationship as well.
+The high values of GPP we already found to be associated with low fractions of underlying measured data in the time series plot is not explained by simultaneously high PPFD. In the plot we see a core cluster of points with fewer points outside this denser area. These outlying points are lighter and do not fit the linear relationship as well.
 
-Despite scattered data points, there is a positive linear relationship between GPP and PPFD.
-To find the best fit of this linear relationship, meaning the straight line that best fits our data points, we will move on to modelling using a univariate linear regression.
-This will serve as a brief introduction, as later chapters will go into more detail on modelling.
+Despite scattered data points, there is a positive linear relationship between GPP and PPFD. To find the best fit of this linear relationship, meaning the straight line that best fits our data points, we will move on to modelling using a univariate linear regression. This will serve as a brief introduction, as later chapters will go into more detail on modelling.
 
 We start by making a simple linear model using the function `lm()` and adding in our desired variables:
 
@@ -705,8 +517,7 @@ We start by making a simple linear model using the function `lm()` and adding in
 linmod <- lm(GPP_NT_VUT_REF ~ PPFD_IN, data = ddf)
 ```
 
-We can also directly plot the fitted linear regression line over the scatter plot using `geom_smooth(method = "lm")`.
-Rather than first making a linear model and then plotting it onto the data.
+We can also directly plot the fitted linear regression line over the scatter plot using `geom_smooth(method = "lm")`. Rather than first making a linear model and then plotting it onto the data.
 
 ```{r}
 ddf %>%
@@ -717,13 +528,7 @@ ddf %>%
   labs(x = expression(paste("PPFD (", mu, "mol m"^-2, "s"^-1, ")")), y = expression(paste("GPP (gC m"^-2, "s"^-1, ")")) ) 
 ```
 
-Based on our previous finding that the data quality is associated with GPP values, which is reflected in their relationship with PPFD, we can fit separate linear regression models for data where `f_measured` is greater than versus less than 0.5.
-For this, we can create a new variable with `mutate(more_measured = as.factor(f_measured > 0.5))`).
-The new variable `more_measured` contains binary information as the data is either greater or less than 0.5.
-By adding new factors we can add another previously "hidden" dimension to our data.
-And because it is a categorical variable and not a continuous one, R treats it as a *factor*.
-We can plot this new variable `more_measured` onto the color aesthetic as we did before.
-Since we specify this aesthetic below in the `ggplot()` function call, all subsequent visualisation layers will respect it, also `geom_smooth()`.
+Based on our previous finding that the data quality is associated with GPP values, which is reflected in their relationship with PPFD, we can fit separate linear regression models for data where `f_measured` is greater than versus less than 0.5. For this, we can create a new variable with `mutate(more_measured = as.factor(f_measured > 0.5))`). The new variable `more_measured` contains binary information as the data is either greater or less than 0.5. By adding new factors we can add another previously "hidden" dimension to our data. And because it is a categorical variable and not a continuous one, R treats it as a *factor*. We can plot this new variable `more_measured` onto the color aesthetic as we did before. Since we specify this aesthetic below in the `ggplot()` function call, all subsequent visualisation layers will respect it, also `geom_smooth()`.
 
 ```{r}
 ddf %>%
@@ -735,16 +540,9 @@ ddf %>%
   ylim(-10, 25)
 ```
 
-We observe a slight difference in the slopes of the respective linear models.
-Note also that in the above `ggplot()` call, we specified the aesthetics as `aes(x = PPFD_IN, y = GPP_NT_VUT_REF, color = more_measured)`.
-This triggers all subsequent additions of visualisation layers (here: `geom_piont()` and `geom_smooth`) to use the same aesthetics for plotting.
-The distinction by the same colors is applied both to the points and to the smoothing lines.
+We observe a slight difference in the slopes of the respective linear models. Note also that in the above `ggplot()` call, we specified the aesthetics as `aes(x = PPFD_IN, y = GPP_NT_VUT_REF, color = more_measured)`. This triggers all subsequent additions of visualisation layers (here: `geom_piont()` and `geom_smooth`) to use the same aesthetics for plotting. The distinction by the same colors is applied both to the points and to the smoothing lines.
 
-Scatter plots can appear overcrowded.
-In this example, particularly in the low PPFD range, many points are plotted over each other, which may hide some information.
-To avoid obscuring important details in the plot, we may want to visualise the *density* of points.
-We want to plot how many points fall within bins of a certain range values in GPP and PPFD, this creates grid cells in the GPP-PPFD-space.
-We can create such a raster plot that measures the density using `stat_density_2d()`:
+Scatter plots can appear overcrowded. In this example, particularly in the low PPFD range, many points are plotted over each other, which may hide some information. To avoid obscuring important details in the plot, we may want to visualise the *density* of points. We want to plot how many points fall within bins of a certain range values in GPP and PPFD, this creates grid cells in the GPP-PPFD-space. We can create such a raster plot that measures the density using `stat_density_2d()`:
 
 ```{r}
 ddf %>%
@@ -759,13 +557,9 @@ ddf %>%
   labs(x = expression(paste("PPFD (", mu, "mol m"^-2, "s"^-1, ")")), y = expression(paste("GPP (gC m"^-2, "s"^-1, ")")) ) 
 ```
 
-We detect an interesting "separation" of points, where the increase in GPP with increasing PPFD is steeper than in others.
-Again, we can use our *a priori* understanding of the system to formulate hypotheses and test them by finding the appropriate visualisation type.
-Here, one hypothesis could be that the slope is steeper in some months than in others.
-This is actually more than just a vague guess.
+We detect an interesting "separation" of points, where the increase in GPP with increasing PPFD is steeper than in others. Again, we can use our *a priori* understanding of the system to formulate hypotheses and test them by finding the appropriate visualisation type. Here, one hypothesis could be that the slope is steeper in some months than in others. This is actually more than just a vague guess.
 
-To test this hypothesis we will visuallise the slopes of each month by fitting separate linear regression models.
-Note that each month encompasses data from multiple years, so clear trends will only become clear if there is a commonality between the same months of different years.
+To test this hypothesis we will visuallise the slopes of each month by fitting separate linear regression models. Note that each month encompasses data from multiple years, so clear trends will only become clear if there is a commonality between the same months of different years.
 
 ```{r}
 ddf %>%
@@ -777,37 +571,22 @@ ddf %>%
   labs(x = expression(paste("PPFD (", mu, "mol m"^-2, "s"^-1, ")")), y = expression(paste("GPP (gC m"^-2, "s"^-1, ")")) ) 
 ```
 
-The plot verifies that the relationships indeed differ slightly between months.
-In spring months (3 = March, 4 = April), light levels can be already quite high, but GPP remains much lower than in summer months.
-A reason for this may be that GPP is not influenced by PPFD alone.
-There are other environmental variables, such as temperature or moisture levels, etc., that influence GPP and may not yet be at the levels reached during the summer months.
+The plot verifies that the relationships indeed differ slightly between months. In spring months (3 = March, 4 = April), light levels can be already quite high, but GPP remains much lower than in summer months. A reason for this may be that GPP is not influenced by PPFD alone. There are other environmental variables, such as temperature or moisture levels, etc., that influence GPP and may not yet be at the levels reached during the summer months.
 
-### Functional programming
+### Functional programming I
 
-The daily data is given for a set of eddy covariance measurement sites.
-Data for each site is given in a separate file.
-When dealing with such a setup, we will likely encounter situations where we have to apply the same sequence of data wrangling steps (or functions) to multiple instances of the same object class.
-For example, we will have to apply the same data cleaning steps or fitting a regression model to each site's data.
-In this example, the object class is a data frame, and the "multiple instances" are the data frames for each site.
-This correspnds to functional programming.
+The daily data is given for a set of eddy covariance measurement sites. Data for each site is given in a separate file. When dealing with such a setup, we will likely encounter situations where we have to apply the same sequence of data wrangling steps (or functions) to multiple instances of the same object class. For example, we will have to apply the same data cleaning steps or fitting a regression model to each site's data. In this example, the object class is a data frame, and the "multiple instances" are the data frames for each site. This correspnds to functional programming.
 
-We can also combine each site's data frame into a single large one, e.g., by "stacking" them along the time dimension (rows).
-In this case, we create a new "hidden dimension" - the site identity.
-In this subsection, you will learn how to keep an overview and code efficiently while dealing with such large data frames - always using the tidyverse in R.
+We can also combine each site's data frame into a single large one, e.g., by "stacking" them along the time dimension (rows). In this case, we create a new "hidden dimension" - the site identity. In this subsection, you will learn how to keep an overview and code efficiently while dealing with such large data frames - always using the tidyverse in R.
 
-The **purrr** package of tidyverse offers the functionalities for functional programming.
-It makes use of lists and applies (or "maps") a function to each element of the list.
-Let's start by creating a list of paths that point to the files with daily data.
-They are all located in the directory `"./data"` and share a certain string of characters in their file names `"_FLUXNET2015_FULLSET_DD_"`.
+The **purrr** package of tidyverse offers the functionalities for functional programming. It makes use of lists and applies (or "maps") a function to each element of the list. Let's start by creating a list of paths that point to the files with daily data. They are all located in the directory `"./data"` and share a certain string of characters in their file names `"_FLUXNET2015_FULLSET_DD_"`.
 
 ```{r}
 vec_files <- list.files("./data", pattern = "_FLUXNET2015_FULLSET_DD_", full.names = TRUE)
 print(vec_files[1:5])
 ```
 
-`vec_files` is now a vector of 35 files for 35 sites.
-In simple base-R, we could read them in at once using a simple `for` loop.
-The following creates a list of data frames that are generated by `read_csv()` with the argument `ifil` iteratively changing, taking values of elements in `vec_files`.
+`vec_files` is now a vector of 35 files for 35 sites. In simple base-R, we could read them in at once using a simple `for` loop. The following creates a list of data frames that are generated by `read_csv()` with the argument `ifil` iteratively changing, taking values of elements in `vec_files`.
 
 ```{r message=FALSE, eval=FALSE}
 list_df <- list()
@@ -822,27 +601,15 @@ In the tidyverse, the above loop can be written on one line, using the function 
 list_df <- purrr::map(as.list(vec_files), ~read_csv(.))
 ```
 
-Note that `map()` applies the function `read_csv()` to elements of a *list*.
-Hence, we first have to convert the vector `vec_files` to a list.
-The list is always the first argument within the function.
-Note two new symbols (`~` and `.`) in the command.
-The `~` always goes before the function that is applied, or mapped, to elements of the list.
-The `.` indicates where the elements of the list would go if spelled out (e.g., `read_csv(.)` would here be `read_csv("./data/FLX_BE-Bra_FLUXNET2015_FULLSET_DD_1996-2014_2-3.csv")` for the first iteration).
-The output of `map()` is again a list.
-There are many variants of the function `map()` that each have a specific use.
-A complete reference for all purrr functions is available [here](https://purrr.tidyverse.org/reference/index.html).
-A useful and more extensive tutorial on purrr is available [here](https://www.r-bloggers.com/one-stop-tutorial-on-purrr-package-in-r/).
+Note that `map()` applies the function `read_csv()` to elements of a *list*. Hence, we first have to convert the vector `vec_files` to a list. The list is always the first argument within the function. Note two new symbols (`~` and `.`) in the command. The `~` always goes before the function that is applied, or mapped, to elements of the list. The `.` indicates where the elements of the list would go if spelled out (e.g., `read_csv(.)` would here be `read_csv("./data/FLX_BE-Bra_FLUXNET2015_FULLSET_DD_1996-2014_2-3.csv")` for the first iteration). The output of `map()` is again a list. There are many variants of the function `map()` that each have a specific use. A complete reference for all purrr functions is available [here](https://purrr.tidyverse.org/reference/index.html). A useful and more extensive tutorial on purrr is available [here](https://www.r-bloggers.com/one-stop-tutorial-on-purrr-package-in-r/).
 
-The above `map()` call does not return a named list as our `for` loop created.
-But we can give each element of the returned list of data frames different names by:
+The above `map()` call does not return a named list as our `for` loop created. But we can give each element of the returned list of data frames different names by:
 
 ```{r}
 names(list_df) <- vec_files  # this makes it a named list
 ```
 
-We will apply a similar cleaning function to this data set as we did earlier for half-hourly data.
-Unfortunately, we cannot reuse the same code because not all variables that are given in the half-hourly data are available also in the daily data and because the quality control flag is defined differently.
-We can define the daily data cleaning function:
+We will apply a similar cleaning function to this data set as we did earlier for half-hourly data. Unfortunately, we cannot reuse the same code because not all variables that are given in the half-hourly data are available also in the daily data and because the quality control flag is defined differently. We can define the daily data cleaning function:
 
 ```{r}
 ## function definition
@@ -881,11 +648,7 @@ clean_fluxnet_dd <- function(df){
 list_df <- purrr::map(list_df, ~clean_fluxnet_dd(.))
 ```
 
-Have different data frames as elements of a list may be impractical.
-Upon closer examination, the data frames read in here all have similar shapes, meaning they share the same columns.
-They only differ by the number of rows, and the data values they contain.
-This suggests that we can "stack" each data frame along its rows.
-This can be done using `bind_rows()` and we can automatically create a new column `"siteid"` in the stacked data frame that takes the name of the corresponding list element.
+Have different data frames as elements of a list may be impractical. Upon closer examination, the data frames read in here all have similar shapes, meaning they share the same columns. They only differ by the number of rows, and the data values they contain. This suggests that we can "stack" each data frame along its rows. This can be done using `bind_rows()` and we can automatically create a new column `"siteid"` in the stacked data frame that takes the name of the corresponding list element.
 
 ```{r}
 ddf_allsites <- bind_rows(list_df, .id = "siteid")
@@ -914,21 +677,15 @@ vis_miss(
 
 We see that `PPFD_IN` is often missing.
 
-#### Strings
+### Strings
 
-The column `siteid` now contains strings specifying the full paths of the files that were read.
-We would like to extract the site name from these strings.
-The file names follow a clear pattern.
-Naming files wisely can often make life a lot simpler.
+The column `siteid` now contains strings specifying the full paths of the files that were read. We would like to extract the site name from these strings. The file names follow a clear pattern. Naming files wisely can often make life a lot simpler.
 
 ```{r}
 ddf_allsites$siteid %>% head()
 ```
 
-The paths each start with the subdirectory where they are located (`"./data/"`), then `"FLX_"`, followed by the site name (the first three entries of the table containing data from all sites are for the site `"BE-Bra"`), and then some more specifications, including the years that respective files' data cover.
-What is the most effective way to extract the site name from all these strings?
-The `stringr` package offers a set of very handy tools to work with strings, see this [cheat sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) for a summary of them.
-Here, we would like to extract the six characters, starting at position **15**.
+The paths each start with the subdirectory where they are located (`"./data/"`), then `"FLX_"`, followed by the site name (the first three entries of the table containing data from all sites are for the site `"BE-Bra"`), and then some more specifications, including the years that respective files' data cover. What is the most effective way to extract the site name from all these strings? The `stringr` package offers a set of very handy tools to work with strings, see this [cheat sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) for a summary of them. Here, we would like to extract the six characters, starting at position **15**.
 
 ```{r}
 vec_sites <- str_sub(vec_files, start = 12, end = 17)
@@ -944,50 +701,21 @@ ddf_allsites <- ddf_allsites %>%
 head(ddf_allsites)
 ```
 
-**Checkpoint**
 
-Create a string with your home address.
-Replace "Umlaute -äöu" and remove the house number.
-Tip: use the stringr package function str_replace().
+### Combining relational data
 
-```{r}
-### Solution
-address <- "Mr. Miyagi, Universitätsstrasse 16, 8006 Zürich"
-address <- str_replace(address,'ü', 'ue')
-address <- str_replace(address,'ä', 'ae')
-address <- str_replace(address, "16", "")
-print(address)
-```
+In many situations, we want to combine information from multiple data frames into a single one. In our case, we are interested in knowing more about the sites for which we have time series data. We are interested in *meta-information* about the sites, for example, the vegetation type, geographical location, elevation, etc. In such cases, where information about common sets of units (here sites) is distributed across multiple data objects, we are referring to *relational data*. There has to be a link between them. In our case, this is the site identity or site name. Specifically, this means that the same labeling of site identities has to be available from all relational data objects.
 
-#### Combining relational data
+You may ask yourself what is the purpose of keeping data in separate relational data objects. We would have to duplicate each value of site elevation, for example, when adding this info as a new column to a time series data frame of the respective site. This would inflate the memory of the object considerably without actually adding information. Therefore it can make sense to keep such differently structured data objects separate and combine them only during the analysis step.
 
-In many situations, we want to combine information from multiple data frames into a single one.
-In our case, we are interested in knowing more about the sites for which we have time series data.
-We are interested in *meta-information* about the sites, for example, the vegetation type, geographical location, elevation, etc.
-In such cases, where information about common sets of units (here sites) is distributed across multiple data objects, we are referring to *relational data*.
-There has to be a link between them.
-In our case, this is the site identity or site name.
-Specifically, this means that the same labeling of site identities has to be available from all relational data objects.
-
-You may ask yourself what is the purpose of keeping data in separate relational data objects.
-We would have to duplicate each value of site elevation, for example, when adding this info as a new column to a time series data frame of the respective site.
-This would inflate the memory of the object considerably without actually adding information.
-Therefore it can make sense to keep such differently structured data objects separate and combine them only during the analysis step.
-
-A comprehensive collection of FLUXNET site meta information is freely available from [Falge et al.](https://daac.ornl.gov/FLUXNET/guides/Fluxnet_site_DB.html).
-Let's read this file (`"fluxnet_site_info_all.csv"`).
+A comprehensive collection of FLUXNET site meta information is freely available from [Falge et al.](https://daac.ornl.gov/FLUXNET/guides/Fluxnet_site_DB.html). Let's read this file (`"fluxnet_site_info_all.csv"`).
 
 ```{r}
 df_sites <- read_csv("./data/fluxnet_site_info_all.csv")
 head(df_sites)
 ```
 
-The file contains information on many more sites (844 rows for 844 sites) than we have data for (35 sites).
-The key variable that combines the two is the standard site ID name that is commonly used for FLUXNET sites.
-In the sites table (`df_sites`), the key is called `fluxnetid`.
-In the temporal dataset `ddf_allsites`, the site key column is called `siteid`.
-To combine ("join") the two data frames, the joining "key" ID has to be named the same way (here `"siteid"`) and should contain the same set of different values (site names in our case).
-Hence, we have to rename the respective column in one of our data frames in order to join them.
+The file contains information on many more sites (844 rows for 844 sites) than we have data for (35 sites). The key variable that combines the two is the standard site ID name that is commonly used for FLUXNET sites. In the sites table (`df_sites`), the key is called `fluxnetid`. In the temporal dataset `ddf_allsites`, the site key column is called `siteid`. To combine ("join") the two data frames, the joining "key" ID has to be named the same way (here `"siteid"`) and should contain the same set of different values (site names in our case). Hence, we have to rename the respective column in one of our data frames in order to join them.
 
 ```{r}
 df_sites <- df_sites %>%
@@ -1005,11 +733,7 @@ ddf_allsites_joined <- df_sites %>%
   )
 ```
 
-Here, we applied the function `right_join()`.
-This can be understood as joining the data frame given by the first argument to `right_join()` (here, what is being piped from the left side of the pipe) onto the data frame given by the second argument (`ddf_allsites`).
-The output of `right_join()` has the same number or rows as the data frame on the "right" (the second argument) and is, as for all tidyverse functions, a data frame.
-There is also a `left_join()` that creates a new data frame with the number of rows corresponding to the data frame on the "left" (the first argument).
-You can find more on relational data and joining data frames, e.g., [here](https://r4ds.had.co.nz/relational-data.html), or [here](https://rpubs.com/williamsurles/293454).
+Here, we applied the function `right_join()`. This can be understood as joining the data frame given by the first argument to `right_join()` (here, what is being piped from the left side of the pipe) onto the data frame given by the second argument (`ddf_allsites`). The output of `right_join()` has the same number or rows as the data frame on the "right" (the second argument) and is, as for all tidyverse functions, a data frame. There is also a `left_join()` that creates a new data frame with the number of rows corresponding to the data frame on the "left" (the first argument). You can find more on relational data and joining data frames, e.g., [here](https://r4ds.had.co.nz/relational-data.html), or [here](https://rpubs.com/williamsurles/293454).
 
 To understand the differences between the data frames before and after the join, we check the number of columns in the two data frames provided as arguments and in the resulting data frame.
 
@@ -1021,22 +745,15 @@ head(ddf_allsites_joined)
 head(ddf_allsites)
 ```
 
-```{=html}
-<!-- 
-**Everything below this box is Bonus Material**
+### Functional programming II [BONUS]
 
-#### Functional programming II
-
-Functions can be applied to any list.
-Because lists can consist of any type of objects, `map()` is a powerful approach to "iterating" over multiple instances of the same object and can be used for all sorts of tasks.
-In the following, list elements are data frames of daily data and the mapping function `lm()` fits a linear regression model of GPP versus PPFD to each sites' data.
+Functions can be applied to any list. Because lists can consist of any type of objects, `map()` is a powerful approach to "iterating" over multiple instances of the same object and can be used for all sorts of tasks. In the following, list elements are data frames of daily data and the mapping function `lm()` fits a linear regression model of GPP versus PPFD to each sites' data.
 
 ```{r}
 list_linmod <- purrr::map(list_df, ~lm(GPP_NT_VUT_REF ~ PPFD_IN, data = .))
 ```
 
-Note how the `.` now indicates where the elements of `list_df` go when evaluating the `lm()` function.
-This now returns a list of linear model objects (the type of objects returned by the `lm()` function call).
+Note how the `.` now indicates where the elements of `list_df` go when evaluating the `lm()` function. This now returns a list of linear model objects (the type of objects returned by the `lm()` function call).
 
 We can spin the functional programming concept further and apply (or map) the `summary()` function to the `lm`-model objects to get a list of useful statistics and metrics, and then further extract the element `r.squared"` from that list as:
 
@@ -1047,18 +764,13 @@ list_linmod %>%
   head() # for handy output
 ```
 
-`map_dbl()` is a variant of the `map()` function that returns not a list, but a vector of numeric values of class "double" (hence, the name `_dbl`).
-Note further, that providing a character (`"r.squared"`) as an argument instead of an (unquoted) function name, `map()` extracts the correspondingly named list element, instead of applying a function to a list element.
+`map_dbl()` is a variant of the `map()` function that returns not a list, but a vector of numeric values of class "double" (hence, the name `_dbl`). Note further, that providing a character (`"r.squared"`) as an argument instead of an (unquoted) function name, `map()` extracts the correspondingly named list element, instead of applying a function to a list element.
 
-When writing code for an analysis, it is useful, if not essential, to understand the objects we are working with and make sense of the results of simple `print <object>` statements.
-Data frames are particularly handy as they provide an organisation of data that is particularly intuitive (variables along columns, observations along rows, values in cells).
-We have encountered such data frames above.
-Here, we are dealing with a list of linear model objects.
-Can such a list fit into the tidy paradigm?
+When writing code for an analysis, it is useful, if not essential, to understand the objects we are working with and make sense of the results of simple `print <object>` statements. Data frames are particularly handy as they provide an organisation of data that is particularly intuitive (variables along columns, observations along rows, values in cells). We have encountered such data frames above. Here, we are dealing with a list of linear model objects. Can such a list fit into the tidy paradigm?
 
 Yes, they can.
-Think of the linear model objects as 'values'.
-Values do not necessarily have to be scalars, but they can be of any type (class).
+
+Think of the linear model objects as 'values'. Values do not necessarily have to be scalars, but they can be of any type (class).
 
 ```{r}
 tibble(
@@ -1067,9 +779,7 @@ tibble(
   )
 ```
 
-The fact that cells can contain any type of object offers a powerful concept.
-Instead of a linear model object as in the example above, each cell may also contain another data frame.
-In such a case, we say that the data frame is no longer flat, but *nested*.
+The fact that cells can contain any type of object offers a powerful concept. Instead of a linear model object as in the example above, each cell may also contain another data frame. In such a case, we say that the data frame is no longer flat, but *nested*.
 
 The following creates a nested data frame, where the column `data` is defined by the list of data frames read from files above (`list_df`).
 
@@ -1080,8 +790,7 @@ tibble(
   )
 ```
 
-We can achieve the same result, by directly nesting the flat data frame holding all sites' data (`ddf_allsites`).
-This is done by combining the `group_by()`, which we have encountered above when aggregating using `summarise()`, with the function `nest()` from the tidyr package.
+We can achieve the same result, by directly nesting the flat data frame holding all sites' data (`ddf_allsites`). This is done by combining the `group_by()`, which we have encountered above when aggregating using `summarise()`, with the function `nest()` from the tidyr package.
 
 ```{r}
 library(tidyr)
@@ -1090,11 +799,7 @@ ddf_allsites %>%
   nest()
 ```
 
-The function `nest()` names the nested data column automatically `"data"`.
-
-This structure is very useful.
-For example for applying functions over sites' data frames separately (and not over the entire data frame).
-By combining `map()` and `mutate()`, we can fit linear models on each site's data frame individually in one go.
+The function `nest()` names the nested data column automatically `"data"`. This structure is very useful. For example for applying functions over sites' data frames separately (and not over the entire data frame). By combining `map()` and `mutate()`, we can fit linear models on each site's data frame individually in one go.
 
 ```{r eval=FALSE}
 ddf_allsites %>%
@@ -1103,8 +808,7 @@ ddf_allsites %>%
   mutate(linmod = map(data, ~lm(GPP_NT_VUT_REF ~ PPFD_IN, data = .)))
 ```
 
-This is approach is extremely powerful and lets you stick to handy and tidy data frames and use the rows-dimension flexibly.
-Here, rows are sites and no longer time steps, while the nested data frames in column `"data"` has time steps along their rows.
+This is approach is extremely powerful and lets you stick to handy and tidy data frames and use the rows-dimension flexibly. Here, rows are sites and no longer time steps, while the nested data frames in column `"data"` has time steps along their rows.
 
 And just because it is fun, this can be spun further, with the same steps as done above, to:
 
@@ -1119,18 +823,14 @@ ddf_allsites_nested <- ddf_allsites %>%
 ```
 
 Amazing!
-In these few lines we have separated a huge flat data frame containing all sites' data, fitted a linear regression model to each site's data separately, extracted summary statistics (a list), and the R<sup>2</sup> (the coefficient of determination) for each of them, and finally rearranged rows in descending order by R$^2$.
-And the output is a handy and nicely looking data frame with nested columns:
+
+In these few lines we have separated a huge flat data frame containing all sites' data, fitted a linear regression model to each site's data separately, extracted summary statistics (a list), and the R<sup>2</sup> (the coefficient of determination) for each of them, and finally rearranged rows in descending order by R$^2$. And the output is a handy and nicely looking data frame with nested columns:
 
 ```{r}
 ddf_allsites_nested %>% head()
 ```
 
-Nesting is useful also for avoiding value duplication when joining relational data objects.
-Above, we nested time series data objects (where time steps and sites are both organised along rows) by sites and got a data frame where only sites are organised along rows, while time steps are nested inside the column `"data"`.
-This now fits the structure of a relational data object containing site-specific meta information (also with only sites along rows).
-(There is just one elevation value for each site - site elevation doesn't change over time.).
-Joining the nested data frame with site meta information results in a substantially smaller and much handier data frame than joining the flat long data frame with site meta information as we did in Section *Combining relational data*.
+Nesting is useful also for avoiding value duplication when joining relational data objects. Above, we nested time series data objects (where time steps and sites are both organised along rows) by sites and got a data frame where only sites are organised along rows, while time steps are nested inside the column `"data"`. This now fits the structure of a relational data object containing site-specific meta information (also with only sites along rows). (There is just one elevation value for each site - site elevation doesn't change over time.). Joining the nested data frame with site meta information results in a substantially smaller and much handier data frame than joining the flat long data frame with site meta information as we did in Section *Combining relational data*.
 
 ```{r}
 ddf_allsites_nested_joined <- df_sites %>%
@@ -1148,21 +848,11 @@ print("Flat long and joined:"); object.size(ddf_allsites_joined) %>% print(units
 print("Nested and joined:"); object.size(ddf_allsites_nested_joined %>% select(-linmod, -summ, -rsq)) %>% print(units = "auto", standard = "SI")  # removing added columns that are not in the flat long df
 ```
 
-#### Advanced data visualisation
+### Data visualisation III
 
-Let's dive a bit further into visualisation.
-We have encountered how to map different dimensions of our data not only onto x and y axes in a cartesian coordinate system, but also along other "aesthetics".
-We mapped it to color, but there are also other aesthetics available for such mapping in ggplot2, in particular for categorical variables (e.g., line type, point type).
-Yet another "mapping" is available with `facet_wrap()`.
-It separates the visualisation into different sub-plots, each showing a part of the data.
-It is not dealt the same way as other aesthetics (not with specifying it with `aes()`), but with adding the `facet_wrap()` with a `+` to the `ggplot()` object.
+Let's dive a bit further into visualisation. We have encountered how to map different dimensions of our data not only onto x and y axes in a cartesian coordinate system, but also along other "aesthetics". We mapped it to color, but there are also other aesthetics available for such mapping in ggplot2, in particular for categorical variables (e.g., line type, point type). Yet another "mapping" is available with `facet_wrap()`. It separates the visualisation into different sub-plots, each showing a part of the data. It is not dealt the same way as other aesthetics (not with specifying it with `aes()`), but with adding the `facet_wrap()` with a `+` to the `ggplot()` object.
 
-Remember that our data frame `ddf_allsites` has the time series data nested for each site in the column `data`.
-ggplot doesn't like that.
-Therefore, we can simply `unnest()` the respective column and get a long flat data frame again.
-Let's plot GPP versus PPFD in separate subplots for each site.
-The factor (column name) by which `facet_wrap()` separates the plot has to be specified as an argument with a preceeding `~`.
-Here, this is `~siteid`.
+Remember that our data frame `ddf_allsites` has the time series data nested for each site in the column `data`. ggplot doesn't like that. Therefore, we can simply `unnest()` the respective column and get a long flat data frame again. Let's plot GPP versus PPFD in separate subplots for each site. The factor (column name) by which `facet_wrap()` separates the plot has to be specified as an argument with a preceeding `~`. Here, this is `~siteid`.
 
 ```{r}
 ddf_allsites_joined %>%
@@ -1171,22 +861,13 @@ ddf_allsites_joined %>%
   facet_wrap(~siteid)
 ```
 
-What do you notice?
-Does the relationship look similar for all sites?
+What do you notice? Does the relationship look similar for all sites?
 
-Again, we get further if we have some *a priori* knowledge about the system that generated out data.
-PPFD just measures the incoming photosynthetically active light.
-We do not know whether there are any leaves on the trees to absorb that light.
-While some trees shed their leaves during winter or during the dry period, others are evergreen and the fraction of PPFD they actually absorb doesn't vary by far not as much as for deciduous trees.
-Therefore, whether a site is dominated by deciduous or evergreen vegetation should somehow affect how directly GPP is correlated with GPP.
-So there's our hypothesis: Sites with evergreen vegetation should exhibit a higher *R*<sup>2</sup> between GPP and PPFD than sites with deciduous vegetation.
-Remember that we have evaluated the *R*<sup>2</sup> between GPP and PPFD already above and have it stored as a column `rsq` of our nested data frame `ddf_allsites`.
-We have also collected site meta-information about the vegetation type (it is in column `lai_fpar`), and have joined the meta info onto the data.
-Unfortunately, it is not quite ready to use.
-Since we need a `TRUE`/`FALSE` type of information of whether the vegetation type is evergreen or not, we have to take another step.
-Below, we take the strings of column `lai_fpar` and check whether it contains the sub-string `"Evergreen"`, using the function `str_detect()` from the stringr package (part of the tidyverse).
-This boolean information makes up a new column that we call `evergreen`.
-Sounds like a lot of steps, but in the tidyverse, the code is short and clean:
+Again, we get further if we have some *a priori* knowledge about the system that generated out data. PPFD just measures the incoming photosynthetically active light. We do not know whether there are any leaves on the trees to absorb that light.
+
+While some trees shed their leaves during winter or during the dry period, others are evergreen and the fraction of PPFD they actually absorb doesn't vary by far not as much as for deciduous trees. Therefore, whether a site is dominated by deciduous or evergreen vegetation should somehow affect how directly GPP is correlated with GPP. So there's our hypothesis: Sites with evergreen vegetation should exhibit a higher *R*<sup>2</sup> between GPP and PPFD than sites with deciduous vegetation. Remember that we have evaluated the *R*<sup>2</sup> between GPP and PPFD already above and have it stored as a column `rsq` of our nested data frame `ddf_allsites`. We have also collected site meta-information about the vegetation type (it is in column `lai_fpar`), and have joined the meta info onto the data. Unfortunately, it is not quite ready to use. Since we need a `TRUE`/`FALSE` type of information of whether the vegetation type is evergreen or not, we have to take another step.
+
+Below, we take the strings of column `lai_fpar` and check whether it contains the sub-string `"Evergreen"`, using the function `str_detect()` from the stringr package (part of the tidyverse). This boolean information makes up a new column that we call `evergreen`. Sounds like a lot of steps, but in the tidyverse, the code is short and clean:
 
 ```{r}
 gg <- ddf_allsites_nested_joined %>%
@@ -1197,29 +878,16 @@ print(gg)
 ```
 
 Eureka II!
-Indeed, the *R*<sup>2</sup> between GPP and PPFD tend to be higher for sites with evergreen vegetation than for sites with deciduous vegetation.
-What we see here is a boxplot.
-It visualises the distribution of *R*<sup>2</sup> by factors (`evergreen`).
-The fat horizontal like inside the box indicates the median, the lower and upper margins of the box are the 25% and 75% quantiles, the whiskers (vertical lines) extend 1.5 times the inter-quartile range, starting at the upper and lower margins of the box, or just to the smallest and largest values if they are within a shorter distance.
-Apparently, in our plot above, they are.
 
-Boxplots are useful because they provide a visualisation of distrubtions that can be based on a very large number of underlying points.
-This yields "light" and clean figures.
-However, they also hide a lot of information and sometimes it is ok to show more information without overloading the plot.
-For example, individual points can be shown in the plot above by `geom_jitter()`.
-The x-axis represents the level of the factor `evergreen` and when using a simple `geom_points`, all points would be located either at the position (given by the tick mark) of `TRUE` or `FALSE`.
-This would result in overplotting and thus hiding a large number of points.
-`geom_jitter()` takes care of this by slightly rearranging them in a random fashion along the x-axis.
-Note that the rearranged position along the x-axis doesn't actually encode any information.
-However, as long as points are still separable along the "`evergreen`-axis", this is acceptable.
+Indeed, the *R*<sup>2</sup> between GPP and PPFD tend to be higher for sites with evergreen vegetation than for sites with deciduous vegetation. What we see here is a boxplot. It visualises the distribution of *R*<sup>2</sup> by factors (`evergreen`). The fat horizontal like inside the box indicates the median, the lower and upper margins of the box are the 25% and 75% quantiles, the whiskers (vertical lines) extend 1.5 times the inter-quartile range, starting at the upper and lower margins of the box, or just to the smallest and largest values if they are within a shorter distance. Apparently, in our plot above, they are.
+
+Boxplots are useful because they provide a visualisation of distrubtions that can be based on a very large number of underlying points. This yields "light" and clean figures. However, they also hide a lot of information and sometimes it is ok to show more information without overloading the plot. For example, individual points can be shown in the plot above by `geom_jitter()`. The x-axis represents the level of the factor `evergreen` and when using a simple `geom_points`, all points would be located either at the position (given by the tick mark) of `TRUE` or `FALSE`. This would result in overplotting and thus hiding a large number of points. `geom_jitter()` takes care of this by slightly rearranging them in a random fashion along the x-axis. Note that the rearranged position along the x-axis doesn't actually encode any information. However, as long as points are still separable along the "`evergreen`-axis", this is acceptable.
 
 ```{r}
 gg + geom_jitter(color = "grey50", width = 0.1)
 ```
 
-Note that in the two cells above, we have first stored the output of a `ggplot()` call as a new object that we named `gg`.
-Doing `print(gg)` just creates the respective plot.
-The advantage is that we can add visualisation elements or modify the theme or add labels to that object in a separate step.
+Note that in the two cells above, we have first stored the output of a `ggplot()` call as a new object that we named `gg`. Doing `print(gg)` just creates the respective plot. The advantage is that we can add visualisation elements or modify the theme or add labels to that object in a separate step.
 
 Maybe you've asked yourself whether the magnitude of GPP varies much across vegetation types (column `igbp_land_use` in our dataset).
 
@@ -1232,17 +900,11 @@ ddf_allsites_joined %>%
   coord_flip()
 ```
 
-Here, you can see a number of points that are beyond the quartiles plot 1.5 times the inter-quartile range.
-They are plotted individually and are referred to as "outlying points".
-We have also flipped the boxes to extend vertically.
-`coord_flip()` overrides what is specified by `aes()` in that it rotates it by 90<sup>º</sup>.
+Here, you can see a number of points that are beyond the quartiles plot 1.5 times the inter-quartile range. They are plotted individually and are referred to as "outlying points". We have also flipped the boxes to extend vertically. `coord_flip()` overrides what is specified by `aes()` in that it rotates it by 90<sup>º</sup>.
 
-Before we finish, let's save our nice daily data frame, after having selected interesting variables, having nested data by sites, and after having complemented it with site meta information.
-We may use it later in the course ...
+Before we finish, let's save our nice daily data frame, after having selected interesting variables, having nested data by sites, and after having complemented it with site meta information. We may use it later in the course ...
 
-Since `ddf_allsites_nested_joined` is no longer a "flat" table (it is nested), we cannot save it in a plain text-based format like CSV.
-Instead, we save it as an R object.
-In can be later loaded into an R session by `load()`.
+Since `ddf_allsites_nested_joined` is no longer a "flat" table (it is nested), we cannot save it in a plain text-based format like CSV. Instead, we save it as an R object. In can be later loaded into an R session by `load()`.
 
 ```{r}
 save(ddf_allsites_nested_joined, file = "data/ddf_allsites_nested_joined.RData")
@@ -1260,19 +922,20 @@ save(ddf_ch_lae, file = "data/ddf_ch_lae.RData")
 
 ## Exercise
 
-1. Outlier removal: Based on the half-hourly dataset for site CH-Lae, aggregated to daily means, identify outliers in `GPP_NT_VUT_REF` with respect to the linear relationship between `GPP_NT_VUT_REF` and `PPFD_IN`. To do so, first fit a linear regression model using `lm()`. This function returns a list of objects, one of which is `residuals`. Determine outliers as the "outlying" points in the distribution of residuals. You may use the base-R function `boxplot.stats()` and set the argument `coef` accordingly to our customised threshold definition.
-***
-2. Remove outliers by setting values in the data frame (aggregated daily data frame for CH-Lae) to `NA`.
-***
-3. Create a scatterplot of all daily data (GPP vs. PPFD) and highlight outliers that are removed by step 2.
-***
-4. Visualising diurnal and seasonal cycles: Using the half-hourly dataset for site CH-Lae, visualise how GPP (`GPP_NT_VUT_REF`) varies on two time scales: diurnal (within-day at hourly time scale) and seasonal.
-To implement this, follow the following steps:
-    a. Summarise half-hourly data for each data across multiple years to get a mean seasonality with a mean diurnal cycle for each day of the year. You will use functions from the lubridate package (e.g., `yday()`). To deal with date-time objects, use the lubridate package. Enter `?day` to get more hints.
+1.  Outlier removal: Based on the half-hourly dataset for site CH-Lae, aggregated to daily means, identify outliers in `GPP_NT_VUT_REF` with respect to the linear relationship between `GPP_NT_VUT_REF` and `PPFD_IN`. To do so, first fit a linear regression model using `lm()`. This function returns a list of objects, one of which is `residuals`. Determine outliers as the "outlying" points in the distribution of residuals. You may use the base-R function `boxplot.stats()` and set the argument `coef` accordingly to our customised threshold definition. \*\*\*
+
+2.  Remove outliers by setting values in the data frame (aggregated daily data frame for CH-Lae) to `NA`. \*\*\*
+
+3.  Create a scatterplot of all daily data (GPP vs. PPFD) and highlight outliers that are removed by step 2. \*\*\*
+
+4.  Visualising diurnal and seasonal cycles: Using the half-hourly dataset for site CH-Lae, visualise how GPP (`GPP_NT_VUT_REF`) varies on two time scales: diurnal (within-day at hourly time scale) and seasonal. To implement this, follow the following steps:
+
+    a.  Summarise half-hourly data for each data across multiple years to get a mean seasonality with a mean diurnal cycle for each day of the year. You will use functions from the lubridate package (e.g., `yday()`). To deal with date-time objects, use the lubridate package. Enter `?day` to get more hints.
     b.  Create a raster plot (`geom_raster()`), mapping the hour of the day to the x-axis, the day of the year to the y-axis, and the magnitude of `GPP_NT_VUT_REF` to color (fill).
     c.  Make this figure ready for publication by adding nice labels and choosing a good color scale.
 
-***
+------------------------------------------------------------------------
+
 *You can use the pseudo code below as a guidance or come up with your own solution!*
 
 ```{r eval=F, echo=T}
@@ -1344,6 +1007,4 @@ hhdf_meanseason %>%
 
 ## c. Make raster plot publishable - This is up to your judgement.
 ...
-```
--->
 ```
