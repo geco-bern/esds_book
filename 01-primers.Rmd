@@ -46,6 +46,7 @@ This tutorial uses a set of libraries. Libraries provide a set of functions and/
 list_pkgs <- c("tidyverse")
 new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
 if (length(new_pkgs) > 0) install.packages(new_pkgs)
+library(tidyverse)
 ```
 
 In each chapter of this tutorial, you'll find a similar statement to specify which package the respective chapter's tutorial will use and to install them if not available.
@@ -305,9 +306,9 @@ Often, analyses require many steps and your scripts may get excessively long. Ov
 For example, the following code, converting temperature values provided in Fahrenheit to degrees Celsius, could be made into a function.
 ```{r eval=FALSE}
 ## NOT ADVISABLE
-my_df$temp_soil <- (my_df$temp_soil - 32) * 5 / 9
-my_df$temp_air  <- (my_df$temp_air  - 32) * 5 / 9
-my_df$temp_leaf <- (my_df$temp_leaf - 32) * 5 / 9
+temp_soil <- (temp_soil - 32) * 5 / 9
+temp_air  <- (temp_air  - 32) * 5 / 9
+temp_leaf <- (temp_leaf - 32) * 5 / 9
 ```
 
 The same, but using our own function `convert_fahrenheit_to_celsius()`:
@@ -317,9 +318,9 @@ convert_fahrenheit_to_celsius <- function(temp_f){
   temp_c <- (temp_f - 32) * 5 / 9
 }
 
-my_df$temp_soil <- convert_fahrenheit_to_celsius(my_df$temp_soil)
-my_df$temp_air  <- convert_fahrenheit_to_celsius(my_df$temp_air)
-my_df$temp_leaf <- convert_fahrenheit_to_celsius(my_df$temp_leaf)
+temp_soil <- convert_fahrenheit_to_celsius(temp_soil)
+temp_air  <- convert_fahrenheit_to_celsius(temp_air)
+temp_leaf <- convert_fahrenheit_to_celsius(temp_leaf)
 ```
 
 Functions (particularly long ones) can be written to separate source file (text files containing executable code).

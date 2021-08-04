@@ -53,18 +53,19 @@ The students are able to
 
 ```{r include=FALSE}
 ## Set-Up for bookdown build
+all_pkg <- c('base', 'bookdown', 'broom', 'caret', 'conflicted', 'datasets', 'dplyr', 'forcats', 'ggfortify', 'ggplot2', 'ggridges', 'graphics', 'grDevices', 'imputeTS', 'IRdisplay', 'keras', 'lattice', 'latticeExtra', 'leaps', 'lubridate', 'knitr', 'maptools', 'methods', 'Metrics', 'modelr', 'MODISTools', 'patchwork', 'pdp', 'pROC', 'purrr', 'raster', 'rasterVis', 'RColorBrewer', 'RCurl', 'readr', 'recipes', 'reticulate', 'rfishbase', 'rgbif', 'rgdal', 'rgeos', 'rjson', 'rmarkdown', 'rsample', 'sf', 'sp', 'spData', 'stats', 'stringr', 'tensorflow', 'terra', 'tibble', 'tidyr', 'tidyverse', 'utils', 'vip', 'visdat', 'XML', 'yardstick')
 
-# Preferences for conflicting packages
-conflict_prefer("select", "dplyr")
-conflict_prefer("filter", "dplyr")
-conflict_prefer("levelplot", "rasterVis")
-conflict_prefer("origin", "raster")
-conflict_prefer("extract", "raster")
-conflict_prefer("partial", "pdp")
-conflict_prefer("mse", "Metrics")
-conflict_prefer("near", "dplyr")
-conflict_prefer("resample", "raster")
-conflict_prefer("train", "caret")
+# # Preferences for conflicting packages
+# conflict_prefer("select", "dplyr")
+# conflict_prefer("filter", "dplyr")
+# conflict_prefer("levelplot", "rasterVis")
+# conflict_prefer("origin", "raster")
+# conflict_prefer("extract", "raster")
+# conflict_prefer("partial", "pdp")
+# conflict_prefer("mse", "Metrics")
+# conflict_prefer("near", "dplyr")
+# conflict_prefer("resample", "raster")
+# conflict_prefer("train", "caret")
 
 # Write packages bibliography
 knitr::write_bib(all_pkg, "packages.bib")

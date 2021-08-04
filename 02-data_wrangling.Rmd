@@ -56,7 +56,7 @@ Now that we roughly know what to expect from the contents of our dataset and we 
 ### Libraries
 
 Install missing packages for this tutorial.
-```{r eval=TRUE}
+```{r}
 list_pkgs <- c("tidyverse", "conflicted")
 new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
 if (length(new_pkgs) > 0) install.packages(new_pkgs)
@@ -79,8 +79,8 @@ XXXrefXXX for all packages
 
 It can happen that different functions with the same name are available from different packages. To avoid conflicts and make sure we use the preferred ones, we can use the *conflicted* package XXXrefXXX and specify:
 ```{r}
-conflict_prefer("select", "dplyr")
-conflict_prefer("filter", "dplyr")
+conflicted::conflict_prefer("select", "dplyr")
+conflicted::conflict_prefer("filter", "dplyr")
 ```
 
 ### Variables in a data frame
@@ -412,7 +412,7 @@ hhdf %>%
   theme_classic()
 ```
 
-We can observe a variation in the measured values fluctuating between high and low values during one day. Hence, we see that we have GPP variations at the sub-daily (diurnal) time scale, as well as at the seasonal time scale. This is very typical for environmental time series data. Sometimes, we even observe a long-term trend on top of the daily signal. Dealing with such multiple scales of variations and "hidden dimensions" something you will have to deal with a lot as an "Environmental Systems Data Scientist".
+We can observe a variation in the measured values fluctuating between high and low values during one day. Hence, we see that we have GPP variations at the sub-daily (diurnal) time scale, as well as at the seasonal time scale. This is very typical for environmental time series data. Sometimes, we even observe a long-term trend on top of the daily signal. Dealing with such multiple scales of variations and "hidden dimensions" is something you will have to deal with a lot as an "Environmental Systems Data Scientist".
 
 Above, we have first selected rows of the data frame with the dplyr function `slice()` and then piped its output (which is again a data frame) into `ggplot()`, which takes the data frame as the first argument.
 
@@ -421,7 +421,7 @@ The second type of visualisation that allows one to quickly understand the data 
 ```{r}
 hhdf %>%
   ggplot(aes(x = GPP_NT_VUT_REF, y = ..density..)) +
-  geom_histogram(fill = "grey70", color = "black")
+  geom_histogram(fill = "grey70", color = "black") +
   geom_density(color = "red")
 ```
 
@@ -431,7 +431,9 @@ Find a complete reference to ggplot [here](https://ggplot2.tidyverse.org/). More
 
 ### Aggregating
 
-All data frames have two dimensions, rows and columns. Our data frame is organised along half-hourly time steps in rows. These time steps belong to different days, months, and years, although these "dimensions" are not reflected by the structure of the data frame and we do not have columns that indicate the day, month or year of each half-hourly time step. This would actually be redundant information since the date-time objects of columns `TIMESTAMP_*` contain this information. The tidyverse makes it very easy to work with such "hidden dimensions" of a data frame. Let's say we want to calculate the mean of half-hourly GPP across each data. That is, to aggregate our half-hourly data to daily data by taking a sum. You see, there are two pieces of information needed for an aggregation step: The factor (or "hidden dimension") that groups a vector of values for collapsing it into a single value, and the function used for collapsing values. This function should take a vector as an argument and return a single value as an output. These two steps are implemented by the dplyr functions `group_by()` and `summarise()` and the nice and intuitive code that solves our problem of aggregating to daily values by summing looks like this:
+All data frames have two dimensions, rows and columns. Our data frame is organised along half-hourly time steps in rows. These time steps belong to different days, months, and years, although these "dimensions" are not reflected by the structure of the data frame and we do not have columns that indicate the day, month or year of each half-hourly time step. This would actually be redundant information since the date-time objects of columns `TIMESTAMP_*` contain this information. 
+
+The tidyverse makes it very easy to work with such "hidden dimensions" of a data frame. Let's say we want to calculate the mean of half-hourly GPP across each day That is, to aggregate our half-hourly data to daily data by taking a sum. You see, there are two pieces of information needed for an aggregation step: The factor (or "hidden dimension") that groups a vector of values for collapsing it into a single value, and the function used for collapsing values. This function should take a vector as an argument and return a single value as an output. These two steps are implemented by the dplyr functions `group_by()` and `summarise()` and the nice and intuitive code that solves our problem of aggregating to daily values by averaging (mean) looks like this:
 
 ```{r message=FALSE}
 ddf <- hhdf %>% 
@@ -442,7 +444,7 @@ ddf <- hhdf %>%
 
 More info on [grouped summaries](https://r4ds.had.co.nz/transform.html#grouped-summaries-with-summarise), [group_by()](https://dplyr.tidyverse.org/reference/group_by.html) and [summarise()](https://dplyr.tidyverse.org/reference/summarise.html).
 
-Using `filter()`, we can now plot daily total GPP for all days in the year 2007.
+Using `filter()`, we can now plot daily mean GPP for all days in the year 2007.
 
 ```{r}
 ddf %>% 
@@ -466,6 +468,7 @@ ddf <- hhdf %>%
               .groups = 'drop'
               ) %>% 
     mutate(f_measured = n_measured / n_datapoints) # calculate the fraction of measured values over total observations
+ddf
 ```
 
 ### Data visualisation II
@@ -591,7 +594,7 @@ print(vec_files[1:5])
 ```{r message=FALSE, eval=FALSE}
 list_df <- list()
 for (ifil in vec_files){
-    list_df[[ifil]] <- read.csv(ifil)
+    list_df[[ifil]] <- read_csv(ifil)
 }
 ```
 
@@ -745,9 +748,9 @@ head(ddf_allsites_joined)
 head(ddf_allsites)
 ```
 
-### Functional programming II [BONUS]
+### Bonus: Functional programming II
 
-Functions can be applied to any list. Because lists can consist of any type of objects, `map()` is a powerful approach to "iterating" over multiple instances of the same object and can be used for all sorts of tasks. In the following, list elements are data frames of daily data and the mapping function `lm()` fits a linear regression model of GPP versus PPFD to each sites' data.
+Functions can be applied to any list. Because lists can consist of any type of objects, `map()` is a powerful approach to "iterating" over multiple instances of the same class of object and can be used for all sorts of tasks. In the following, list elements are data frames of daily data and the mapping function `lm()` fits a linear regression model of GPP versus PPFD to each sites' data.
 
 ```{r}
 list_linmod <- purrr::map(list_df, ~lm(GPP_NT_VUT_REF ~ PPFD_IN, data = .))
@@ -884,7 +887,7 @@ Indeed, the *R*<sup>2</sup> between GPP and PPFD tend to be higher for sites wit
 Boxplots are useful because they provide a visualisation of distrubtions that can be based on a very large number of underlying points. This yields "light" and clean figures. However, they also hide a lot of information and sometimes it is ok to show more information without overloading the plot. For example, individual points can be shown in the plot above by `geom_jitter()`. The x-axis represents the level of the factor `evergreen` and when using a simple `geom_points`, all points would be located either at the position (given by the tick mark) of `TRUE` or `FALSE`. This would result in overplotting and thus hiding a large number of points. `geom_jitter()` takes care of this by slightly rearranging them in a random fashion along the x-axis. Note that the rearranged position along the x-axis doesn't actually encode any information. However, as long as points are still separable along the "`evergreen`-axis", this is acceptable.
 
 ```{r}
-gg + geom_jitter(color = "grey50", width = 0.1)
+gg + geom_jitter(color = "red", width = 0.1)
 ```
 
 Note that in the two cells above, we have first stored the output of a `ggplot()` call as a new object that we named `gg`. Doing `print(gg)` just creates the respective plot. The advantage is that we can add visualisation elements or modify the theme or add labels to that object in a separate step.
@@ -951,7 +954,7 @@ hhdf <-  ... %>%
     ... %>% 
   
     # interpret timestamp variable as a date-time object
-    mutate_at(vars(starts_with(...)), ymd_hm)
+    mutate(across(starts_with(...), ymd_hm))
 
 
 # aggregate to daily
@@ -961,10 +964,7 @@ ddf <- hhdf %>%
     ... %>% 
   
     # aggregate
-    group_by(...) %>% 
-    summarise(GPP_NT_VUT_REF = ...,
-              PPFD_IN = ...,
-    )
+    ...
 
 # fit linear regression model
 linmod <- ...
@@ -988,22 +988,20 @@ ddf <- ddf %>%
 
 ## 3. Create scatterplot
 ddf %>% 
-  ggplot(...) + 
-  geom_point(...) +  # first, plot all points including outliers in one color
-  geom_point(...)    # then overplot cleaned data in black so that remaining red points are outliers
+  ggplot(..., aes()) + 
+  geom_...(...)
 
 ## 4. Visualising cycles
 ## a. Half-hourly dataset
 hhdf_meanseason <- hhdf %>% 
-  mutate(hour_day = hour(...),
-         day_year = yday(...)) %>% 
-  group_by(...) %>% 
-  summarise(gpp = ...)
+  mutate(hour_day = ...,
+         day_year = ...) %>% 
+  ...
 
 ## b. Raster plot
 hhdf_meanseason %>% 
   ggplot(...) +
-  geom_raster()
+  ...
 
 ## c. Make raster plot publishable - This is up to your judgement.
 ...
