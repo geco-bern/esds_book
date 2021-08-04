@@ -16,19 +16,19 @@ conflict_prefer("mse", "Metrics")
 
 ### Overview
 
-In this practical we will look at data variety in environmental sciences. We will start with the data from one eddy covariance measurement site in Switzerland encountered in Chapter 1, and complement it with remote sensing data. Specifically, we will download remote sensing data that measures vegetation greenness data, quantified by the normalised difference vegetation index, NDVI. We are interested in this data, because we expect ecosystem photosynthesis (gross primary production), measured at the eddy covariance tower, to covary with NDVI. Such covariation can provide powerful information for modelling. For example, we can train a machine learning model with the observed covariation between measured GPP and NDVI at eddy covariance sites and use that model to predict GPP from data obtained in space (NDVI is available for the whole globe, while GPP can only be measured locally.) You will be doing this kind of modelling in session 13. For now, we will focus on working with the spatial aspects of the data (since remote sensing data is inherently spatial) and introduce you to the tool set to work with spatial, in particular, geo-spatial data. 
+In this chapter, we will look at data variety in environmental sciences. We will start with the data from one eddy covariance measurement site in Switzerland encountered in Chapter 1, and complement it with remote sensing data. Specifically, we will download remote sensing data that measures vegetation greenness data, quantified by the normalised difference vegetation index, NDVI. We are interested in remote sensing data, because we expect ecosystem photosynthesis (gross primary production), measured at the eddy covariance tower, to covary with NDVI. Such covariation can provide powerful information for modelling. For example, we can train a machine learning model with the observed covariation between measured GPP and NDVI at eddy covariance sites and use that model to predict GPP from data obtained in space (NDVI is available for the whole globe, while GPP can only be measured locally.) You will be doing this modelling in exercise 13. Here, we will focus on working with the spatial aspects of the data (since remote sensing data is inherently spatial) and introduce the tool set to work with geo-spatial data. 
 
-To get you familiar with spatial data types we will use a variety of data from freely accessible sites. We can obtain abiotic and biotic conditions at the tower locations. We will be spatially plotting the eddy towers you have already encountered in the first two chapters and extracting values for these locations from other data. By doing this we can show that the climate at these sites spans a gradient temperature and landcover. There are also biotic components that could explain variation in productivity among sites, including species composition and functional traits of plants. 
+To get familiar with spatial data types, we will use a variety of data from freely accessible sites. We can obtain abiotic and biotic conditions at the tower locations. We will be spatially plotting the eddy towers you have already encountered in the first two chapters and extracting values for these locations from other data. By doing this, we can show that the climate at these sites spans a gradient temperature and landcover. 
 
 ### Learning objectives
 
 After this learning unit, you will be able to ...
 
-* explain the possible sources of data in environmental sciences;
-* understand the range of operations applied to data from basic to complex;
-* read various types of data in R and apply basic operations;
-* understand the structure of spatial data, including rasters and shapefiles;
-* apply a range of operations to prepare data for analyses.
+* Explain the possible sources of data in environmental sciences.
+* Understand the range of operations applied to data from basic to complex.
+* Read various types of data in R and apply basic operations.
+* Understand the structure of spatial data, including rasters and shapefiles.
+* Apply a range of operations to prepare data for analyses.
 
 ### Key points of the lecture
 
@@ -42,19 +42,19 @@ Data operations range in complexity, here they are listed from simplest to extre
 * Regressions
 * Neural network deep learning
 
-Examples of methods for the computing differences between datasets:
+Examples of methods for the computing differences between observations associated with a set of features:
 
-* _Euclidean distance_ is used for the simple quantification of variation
-* _PCA_ is a valuable tool to explore variation and reduce dimension
-* _Hamming distance_ helps measure the difference between strings
-* _Jaccard index_ describes the similarity between two or more binary data sets
+* _Euclidean distance_ is used for the simple quantification of variation.
+* _PCA_ is a valuable tool to explore variation and reduce dimension.
+* _Hamming distance_ helps measure the difference between strings.
+* _Jaccard index_ describes the similarity between two or more binary data sets.
 
-Machine learning is loosely defined as any learning done by a computer. It can be divided into…
+Machine learning is loosely defined as any learning done by a computer. It can be divided into two main categories…
 
 * _Unsupervised learning_: without explanatory data, which uses clustering to obtain a categorical output
 * _Supervised learning_: with explanatory data, which uses either classification also resulting in a categorical output, or regression when a numerical output is required
 
-Data errors are divided into errors of accuracy and precision. If data is inaccurate, it strays from the true value. If data is imprecise, individual data points are variable under the same conditions. Systematic errors and inaccurate data is much harder to correct! 
+Data errors are divided into errors of accuracy and precision. If data is inaccurate, it strays from the true value. If data is imprecise, individual data points are variable under the same conditions. Systematic errors and inaccurate data is much harder to correct.
 
 Errors can arise throughout the data science workflow.
 
@@ -63,16 +63,16 @@ Errors can arise throughout the data science workflow.
 
 Data can be cleaned from errors by looking for:
 
-* Non-uniform data
-* Missing data
-* Duplicated data
-* Outliers
-* Measurement errors
+* _Non-uniform data_
+* _Missing data_ where there is no value for the observed variable, often denoted as _NA_.
+* _Duplicated data_ where a dataset contains multiple records of identical data.
+* _Outliers_ which are data points that are significantly different to other data points or lie abnormally far from most other data points.
+* _Measurement errors_ known as the discrepancy between the measured value and its true value.
 
-Quantifying uncertainty is extremely important, as undetectable errors will persist even after data cleaning. Examples of uncertainty quantification include…
+Quantifying uncertainty is extremely important, as undetectable errors will persist even after data cleaning. Examples of uncertainty quantification metrics include:
 
-* Confidence interval (CI)
-* Prediction interval
+* _Confidence interval (CI)_ is a range of values that with a certain probability or degree of certainty the chosen parameter of the data variable will fall within.
+* _Prediction interval_ is the estimated interval within which observations will occur, with a certain degree of confidence, based on the previously observed data.
 
 Error propagation is used for datasets containing different uncertainties to determine the overall uncertainty.
 
