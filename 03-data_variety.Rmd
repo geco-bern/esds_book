@@ -310,25 +310,25 @@ R2 increased from 0.5229 to 0.603 when including considering NDVI * PPFD, instea
 
 ### Points on the globe
 
-Documenting the coordinates of data as it is collected allows us to assign a precise location to that data, which can be important in further analysis when, for example, comparing location. As you all undoubtedly know coordinates come with a latitude (defining the position N or S of the equator) and longitude (defining the position E or W of the meridian). With the coordinates we can already plot our data points, remembering that the latitude is equivalent to the y-axis and longitude to the x-axis.
+Documenting the geographic coordinates of data allows us to assign a precise location to that data observation, which can be important for further analysis when, for example, comparing location. Coordinates come with a latitude (defining the position N or S of the equator) and longitude (defining the position E or W of the meridian). With the coordinates, we can plot data points, remembering that the latitude is equivalent to the y-axis and longitude to the x-axis.
 
 In this section, we look at the position of the Fluxnet sites. The Fluxnet network measures land-atmosphere exchanges of greenhouse gases and energy for sites across the globe using the eddy covariance technique. High-frequency measurements of vertical wind velocity and a scalar mixing ratio (CO2, H2O, temperature, etc.) provides estimates of the net exchange of the scalar. Eddy covariance is currently the standard method to measure fluxes of trace gases between ecosystems and the atmosphere (sources:
 [Fluxnet](https://fluxnet.org/about/), [Nature Article on Fluxnet Dataset](https://www.nature.com/articles/s41597-020-0534-3.pdf).
 
-Right at the beginning of this tutorial we loaded the dataset containing information on sites in Europe. We treat site locations as a geographical position. So we will extract the name, longitude and latitude of our sites.
+At the beginning of this tutorial we loaded the dataset containing information on sites in Europe. We treat site locations as a geographical position. So we will extract the name, longitude and latitude of our sites.
 
 ```{r}
 head(df_sites)
 ```
 
-Our dataset _'df_sites'_ contains two sites in Greenland and Siberia. We'll focus on a smaller spatial domain, restricted to "mainland" Europe, therefore, we exclude sites RU-Cok and DK-ZaH.
+Our dataset _'df_sites'_ contains two sites in Greenland and Siberia. We'll focus on a smaller spatial domain, restricted to "mainland" Europe. Therefore, we exclude sites RU-Cok and DK-ZaH.
 
 ```{r}
 df_sites <- df_sites %>% 
   filter(!(site %in% c("RU-Cok", "DK-ZaH")))
 ```
 
-Already now we can plot our data points without any further adjustments.
+Now we can plot our data points without any further adjustments.
 
 ```{r}
 ggplot() +
@@ -337,9 +337,9 @@ ggplot() +
   theme_bw()
 ```
 
-We can make an educated guess where the points are but this plot doesn't tell us much by itself without a map as a reference.
+We can make an educated guess where the points are but this plot does not tell us much by itself without a map as a reference.
 
-So to visualize the location of our points we plot them on a map. We use the package `SpData` to get the world map and crop it to Europe.
+To visualize the location of our points we plot them on a map. We use the package `SpData` to get the world map and crop it to Europe.
 
 ```{r message=FALSE, warning=FALSE}
 library(sf)
@@ -353,19 +353,19 @@ ggplot() +
   theme_bw()
 ```
 
-Of course, we can carry on using the data points as they are (for plotting or analysis) but for more detailed spatial analysis we will turn them into _SpatialPoints_. 
+We can carry on using the data points as they are (for plotting or analysis) but for more detailed spatial analysis we will transform them into a _SpatialPoints_ format. 
 
 _SpatialPoints_ consist of a matrix with _n_ rows and 2 columns, one for each coordinate (latitude & longitude). _n_ is the number of points in the data. These points also have a so-called _'projection string'_ or _'crs'_ indicating the coordinate reference system in which coordinates of points are expressed. 
-There are different ways (formulas) to project the earth (an ellipsoid) onto a 2-dimensional map. You can only perform calculations, if the same method (projection, coordinate reference system (crs)) is used. Having points in different coordinate reference systems can cause data to look very skewed. It's good to know which coordinate reference system your data is in, the most commonly used one is **WGS84 (EPSG: 4326)**. There are some useful resources to convert help you find the correct [spatial reference](https://spatialreference.org/ref/epsg/4326/).
+There are different ways (formulas) to project the earth (an ellipsoid) onto a 2-dimensional map. We can only perform calculations, if the same method (projection, coordinate reference system (crs)) is used. Having points in different coordinate reference systems can cause data to look skewed. It is essential to know which coordinate reference system your data is in. The most commonly used one is **WGS84 (EPSG: 4326)**. There are some useful resources to convert help you find the correct [spatial reference](https://spatialreference.org/ref/epsg/4326/).
 
-To transform points into _SpatialPoints_ we use the function `SpatialPoints` in the r package `sp`.
+To transform points into _SpatialPoints_, we use the function `SpatialPoints` in the r package `sp`.
 
 ```{r message=FALSE, warning=FALSE}
 library(sp)
 sp_sites <- SpatialPoints(dplyr::select(df_sites, -site)) # remove character column
 ```
 
-Below you can see how with the R-base call `plot()` you can plot the _SpatialPoints_ directly. But we'll have to also provide a map to plot them onto. The loaded shapefile of europe will also be used in the next part called Shapefiles.
+Below you can see how with the R-base call `plot()` you can plot the _SpatialPoints_ directly. But we will have to also provide a map to plot them onto. The loaded shapefile of Europe will also be used in the next section called Shapefiles.
 
 ```{r warning=F, message=F}
 library(rgdal)
