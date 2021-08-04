@@ -365,19 +365,24 @@ library(sp)
 sp_sites <- SpatialPoints(dplyr::select(df_sites, -site)) # remove character column
 ```
 
-Below you can see how with the R-base call `plot()` you can plot the _SpatialPoints_ directly. But we will have to also provide a map to plot them onto. The loaded shapefile of Europe will also be used in the next section called Shapefiles.
+Below you can see how the R-base call `plot()`, plots the _SpatialPoints_ directly. 
 
 ```{r warning=F, message=F}
-library(rgdal)
-europe_shape <- readOGR(dsn="./data/shapefiles", layer="europe_map")
-
-plot(europe_shape, col="grey")
-plot(sp_sites, col = "red", add = TRUE, pch = 16)
+plot(sp_sites, col = "red", pch = 16)
 ```
+If, however, we make the point's locations visually meaningful, we have to provide a map to plot as a background. The loaded shapefile of Europe will also be used in the next section called Shapefiles.
+```{r}
+library(rgdal)
+europe_shape <- readOGR(dsn="./data/shapefiles", layer="europe_map") # imports the shapefile of the European map
+
+plot(europe_shape, col="grey")                                       # plots the European map as the background
+plot(sp_sites, col = "red", add = TRUE, pch = 16)                    # plots the points (here tower locations) on to the map
+```
+Now, we can see the tower locations as red circles plotted on a grey European map with country boarders, which puts the data points in a meaningful and comprehendable visual context. 
 
 ### Shapefiles
 
-Above we looked at points on the globe and transformed our data to _SpatialPoints_. This was already the first example of what forms a shapefile can come in. Shapefiles basically store geographic information, meaning location and any additional information, in shape objects. Shape objects in R are defined by _SpatialPoints_, _SpatialLines_, and _SpatialPolygons_ classes of the `sp` package. The corresponding _SpatialPointsDataFrame_, _SpatialLinesDataFrame_, and _SpatialPolygonsDataFrame_ classes allow storing shape objects together with a dataframe. The number of rows in the dataframe corresponds to the number of points (number of rows in coordinate matrix), lines (size of the list of Lines), or polygons (size of the list of Polygons). This allows us to associate a vector of variables (a row of the dataframe) to each shape object.
+Above we looked at points on the globe and transformed our data to _SpatialPoints_. This was already the first example of what forms a shapefile can come in. Shapefiles store geographic information, including location and any additional information, in shape objects. Shape objects in R are defined by _SpatialPoints_, _SpatialLines_, and _SpatialPolygons_ classes of the `sp` package. The corresponding _SpatialPointsDataFrame_, _SpatialLinesDataFrame_, and _SpatialPolygonsDataFrame_ classes allow storing shape objects together with a dataframe. The number of rows in the dataframe corresponds to the number of points (number of rows in coordinate matrix), lines (size of the list of Lines), or polygons (size of the list of Polygons). This allows us to associate a vector of variables (a row of the dataframe) to each shape object.
 In the next step, we load a shapefile containing the countries of the world provided by [Natural Earth](www.naturalearthdata.com), as a reference with which we can contextualize our spatial data. Since we only are looking at towers in Europe, we have cropped the raster to Europe for you.
 
 ```{r warning=F, message=F}
@@ -385,26 +390,26 @@ library(rgdal)
 europe_shape <- readOGR(dsn="./data/shapefiles", layer="europe_map")
 ```
 
-Let's see what class _europe_shape_ is:
+We can look at what class _europe_shape_ is:
 
 ```{r}
 class(europe_shape)
 ```
 
-Above we mentioned that _SpatialPolygonsDataFrame_ contains both a list of _SpatialPolygons_ and a dataframe with information on each polygon. Here's how you can access the information in the dataframe. We'll just display the header of some of the 94 features for now.
+Above we mentioned that _SpatialPolygonsDataFrame_ contains both a list of _SpatialPolygons_ and a dataframe with information on each polygon. Here is how we can access the information in the dataframe. We will start by displaying the header of some of the 94 features for now.
 
 ```{r}
 europe_shape@data %>% select(c(NAME, SOVEREIGNT, SUBREGION, POP_EST))%>% head()
 ```
 
-Let's first plot our towers on this map of Europe. Remember, how when you transformed the tower locations we mentioned each point has a designated coordinate reference system? Here, we need to extract this projection from _europe_shape_ using `proj4string()` and add it to our _SpatialPoints_. This way we can make sure they are in the same reference system for plotting them together.
+Now, we want to plot our towers on this map of Europe. First, we need to extract the projection from _europe_shape_ using `proj4string()` and add it to our _SpatialPoints_. Thereby ensuring they are in the same reference system  to plot them together.
 
 ```{r message=F}
 geo.proj <- sp::proj4string(europe_shape)
 pts <- sp::SpatialPoints(sp_sites, proj4string = sp::CRS(geo.proj))
 ```
 
-Then we can take the _SpatialPoints_, now in the correct coordinate reference system, the data from _europe_shape_ and bind them to our tower sites in the dataframe _df_sites_.
+By using the _SpatialPoints_, now in the correct coordinate reference system, and the data from _europe_shape_, we can bind them to our tower sites in the dataframe _df_sites_.
 
 ```{r paged.print=TRUE}
 df_sites_country_info <- sp::over(pts, europe_shape) %>% 
@@ -414,7 +419,7 @@ df_sites_country_info <- sp::over(pts, europe_shape) %>%
 head(df_sites_country_info) %>% select(1:6)
 ```
 
-For the next part we will be using a map European with country boarders. For this, we'll make an object called _shp_df_, this we do using the column _SOVEREIGNT_, which we saw when looking at `europe_shape@data`. This preserves only the data we need for further analysis and plotting. 
+For the next part, we will be using a European map with country boarders. For this, we will make an object called _shp_df_ using the column _SOVEREIGNT_, which we saw when looking at `europe_shape@data`. This preserves only the data needed for further analysis and plotting. 
 
 ```{r message=F}
 library(maptools)
@@ -428,10 +433,9 @@ ggplot() +
   theme(legend.position = "none")
 ```
 
-As we saw in the earlier plot of the tower locations only some countries in Europe contain towers. Therefore, we want to crop our map to include only those countries.
+As we saw in the earlier plot of the tower locations only some countries in Europe contain towers. Therefore, we want to crop our map to only include those countries.
 
-To do this we first make a vector which is a list of the country each tower is located in. We get this from _df_site_country_info_. 
-Then we filter out only those countries with a tower in them and voilà, plot the countries and tower locations as a result.
+We first create a vector which is lists the country each towers is located in. We obtain this vector from the data frame _df_site_country_info_.  Then, we filter out only those countries with a tower in them and voilà, plot the countries and tower locations as a result.
 
 ```{r}
 countries_with_site <- df_sites_country_info %>% pull(SOVEREIGNT) %>% as.character()
@@ -453,7 +457,7 @@ ggplot() +
 
 **Checkpoint**
 
-You just learnt how to plot _europe_shape_ coloured by country ("SOVREIGNT"), now plot it coloured by region in europe.
+You just learnt how to plot _europe_shape_ coloured by country ("SOVREIGNT"), now plot it coloured by region in Europe.
 Start by finding the column that gives you this information in `europe_shape@data`.
 
 **Solution**
@@ -472,6 +476,7 @@ ggplot() +
   geom_point(data = df_sites, aes(x = lon, y = lat)) +
   theme_bw()
 ```
+We now have a map showing the tower's locations as black circles within the different regions in Europe.
 
 ### Rasters
  
