@@ -80,34 +80,33 @@ Error propagation is used for datasets containing different uncertainties to det
 
 ### Overview
 
-In this practical, you will be downloading and getting to know spatial data. There are three types of spatial data:
+In this practical, we will be downloading and getting to know spatial data. There are three types of spatial data:
 
 * points;
 * shapefiles;
 * rasters.
 
-The first part of this practical is mandatory and will start with a little introduction on downloading remote sensing data for our tower sites and seeing what kinds of information we can gather from this. Then we will get into the nitty-gritty aspects of the aforementioned spatial data types. 
+This practical will start with a little introduction on downloading remote sensing data for our tower sites and seeing how this information can be used for analyses. Then we will get into the nitty-gritty aspects of the aforementioned spatial data types. 
 
-The second part is facultative, there we will discuss trait data and the principal component analysis (PCA), which is a method to reduce the dimensions of datasets.
 
 ### MODIS remote download
 
-We will be starting off this tutorial with an example on using remote sensing data. Let us focus on a fluxnet site already familiar to you: CH-Lae. The Lägern site is located on a mountain in the Swiss Plateau NW of Zürich and is surrounded by managed mixed deciduous mountain forests. The forest is highly diverse and dominated by beech. In the following figures, you can get an impression of the tower and its surroundings.  
+We will be starting off this tutorial with an example on using remote sensing data. We will focus on a fluxnet site already presented in the first practical: CH-Lae. The Lägern site is located on a mountain in the Swiss Plateau NW of Zürich and is surrounded by managed mixed deciduous mountain forests. The forest is highly diverse and dominated by beech. In the following figures, you can get an impression of the tower and its surroundings.  
 
-```{r, echo=FALSE, out.width="32%", out.height="49%", fig.show='hold', fig.cap="Images of Fluxnet sites and measurement station."}
+```{r, echo=FALSE, out.width="32%", out.height="49%", fig.show='hold', fig.cap="Images of Fluxnet sites and measurement station at the Lägern site."}
 knitr::include_graphics(c("./figures/site1.jpg",
                           "./figures/site2.jpg",
                           "./figures/site3.jpg"))
 ```
 
-As always we start by loading `tidyverse`and our fluxnet site data.
+As always, we start by loading `tidyverse`and our fluxnet site data.
 
 ```{r warning=F, message=F}
 library(tidyverse)
 df_sites <- read_csv("./data/fluxnet_site_info_reduced.csv")
 ```
 
-Since we will only be working with the Lägern site for this section, we can extract its latitude and longitude.
+Since we will only be working with the Lägern site for this section, we can extract its latitude and longitude for further use.
 
 ```{r}
 lon_lae <- df_sites %>% 
@@ -119,13 +118,13 @@ lat_lae <- df_sites %>%
   pull(lat)
 ```
 
-In this first analysis, we want to complement temporal data measured by the Fluxnet tower with remote sensing data. _Remote sensing_ is the detection or monitoring of physical characteristics of the Earth’s surface by measuring reflected and emitted radiation at a distance. Data is collected in the form of images by special cameras typically from aircrafts or satellites. With this method, a huge amount of global data at large spatial scales gets easily accessible and therefore represents a useful method for the monitoring of ecosystems. However, this remotely acquired data requires validation from ground measurements, which can be done for example using the Eddy towers from the previous practicals.
+In this first analysis, we want to complement temporal data measured by the Fluxnet tower with remote sensing data. _Remote sensing_ is the detection or monitoring of physical characteristics of the Earth’s surface by measuring reflected and emitted radiation at a distance. Data is collected in the form of images by special cameras typically from aircrafts or satellites. With this method, a large amount of global data at large spatial scales gets easily accessible and therefore represents a useful method for the monitoring of ecosystems. However, this remotely acquired data requires validation from ground measurements, which can be done for example using the eddy towers from the previous practicals.
 
 One of these satellite remote sensing instruments is MODIS (Moderate Resolution Imaging Spectroradiometer). Terra MODIS and Aqua MODIS are viewing the entire Earth's surface every 1 to 2 days, acquiring data in 36 spectral bands, or groups of wavelengths. 
 
-You used to have to visit an website to be able to download the data file by file, which was a long and tedious process. Luckily, now we have access to tools that make it much more straightforward to download remote sensing data from satellites. It provides Atmosphere, Ocean, Cryosphere and Land data series. The `MODISTools` package provides a programmatic interface to the [MODIS Land Products Subsets web services](https://modis.gsfc.nasa.gov/) allows for easy downloads of "MODIS" time series (of single pixels or small regions of interest) directly to your R workspace or your computer. 
+We have access to tools that make it more straightforward to download remote sensing data from satellites. It provides Atmosphere, Ocean, Cryosphere and Land data series. The `MODISTools` package in R provides a programmatic interface to the [MODIS Land Products Subsets web services](https://modis.gsfc.nasa.gov/) allows for easy downloads of "MODIS" time series (of single pixels or small regions of interest) directly to your R workspace or your computer. 
 
-* Using the `mt_...()` functions of the MODISTools we can check which products are available in MODIS, how the product we are searching for is called, and what temporal and spatial resolutions are available. 
+* Using the `mt_...()` functions of the MODISTools, we can check which products are available in MODIS, how the product we are searching for is called, and what temporal and spatial resolutions are available. 
 * `t_products()` lists all available products from MODIS with their temporal and spatial resolution. Products are parent categories of variables measured by the satellites, such as vegetation indices. 
 * `mt_bands()` requires the entry of a product chosen from "products" and list the available data variables that are represented by the different actually measured wavelengths. 
 * Finally, `mt_dates()` lists all dates of which data from the chosen product and band are available.
@@ -139,7 +138,7 @@ bands <- mt_bands(product = "MOD13Q1") %>% as_tibble()
 dates <- mt_dates(product = "MOD13Q1", lat = lat_lae, lon = lon_lae) %>% as_tibble()
 ```
 
-Next, we will get the NDVI data for 6 years for a square of 2km x 2km around the tower site. We can use the function `mt_subset()` for this. The parameters of this function download a subset of data within the chosen product (here 'MOD13Q1'). We specify the location as latitude and longitude, and the band we chose, which is at 250m spatial resolution and 16-day temporal resolution. The time period can be chosen as a subset of “dates” and must be provided in the form of start and end date. We are looking at the beginning of 2009 to the end of 2014. `km_lr` and `km_ab` define the kilometers to the left and right of the location and kilometers above and below, respectively. Since these values are being rounded to the nearest integer, we choose this minimum of 1, corresponding to 2km2. Sitename is used in writing data to file, internal gives the command whether the data should be returned as an internal structure. The progress setting defines whether the download progress should be shown or not.
+Next, we will get the NDVI data for 6 years for a square of 2km x 2km around the tower site. We can use the function `mt_subset()` for this. The parameters of this function download a subset of data within the chosen product (here 'MOD13Q1'). We specify the location as latitude and longitude, and the band we chose, which is at 250m spatial resolution and 16-day temporal resolution. The time period can be chosen as a subset of “dates” and must be provided in the form of start and end date. We are looking at the beginning of 2009 to the end of 2014. `km_lr` and `km_ab` define the kilometers to the left and right of the location and kilometers above and below, respectively. Since these values are being rounded to the nearest integer, we choose this minimum of 1, corresponding to 2 km^2. Sitename is used in writing data to file, internal gives the command whether the data should be returned as an internal structure. The progress setting defines whether the download progress should be shown or not.
 
 ```{r eval = F}
 df_ndvi <- mt_subset(product = "MOD13Q1",            # the chosen product
@@ -165,7 +164,7 @@ df_ndvi <- readRDS("./data/df_ndvi.rds")
 head(df_ndvi) %>% select(2:7) # Only displaying 6 of 21 features
 ```
 
-This dataframe takes some effort to make sense of. Let's make our lives a little easier and put this data into a useful spatial context. For that it needs to be converted to a raster. This is a key spatial data type and will be described in more detail in the section Raster below. 
+This dataframe appears complicated, but we can transform the data into a useful spatial format. For that it needs to be converted to a raster. This is a key spatial data type and will be described in more detail in the section Raster below. 
 The `MODISTools` packages provides a handy function, called `mt_to_raster()`, for converting such data frames produced by `mt_subset()` into a raster.
 
 ```{r echo=F, message=FALSE, warning=FALSE}
@@ -182,7 +181,7 @@ We plot four images in the winter season.
 plot(raster_ndvi[[1:4]], zlim=c(-0.1, 0.95))
 ```
 
-Just out of interest let's calculate the minimum and maximum of these plots.
+We can derive a variety of statisctics and for instance calculate the minimum and maximum of these rasters.
 
 ```{r}
 min_winter <- min(minValue(raster_ndvi[[1:4]]))
@@ -191,13 +190,13 @@ cat(" Minimum Winter: ", min_winter, "\n",
     "Maximum Winter: ", max_winter)
 ```
 
-We do the same for the summer season.
+The same can be done for the summer season.
 
 ```{r}
 plot(raster_ndvi[[13:16]], zlim=c(-0.1, 0.95))
 ```
 
-We compute minimum and maximum.
+We again compute minimum and maximum.
 
 ```{r}
 min_summer <- min(minValue(raster_ndvi[[13:16]]))
@@ -206,9 +205,9 @@ cat(" Minimum Summer: ", min_summer, "\n",
     "Maximum Summer: ", max_summer)
 ```
 
-From the two plots, we can clearly distinguish summer and winter time steps due to the differences in NDVI. Summer NDVI is much higher since our tower site is located in the Northern hemisphere where leaves get lost during winter for many vegetation types. Heterogeneity in winter is higher which might be due to conifers that don't lose their leaves.
+From the two plots, we can clearly distinguish summer and winter time steps due to the differences in NDVI. Summer NDVI is higher since our tower site is located in the Northern hemisphere where leaves get lost during winter for many vegetation types. The range in winter is also larger which might be due to conifers that do not lose their leaves during this season.
 
-However, we are also interested in the mean across all (spatial) pixels for each date. To clarify this means we collapse the pixel dimension into a single mean value for each date. This is can done using `group_by()` in combination with `summarise()`, which were explained in Chapter \@ref(ch-02). 
+We are also interested in the mean across all (spatial) pixels for each date. For this we can collapse the pixel dimension into a single mean value for each date. This is done using `group_by()` in combination with `summarise()`, which were explained in Chapter \@ref(ch-02). 
 
 ```{r, warning=F, message=F}
 library(lubridate) # lubridate is loaded to work with dates
@@ -226,7 +225,7 @@ df_ndvi_spatialmean <- df_ndvi %>%
   mutate(mean = mean * scale_factor, min = min * scale_factor, max = max * scale_factor)  # apply scale_factor (see )
 ```
 
-We can now plot our NDVI time series across our years (2009 to 2014) using the means we calculated above.
+We can now plot our NDVI time series across our years (2009 to 2014) using the mean NDVI values from the rasters calculated.
 
 ```{r}
 df_ndvi_spatialmean %>% 
@@ -235,7 +234,7 @@ df_ndvi_spatialmean %>%
   geom_line(aes(y = mean))
 ```
 
-After having aggregated the data to the mean NDVI across all 81 pixels for each date, we have reduced the dimensions of the data frame to only one (time). It now has a structure that can easily be combined with the time series data from the eddy covariance tower (each site is a point in space).
+After having aggregated the data to the mean NDVI across all 81 pixels for each date, we have reduced the dimensions of the data frame to one unique dimension. It now has a structure that can easily be combined with the time series data from the eddy covariance tower (each site is a point in space).
 
 ```{r message=F}
 # this can now be combined to the data frame with flux data that also has dates along rows
@@ -252,16 +251,16 @@ ddf_ch_lae_ndvi <- ddf_ch_lae %>%
   dplyr::select(-year)
 ```
 
-NDVI data is provided every 16 days. In order to predict values at other time steps, we can fit a cubic smoothing spline to our daily values using `smooth.spline()`. In a nutshell, this is a way to fit a curve between two data points using cubic functions.
+NDVI data is provided every 16 days, but the eddy towers provide continuous measurements. In order to predict values at other time steps, we can fit a cubic smoothing spline to our daily values using `smooth.spline()`. In a nutshell, this is a way to fit a curve between two data points using cubic functions.
 
-(In more detail, for the interested: Cubic smoothing splines embody a curve fitting technique that blends the ideas of cubic splines and curvature minimization to create an effective data modeling tool for noisy data. Traditional interpolating cubic splines represent the tabulated data as a piece-wise continuous curve which passes through each value in the data table. The curve spanning each data interval is represented by a cubic polynomial, with the requirement that the endpoints of adjacent cubic polynomials match in location and in their first and second derivatives. For more, have a look at this [blogpost](https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac)) 
+Cubic smoothing splines embody a curve fitting technique that blends the ideas of cubic splines and curvature minimization to create an effective data modeling tool for noisy data. Traditional interpolating cubic splines represent the tabulated data as a piece-wise continuous curve which passes through each value in the data table. The curve spanning each data interval is represented by a cubic polynomial, with the requirement that the endpoints of adjacent cubic polynomials match in location and in their first and second derivatives. For more, have a look at this [blogpost](https://towardsdatascience.com/numerical-interpolation-natural-cubic-spline-52c1157b98ac). 
 
 ```{r}
 ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>% 
-  mutate(date_dec = decimal_date(date))
+  mutate(date_dec = decimal_date(date))     # adds a column with the date converted into a decimal of its year
 
 df_nona <- ddf_ch_lae_ndvi %>% 
-  drop_na()
+  drop_na()                                 # removes rows containing NAs
 
 out_spline <- smooth.spline(df_nona$date_dec, df_nona$mean, spar=0.1 )
 vals_spline <- predict(out_spline, ddf_ch_lae_ndvi$date_dec )$y
@@ -270,7 +269,7 @@ ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>%
   mutate(ndvi_splined = vals_spline)
 ```
 
-Let's take a look...
+Now, we can plot this relationship.
 
 ```{r warning=F}
 ddf_ch_lae_ndvi %>% 
@@ -279,26 +278,35 @@ ddf_ch_lae_ndvi %>%
   geom_line(aes(x = date, y = ndvi_splined), color = "red")
 ```
 
-To see how well this data correlates with measurements from the fluxnet tower, we look at the relationship of GPP vs. NDVI*PPFD.
+To see how well this data correlates with measurements from the fluxnet tower, we look at the relationship of gross primary productivity (GPP) vs. NDVI*PPFD (photosynthetic photon flux density). 
 
 ```{r}
 ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>% 
   mutate(ppfd_abs = ndvi_splined * PPFD_IN)
 ```
 
-Does NDVI affect the relationship between GPP and PPFD?
+In order to investigate whether NDVI is associated with GPP and PPFD, we can fit a linear model.
 
 ```{r}
 linmod1 <- lm(GPP_NT_VUT_REF ~ PPFD_IN, data = ddf_ch_lae_ndvi)
 summary(linmod1)
 ```
 
+The summary contains the following information:
+
+* Call: this is the formula R uses to fit the data.
+* Residuals: residuals are essentially the difference between the actual observed response values and the response values that the model predicts. 
+* Coefficients:  the coefficients are the two unknown constants that represent the intercept and slope terms in the linear model. Besides the estimates of the two unknown constants (-5.078 and 15.412), the standard error of the estimates and measures of statistical significance (t value and Pr(>|t|)) are given. The coefficient standard error measures the average amount that the coefficient estimates vary from the actual average value of our response variable. The coefficient t-value is a measure of how many standard deviations our coefficient estimate is away from zero. The larger the absolute value of t, the smaller gets the probability of observing any value larger than |t| by chance, which is expressed by Pr(>|t|). The signif. codes or p-values (stars behind the coefficients) are associated to each estimate and categorize the probabilities Pr(>|t|) by significance thresholds.
+* Residual standard error: the Residual Standard Error is the average amount that the response will deviate from the true regression line. It is a measure of the quality of a linear regression fit.
+* Multiple R-squared : the R^2 quantifies what proportion of the variance found in the response variable can be explained by the predictor variable. It is a measure of how well the model is fitting the actual data.
+* F-statistic: F-statistic is a good indicator of whether there is a relationship between our predictor and the response variables. The further the F-statistics from 1 the better it is. However it depends on the number of data points and the number of predictors how much larger the F-statistics has to be in order to ascertain a relationship between the predictor and the response variables.
+
 ```{r}
 linmod2 <- lm(GPP_NT_VUT_REF ~ ppfd_abs, data = ddf_ch_lae_ndvi)
 summary(linmod2)
 ```
 
-Indeed, R2 increased from 0.5229 to 0.603 when including considering NDVI * PPFD, instead of just PPFD. In other words, it also matters whether leaves are actually out and green for modelling the relationship between GPP and PPFD. NDVI * PPFD approximates the amount of *absorbed* incoming light (not just the incoming light) and is therefore closer to being a physiologically relevant quantity. 
+R2 increased from 0.5229 to 0.603 when including considering NDVI * PPFD, instead of just PPFD. Hence, it also matters whether leaves are actually out and green for modelling the relationship between GPP and PPFD. NDVI * PPFD approximates the amount of *absorbed* incoming light, not just the incoming light, and is therefore a physiologically more relevant quantity. 
 
 ### Points on the globe
 
