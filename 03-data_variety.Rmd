@@ -480,7 +480,7 @@ We now have a map showing the tower's locations as black circles within the diff
 
 ### Rasters
  
-Next up are rasters. A raster is a matrix or grid of cells each of which contains information in the form of a value.
+In this section we will learn how to use rasters. A raster is a matrix or grid of cells each of which contains information in the form of a value.
 
 A raster object consists primarily of:
 
@@ -489,7 +489,7 @@ A raster object consists primarily of:
 * A variable of interest for which each cell in the grid has a value, and;
 * Other information relating to the CRS, projection, resolution, etc.
 
-Let's take a look at some rasters and get familiar with some functions to analyse them.
+We will load and check some rasters and get familiar with functions to analyse them.
 
 Since our goal ultimate goal is to predict productivity, we will consider different factors that might explain productivity, for example, landcover and temperature. 
 To start off we'll look at some landcover data. With this data, we can investigate the surroundings of the Fluxnet towers. This data gives us the different classes of physical coverage of the Earth’s surface, such as forests, grasslands, croplands, lakes, etc. Landcover types affect fluxes measured by the tower through the vegetation that characterizes them, or by influencing the radiation budget through albedo, or water availability. Although we have some information from the overview file of the towers, we can still check whether we can confirm this information. We will load landcover data from GlobCover provided by the [European space agency (ESA)](http://due.esrin.esa.int/page_globcover.php). This project provides landcover maps observations of surface reflectance from the 300m MERIS sensor on board the ENVISAT satellite mission as their input.
@@ -516,7 +516,7 @@ plot(raster_landcover_crop, legend=FALSE, xlab="longitude", ylab="latitude")
 points(lon_lae, lat_lae, pch = 16, col = "red")
 ```
 
-If we want to conduct analysis using two different rasters, we have to make sure they have the same resolution and are aligned on the same grid. Let's read a second raster and compare the grids. We load spatio-temporal temperature rasters available from [CHELSA](https://chelsa-climate.org) to complement our flux tower measurements for further analysis.
+If we want to conduct analysis using two different rasters, we have to make sure they have the same resolution and are aligned on the same grid. We can read a second raster and compare the grids. We load spatio-temporal temperature rasters available from [CHELSA](https://chelsa-climate.org) to complement our flux tower measurements for further analysis.
 The temperature raster data from CHELSA provides free high-resolution climate data (temperature and precipitation) for the past and the future. The past data we use here are downscaled model output temperature and precipitation estimates of the ERA-Interim climatic reanalysis (forecast models and data assimilation systems reanalysing archived observations). While the temperature algorithm is based on statistical downscaling of atmospheric temperatures, the precipitation algorithm incorporates orographic predictors including wind fields, valley exposition, and boundary layer height, with subsequent bias correction. The data we use consists of a monthly temperature and precipitation time series over the area of Europe from 2006 to 2012 in January. To compare this new raster with the previous one we need to crop it to the same region as the tower.
 
 ```{r}
@@ -532,13 +532,13 @@ plot(raster_chelsa_crop, col = pal(20), xlab="longitude", ylab="latitude")
 points(lon_lae, lat_lae, pch = 16, col = "red")
 ```
 
-We see that the temperature units are not in a comprehensive format. To change the unit from Kelvin x10 to degree Celsius we have to divide the data by 10 and subtract 273.15. 
+We see that the temperature units are not in a format that is straightforward to read. To change the unit from Kelvin x10 to degree Celsius, we have to divide the data by 10 and subtract 273.15. 
 
 ```{r}
 raster_chelsa_crop <- raster_chelsa_crop/10-273.15
 ```
 
-We plot our raster again.
+We plot our raster again, with this temperature transformation.
 
 ```{r}
 pal <- colorRampPalette(c("purple","blue","cyan","green","yellow","red"))
@@ -561,7 +561,7 @@ plt
 
 Create your own small raster with 100 grid cells. Give it values, a projection (e.g. '+proj=utm +zone=48 +datum=WGS84') and plot it.
     
-_Bonus_: If you chose the example projection provided, add _europe_shape_ to your plot.
+If you chose the example projection provided, add _europe_shape_ to your plot.
 
 **Solution**
 
@@ -585,13 +585,13 @@ projection(myraster) <- "+proj=utm +zone=48 +datum=WGS84"
 
 # plot it
 plot(myraster)
-# for fun let's see where europe would be on our raster, since it has a projection...
+# Since the raster has a projection we can visualise Europe on this new raster.
 plot(europe_shape, add=TRUE)
 ```
 
 #### Aggregating
 
-A **raster grid** is uniquely defined by an _origin_, a point that one of the intersections of grid lines, and its resolution, the magnitude of each cell-side. In the R package `raster`, the origin is defined as the point closest to (0,0) that is still an intersection of grid lines. The functions `origin()` and `res()` from the R package `raster` return the origin and resolution of a raster object. So let's see what the resolution and origin of the rasters we loaded before are.
+A **raster grid** is uniquely defined by an _origin_, a point that one of the intersections of grid lines, and its resolution, the magnitude of each cell-side. In the R package `raster`, the origin is defined as the point closest to (0,0) that is still an intersection of grid lines. The functions `origin()` and `res()` from the R package `raster` return the origin and resolution of a raster object. As an example, we will see what the resolution and origin of the rasters we loaded before are.
 
 ```{r}
 cat(" Resolution Raster Landover: ", res(raster_landcover), "\n",
@@ -603,7 +603,7 @@ cat(" Origin Raster Landover: ", origin(raster_landcover), "\n",
     "Origin Raster Chelsa: ", origin(raster_chelsa))
 ```
 
-Landcover has a much higher resolution. Let's re-grid the Landcover raster to match the grid of the Chelsa raster. Aggregating means resampling an input raster to a coarser resolution based on a specified aggregation strategy. We now determine the aggregation factor by dividing the resolution of the landcover raster by that of the Chelsa raster. We do it both for the longitude and latitude to make sure they match.
+Landcover has a much higher resolution. We can re-grid the Landcover raster to match the grid of the Chelsa raster. Aggregating means resampling an input raster to a coarser resolution based on a specified aggregation strategy. We now determine the aggregation factor by dividing the resolution of the landcover raster by that of the Chelsa raster. We do it both for the longitude and latitude to make sure they match.
 
 ```{r}
 res_landcover <- res(raster_landcover)
@@ -616,7 +616,7 @@ cat(" Longitudinal Aggregation Factor: ", factor_agg_lon, "\n",
     "Latitudinal Aggregation Factor: ", factor_agg_lon)
 ```
 
-First, we observed that the land cover raster has a higher resolution than the temperature raster, now we now it is 3 times higher. So we need to transform the landcover raster to make sure it has the same grid (same _origin_ and _resolution_) as the temperature raster. This will allow us to combine them in a potential analysis. We achieve this using `aggregate()` from the R package `raster` to obtain a sum of edges raster at 1000m x 1000m resolution. 
+We observed that the landcover raster has a higher resolution than the temperature raster, we have deduced it is 3 times higher. So we need to transform the landcover raster to make sure it has the same grid (same _origin_ and _resolution_) as the temperature raster. This will allow us to combine them in a potential analysis. We achieve this using `aggregate()` from the R package `raster` to obtain a sum of edges raster at 1000m x 1000m resolution. 
 
 The aggregate function takes three main arguments. 
 * **_x_** : the raster object to aggregate,
@@ -661,7 +661,7 @@ raster_landcover_crop_resampl <- resample(raster_landcover_crop, raster_chelsa_c
 
 [ ](./figures/04_output-crop.png)
 
-Now we check if the two rasters are aligned.
+Now, we can check whether the two rasters are aligned.
 
 ```{r}
 cat(" Resolution Landcover: ", res(raster_landcover_crop_resampl), "\n",
@@ -670,11 +670,11 @@ cat(" Resolution Landcover: ", res(raster_landcover_crop_resampl), "\n",
     "Origin Chelsa:      ", origin(raster_chelsa), "\n")
 ```
 
-Now the two rasters are aligned.
+As we can see in the output of the code above, both the resolution and origin are identical. This means our rasters are now aligned. Remember, the _resolution_ is the size of the cells or pixels in a raster and the _origin_ is the coordinates of the point point closest to _(0,0)_ that you could get if you moved towards _that point_(0,0) in steps of the x and y resolution of the rasters being analysed.
 
 #### Point extraction
 
-In this section, we will show you how to extract data from our rasters or spatial data. We will be extracting the values for the locations of our towers. The function to extract values is aptly named `extract()`. First, we specify the raster from which the values should be extracted and then the exact sites at which the values should be extracted. Here, we combine all this into a neat dataframe.
+In this section, we will extract data from our rasters or spatial data. We will be extracting the values for the locations of our towers. The function to extract values is aptly named `extract()`. First, we specify the raster from which the values should be extracted and then the exact sites at which the values should be extracted. Here, we combine all this into a dataframe.
 
 ```{r message=F}
 df_sites_temp <- read_csv("./data/fluxnet_site_info_reduced.csv")
@@ -685,7 +685,12 @@ df_sites_temp <- extract(raster_chelsa, sp_sites, sp = TRUE) %>%
   dplyr::rename(temp_chelsa = Chelsa_t_mean_2006.2012)
 ```
 
-In the lectures, you have already, heard that we must always be aware of modelled data and be aware of its limitations. Therefore, we don't just want to use CHELSA temperature data. It is important to consider different models and compare them. Hence, we'll look at another climate model. We load and plot the provided rasters showing the mean annual temperatures for the Worldclim data for the years 2006-2012. WorldClim is a set of global climate layers (gridded climate data) with a spatial resolution of about 1 km2. We extract values from Worldclim at the same tower sites and add them to the _df_sites_ data frame. Now we have a tidy dataframe with the site, latitude and longitude, temperatures for Chelsa and WorldClim at each tower location.
+In the lectures, we have seen that we must always be aware of modelled data and be aware of its limitations. Therefore, we do not just want to use CHELSA temperature data. It is important to consider different models and compare them. Hence, we will look at another climate model: [WorldClim](https://worldclim.org/). The WorldClim data website is a database containing global weather and climate data at a high spatial resolution. The data can be downloaded for historic ("near current") and future climate and weather conditions. We will be using the historical monthly weather data. Due to the size of the rasters downloaded from WorldClim, we have done this already and made a raster of the mean annual temperature for the years 2006 to 2012. Through this we lose some details and information but for our analysis it suffices.
+
+Next, we load and plot the provided rasters showing the mean annual temperatures for the WorldClim data for the years 2006-2012. WorldClim is a set of global climate layers (gridded climate data) with a spatial resolution between 1-340 km^2. 
+We want to extract values from WorldClim at the same tower sites, as we have used previously, and add them to the _df_sites_ data frame. 
+
+This will give us a tidy dataframe with the site, latitude and longitude, temperatures for Chelsa and WorldClim at each tower location.
 
 ```{r}
 raster_worldclim <- raster("./data/WC_mean_t_2006-2012.tif")
@@ -698,7 +703,7 @@ df_sites_temp <- extract(raster_worldclim, sp_sites, sp = TRUE) %>%
 head(df_sites_temp)
 ```
 
-We get the monthly mean temperature of Jan 2006 from FLUXNET data.
+We obtain the monthly mean temperature of Jan 2006 from FLUXNET data.
 
 ```{r message=F}
 library(lubridate)
@@ -756,12 +761,12 @@ We compute the mean squared error.
 mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_wc)
 ```
 
-We see that Chelsa correlates better (because the mean squared error is smaller) with the temperature values at the towers. We also see that Worldclim compared to CHELSA tends to predict colder temperatures.
+We see that Chelsa correlates better, since the mean squared error is smaller, with the temperature values at the towers. We also see that WorldClim compared to CHELSA tends to predict colder temperatures.
 
 **Checkpoint**
 
 Above, we compared the CHELSA temperatures with the tower temperatures. Now we want to visually see which of the two data had the higher mean for each tower location.
-Plot the map of europe and add the tower locations as points. Colour the points so that for a higher CHESLA mean they are one colour and a higher tower temperature another.
+To achieve this, attempt to plot the map of Europe and add the tower locations as points. Then colour the points so that for a higher CHESLA mean they are one colour and a higher tower temperature another.
 
 **Solution**
 
@@ -786,11 +791,11 @@ ggplot() +
   theme_classic()+ 
   coord_quickmap()
 ```
-
+From the resulting map of Europe, we can deduce that for any points (here representing the towers) that are purple (circles) the mean temperature of CHELSA is higher than the measured temperature. Any orange points (triangles) the towers measured a higher temperature than CHELSA predicted. There seem to be more purple circles suggests CHELSA predicts higher temperatures than are measured by the fluxnet towers.
 
 #### Correlations with GPP
 
-We already had a look at GPP in Chapter \@ref(ch-02). In this section we want to correlate Chelsa temperature and landcover with GPP. 
+We already had a look at GPP in Chapter \@ref(ch-02). In this section we want to correlate CHELSA temperature and landcover with GPP. 
 
 In models we often take multiple variables and correlate them to another variable (here GPP). By seeing if they correlate well we can see if any of the variables make good so-called _predictors_.  Let's see how well landcover and temperature correlate with GPP.
 
@@ -805,7 +810,8 @@ GPP <- ddf_allsites_nested_joined %>%
   ungroup() %>% 
   group_by(siteid) %>% 
   summarise(gpp_meanann = mean(gpp_ann)) %>% 
-  dplyr::select(siteid, gpp_meanann)
+  summarise(gpp_medianann = median(gpp_ann)) %>%
+  dplyr::select(siteid, gpp_meanann, gpp_medianann)
 
 # we remove the data we don't have in the other datasets for the correlations
 GPP <- GPP[-c(14, 16, 34), ]
@@ -821,7 +827,7 @@ df_sites_landcover <- as.tibble(df_sites_landcover)
 df_sites_landcover <- df_sites_landcover[-c(16, 34), ]
 ```
 
-And create a dataframe with all the extracted data from the tower sites to then make correlations.
+We can create a dataframe with all the extracted data from the tower sites to then make correlations.
 
 ```{r}
 landcover <- df_sites_landcover$Globcover_EU
@@ -847,32 +853,47 @@ df_corr <- df_corr %>%
         landcover == 150 ~ "sparse vegetation"))
 ```
 
-Back to correlations! Let's start by correlating the Chelsa temperatures with GPP. We do this by building a simple linear model using the function `lm()`.
+Back to correlations, we can start by correlating the CHELSA temperatures with GPP. We do this by building a simple linear model using the function `lm()`.
 
 ```{r}
 reg1 <- lm(gpp_meanann~chelsa, data = df_corr) 
+
+sum(reg1)
 ```
 
 To visualise the correlation we plot our temperature data with the linear model.
 
 ```{r message=F, warning=F}
-df_corr %>% 
+p_mean <- df_corr %>% 
   ggplot(aes(x = chelsa, y = gpp_meanann)) +
   geom_point() +
   geom_smooth(method='lm', color="red", size=0.5, se=FALSE) +
   xlab("Chelsa temperature") +
   ylab("GPP mean [µmolCO2 m-2 s-1]") +
   theme_classic()
+
+p_mean
+
+p_median <- df_corr %>% 
+  ggplot(aes(x = chelsa, y = gpp_medianann)) +
+  geom_point() +
+  geom_smooth(method='lm', color="red", size=0.5, se=FALSE) +
+  xlab("Chelsa temperature") +
+  ylab("GPP mean [µmolCO2 m-2 s-1]") +
+  theme_classic()
+
+p_median
 ```
 
 Then we make a linear model for GPP and landcover.
 
 ```{r}
 reg2 <- lm(gpp_meanann~landcover, data=df_corr)
+
+sum(reg2)
 ```
 
-... and again plot it. However, since landcover is categorical data we make a boxplot instead. We've also added a general trendline but remember this could be quite different if we correclated data from a specific landcover category with GPP.
-
+Again, we can plot it. However, since landcover is categorical data we make a boxplot instead. A boxplot is a figure that gives a graphical representation of the variability or spread of the data, by providing information beyond the central tendency of the data. A boxplot will show ...
 ```{r warning=F}
 ggplot(data=df_corr, aes(x=landcover_cat, y=gpp_meanann, group=as.factor(landcover_cat)))+ 
         geom_boxplot() + 
@@ -883,7 +904,7 @@ ggplot(data=df_corr, aes(x=landcover_cat, y=gpp_meanann, group=as.factor(landcov
 
 We don't see a particularly strong correlation, thus we need to consider other predictors and more complex models. You will discuss that later in the class.
 
-### Key points of the tutorial
+### Key points from the tutorial
     
 Integrating remote sensing data: we extract NDVI in the area around our eddy flux towers from the MODISTools package and conver it into a raster format.
 
@@ -911,7 +932,7 @@ Rasters: we investigate whether the variables landcover and temperature can expl
 
 * Load landcover data from Globcover temperature data from CHELSA in the form of rasters and plot them around our tower sites with the raster and rasterVis packages
 * Apply the same resolution (aggregate) and origin (align) to the climate and landcover rasters 
-* Compare modeled climate data from CHELSA and Worldclim to our fluxnet data by extracting the temperatures at the tower sites and calculating the MSE
+* Compare modeled climate data from CHELSA and WorldClim to our fluxnet data by extracting the temperatures at the tower sites and calculating the MSE
 * Finally, landcover and CHELSA modeled temperatures are plugged into a linear regression to see if they are significantly correlated with GPP
 
 Bonus: here we incorporate plant species data from GBIF to determine their effect on GPP with the help of PCA.
@@ -922,385 +943,9 @@ Bonus: here we incorporate plant species data from GBIF to determine their effec
 * Add species traits to our dataset with a for loop
 * Use PCA to determine which traits explain the most variation in GPP
 
-### Bonus: Species Occurrence, Trait Data and PCAs
-
-In functional ecology, we focus on the function that a species has in a community. This sub-discipline of ecology represents the intersection between ecological patterns and the mechanisms that underlie them and focuses on traits represented in large number of species. Here, we use plant distribution data around the fluxnet towers to investigate the plant community composition for each location. The community composition will allow us to get insights on which plant traits that are dominant. This is relevant because plant traits are both responsive to local climate and strong predictors of primary productivity. For example, Specific Leaf Area (SLA) and plant height, are linked to GPP and affected by local climate. Functional traits capture core differences in the strategies plants use to acquire and invest resources. Most woody plants have the same basic physiological function and key resource requirements, however species differ considerably in the rates at which resources are acquired, invested into different tissues, and lost via turnover. Traits for example moderate plant responses to light environment and determine shade tolerance. They have been shown to affect growth depending on plant size. In the first step, we use distribution data from the Global Biodiversity Information Facility (GBIF) to obtain the community composition in each location. 
-
-GBIF is an international organization that makes biodiversity data publicly available. The data are provided by many institutions from around the world and GBIF gathers these data and makes them accessible and searchable through their platform. Data available on GBIF are primarily distribution records on plants, animals, fungi, and microbes for the world, and scientific names data. This is very useful information for ecological analysis. With the "rgbif" package we can download occurrence data directly from the GBIF database to R.
-
-##### Species Occurrences
-
-We start by to loading the relevant packages.
-
-```{r message=F}
-library(rgbif)
-library(rgeos)
-```
-
-In this first, section we will give you an example of how to download data from gbif for the CH-Lae site.
-
-```{r message=F, warning=F}
-# combine the CH-Lae latitude and longitude
-CHLae_lonlat <- as.data.frame(cbind(longitude=lon_lae, latitude=lat_lae))
-
-# make them into 'SpatialPoints', this is an alternative method to the one used above
-coordinates(CHLae_lonlat) <- ~longitude + latitude
-
-# assign a projection and coordinate reference system
-crs(CHLae_lonlat) <- "+init=epsg:4326 +proj=longlat +datum=WGS84 +no_defs"
-
-# create a roughly 5.5km buffer around the CH-Lae tower
-TowerBuffer <- gBuffer(CHLae_lonlat, width=0.05)
-
-# transform the tower buffer into polygons
-tower.polygon <- polygons(TowerBuffer)
-```
-
-Then transform the polygon to wkt format which is needed for the gbif input:
-
-```{r}
-tower.polygon.wkt <- writeWKT(tower.polygon)
-```
-
-Now we are ready to download occurrence records of plants around the CH-Lae tower from gbif with `occ_search()` function.
-We add the hasCoordinate = T, to make sure we only download data with coordinates.
-The _geometry_ argument will be equal to our constructed polygon of the buffer.
-
-```{r eval=F}
-occ_CHlae <- occ_data(taxonKey = 7707728, hasCoordinate = T, 
-                     geometry = tower.polygon.wkt, limit = 50000)
-
-# The output is a list so we extract the actual data since this is of interest
-occ_CHlae <- as.data.frame(occ_CHlae$data)
-
-```
-
-```{r echo=F, paged.print=TRUE}
-occ_CHlae <- readRDS("./data/occ_CHlae.RDS")
-head(occ_CHlae) %>% select(1:6) # Only displaying 6 of the 303 features of occ_CHlae
-```
-
-Let's have a quick look at the orders of the species in the polygon around our tower.
-
-```{r}
-# first we make the maine plot of the points coloured by order with the buffer polygon around them
-plot_sp_occ <- ggplot()+
-  geom_point(data=occ_CHlae, aes(x=decimalLongitude, y=decimalLatitude, color=order))+
-  geom_polygon(data=tower.polygon, 
-               aes(x=tower.polygon@polygons[[1]]@Polygons[[1]]@coords[,1], y=tower.polygon@polygons[[1]]@Polygons[[1]]@coords[,2]), fill = NA, colour = "black")+
-  theme_classic() + 
-  xlab("Longitude") + 
-  ylab("Latitude") +
-  theme(legend.position = "none")
-
-# then we add the CH-Lae tower in the middle in red
-plot_sp_occ + geom_point(aes(x=lon_lae, y=lat_lae, fill="#FC717F"), size=5, colour="black", shape=21, stroke=1)
-```
-
-To make a species list and calculate the species richness for that tower we simply extract the unique species
-
-```{r}
-sp.list <- unique(occ_CHlae$scientificName)
-length(unique(occ_CHlae$scientificName))
-```
-
-Normally at this point a species name filtration step would be done. That means the plant names from our species list would be compared to that of 'The Plant List' (TPL) using the package `Taxonstand`.
-This is quite time consuming, so we have already done it for the species lists of each tower.
-Below is the example code:
-
-```{r eval=F}
-# We retrieve name from taxonstand. To specify how much difference in the names we want to allow we specify diffchar=.
-library(Taxonstand)
-name <- TPL(sp.list.final, diffchar = 4, drop.lower.level = T)
-
-# select columns of interest
-name <- name[, c("Taxon", "New.Genus", "New.Species", "New.Taxonomic.status", "Typo")]
-
-# create column with new species name
-name$autocorrected <- paste(name$New.Genus, name$New.Species)
-
-# drop new.species and new.genus column
-name <- name[, c("Taxon", "autocorrected", "New.Taxonomic.status", "Typo")]
-
-# change column names
-colnames(name) <- c("submittedname", "autocorrected", "taxo_status", "typo")
-
-# Finally, we can drop all species for which we did not find a matching scientific name.
-names.accepted <- unique(name[name$taxo_status=="Accepted",])
-```
-
-```{r}
-# read in the resolved species names .csv
-species_list_full <- read.csv("./data/resolved_species_names.csv",sep=";")
-```
-
-```{r}
-# check how many species are in the list
-dim(species_list_full)
-```
-
-Next, we can use this information to build a presence-absence matrix for all locations and species, this will allow us to see where each species is found. This can be the basis for many community ecology calculations or species distribution models linking the environmental variables to species' occurrences to see which are most correlated with certain factors.
-
-```{r message=F, warning=F, eval=F}
-# select all files with resolved in their name
-paths <- list.files(file.path("./data/", "species_occurrences"), pattern='resolved_*', recursive = F, full.names = T)
-
-# create a function to read them all in
-read_species = function(file_path){
-  return(read.csv(file_path,sep=";"))
-}
-
-# read all the files in paths in using the function read_species
-species_occurrences <- lapply(paths, read_species)
-
-# bind them into a df and give an identifier with .id=
-species_occ_df <- bind_rows(species_occurrences, .id="id")
-
-# make a species occurrence (or presence-absence) matrix
-species_occ_mat <- species_occ_df %>%
-  group_by(id)%>%                           # group the species lists by the sites
-  distinct() %>%                            # select only unique species names since some occur multiple times
-  mutate(present = 1) %>%                   # create a column where all the species get a 1 (for presence)
-  pivot_wider(names_from = names.accepted.autocorrected, values_from = present) %>%   # turn (spread) the column of species names to the column names
-  mutate_all(funs(ifelse(is.na(.), 0, .)))  # replace the missing values with 0
-```
-
-```{r echo=F}
-load("./data/species_occ_mat.RData")
-```
-
-```{r paged.print=TRUE}
-head(species_occ_mat) %>% select(1:6) # Only displaying the first 6 featurs of species_occ_mat
-```
-
-GBIF is a great source for species occurrences. However, we have to keep in mind that the data collection is biased by regions. For example, we find much fewer plant records in Africa than in Europe. But also within Europe, there are some biases. Therefore we need to be careful with the interpretation.
-
-```{r message=F}
-nr_occurrences <- read_csv("./data/flx_tower_occurrences.csv")
-
-occurrences <- nr_occurrences$nr_occurrences
-```
-
-```{r message=F, warning=F}
-ggplot() +
-  geom_polygon(data = europe_shape,
-               aes(x = long, y = lat, group = group), fill = NA, colour = "black") +
-  geom_point(aes(colour = occurrences, x = df_sites$lon,
-                              y = df_sites$lat)) +
-  scale_colour_gradient(low = "yellow", high = "red", na.value = NA) +
-  theme_classic() + xlab("Longitude") + ylab("Latitude") + coord_quickmap()
-```
-
-We see that the numbers of occurrence records in southern Europe are lower than in central Europe. This suggests there is a sampling bias, with a higher sampling effort in central European countries.
-
-Knowing the species richness of the different sites can help us learn more about the ecological context the towers are located in. We made the occurrence matrix above and now we'll use that to plot the richness. The richness is the number of species at each site. Since each row in the matrix is a site we can just sum the rows and we'll get the number of species per site. We don't have data for all our towers in _df_sites_ so we will make a new dataframe with only the relevant sites and call it _df_sp_sites_.
-
-```{r message=F, warning=F}
-# remove the sites for which we have no species lists
-df_sp_sites <- df_sites %>% 
-  filter(!(site %in% c("CH-Oe1", "DE-Obe", "FR-LBr", "IT-Cpz", "IT-Ro1")))
-
-# the first column is the 'id', so we exclude that
-richness <- rowSums(species_occ_mat[,-1])
-
-ggplot() +
-  geom_polygon(data = europe_shape,
-               aes(x = long, y = lat, group = group), fill = NA, colour = "black") +
-  geom_point(aes(colour = richness, x = df_sp_sites$lon,
-                              y = df_sp_sites$lat)) +
-  scale_colour_gradient(low = "yellow", high = "red", na.value = NA) +
-  theme_classic() + xlab("Longitude") + ylab("Latitude") + coord_quickmap()
-```
-
-#### Species Traits
-
-In the next step, we will study the relationship between plant traits, GPP, and climatic variables for our fluxnet towers. We obtained data from the TRY database, which is a database containing plant trait data. You can make data requests on [their website](www.https://www.try-db.org). You can select the traits that you are interested in and the species for which you would like to look at the traits. 
-For this tutorial we already requested a dataset, because usually, it takes time to receive the data. We downloaded data on 9 different traits for all species available. We extracted the trait data for all the species we have in our species list (and therefore also in our species occurrence matrix). 
-
-Let's load the data.
-
-```{r paged.print=TRUE}
-trait_df <- read.csv("./data/Trait_df.csv")
-head(trait_df) %>% select(1:3, 5) # Only displaying 4 of 9 features
-```
-
-Some examples of traits are are leaf texture, leaf thickness, eaf chlorophyll content per leaf area, specific leaf area, etc.
-
-As a next step, we can combine the species occurrence data with the trait data. The presence/absence matrix (_species_occ_mat_) we made earlier, gives us the species present at each site. From that we can then extract these species and their respective trait values from the trait dataframe (_trait_df_). Then we go on to summarise this data by calculating the mean value for each trait across all the species at the tower sites. 
-
-We start by doing this for one site.
-
-```{r}
-ba <- trait_df
-
-# select all the species (species names= column names) which are present (so ==1)
-species_present <- colnames(species_occ_mat)[which(species_occ_mat[1, ] == 1)]
-
-# filter out the trait data for the species present at that site
-trait_subset <- ba[ba$SpeciesName %in% species_present,]
-
-# calculate the mean of each trait across all species present
-bac <- aggregate(trait_subset$OrigValueStr, list(trait_subset$TraitID), mean, na.rm=T)
-```
-
-To finish preparing the data for the PCA, we do the above steps for all the remaining sites by using a _'for loop'_.
-
-```{r}
-df_pca <- bac$x
-for(i in c(2:28)){
-    species_present <- colnames(species_occ_mat)[which(species_occ_mat[i, ] == 1)]
-    trait_subset <- ba[ba$SpeciesName %in% species_present,]
-    bac <- aggregate(trait_subset$OrigValueStr, list(trait_subset$TraitID), mean, na.rm=T)
-    df_pca <- rbind(df_pca, bac$x)
-}
-```
-
-For the PCA we use only the traits with traitIDs: 46, 47, 3106 and 3117. This is because the other traits are just slightly modified versions of these four traits. These four traitIDs correspond to the traits: _leaf thickness_, _leaf dry matter content (LDMC)_, _plant height_ and _specific leaf area (SLA)_. _Leaf dry matter content_ is calculated as leaf dry mass per leaf fresh mass and _specific leaf area_ is defined as leaf area per leaf dry mass.
-
-```{r}
-# we select the columns corresponding to our desired traits
-df_pca <- cbind(df_pca[,2],df_pca[,3],df_pca[,5],df_pca[,9])
-
-# to make the data easier to understand we name the columns after the trait
-colnames(df_pca) <- c("leaf thickness", "leaf dry matter content (LDMC)", "plant height vegetative", "specific leaf area (SLA)")
-
-head(df_pca)
-```
-
-Principal Component Analysis (PCA) is one of famous techniques for dimension reduction, feature extraction, and data visualization. In general, PCA is defined as the transformation of a high dimensional vector space to a low dimensional space. Just imagine having to visualise data with 10 dimensions... we often stuggle already with three. It's almost impossible to effectively show the shape of such a high dimensional data distribution. PCA provides an efficient way to reduce the dimensionalty (i.e. from 10 to 2), so it is much easier to visualize the shape of data distribution. In a nutshell, this reduction happens by the PCA taking the two axes that best explain the variation in the data.
-
-PCA is also useful in the modeling a robust classifier where considerably small number of high dimensional training data is provided. By reducing the dimensions of learning data sets, PCA provides an effective and efficient method for data description and classification.
-For a more mathematical description of PCA you can check https://www.projectrhea.org/rhea/index.php/PCA_Theory_Examples.
-
-So now let's reduce the dimensions of our trait data as an example... For this we use the function `prcomp()`.
-
-```{r}
-traits_pca <- prcomp(df_pca, center = TRUE, scale = TRUE)
-summary(traits_pca)
-```
-
-From the information above we can see how much of the variation in the data is explained by each axis or dimensionality. Ideally, you want the first to axes to explain the vast majority of the variation, while the subsequent ones are much less important. 
-But what do all these numbers mean and how does the data look. It's time to visualise the PCA.
-
-```{r}
-library(ggfortify)
-autoplot(traits_pca, data = df_pca, col ="#138D37", loadings = TRUE, loadings.colour = 'blue', loadings.label = TRUE, loadings.label.size = 3) + theme_classic()
-```
-
-We have successfully reduced the dimensionality of our data! We started with four traits and now we have reduced the variation to two main axes. We see that PC1 is mainly associated to leaf dry matter content, and plant height, while PC2 is associated with specific leaf area and leaf thickness.
-
-It can be interesting to see how the points relate spatially, this could, for example, allow us to identify clusters. Therefore, we will visualise our tower sites coloured by the corresponding position (positive or negative) on the PC1 axes.
-
-```{r}
-# start by designating trait and axis values to vector objects
-tr1 <- df_pca[,1] # these are the traits
-tr2 <- df_pca[,2] # these are the traits
-
-pc1 <- traits_pca$x[,1] # these are the axis values
-pc2 <- traits_pca$x[,2] # these are the axis values
-```
-
-```{r}
-# specify the colour palettes for positive and negative values
-pospal <- colorRampPalette(c("#E9E15C", "#CF2B1E"))
-negpal <- colorRampPalette(c("#1E3498", "#95D7DB"))
-
-# we separate positive from negative values for visualization
-neg_pc1 <- pc1 
-neg_pc1[neg_pc1 > 0 ] <- NA
-pos_pc1 <- pc1 
-pos_pc1[pos_pc1 < 0 ] <- NA
-
-datColpos <- pospal(100)[as.numeric(cut(pos_pc1,breaks = 100))] 
-datColneg <- negpal(100)[as.numeric(cut(neg_pc1,breaks = 100))]
-```
-
-Once the colours are defined, we can plot PC1.
-
-```{r}
-#PC1 
-plot(europe_shape)
-points(df_sp_sites$lon, df_sp_sites$lat, col=datColpos,cex=1, pch = 19) 
-points(df_sp_sites$lon, df_sp_sites$lat, col=datColneg,cex=1, pch = 19)
-```
-
-And then repeat the process for PC2:
-
-```{r}
-# PC2
-neg_pc2 <- pc2 
-neg_pc2[neg_pc2 > 0 ] <- NA
-pos_pc2 <- pc2 
-pos_pc2[pos_pc2 < 0 ] <- NA
-
-datColpos <- pospal(100)[as.numeric(cut(pos_pc2,breaks = 100))] 
-datColneg <- negpal(100)[as.numeric(cut(neg_pc2,breaks = 100))]
-
-# and plot it on the map
-plot(europe_shape)
-points(df_sp_sites$lon, df_sp_sites$lat, col=datColpos,cex=1, pch = 19)
-points(df_sp_sites$lon, df_sp_sites$lat, col=datColneg,cex=1, pch = 19)
-```
-
-The last step in our trait data PCA is to compare the results with GPP. Since GPP has more sites than we used for this analysis we start by removing these sites.
-
-```{r}
-GPP_pca <- GPP %>% 
-  filter(!(siteid %in% c("CH-Oe1", "DE-Obe", "FR-LBr", "IT-Cpz", "IT-Ro1")))
-```
-
-Then we make a linear model for PC1 and GPP and plot it.
-
-```{r message=F, warning=F}
-reg_gpp_pc1 <- lm(gpp_meanann~pc1, data = GPP_pca)
-
-GPP_pca %>% 
-  ggplot(aes(x = pc1, y = gpp_meanann)) +
-  geom_point() +
-  geom_smooth(method='lm', color="red", size=0.5, se=FALSE) +
-  xlab("PC1") +
-  ylab("GPP mean [µmolCO2 m-2 s-1]") +
-  theme_classic()
-```
-
-We repeat this for GPP and PC2.
-
-```{r message=F, warning=F}
-reg_gpp_pc2 <- lm(gpp_meanann~pc2, data = GPP_pca)
-
-GPP_pca %>% 
-  ggplot(aes(x = pc2, y = gpp_meanann)) +
-  geom_point() +
-  geom_smooth(method='lm', color="red", size=0.5, se=FALSE) +
-  xlab("PC2") +
-  ylab("GPP mean [µmolCO2 m-2 s-1]") +
-  theme_classic() 
-```
-
-Once again we see weak correlations with GPP. Therefore, we can conclude that this further search for predictors that explain the variation in GPP has not yielded any good results. We will have to continue looking for better predictors, which explain this variation in GPP between the sites.
-
-**Checkpoint**
-
-Plot the spatial distribution of the trait 'leaf thickness', make the colour or size related to the leaf thickness values. Describe what you can gather from this plot.
-
-**Solution**
-
-```{r message=F, warning=F}
-leaf_t <- df_pca[,1]
-
-leavepal <- colorRampPalette(c("#E2C151","#138D37"))
-
-datColleaves <- leavepal(10)[as.numeric(cut(leaf_t,breaks = 10))]
-
-plot(europe_shape)
-points(df_sp_sites$lon, df_sp_sites$lat, col=datColleaves,cex=leaf_t/18, pch = 19) 
-```
-
-The distribution of leaf thickness seems to depend on latitude. In Southern regions, leaves are generally thinner than in Northern regions. To confirm this we would have to make a model and test our observation.
-
 ## Exercise
 
-### Part 1: Plotting Elevation differences
+**Part 1: Plotting Elevation differences**
 
 In this first part of the exercise, we consider elevation data from the ETOPO dataset. ETOPO is a 1 arc-minute global relief model of the Earth's surface that integrates land topography and ocean bathymetry. Since it is modelled date there is a certain level of uncertainty associated with it. In this exercise, you will look at the differences between the elevations from the tower data, which is directly measured at the site, and the values you will extract from this modelled ETOPO data.
 
@@ -1318,9 +963,9 @@ d. Calculate the difference between the elevations of the towers and the one ext
 e. Plot the difference in elevation calculated for each site on a map of Europe.
 _Hint:_ there are several ways to do this, one could be to using ifelse().
 
-### Part 2: Temperature and Elevation Correlations
+**Part 2: Temperature and Elevation Correlations**
 
-In this second part, we want to find out which of the elevations we gathered in the first part (ETOPO and towers) correlates better with the temperatures measured at the towers.
+Since we know temperature and altitude (or elevation) are correlated due to a decrease in air pressure at higher altitudes, we want to see this correlation in our data. Therefore, in this second part, we want to find out which of the elevations we gathered in the first part (ETOPO and tower elevations) correlates better with the temperatures measured at the towers. Since the temperatures and elevations for the tower were measured in the same place, we would expect those to be more correlated than the modelled ETOPO elevations and the tower temperatures.
 
 a. Correlate the ETOPO elevations at the towers sites with the temperatures measured at the towers. 
 
