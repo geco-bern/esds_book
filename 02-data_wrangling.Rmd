@@ -748,182 +748,12 @@ head(ddf_allsites_joined)
 head(ddf_allsites)
 ```
 
-### Bonus: Functional programming II
-
-Functions can be applied to any list. Because lists can consist of any type of objects, `map()` is a powerful approach to "iterating" over multiple instances of the same class of object and can be used for all sorts of tasks. In the following, list elements are data frames of daily data and the mapping function `lm()` fits a linear regression model of GPP versus PPFD to each sites' data.
-
-```{r}
-list_linmod <- purrr::map(list_df, ~lm(GPP_NT_VUT_REF ~ PPFD_IN, data = .))
-```
-
-Note how the `.` now indicates where the elements of `list_df` go when evaluating the `lm()` function. This now returns a list of linear model objects (the type of objects returned by the `lm()` function call).
-
-We can spin the functional programming concept further and apply (or map) the `summary()` function to the `lm`-model objects to get a list of useful statistics and metrics, and then further extract the element `r.squared"` from that list as:
-
-```{r}
-list_linmod %>%
-  purrr::map(summary) %>%              # applyting a function
-  purrr::map_dbl("r.squared") %>%      # extracting from a named list
-  head() # for handy output
-```
-
-`map_dbl()` is a variant of the `map()` function that returns not a list, but a vector of numeric values of class "double" (hence, the name `_dbl`). Note further, that providing a character (`"r.squared"`) as an argument instead of an (unquoted) function name, `map()` extracts the correspondingly named list element, instead of applying a function to a list element.
-
-When writing code for an analysis, it is useful, if not essential, to understand the objects we are working with and make sense of the results of simple `print <object>` statements. Data frames are particularly handy as they provide an organisation of data that is particularly intuitive (variables along columns, observations along rows, values in cells). We have encountered such data frames above. Here, we are dealing with a list of linear model objects. Can such a list fit into the tidy paradigm?
-
-Yes, they can.
-
-Think of the linear model objects as 'values'. Values do not necessarily have to be scalars, but they can be of any type (class).
-
-```{r}
-tibble(
-  siteid = vec_sites,
-  linmod = list_linmod
-  )
-```
-
-The fact that cells can contain any type of object offers a powerful concept. Instead of a linear model object as in the example above, each cell may also contain another data frame. In such a case, we say that the data frame is no longer flat, but *nested*.
-
-The following creates a nested data frame, where the column `data` is defined by the list of data frames read from files above (`list_df`).
-
-```{r}
-tibble(
-  siteid = vec_sites,
-  data = list_df
-  )
-```
-
-We can achieve the same result, by directly nesting the flat data frame holding all sites' data (`ddf_allsites`). This is done by combining the `group_by()`, which we have encountered above when aggregating using `summarise()`, with the function `nest()` from the tidyr package.
-
-```{r}
-library(tidyr)
-ddf_allsites %>%
-  group_by(siteid) %>%
-  nest()
-```
-
-The function `nest()` names the nested data column automatically `"data"`. This structure is very useful. For example for applying functions over sites' data frames separately (and not over the entire data frame). By combining `map()` and `mutate()`, we can fit linear models on each site's data frame individually in one go.
-
-```{r eval=FALSE}
-ddf_allsites %>%
-  group_by(siteid) %>%
-  nest() %>%
-  mutate(linmod = map(data, ~lm(GPP_NT_VUT_REF ~ PPFD_IN, data = .)))
-```
-
-This is approach is extremely powerful and lets you stick to handy and tidy data frames and use the rows-dimension flexibly. Here, rows are sites and no longer time steps, while the nested data frames in column `"data"` has time steps along their rows.
-
-And just because it is fun, this can be spun further, with the same steps as done above, to:
-
-```{r}
-ddf_allsites_nested <- ddf_allsites %>%
-  group_by(siteid) %>%
-  nest() %>%
-  mutate(linmod = purrr::map(data, ~lm(GPP_NT_VUT_REF ~ PPFD_IN, data = .))) %>%
-  mutate(summ = purrr::map(linmod, ~summary(.))) %>%
-  mutate(rsq = purrr::map_dbl(summ, "r.squared")) %>%
-  arrange(desc(rsq)) ## to arrange output, with highest r-squared on top
-```
-
-Amazing!
-
-In these few lines we have separated a huge flat data frame containing all sites' data, fitted a linear regression model to each site's data separately, extracted summary statistics (a list), and the R<sup>2</sup> (the coefficient of determination) for each of them, and finally rearranged rows in descending order by R$^2$. And the output is a handy and nicely looking data frame with nested columns:
-
-```{r}
-ddf_allsites_nested %>% head()
-```
-
-Nesting is useful also for avoiding value duplication when joining relational data objects. Above, we nested time series data objects (where time steps and sites are both organised along rows) by sites and got a data frame where only sites are organised along rows, while time steps are nested inside the column `"data"`. This now fits the structure of a relational data object containing site-specific meta information (also with only sites along rows). (There is just one elevation value for each site - site elevation doesn't change over time.). Joining the nested data frame with site meta information results in a substantially smaller and much handier data frame than joining the flat long data frame with site meta information as we did in Section *Combining relational data*.
-
-```{r}
-ddf_allsites_nested_joined <- df_sites %>%
-  rename(siteid = fluxnetid) %>%
-  right_join(ddf_allsites_nested,
-             by = "siteid") %>%
-
-  ## perform some variable renaming for our own taste
-  rename(lon = longitude,
-         lat = latitude,
-         elv = gtopo30_elevation
-  )
-
-print("Flat long and joined:"); object.size(ddf_allsites_joined) %>% print(units = "auto", standard = "SI")
-print("Nested and joined:"); object.size(ddf_allsites_nested_joined %>% select(-linmod, -summ, -rsq)) %>% print(units = "auto", standard = "SI")  # removing added columns that are not in the flat long df
-```
-
-### Data visualisation III
-
-Let's dive a bit further into visualisation. We have encountered how to map different dimensions of our data not only onto x and y axes in a cartesian coordinate system, but also along other "aesthetics". We mapped it to color, but there are also other aesthetics available for such mapping in ggplot2, in particular for categorical variables (e.g., line type, point type). Yet another "mapping" is available with `facet_wrap()`. It separates the visualisation into different sub-plots, each showing a part of the data. It is not dealt the same way as other aesthetics (not with specifying it with `aes()`), but with adding the `facet_wrap()` with a `+` to the `ggplot()` object.
-
-Remember that our data frame `ddf_allsites` has the time series data nested for each site in the column `data`. ggplot doesn't like that. Therefore, we can simply `unnest()` the respective column and get a long flat data frame again. Let's plot GPP versus PPFD in separate subplots for each site. The factor (column name) by which `facet_wrap()` separates the plot has to be specified as an argument with a preceeding `~`. Here, this is `~siteid`.
-
-```{r}
-ddf_allsites_joined %>%
-  ggplot(aes(x = PPFD_IN, y = GPP_NT_VUT_REF)) +
-  geom_point(alpha = 0.1) +
-  facet_wrap(~siteid)
-```
-
-What do you notice? Does the relationship look similar for all sites?
-
-Again, we get further if we have some *a priori* knowledge about the system that generated out data. PPFD just measures the incoming photosynthetically active light. We do not know whether there are any leaves on the trees to absorb that light.
-
-While some trees shed their leaves during winter or during the dry period, others are evergreen and the fraction of PPFD they actually absorb doesn't vary by far not as much as for deciduous trees. Therefore, whether a site is dominated by deciduous or evergreen vegetation should somehow affect how directly GPP is correlated with GPP. So there's our hypothesis: Sites with evergreen vegetation should exhibit a higher *R*<sup>2</sup> between GPP and PPFD than sites with deciduous vegetation. Remember that we have evaluated the *R*<sup>2</sup> between GPP and PPFD already above and have it stored as a column `rsq` of our nested data frame `ddf_allsites`. We have also collected site meta-information about the vegetation type (it is in column `lai_fpar`), and have joined the meta info onto the data. Unfortunately, it is not quite ready to use. Since we need a `TRUE`/`FALSE` type of information of whether the vegetation type is evergreen or not, we have to take another step.
-
-Below, we take the strings of column `lai_fpar` and check whether it contains the sub-string `"Evergreen"`, using the function `str_detect()` from the stringr package (part of the tidyverse). This boolean information makes up a new column that we call `evergreen`. Sounds like a lot of steps, but in the tidyverse, the code is short and clean:
-
-```{r}
-gg <- ddf_allsites_nested_joined %>%
-  mutate(evergreen = str_detect(lai_fpar, "Evergreen")) %>%
-  ggplot(aes(y = rsq, x = evergreen)) +
-  geom_boxplot()
-print(gg)
-```
-
-Eureka II!
-
-Indeed, the *R*<sup>2</sup> between GPP and PPFD tend to be higher for sites with evergreen vegetation than for sites with deciduous vegetation. What we see here is a boxplot. It visualises the distribution of *R*<sup>2</sup> by factors (`evergreen`). The fat horizontal like inside the box indicates the median, the lower and upper margins of the box are the 25% and 75% quantiles, the whiskers (vertical lines) extend 1.5 times the inter-quartile range, starting at the upper and lower margins of the box, or just to the smallest and largest values if they are within a shorter distance. Apparently, in our plot above, they are.
-
-Boxplots are useful because they provide a visualisation of distrubtions that can be based on a very large number of underlying points. This yields "light" and clean figures. However, they also hide a lot of information and sometimes it is ok to show more information without overloading the plot. For example, individual points can be shown in the plot above by `geom_jitter()`. The x-axis represents the level of the factor `evergreen` and when using a simple `geom_points`, all points would be located either at the position (given by the tick mark) of `TRUE` or `FALSE`. This would result in overplotting and thus hiding a large number of points. `geom_jitter()` takes care of this by slightly rearranging them in a random fashion along the x-axis. Note that the rearranged position along the x-axis doesn't actually encode any information. However, as long as points are still separable along the "`evergreen`-axis", this is acceptable.
-
-```{r}
-gg + geom_jitter(color = "red", width = 0.1)
-```
-
-Note that in the two cells above, we have first stored the output of a `ggplot()` call as a new object that we named `gg`. Doing `print(gg)` just creates the respective plot. The advantage is that we can add visualisation elements or modify the theme or add labels to that object in a separate step.
-
-Maybe you've asked yourself whether the magnitude of GPP varies much across vegetation types (column `igbp_land_use` in our dataset).
-
-Let's do another boxplot - because we can...
-
-```{r}
-ddf_allsites_joined %>%
-  ggplot(aes(y = GPP_NT_VUT_REF, x = igbp_land_use)) +
-  geom_boxplot() +
-  coord_flip()
-```
-
-Here, you can see a number of points that are beyond the quartiles plot 1.5 times the inter-quartile range. They are plotted individually and are referred to as "outlying points". We have also flipped the boxes to extend vertically. `coord_flip()` overrides what is specified by `aes()` in that it rotates it by 90<sup>º</sup>.
-
-Before we finish, let's save our nice daily data frame, after having selected interesting variables, having nested data by sites, and after having complemented it with site meta information. We may use it later in the course ...
-
-Since `ddf_allsites_nested_joined` is no longer a "flat" table (it is nested), we cannot save it in a plain text-based format like CSV. Instead, we save it as an R object. In can be later loaded into an R session by `load()`.
-
-```{r}
-save(ddf_allsites_nested_joined, file = "data/ddf_allsites_nested_joined.RData")
-```
-
-```{r include=FALSE}
-## save cleaned daily data frame for ch-lae only
-ddf_ch_lae <- ddf_allsites_nested_joined %>%
-  filter(siteid == "CH-Lae") %>%
-  select(data) %>%
-  unnest(data)
-
-save(ddf_ch_lae, file = "data/ddf_ch_lae.RData")
-```
-
 ## Exercise
+
+Detecting unusual values or outliers in datasets is important, as they increase the variablility of data and can distort statistical tests performed on the data. The decision of which or whether outliers should be removed is not always an easy one, since outliers can also provide valuable information on the dataset. Outliers could come from errors or problems in the sampling procedure or be errors in measurements or arise during dat entry into a database (e.g. typing a wrong value or putting the decimal point in the wrong place) or even be a by-product of natural variation in the data. 
+The aim of this exercise is to get familiarised with detecting and removing outliers. 
+
+Below a pseudo code is provided to help you complete the exercise. A pseudo code is plain language description of what will be done by an algorithm or function. It plans out each step that will be completed. It can be helpful for data scientists to create a pseudo code before starting any analyses to ensure they complete all the desired steps and do not miss out anything important.
 
 1.  Outlier removal: Based on the half-hourly dataset for site CH-Lae, aggregated to daily means, identify outliers in `GPP_NT_VUT_REF` with respect to the linear relationship between `GPP_NT_VUT_REF` and `PPFD_IN`. To do so, first fit a linear regression model using `lm()`. This function returns a list of objects, one of which is `residuals`. Determine outliers as the "outlying" points in the distribution of residuals. You may use the base-R function `boxplot.stats()` and set the argument `coef` accordingly to our customised threshold definition. \*\*\*
 
@@ -939,7 +769,7 @@ save(ddf_ch_lae, file = "data/ddf_ch_lae.RData")
 
 ------------------------------------------------------------------------
 
-*You can use the pseudo code below as a guidance or come up with your own solution!*
+*You can use the pseudo code below as a guidance or come up with your own solution*
 
 ```{r eval=F, echo=T}
 ## 1. Outlier Removal
