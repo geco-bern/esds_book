@@ -63,7 +63,7 @@ Errors can arise throughout the data science workflow.
 
 Data can be cleaned from errors by looking for:
 
-* _Non-uniform data_
+* _Non-uniform data_ where the data is not uniformly or normally distributed.
 * _Missing data_ where there is no value for the observed variable, often denoted as _NA_.
 * _Duplicated data_ where a dataset contains multiple records of identical data.
 * _Outliers_ which are data points that are significantly different to other data points or lie abnormally far from most other data points.
@@ -71,10 +71,10 @@ Data can be cleaned from errors by looking for:
 
 Quantifying uncertainty is extremely important, as undetectable errors will persist even after data cleaning. Examples of uncertainty quantification metrics include:
 
-* _Confidence interval (CI)_ is a range of values that with a certain probability or degree of certainty the chosen parameter of the data variable will fall within.
-* _Prediction interval_ is the estimated interval within which observations will occur, with a certain degree of confidence, based on the previously observed data.
+* _Confidence interval (CI)_ is a range of values that the chosen parameter of the data variable will fall within with a certain probability or degree of certainty.
+* _Prediction interval_ is the estimated interval within which observations will occur based on the previously observed data and with a certain degree of confidence.
 
-Error propagation is used for datasets containing different uncertainties to determine the overall uncertainty.
+Error propagation is used for datasets containing different uncertainties to determine the overall uncertainty. For example, if the variables in the dataset come from measurements, these values will have a level of uncertainty due to limitations in the measuring process, such as the precision of the instrument. This uncertainty or errors will add up across the data set and analysis due to the variables being combined within a function. Often this error or uncertainty is expressed in terms of the standard deviation _σ_.
 
 ## Tutorial
 
@@ -164,7 +164,7 @@ df_ndvi <- readRDS("./data/df_ndvi.rds")
 head(df_ndvi) %>% select(2:7) # Only displaying 6 of 21 features
 ```
 
-This dataframe appears complicated, but we can transform the data into a useful spatial format. For that it needs to be converted to a raster. This is a key spatial data type and will be described in more detail in the section Raster below. 
+This data frame appears complicated, but we can transform the data into a useful spatial format. For that it needs to be converted to a raster. This is a key spatial data type and will be described in more detail in the section Raster below. 
 The `MODISTools` packages provides a handy function, called `mt_to_raster()`, for converting such data frames produced by `mt_subset()` into a raster.
 
 ```{r echo=F, message=FALSE, warning=FALSE}
@@ -260,13 +260,13 @@ ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>%
   mutate(date_dec = decimal_date(date))     # adds a column with the date converted into a decimal of its year
 
 df_nona <- ddf_ch_lae_ndvi %>% 
-  drop_na()                                 # removes rows containing NAs
+  drop_na()                                 # removes any rows containing NAs
 
-out_spline <- smooth.spline(df_nona$date_dec, df_nona$mean, spar=0.1 )
-vals_spline <- predict(out_spline, ddf_ch_lae_ndvi$date_dec )$y
+out_spline <- smooth.spline(df_nona$date_dec, df_nona$mean, spar=0.1 )   # fits a cubic smoothing spline to df
+vals_spline <- predict(out_spline, ddf_ch_lae_ndvi$date_dec )$y          # applies the cubic smoothing spline to our data
 
 ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>% 
-  mutate(ndvi_splined = vals_spline)
+  mutate(ndvi_splined = vals_spline)        # adds the spline values for our data to ddf_ch_lae_ndvi
 ```
 
 Now, we can plot this relationship.
@@ -277,8 +277,10 @@ ddf_ch_lae_ndvi %>%
   geom_point(aes(x = date, y = mean)) +
   geom_line(aes(x = date, y = ndvi_splined), color = "red")
 ```
+Note how the red line is smoothed and closely follows the black data points.
 
-To see how well this data correlates with measurements from the fluxnet tower, we look at the relationship of gross primary productivity (GPP) vs. NDVI*PPFD (photosynthetic photon flux density). 
+  
+To see how well this data correlates with measurements from the fluxnet tower, we look at the relationship of GPP (gross primary productivity) vs. NDVI (Normalized Difference Vegetation Index) * PPFD (photosynthetic photon flux density).  
 
 ```{r}
 ddf_ch_lae_ndvi <- ddf_ch_lae_ndvi %>% 
@@ -321,11 +323,11 @@ At the beginning of this tutorial we loaded the dataset containing information o
 head(df_sites)
 ```
 
-Our dataset _'df_sites'_ contains two sites in Greenland and Siberia. We'll focus on a smaller spatial domain, restricted to "mainland" Europe. Therefore, we exclude sites RU-Cok and DK-ZaH.
+Our dataset _'df_sites'_ contains two sites in Greenland and Siberia. We'll focus on a smaller spatial domain, restricted to "mainland" Europe. Therefore, we exclude sites RU-Cok and DK-ZaH. We will also remove DE-Obe since this was removed in previous chapters.
 
 ```{r}
 df_sites <- df_sites %>% 
-  filter(!(site %in% c("RU-Cok", "DK-ZaH")))
+  filter(!(site %in% c("RU-Cok", "DK-ZaH", "DE-Obe")))
 ```
 
 Now we can plot our data points without any further adjustments.
@@ -382,7 +384,7 @@ Now, we can see the tower locations as red circles plotted on a grey European ma
 
 ### Shapefiles
 
-Above we looked at points on the globe and transformed our data to _SpatialPoints_. This was already the first example of what forms a shapefile can come in. Shapefiles store geographic information, including location and any additional information, in shape objects. Shape objects in R are defined by _SpatialPoints_, _SpatialLines_, and _SpatialPolygons_ classes of the `sp` package. The corresponding _SpatialPointsDataFrame_, _SpatialLinesDataFrame_, and _SpatialPolygonsDataFrame_ classes allow storing shape objects together with a dataframe. The number of rows in the dataframe corresponds to the number of points (number of rows in coordinate matrix), lines (size of the list of Lines), or polygons (size of the list of Polygons). This allows us to associate a vector of variables (a row of the dataframe) to each shape object.
+Above we looked at points on the globe and transformed our data to _SpatialPoints_. This was already the first example of what forms a shapefile can come in. Shapefiles store geographic information, including location and any additional information, in shape objects. Shape objects in R are defined by _SpatialPoints_, _SpatialLines_, and _SpatialPolygons_ classes of the `sp` package. The corresponding _SpatialPointsDataFrame_, _SpatialLinesDataFrame_, and _SpatialPolygonsDataFrame_ classes allow storing shape objects together with a data frame. The number of rows in the data frame corresponds to the number of points (number of rows in coordinate matrix), lines (size of the list of Lines), or polygons (size of the list of Polygons). This allows us to associate a vector of variables (a row of the data frame) to each shape object.
 In the next step, we load a shapefile containing the countries of the world provided by [Natural Earth](www.naturalearthdata.com), as a reference with which we can contextualize our spatial data. Since we only are looking at towers in Europe, we have cropped the raster to Europe for you.
 
 ```{r warning=F, message=F}
@@ -396,7 +398,7 @@ We can look at what class _europe_shape_ is:
 class(europe_shape)
 ```
 
-Above we mentioned that _SpatialPolygonsDataFrame_ contains both a list of _SpatialPolygons_ and a dataframe with information on each polygon. Here is how we can access the information in the dataframe. We will start by displaying the header of some of the 94 features for now.
+Above we mentioned that _SpatialPolygonsDataFrame_ contains both a list of _SpatialPolygons_ and a  with information on each polygon. Here is how we can access the information in the . We will start by displaying the header of some of the 94 features for now.
 
 ```{r}
 europe_shape@data %>% select(c(NAME, SOVEREIGNT, SUBREGION, POP_EST))%>% head()
@@ -409,36 +411,43 @@ geo.proj <- sp::proj4string(europe_shape)
 pts <- sp::SpatialPoints(sp_sites, proj4string = sp::CRS(geo.proj))
 ```
 
-By using the _SpatialPoints_, now in the correct coordinate reference system, and the data from _europe_shape_, we can bind them to our tower sites in the dataframe _df_sites_.
+
+By using the _SpatialPoints_, now in the correct coordinate reference system, and the data from _europe_shape_, we can bind them to our tower sites in the data frame _df_sites_. The function `over`from the package `sp`, retrieves the indexes or attributes from the specified spatial object (_europe shape_) at the spatial locations of a specified object (_pts_).
 
 ```{r paged.print=TRUE}
-df_sites_country_info <- sp::over(pts, europe_shape) %>% 
-    as_tibble() %>% 
-    bind_cols(df_sites, .)
+df_sites_country_info <- sp::over(pts, europe_shape) %>%  # retrieves info from 'europe_shape' at the 'pts' locations
+    as_tibble() %>%                                       # makes a tibble
+    bind_cols(df_sites, .)                                # bind the information gathered to the df_sites
 
 head(df_sites_country_info) %>% select(1:6)
 ```
+In the header above, is the new data frame _df_sites_country_info_ consisting of three columns ('site', 'lat', 'lon') from _df_sites_ and then 91 columns containing information from _europe_shape_ at the spatial locations of _pts_ (the tower sites).
+
 
 For the next part, we will be using a European map with country boarders. For this, we will make an object called _shp_df_ using the column _SOVEREIGNT_, which we saw when looking at `europe_shape@data`. This preserves only the data needed for further analysis and plotting. 
 
 ```{r message=F}
 library(maptools)
 
-shp_df <- broom::tidy(europe_shape, region = "SOVEREIGNT")
-head(shp_df)
+shp_df <- broom::tidy(europe_shape, region = "SOVEREIGNT") # transforms the information in 'SOVREIGNT' into a tidy df
 
+head(shp_df)
+```
+The data frame above is the tidied version of the information in the _SOVEREIGNT_ column of _europe_shape_. It contains the coordinates, country (sovereignty) and order of each of the polygons from the _SpatialPolygonsDataFrame_. Plotting the information in this data frame looks as follows:
+
+```{r message=F}
 ggplot() + 
   geom_polygon(data = shp_df, aes(x = long, y = lat, group = group, fill = id), colour = "black") +
   theme_bw() +
   theme(legend.position = "none")
 ```
-
 As we saw in the earlier plot of the tower locations only some countries in Europe contain towers. Therefore, we want to crop our map to only include those countries.
 
-We first create a vector which is lists the country each towers is located in. We obtain this vector from the data frame _df_site_country_info_.  Then, we filter out only those countries with a tower in them and voilà, plot the countries and tower locations as a result.
+We first create a vector which is lists the country each towers is located in. We obtain this vector from the data frame _df_site_country_info_.  Then, we filter out only those countries with a tower in them. We can plot the countries and tower locations as a result.
 
 ```{r}
-countries_with_site <- df_sites_country_info %>% pull(SOVEREIGNT) %>% as.character()
+# character vector of the country each tower is located in from column 'SOVREIGNT'
+countries_with_site <- df_sites_country_info %>% pull(SOVEREIGNT) %>% as.character()   
 
 # resulting character vector (without NAs)
 countries_with_site %>% na.omit()
@@ -674,7 +683,7 @@ As we can see in the output of the code above, both the resolution and origin ar
 
 #### Point extraction
 
-In this section, we will extract data from our rasters or spatial data. We will be extracting the values for the locations of our towers. The function to extract values is aptly named `extract()`. First, we specify the raster from which the values should be extracted and then the exact sites at which the values should be extracted. Here, we combine all this into a dataframe.
+In this section, we will extract data from our rasters or spatial data. We will be extracting the values for the locations of our towers. The function to extract values is aptly named `extract()`. First, we specify the raster from which the values should be extracted and then the exact sites at which the values should be extracted. Here, we combine all this into a .
 
 ```{r message=F}
 df_sites_temp <- read_csv("./data/fluxnet_site_info_reduced.csv")
@@ -690,7 +699,7 @@ In the lectures, we have seen that we must always be aware of modelled data and 
 Next, we load and plot the provided rasters showing the mean annual temperatures for the WorldClim data for the years 2006-2012. WorldClim is a set of global climate layers (gridded climate data) with a spatial resolution between 1-340 km^2. 
 We want to extract values from WorldClim at the same tower sites, as we have used previously, and add them to the _df_sites_ data frame. 
 
-This will give us a tidy dataframe with the site, latitude and longitude, temperatures for Chelsa and WorldClim at each tower location.
+This will give us a tidy  with the site, latitude and longitude, temperatures for Chelsa and WorldClim at each tower location.
 
 ```{r}
 raster_worldclim <- raster("./data/WC_mean_t_2006-2012.tif")
@@ -729,7 +738,8 @@ We compare the climate models by showing the correlations with the tower's data.
 df_sites_temp$temp_chelsa <- df_sites_temp$temp_chelsa/10 -273.15
 
 # we remove the sites we removed before
-df_sites_temp <- df_sites_temp[-c(16, 34), ]
+df_sites_temp <- df_sites_temp %>% 
+  filter(!(site %in% c("RU-Cok", "DK-ZaH")))
 
 df_sites_temp %>% 
   ggplot(aes(x = temp_fluxnet, y = temp_chelsa), xlim=c(-10,5)) +
@@ -761,7 +771,11 @@ We compute the mean squared error.
 mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_wc)
 ```
 
-We see that Chelsa correlates better, since the mean squared error is smaller, with the temperature values at the towers. We also see that WorldClim compared to CHELSA tends to predict colder temperatures.
+We see that CHELSA correlates better, since the mean squared error is smaller, with the temperature values at the towers. We also see that WorldClim compared to CHELSA tends to predict colder temperatures.
+It is important to remember that CHELSA and WorldClim are both 'modelled data' and as such come with errors and uncertainties. When using environmental layers for analyses, the data source should be well researched and possible uncertainty or errors carefully considered to understand the weaknesses and limitations of the data.
+Th main differences between CHELSA and WorldClim are down to the input data of their models. As mentioned earlier CHELSA predicts its variable on down-scaled ERA-Interim data (global atmospheric reanalysis) and implements bias correction analyses.
+WorldClim's predicted variables are based on point data from weather station, which is then interpolated based on elevation, longitude and latitude. Due to the dependence on data from weather stations, the accuracy of WorldClim is more dependent on station density. For a more detailed comparison of the two climate data and why such models must be used with care, refer to [Bobrowski, Weidinger & Schickhoff, 2021](https://www.mdpi.com/2073-4433/12/5/543).
+
 
 **Checkpoint**
 
@@ -773,7 +787,7 @@ To achieve this, attempt to plot the map of Europe and add the tower locations a
 ```{r message=F, warning=F}
 # There are more way to do this but we used the function ifelse(). 
 # It takes 3 components: a condition, what to do if the condition applies and what to do if it doesn't apply.
-# So here if chelsa temperatures are higher we want the point to be purple otherwise orange:
+# So here if CHELSA temperatures are higher we want the point to be purple otherwise orange:
 cols_chelsa_flux <- ifelse(df_sites_temp$temp_chelsa > df_sites_temp$temp_fluxnet,"purple","orange")
 
 # We could also do different shapes if we wanted...
@@ -797,74 +811,67 @@ From the resulting map of Europe, we can deduce that for any points (here repres
 
 We already had a look at GPP in Chapter \@ref(ch-02). In this section we want to correlate CHELSA temperature and landcover with GPP. 
 
-In models we often take multiple variables and correlate them to another variable (here GPP). By seeing if they correlate well we can see if any of the variables make good so-called _predictors_.  Let's see how well landcover and temperature correlate with GPP.
+In models we often take multiple variables and correlate them to another variable (here GPP). By seeing if they correlate well we can see if any of the variables make good so-called _predictors_.  Below we will explore how well landcover and temperature correlate with GPP.
 
-We start off by extracting the mean GPP at the tower sites. To do this we group our data by the _siteid_ (or tower) and the year. This way we can get the GPP across a year and then an average across all years for each site. 
+We start off by extracting the mean GPP at the tower sites. To do this we group our data by the _siteid_ (or tower) and the year. This way we can get the GPP across a year and then an average across all years for each site. We will also consider the median to see if this changes the correlation.
+
+To compare GPP and landcover, we will use both the landcover from the raster used above and the landcover given in the fluxnet data for each tower site. There is a column in the the fluxnet data set called `umd_land_cover`, which refers to the University of Maryland landcover classification scheme.
 
 ```{r message=F}
-GPP <- ddf_allsites_nested_joined %>% 
+GPP_ann <- ddf_allsites_nested_joined %>% 
   unnest(data) %>% 
   mutate(year = year(TIMESTAMP)) %>% 
   group_by(siteid, year) %>% 
   summarise(gpp_ann = sum(GPP_NT_VUT_REF)) %>% 
   ungroup() %>% 
   group_by(siteid) %>% 
-  summarise(gpp_meanann = mean(gpp_ann)) %>% 
-  summarise(gpp_medianann = median(gpp_ann)) %>%
+  summarise(gpp_meanann = mean(gpp_ann),  gpp_medianann = median(gpp_ann)) %>% 
   dplyr::select(siteid, gpp_meanann, gpp_medianann)
 
-# we remove the data we don't have in the other datasets for the correlations
-GPP <- GPP[-c(14, 16, 34), ]
+GPP_ann <- cbind(GPP_ann, 'umd_land_cover' = ddf_allsites_nested_joined$umd_land_cover)
+
+# for the correlations we remove the sites we don't have in the other datasets
+GPP_ann <- GPP_ann %>%
+  filter(!siteid %in% c("DE-Obe","DK-ZaH", "RU-Cok"))
 ```
 
-We then extract landcover data at the tower sites.
+We then extract landcover data from the GlobCover raster at the tower sites.
 
 ```{r message=F, warning=F}
 df_sites_landcover <- extract(raster_landcover, sp_sites, sp = TRUE)
 df_sites_landcover <- as.tibble(df_sites_landcover)
 
-# we remove the sites we removed before
-df_sites_landcover <- df_sites_landcover[-c(16, 34), ]
 ```
 
-We can create a dataframe with all the extracted data from the tower sites to then make correlations.
+To make the correlations, we create a data frame with all the extracted temperature, landcover and GPP data from the tower sites.
 
 ```{r}
 landcover <- df_sites_landcover$Globcover_EU
 chelsa <- df_sites_temp$temp_chelsa
-df_corr <- cbind(landcover, chelsa, GPP)
-df_corr <- as.data.frame(df_corr)
-head(df_corr)
+
+df_corr_ann <- cbind(landcover, chelsa, GPP_ann)
+df_corr_ann <- as.data.frame(df_corr_ann)
+
+head(df_corr_ann)
 ```
 
-Though the landcover column contains numbers, it is actually categorical data. Each number represents a specific landcover type, so we add a column with the corresponding the landcover category name.
+We will start by correlating the CHELSA temperatures with GPP. We do this by building a simple linear model using the function `lm()`. We do this for both the mean and the median.
 
 ```{r}
-df_corr <- df_corr %>%
-  mutate(landcover_cat = case_when(landcover == 14 ~ "cropland",
-        landcover == 20 ~ "mosaic cropland",
-        landcover == 50 ~ "deciduous forest",
-        landcover == 70 ~ "evergreen forest",
-        landcover == 90 ~ "needleleaved forest",
-        landcover == 110 ~ "mosaic forest",
-        landcover == 120 ~ "mosaic forest/shrub/grass",
-        landcover == 130 ~ "mosaic shrubland",
-        landcover == 140 ~ "mosaic grassland",
-        landcover == 150 ~ "sparse vegetation"))
+# linear model of temperature and mean annual GPP:
+reg_mean_1 <- lm(gpp_meanann~chelsa, data = df_corr_ann) 
+summary(reg_mean_1)
+
+# linear model of temperature and meadian annual GPP:
+reg_median_1 <- lm(gpp_medianann~chelsa, data = df_corr_ann) 
+summary(reg_median_1)
+
 ```
 
-Back to correlations, we can start by correlating the CHELSA temperatures with GPP. We do this by building a simple linear model using the function `lm()`.
-
-```{r}
-reg1 <- lm(gpp_meanann~chelsa, data = df_corr) 
-
-sum(reg1)
-```
-
-To visualise the correlation we plot our temperature data with the linear model.
+To visualise the correlation we plot our temperature data with the two linear models.
 
 ```{r message=F, warning=F}
-p_mean <- df_corr %>% 
+p_mean <- df_corr_ann %>% 
   ggplot(aes(x = chelsa, y = gpp_meanann)) +
   geom_point() +
   geom_smooth(method='lm', color="red", size=0.5, se=FALSE) +
@@ -874,74 +881,134 @@ p_mean <- df_corr %>%
 
 p_mean
 
-p_median <- df_corr %>% 
+p_median <- df_corr_ann %>% 
   ggplot(aes(x = chelsa, y = gpp_medianann)) +
   geom_point() +
-  geom_smooth(method='lm', color="red", size=0.5, se=FALSE) +
+  geom_smooth(method='lm', color="blue", size=0.5, se=FALSE) +
   xlab("Chelsa temperature") +
-  ylab("GPP mean [µmolCO2 m-2 s-1]") +
+  ylab("GPP median [µmolCO2 m-2 s-1]") +
   theme_classic()
 
 p_median
 ```
-
-Then we make a linear model for GPP and landcover.
+We can see a slight positive correlation between the mean and median annual GPP and the CHELSA temperatures. To see if this varies across the whole year, we will also investigate the correlation between mean seasonal GPP and CHELSA temperatures. The same steps apply as for considering mean annual GPP, except that the data is grouped into seasons according to the equinoxes.
 
 ```{r}
-reg2 <- lm(gpp_meanann~landcover, data=df_corr)
+WS <- as.Date("2012-12-21", format = "%Y-%m-%d") # Winter Solstice
+SE <- as.Date("2012-3-21", format = "%Y-%m-%d") # Spring Equinox
+SS <- as.Date("2012-6-20", format = "%Y-%m-%d") # Summer Solstice
+AE <- as.Date("2012-9-23", format = "%Y-%m-%d") # Autumn Equinox
 
-sum(reg2)
+GPP_seasonal <- ddf_allsites_nested_joined %>%
+  unnest(data) %>%
+  mutate(site = siteid) %>%
+  group_by(site) %>%
+  mutate(season = case_when(TIMESTAMP >= WS | TIMESTAMP < SE ~ "Winter",
+                            TIMESTAMP >= SE & TIMESTAMP < SS ~ "Spring",
+                            TIMESTAMP >= SS & TIMESTAMP < AE ~ "Summer", 
+                            TIMESTAMP >= AE & TIMESTAMP < WS ~ "Autumn")) %>%
+  group_by(site, season) %>%
+  summarise(gpp_season = mean(GPP_NT_VUT_REF)) %>%
+  ungroup()
+
+# we remove the towers we don't have in the other datasets for the correlations
+GPP_seasonal <-  GPP_seasonal %>%
+  filter(!site %in% c("DE-Obe","DK-ZaH", "RU-Cok"))
+
+# here we aren't looking t landcover so we only add the CHELSA temperatures to the correlations data frame.
+chelsa_season <- df_sites_temp[,c(1,6)]
+
+df_corr_season <- merge(GPP_seasonal, chelsa_season, by = "site")
+df_corr_season <- as.data.frame(df_corr_season)
+
+head(df_corr_season)
+```
+Once, the data frame for the seasonal correlations is ready, we order the plots by season and plot the results.
+```{r}
+# re-order by season as they should appear in plots
+order_by_season <- c("Spring", "Summer","Autumn", "Winter")
+
+df_corr_season <- arrange(transform(df_corr_season, season=factor(season, levels=order_by_season)), season)
+
+p_mean_season <- df_corr_season %>% 
+  ggplot(aes(x = temp_chelsa, y = gpp_season)) +
+  geom_point() +
+  geom_smooth(method='lm', color="red", size=0.5, se=FALSE) +
+  xlab("Chelsa temperature") +
+  ylab("GPP mean [µmolCO2 m-2 s-1]") +
+  facet_wrap(vars(season)) +
+  theme_classic()
+
+p_mean_season
+```
+From the graph above we can see that the correlation between GPP and temperature differs among the seasons. Summer temperatures show a negative correlation with GPP. Spring, Autumn and Winter temperatures, on the other hand, are slighlty positively correlated with GPP. Spring and Summer seem to have more variability in GPP at different temperatures.
+
+
+Back to landcover and GPP. The landcover column from the GlobCover raster contains numbers, even though it is actually categorical data. Each number represents a specific landcover type, so we can add a column with the corresponding the landcover category name.
+
+```{r}
+df_corr_ann <- df_corr_ann %>%
+  mutate(landcover_cat = case_when(landcover == 14 ~ "cropland",
+        landcover == 20 ~ "mosaic cropland",
+        landcover == 50 ~ "deciduous forest",
+        landcover == 70 ~ "evergreen forest",
+        landcover == 90 ~ "needleleaved forest",
+        landcover == 110 ~ "mosaic forest",
+        landcover == 120 ~ "mosaic forest/shrub/grass",
+        landcover == 130 ~ "mosaic shrubland",
+        landcover == 140 ~ "mosaic grassland",
+        landcover == 150 ~ "sparse vegetation")) %>%
+  droplevels()
 ```
 
-Again, we can plot it. However, since landcover is categorical data we make a boxplot instead. A boxplot is a figure that gives a graphical representation of the variability or spread of the data, by providing information beyond the central tendency of the data. A boxplot will show ...
+Again, we can plot it to visualise the correlation. However, since landcover is categorical data we will make a boxplot instead. 
+A boxplot is a figure that gives a graphical representation of the variability or spread of the data, by providing information beyond the central tendency of the data. A boxplot will show the _median_ (the mid-pont of the data or 50th percentile, shown as a bold line in the middle of the box), the _interquartile range_ (the _box_ shows the range of the data with the edges being the 25th percentile and 75th percentile limits), whiskers (the lines coming out of the box) and any outliers as points beyond the whiskers.
+
+We make a boxplot for mean GPP and the GlobCover landcover raster, as well as mean GPP and the provided fluxnet tower site landcover for comparison.
 ```{r warning=F}
-ggplot(data=df_corr, aes(x=landcover_cat, y=gpp_meanann, group=as.factor(landcover_cat)))+ 
+ggplot(data = df_corr_ann, aes(x = landcover_cat, y = gpp_meanann, group = as.factor(landcover_cat)))+ 
         geom_boxplot() + 
-        labs(x = "Landcover Category", y = "GPP mean [µmolCO2 m-2 s-1]") +
+        labs(x = "Landcover Category (raster)", y = "GPP mean [µmolCO2 m-2 s-1]") +
         theme_classic() +
-        theme(axis.text.x = element_text(angle = 90, size=12))
+        theme(axis.text.x = element_text(angle = 90, size = 12))
+
+ggplot(data = df_corr_ann, aes(x = umd_land_cover, y = gpp_meanann, group = as.factor(umd_land_cover)))+ 
+        geom_boxplot() + 
+        labs(x = "Landcover Category (tower - umd)", y = "GPP mean [µmolCO2 m-2 s-1]") +
+        theme_classic() +
+        theme(axis.text.x = element_text(angle = 90, size = 12))
 ```
 
-We don't see a particularly strong correlation, thus we need to consider other predictors and more complex models. You will discuss that later in the class.
+We don't see a particularly strong correlation with the two plotted landcover categories, as the mean GPP varies depeding on the landcover type. Thus we need to consider other predictors and more complex models to find better predictors of GPP. 
 
 ### Key points from the tutorial
     
-Integrating remote sensing data: we extract NDVI in the area around our eddy flux towers from the MODISTools package and conver it into a raster format.
+**Integrating remote sensing data**: We extracted NDVI in the area around our eddy flux towers from the MODISTools package and converted it into a raster format.
 
-* Collapse NDVI measured within an area around the eddy flux towers to calculate the mean across years
-* Merge this temporal data with our eddy flux data
-* Apply linear regression to test whether the addition of NDVI data to our model of GPP and PPFD_IN improves its accuracy
+* Then collapse NDVI measured within an area around the eddy flux towers to calculate the mean across years.
+* Merge this temporal data with our eddy flux data.
+* Apply a linear regression to test whether the addition of NDVI data to our model of GPP and PPFD_IN improves its accuracy.
     
     
-Points:
-the eddy flux tower sites are plotted as points on a map of Europe.
+**Points**: The eddy flux tower sites were plotted as points on a map of Europe.
 
-* Extract coordinates of the tower sites from the metadata 
-* Transform the points into SpatialPoints with the sp package and plot them on a map of Europe
+* Extract coordinates of the tower sites from the metadata. 
+* Transform the points into SpatialPoints with the sp package and plot them on a map of Europe.
+  
+  
+**Shapefiles**: We added country and border information to our tower site plots.
 
+* Extract the information about the spatial polygons in the europe_shape shapefile and apply one coordinate reference system.
+* Add the SpatialPoints matrix and shapefile data europe_shape to the tower site data frame.
+* Filter out the countries with towers and visualize only the countries containing a tower.
     
     
-Shapefiles: we add country and border information to our tower site plots.
+**Rasters**: We investigated whether the variables landcover and temperature can explain GPP.
 
-* Extract the information about the spatial polygons in the europe_shape shapefile and apply one coordinate reference system
-* Add the SpatialPoints matrix and shapefile data europe_shape to the tower site dataframe
-* Filter out the countries with towers and visualize only them
-    
-    
-Rasters: we investigate whether the variables landcover and temperature can explain GPP.
-
-* Load landcover data from Globcover temperature data from CHELSA in the form of rasters and plot them around our tower sites with the raster and rasterVis packages
-* Apply the same resolution (aggregate) and origin (align) to the climate and landcover rasters 
-* Compare modeled climate data from CHELSA and WorldClim to our fluxnet data by extracting the temperatures at the tower sites and calculating the MSE
-* Finally, landcover and CHELSA modeled temperatures are plugged into a linear regression to see if they are significantly correlated with GPP
-
-Bonus: here we incorporate plant species data from GBIF to determine their effect on GPP with the help of PCA.
-
-* Create a presence-absence matrix for all locations and species
-* Check species data for possible sampling biases by visualizing the number of occurrence records
-* Plot species richness on the map
-* Add species traits to our dataset with a for loop
-* Use PCA to determine which traits explain the most variation in GPP
+* Load landcover data from Globcover temperature data from CHELSA in the form of rasters and plot them around our tower sites with the raster and rasterVis packages.
+* Apply the same resolution (aggregate) and origin (align) to the climate and landcover rasters.
+* Compare modelled climate data from CHELSA and WorldClim to our fluxnet data by extracting the temperatures at the tower sites and calculating the MSE (mean square error).
+* Finally, landcover and CHELSA modelled temperatures are plugged into a linear regression to see if they are significantly correlated with GPP.
 
 ## Exercise
 
