@@ -75,7 +75,57 @@ The last thing we've marked in the image is <span style="color:purple">*Git*</sp
 
 A Git repository exists locally, that is, on your computer. But the power of Git plays out when your local repository has a counterpart in the cloud, for example on [GitHub](https://github.com), or on ETH's [GitLab](https://gitlab.ethz.ch). Git lets you *push* (upload) your commits to your repository's *remote* copy, and *pull* (download) changes that have been uploaded by your collaborator(s) or yourself from a different *clone* (local copy) of your repository.
 
-The following shows these steps. Start by making a change to this document: add a cell at the beginning of the entire document and enter your name. Then save your changes by clicking on the floppy disk icon on the left or hit command + s.
+The following steps will show you how to useg Git with RStudio. 
+
+1. **Installing Git**
+If Git has not been installed on your laptop, begin by installing the appropriate version:
+- Windows & macOS & Linux: [http://git-scm.com/downloads](http://git-scm.com/downloads)
+- Debian/Ubuntu: sudo apt-get install git-core
+- Fedora/RedHat: sudo yum install git-core
+
+2. **Activating Git in RStudio**
+Once Git has been installed, proceed by opening _RStudio_ > _Tools_  > _Global Options..._.
+The following box should appear: .
+![](./figures/Git_RStudio_Global_Tools_General_box.jpg)
+Choose the tab _Git/SVN_ (red box).
+Make sure to tick _'Enable version control interface for RStudio Projects'_ and set _'Git executable:'_ to the PATH for Git to be found. If you don't know where the _'Git executable'_ is located open _Tools_ again, select _Shell_ and type the following into it:
+- `which git` (Mac, Linux)
+- `where git` (Windows)
+
+The output will be the location of `git.exe`, for example: `C:\Program Files\Git\cmd\git.exe`. This can now be copied into the _'Git executable:'_ cell.
+
+![](./figures/Git_RStudio_Git-SVN_box.jpg)
+
+Press _OK_.
+
+3. **Using Git in RStudio**
+
+If you close and open up RStudio now nothing will have changed and here will not be a visible Git tab. To get this working there are several option, all of which involve making a new project.
+Go to _File_ and select _New Project_.
+![](./figures/Git_RStudio_Create_Project_1.jpg)
+You can choose either option depending on your aim.
+- Option 1: New Directory
+  
+To start a new directory and project choose _New Directory_ > **Project Type** _New Project_:
+![](./figures/Git_RStudio_Create_Project_2.jpg)
+The key here is that the box _'Create a git repository'_ is ticked. 
+If you want the project to open in a new session, make sure _'Open in new session'_ is selected. Otherwise RStudio immediately opens the new project and your open scripts will be closed. 
+Click _Create Project_ to create the new project.
+![](./figures/Git_RStudio_Create_Project_3.jpg)
+The new project will open and you should now see the Git related tabs appear in your RStudio.
+
+- Option 2: Existing Directory 
+Choose _Existing Directory_ to create a project in an existing Directory containing other projects.
+Select the _Project working directory:_ and _Create Project_. Again there is the option to _'Open in a new session'_.
+![](./figures/Git_RStudio_Create_Project_4.jpg)
+- Option 3: Version Control
+
+Choose _Version Control_ if you would like to clone a remote repository from Git. You will need the URL of the remote repository for this.
+![](./figures/Git_RStudio_Create_Project_5_Version_Control.jpg)
+![](./figures/Git_RStudio_Create_Project_6_Version_Control.jpg)
+
+#-----------------------------------
+Start by making a change to this document: add a cell at the beginning of the entire document and enter your name. Then save your changes by clicking on the floppy disk icon on the left or hit command + s.
 
 Read the entire section before trying out any of these commands.
 
@@ -85,7 +135,7 @@ Click on Git and chose "Open Git Repository in Terminal"
 
 A new tab will pop up with the terminal.
 
-![](./figures/terminal.png)
+
 
 The first line shows the current working directory. In the second line, ywe can add your Git statements. Only five main commands are necessary to benefit from the advantages of Git:
 
