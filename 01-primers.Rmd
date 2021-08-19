@@ -120,24 +120,31 @@ Select the _Project working directory:_ and _Create Project_. Again there is the
 ![](./figures/Git_RStudio_Create_Project_4.jpg)
 - Option 3: Version Control
 
-Choose _Version Control_ if you would like to clone a remote repository from Git. You will need the URL of the remote repository for this.
+Choose _Version Control_ if you would like to clone a remote repository from Git.
 ![](./figures/Git_RStudio_Create_Project_5_Version_Control.jpg)
+You will need the URL of the remote repository so RStudio can clone it. The specified directory is where the remote repository will be cloned into. 
 ![](./figures/Git_RStudio_Create_Project_6_Version_Control.jpg)
 
-#-----------------------------------
-Start by making a change to this document: add a cell at the beginning of the entire document and enter your name. Then save your changes by clicking on the floppy disk icon on the left or hit command + s.
 
-Read the entire section before trying out any of these commands.
+4. **Using Git commands in RStudio**
 
-Click on Git and chose "Open Git Repository in Terminal"
+When the project opens in Rstudio, you will be able to see the Git tab and the main commands you need to be able to benefit from Git:
 
-![](./figures/opengit.png)
+- commit
+- push
+- pull
 
-A new tab will pop up with the terminal.
+A _commit_ saves the current version of the file or project you are working on to the local repository. By continually adding commits you will get a timeline of your project as it develops. All commits are saved to the _local_ repository. 
 
+To commit press the commit button or `Ctr + Alt + M`. 
+![](./figures/Git_RStudio_Commit_1.jpg)
+RStudio will open up a new window, where you can see the changes, the history and a box where you can add a commit message. The commit message is a way to later know what you changed in the file with that commit. Make sure you tick the box in the column _Staged_ next to the file you want to commit. 
+![](./figures/Git_RStudio_Commit_2_Message.jpg)
+If it worked you will see something like the following:
+![](./figures/Git_RStudio_Commit_3.jpg)
+Remember, this file is still only saved to the _local_ repository. To update it on the _remote_ repository too, you will need to _push_ it.
 
-
-The first line shows the current working directory. In the second line, ywe can add your Git statements. Only five main commands are necessary to benefit from the advantages of Git:
+![](./figures/Git_RStudio_Push.jpg)
 
 ```{r eval=F}
 git status
@@ -148,8 +155,6 @@ git pull
 ```
 
 `git status` will return which files you've modified or added. You have just added a new cell to this file, so if you type `git status` and hit enter, the terminal should return the following:
-
-![](./figures/gitstatus.png)
 
 Next, we use `git add` to specify which file should be added to the next commit:
 
@@ -171,7 +176,6 @@ git commit -m "added a new cell with my name"
 
 Lastly, we can type `git push`. With this command, we upload our changes to the remote Git repository, e.g. on GitHub or GitLab. Go on and type these lines in your terminal. By the end of it the terminal should look as follows:
 
-![](./figures/git.png)
 
 **Whenever you interrupt your work or finish a session, go through these commands.** Else your changes will be lost. Renku has an autosave function in case you forget but it can lead to conflicts when picking up your work again.
 
