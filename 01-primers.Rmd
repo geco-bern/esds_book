@@ -16,7 +16,7 @@ After you've gone through the lecture and solved the exercises, you should be ab
 - Apply basic Git commands for version control.
 - Plot data analysis outputs and write them on the disk.
 
-### Important elements from the lecture 
+### Key Points from the lecture 
 
 The four 'Vs' of *Big Data*: 
 
@@ -98,18 +98,26 @@ To save your work you will want to commit it. A _commit_ saves the current versi
 
 To commit, click one of the two commit button or press `Ctr + Alt + M`. 
 ![](./figures/Renku_Git.jpg)
-RStudio will open up a new window, where you can see the changes, the history and a box where you can add a commit message. The commit message is a way to later know what you changed in the file with that commit. Make sure you tick the box in the column _Staged_ next to the file you want to commit and click _Commit_.
+
+RStudio will open up a new window, showing changes to the selected file, the history and a box where you can add a commit message. The commit message is a way to explain what has been changed in the file since the last commit. 
+Under the section _Status_ each file with either have a yellow box with a `?` for 'unkown' files , a blue box containing an `M` for 'modified' or a green box containing an `A` for 'added'. Added mean the file is ready to be commited. 
+The box in the column _Staged_ must be ticked for the file to be committed. Then click _Commit_.
+
 ![](./figures/Renku_Git_Commit_Message.jpg)
-A message as the following appears, if it worked:
+
+If it worked, a message such as the following will appear:
+
 ![](./figures/Renku_Git_Commit_successful.jpg)
+
 Remember, this file is still only saved to the _local_ repository or environment. RStudio shows the user this with a little message:
 ![](./figures/Renku_Git_pre_Push.jpg)
 To upload it to the _remote_ repository, we will need to _push_ it. To do this click either _Push Branch_ or _Push_ to the right of the green arrows facing up. With this command, we upload our changes to the remote Git repository, e.g. on GitHub or GitLab. 
 ![](./figures/Renku_Git_Push.jpg)
+
 If the _push_ is successful, the little information saying the branch is ahead will have disappeared and a message such as the following appears.
 ![](./figures/Renku_Git_Push_Message.jpg)
 
-**Whenever you interrupt your work or finish a session, go through these commands.** Else your changes will be lost. Renku has an autosave function in case you forget but it can lead to conflicts when picking up your work again.
+**It is good practice to commit and push any changes before you interrupt your work or finish a session.** Else those changes will be lost. Renku has an autosave function in case you forget but it can lead to conflicts when picking up your work again.
 
 Once you start your work again, either stop the environment in which you are working within Renku and open a new one or start the next session the blue arrow in the Git tab that says `Pull`. As its name suggests, with it we can pull changes in our document from the Git repository. This might seem like an unnecessary step, when you are working alone on the document. However, in projects where you might be working together with a peer and need to make sure you integrate her/his changes as well. If you are working together, make sure, that you do not work on the same document at the same time, which could lead to merge conflicts. If at some point you encounter a merge conflict that Git cannot resolve automatically you will have to do so manually. At the [end of this tutorial](#Git-denies-pushing-what-can-I-do?) we show how this is done. However, it is unlikely that you will encounter such a problem in this course, which is why we do not explain it here.
 
