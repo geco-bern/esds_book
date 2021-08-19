@@ -53,7 +53,22 @@ In each chapter of this tutorial, you'll find a similar statement to specify whi
 
 ### Working with RStudio on Renku
 
-XXX 
+[Renku](https://datascience.ch/renku/) is an open cloud computing platform that aims to make 'Multidisciplinary Data Science Collaborations' easier to navigate. It stores the data and code allowing multiple people to work on the same projects and keeps track of the various steps and versions of a project. By keeping track of the changes, there is a history and timeline of each persons contributions and results. Through Renku, its developers hope to make data science more reproducible, reusable and repeatable and hope to encourages and simplify collaborations.
+
+RStudio on Renku is similar to using Rstudio on any  laptop or computer, except it is hosted by the platform. 
+Start by selecting the correct project in Renku. Then select the tab _'Environments'_ and click _'New'_ to start a new interactive environment.
+![](./figures/Renku_RStudio_1_New_Environment.jpg)
+
+Make sure to set the _Default Environment_ to `/rstudio`. The other options can be left on the default settings. The box commit will show you when the latest commit was pushed and who authored it. 
+Press _Start environment_.
+![](./figures/Renku_RStudio_2_New_Environment.jpg)
+This starts loading the environment and can take a while. Once it is ready (signalised by a green tick within a white circle), click _Connect_. 
+![](./figures/Renku_RStudio_3_New_Environment.jpg)
+An online RStudio interface will open in a new browser tab.
+Once RStudio is running, it works as on a laptop or computer. Saving the files will differs when using RStudio on Renku, this will be explained in the section below called _Git_.
+
+Once your progress has been saved an active environment can be closed by clicking on the _three dots_ next to the connect button back on the Renku page and then selecting _Stop_. Do this before logging out of and closing Renku.
+![](./figures/Renku_RStudio_4_New_Environment.jpg)
 
 <!---
 Right now your browser should look something like this:
@@ -75,115 +90,35 @@ The last thing we've marked in the image is <span style="color:purple">*Git*</sp
 
 A Git repository exists locally, that is, on your computer. But the power of Git plays out when your local repository has a counterpart in the cloud, for example on [GitHub](https://github.com), or on ETH's [GitLab](https://gitlab.ethz.ch). Git lets you *push* (upload) your commits to your repository's *remote* copy, and *pull* (download) changes that have been uploaded by your collaborator(s) or yourself from a different *clone* (local copy) of your repository.
 
-The following steps will show you how to useg Git with RStudio. 
+#### Git commands in RStudio
 
-1. **Installing Git**
-If Git has not been installed on your laptop, begin by installing the appropriate version:
-- Windows & macOS & Linux: [http://git-scm.com/downloads](http://git-scm.com/downloads)
-- Debian/Ubuntu: sudo apt-get install git-core
-- Fedora/RedHat: sudo yum install git-core
+Unless Git has been installed on a laptop and connected to RStudio, the Git features in Renkus RStudio will not be visible to a user. We will now introduce you to the main commands you will need to make use of Git.
 
-2. **Activating Git in RStudio**
-Once Git has been installed, proceed by opening _RStudio_ > _Tools_  > _Global Options..._.
-The following box should appear: .
-![](./figures/Git_RStudio_Global_Tools_General_box.jpg)
-Choose the tab _Git/SVN_ (red box).
-Make sure to tick _'Enable version control interface for RStudio Projects'_ and set _'Git executable:'_ to the PATH for Git to be found. If you don't know where the _'Git executable'_ is located open _Tools_ again, select _Shell_ and type the following into it:
-- `which git` (Mac, Linux)
-- `where git` (Windows)
+To save your work you will want to commit it. A _commit_ saves the current version of the file or project you are working on. By continually adding commits you will get a timeline of your project as it develops. All commits are saved to the _local_ repository or environment. 
 
-The output will be the location of `git.exe`, for example: `C:\Program Files\Git\cmd\git.exe`. This can now be copied into the _'Git executable:'_ cell.
-
-![](./figures/Git_RStudio_Git-SVN_box.jpg)
-
-Press _OK_.
-
-3. **Using Git in RStudio**
-
-If you close and open up RStudio now nothing will have changed and here will not be a visible Git tab. To get this working there are several option, all of which involve making a new project.
-Go to _File_ and select _New Project_.
-![](./figures/Git_RStudio_Create_Project_1.jpg)
-You can choose either option depending on your aim.
-- Option 1: New Directory
-  
-To start a new directory and project choose _New Directory_ > **Project Type** _New Project_:
-![](./figures/Git_RStudio_Create_Project_2.jpg)
-The key here is that the box _'Create a git repository'_ is ticked. 
-If you want the project to open in a new session, make sure _'Open in new session'_ is selected. Otherwise RStudio immediately opens the new project and your open scripts will be closed. 
-Click _Create Project_ to create the new project.
-![](./figures/Git_RStudio_Create_Project_3.jpg)
-The new project will open and you should now see the Git related tabs appear in your RStudio.
-
-- Option 2: Existing Directory 
-Choose _Existing Directory_ to create a project in an existing Directory containing other projects.
-Select the _Project working directory:_ and _Create Project_. Again there is the option to _'Open in a new session'_.
-![](./figures/Git_RStudio_Create_Project_4.jpg)
-- Option 3: Version Control
-
-Choose _Version Control_ if you would like to clone a remote repository from Git.
-![](./figures/Git_RStudio_Create_Project_5_Version_Control.jpg)
-You will need the URL of the remote repository so RStudio can clone it. The specified directory is where the remote repository will be cloned into. 
-![](./figures/Git_RStudio_Create_Project_6_Version_Control.jpg)
-
-
-4. **Using Git commands in RStudio**
-
-When the project opens in Rstudio, you will be able to see the Git tab and the main commands you need to be able to benefit from Git:
-
-- commit
-- push
-- pull
-
-A _commit_ saves the current version of the file or project you are working on to the local repository. By continually adding commits you will get a timeline of your project as it develops. All commits are saved to the _local_ repository. 
-
-To commit press the commit button or `Ctr + Alt + M`. 
-![](./figures/Git_RStudio_Commit_1.jpg)
-RStudio will open up a new window, where you can see the changes, the history and a box where you can add a commit message. The commit message is a way to later know what you changed in the file with that commit. Make sure you tick the box in the column _Staged_ next to the file you want to commit. 
-![](./figures/Git_RStudio_Commit_2_Message.jpg)
-If it worked you will see something like the following:
-![](./figures/Git_RStudio_Commit_3.jpg)
-Remember, this file is still only saved to the _local_ repository. To update it on the _remote_ repository too, you will need to _push_ it.
-
-![](./figures/Git_RStudio_Push.jpg)
-
-```{r eval=F}
-git status
-git add
-git commit
-git push
-git pull
-```
-
-`git status` will return which files you've modified or added. You have just added a new cell to this file, so if you type `git status` and hit enter, the terminal should return the following:
-
-Next, we use `git add` to specify which file should be added to the next commit:
-
-```{r eval = F}
-git add notebooks/01_primers.ipynb
-```
-
-A useful shorthand for adding all files that have modifications (updated files) at once, we can do:
-
-```{r eval=F}
-git add -u
-```
-
-We can `git add` multiple times. In addition, it is possible to specify the commit and pass a text message with it that describes it. For instance, we can enter the following: 
-
-```{r eval = F}
-git commit -m "added a new cell with my name"
-```
-
-Lastly, we can type `git push`. With this command, we upload our changes to the remote Git repository, e.g. on GitHub or GitLab. Go on and type these lines in your terminal. By the end of it the terminal should look as follows:
-
+To commit, click one of the two commit button or press `Ctr + Alt + M`. 
+![](./figures/Renku_Git.jpg)
+RStudio will open up a new window, where you can see the changes, the history and a box where you can add a commit message. The commit message is a way to later know what you changed in the file with that commit. Make sure you tick the box in the column _Staged_ next to the file you want to commit and click _Commit_.
+![](./figures/Renku_Git_Commit_Message.jpg)
+A message as the following appears, if it worked:
+![](./figures/Renku_Git_Commit_successful.jpg)
+Remember, this file is still only saved to the _local_ repository or environment. RStudio shows the user this with a little message:
+![](./figures/Renku_Git_pre_Push.jpg)
+To upload it to the _remote_ repository, we will need to _push_ it. To do this click either _Push Branch_ or _Push_ to the right of the green arrows facing up. With this command, we upload our changes to the remote Git repository, e.g. on GitHub or GitLab. 
+![](./figures/Renku_Git_Push.jpg)
+If the _push_ is successful, the little information saying the branch is ahead will have disappeared and a message such as the following appears.
+![](./figures/Renku_Git_Push_Message.jpg)
 
 **Whenever you interrupt your work or finish a session, go through these commands.** Else your changes will be lost. Renku has an autosave function in case you forget but it can lead to conflicts when picking up your work again.
 
-Once you start your work again, either stop the environment in which you are working within Renku and open a new one or start the next session by again opening the terminal within Jupyter and type `git pull`. As its name suggests, with it we can pull changes in our document from the Git repository. This might seem like an unnecessary step, when you are working alone on the document. However, in projects where you might be working together with a peer and need to make sure you integrate her/his changes as well. If you are working together, make sure, that you do not work on the same document at the same time, which could lead to merge conflicts. If at some point you encounter a merge conflict that Git cannot resolve automatically you will have to do so manually. At the [end of this tutorial](#Git-denies-pushing-what-can-I-do?) we show how this is done. However, it is unlikely that you will encounter such a problem in this course, which is why we do not explain it here.
+Once you start your work again, either stop the environment in which you are working within Renku and open a new one or start the next session the blue arrow in the Git tab that says `Pull`. As its name suggests, with it we can pull changes in our document from the Git repository. This might seem like an unnecessary step, when you are working alone on the document. However, in projects where you might be working together with a peer and need to make sure you integrate her/his changes as well. If you are working together, make sure, that you do not work on the same document at the same time, which could lead to merge conflicts. If at some point you encounter a merge conflict that Git cannot resolve automatically you will have to do so manually. At the [end of this tutorial](#Git-denies-pushing-what-can-I-do?) we show how this is done. However, it is unlikely that you will encounter such a problem in this course, which is why we do not explain it here.
 
+<!---
 #### Supplementary: Git denies pushing what can I do?
 
-Most of the time when Git denies you to push changes, it is because of merge conflicts. If you read the error message Git will probably tell you to enter `git pull`. Go ahead and do so. If Git cannot resolve a merge conflict automatically, you will have to do it manually. Here, we show you how it is done.
+Most of the time when Git denies you to push changes, it is because of merge conflicts. If you read the error message Git will probably tell you to enter `git pull`. Go ahead and do so. 
+
+ If Git cannot resolve a merge conflict automatically, you will have to do it manually. Here, we show you how it is done.
 ![](./figures/merge1.png)
 
 Once you have reached this point you will notice that if you close your file and want to reopen it, it will not work. Jupyter will prompt this warning:
@@ -213,7 +148,7 @@ Back in the terminal, type `git status`, `git add notebooks/01_primers.ipyn` (or
 ![](./figures/merge5.png)
 
 Open your document and see if the conflict has been resolved.  Avoid this if you have not managed to resolve the conflict by yourself or feel intimidated or unsure about resolving a conflict, you can ask a teaching assistant for help.
-
+-->
 
 ### R scripts
 
@@ -837,8 +772,9 @@ For the final exercise, you will move to RStudio on Renku. Since you are doing t
 - Close this tab and go back to the [Renku](https://renkulab.io/) website.
 - Navigate to your environments and stop the environment.
 - Create a new environment, select `/rstudio` instead of `/lab`
-- Connect to the environment, navigate to the folder `/exercise/scripts/` and open the R file called 'exercise_01.R' -->
+- Connect to the environment, navigate to the folder `/exercise/scripts/` and open the R file called 'exercise_01.R'
 
 Before you go: Git looks a little different in Rstudio but essentially works the same way. Instead of typing the commands, you use a graphical user interface. Click on Git (highlighted red in the following image), there you will find the three options you are familiar with. `git status` and `git add` are not needed.
 
 ![](./figures/gitrstudio.png)
+-->
