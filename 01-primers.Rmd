@@ -805,7 +805,7 @@ _Where to find help_: First, look within R (e.g. `?pch`), then use the internet 
 
 ### Further reading
 
-A complete tutorial to using R for Data Science in general is the freely available online-book by [Grolemund & Wickham](https://r4ds.had.co.nz/). The material covered in this chapter should serve as a "primer". That is, its purpose is to get you started with R and Git and make sure you know the basics. If you feel that you are still missing some basic concepts of R, a good starting point to fill up your gaps is the [Chapter *Workflow: basics* in Grolemund & Wickham](https://r4ds.had.co.nz/workflow-basics.html). 
+A complete tutorial on using R for Data Science in general is the freely available online-book by [Grolemund & Wickham](https://r4ds.had.co.nz/). The material covered in this chapter should serve as a "primer". That is, its purpose is to get you started with R and Git and make sure you know the basics. If you feel that you are still missing some basic concepts of R, a good starting point to fill up your gaps is the [Chapter *Workflow: basics* in Grolemund & Wickham](https://r4ds.had.co.nz/workflow-basics.html). 
 
 ## Exercise
 
