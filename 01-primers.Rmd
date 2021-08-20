@@ -38,21 +38,9 @@ At the end of each chapter, you will find an exercise that you can complete usin
 
 ## Tutorial
 
-### Libraries
-
-This tutorial uses a set of libraries. Libraries provide a set of functions and/or other objects targeted for specific applications and are not available through *base R*. To run commands of this tutorial, make sure to install and load all packages on your computer. This can be done by:
-
-```{r eval=TRUE}
-list_pkgs <- c("tidyverse")
-new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
-if (length(new_pkgs) > 0) install.packages(new_pkgs)
-library(tidyverse)
-```
-
-In each chapter of this tutorial, you'll find a similar statement to specify which package the respective chapter's tutorial will use and to install them if not available.
-
 ### Working with RStudio on Renku
 
+Cloud computing is becoming increasingly popular as it allows users to connect to the cloud system at any time from almost anywhere. This allows the bulk of features and files to be stored on a cloud-hosted server rather than on the users own computer. 
 [Renku](https://datascience.ch/renku/) is an open cloud computing platform that aims to make 'Multidisciplinary Data Science Collaborations' easier to navigate. It stores the data and code allowing multiple people to work on the same projects and keeps track of the various steps and versions of a project. By keeping track of the changes, there is a history and timeline of each persons contributions and results. Through Renku, its developers hope to make data science more reproducible, reusable and repeatable and hope to encourages and simplify collaborations.
 
 RStudio on Renku is similar to using Rstudio on any  laptop or computer, except it is hosted by the platform. 
@@ -158,6 +146,19 @@ Back in the terminal, type `git status`, `git add notebooks/01_primers.ipyn` (or
 Open your document and see if the conflict has been resolved.  Avoid this if you have not managed to resolve the conflict by yourself or feel intimidated or unsure about resolving a conflict, you can ask a teaching assistant for help.
 -->
 
+### Libraries
+
+This tutorial uses a set of libraries. Libraries provide a set of functions and/or other objects targeted for specific applications and are not available through *base R*. To run commands of this tutorial, make sure to install and load all packages on your computer. This can be done by:
+
+```{r eval=TRUE}
+list_pkgs <- c("tidyverse")
+new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
+if (length(new_pkgs) > 0) install.packages(new_pkgs)
+library(tidyverse)
+```
+
+In each chapter of this tutorial, you'll find a similar statement to specify which package the respective chapter's tutorial will use and to install them if not available.
+
 ### R scripts
 
 A single statement can be entered in the R console. For example, to calculate the mean of 1, 2, and 3, we enter:
@@ -227,9 +228,9 @@ myvar_mean <- mean(myvar)
 ```
 
 
-#### Add space and breaks
+#### Add spaces and breaks
 
-Adding enough white space and line brakes and adding it the right locations greatly helps the legibility of your code. Cramping it up too much leads to an unintelligible sequence of characters and you will not easily understand what parts go together (operators, variable names, brackets). Therefore, consider the following points:
+Adding enough white spaces and line breakes in the right locations greatly helps the legibility of any code. Cramping it up too much leads to an unintelligible sequence of characters and it will not be clear what parts go together (operators, variable names, brackets). Therefore, consider the following points:
 
 - Use spaces around operators (`=`, `+`, `-`, `<-`, `>`, etc.).
 - Use `<-`, not `=`, for allocating a value to a variable.
@@ -331,7 +332,8 @@ Similarly as code, data can be tidy or not. Even if a data file (for example an 
 2. Each row is an observation.
 3. Each value has its own cell.
 
-![Tidy data is defined by organising variables by columns, observations by rows, and each cell containing one value. Figure from Grolemund & Wickham XXXrefXXX](https://r4ds.had.co.nz/tidy-data.html)](./figures/tidy_data.png)
+![Tidy data is defined by organising variables by columns, observations by rows, and each cell containing one value. Figure from Grolemund & Wickham XXXrefXXX](https://r4ds.had.co.nz/tidy-data.html)
+![](./figures/tidy_data.png)
 
 Having data in a tidy format greatly facilitates all steps of data wrangling. When creating a spreadsheet, remember to design it in a tidy structure from the beginning. For example, put variable names in the first row, avoid merged cells, create separate tabs for each table, and make it *machine readable*. For example, avoid entries like ">10 g m-2 s-1". A cell should only contain one value. Here, this is "10". Create a separate column for units, and enter the information there as a character string ("g m-2 s-1"). The information conveyed by the greater-than (">") symbol should be encoded in a machine readable manner. This may not be straight forward. A possibility could be to add a column "is_minimum" and add the entry "TRUE" in the respective cell. 
 
@@ -686,7 +688,9 @@ The evaluation of the criterion (here `(temp < 0.0)`) has to return either `TRUE
 
 ### Loops
 
-Loops are another essential essential feature of programming. `for` and `while` loops exist in probably all programming languages. We introduce them here because they provide an essential and powerful functionality for solving many common tasks. You will encounter them later again (see Chapter \@ref(ch-05). `for` and `while` loops let us repeatedly execute the same set of commands, while changing an index, or counter variable to take a sequence of different values. The following example calculates a temperature sum of the first ten values, by iteratively adding them together. Of course, this is equivalent to just using the `sum()` function. 
+Loops are another essential essential feature of programming. `for` and `while` loops exist in probably all programming languages. We introduce them here because they provide an essential and powerful functionality for solving many common tasks. You will encounter them later again (see Chapter \@ref(ch-05). 
+  
+`for` and `while` loops let us repeatedly execute the same set of commands, while changing an index, or counter variable to take a sequence of different values. The following example calculates a temperature sum of the first ten values, by iteratively adding them together. Of course, this is equivalent to just using the `sum()` function. 
 
 ```{r}
 temp_sum <- 0
@@ -712,7 +716,7 @@ print(sum(df_small$temp[1:10]))
 ```
 
 
-### Where to find Help
+### Where to find help
 
 The material covered in this course will give you a solid basis for your future projects. Even more so, it provides you with code examples that you can adapt to your own purposes. Naturally, you will face problems we did not cover in the course and you will need to learn more as you go. The good news is, you do not have to. Many people make their code available online and often others have faced similar problems. Modifying existing code might make it easier for you to get started.
 
@@ -737,7 +741,7 @@ args(boxplot)
 ??jpeg
 ```
 
-Note that it only looks through your installed packages.
+Note that it only looks through your _installed_ packages.
 
 #### Online
 
@@ -752,6 +756,52 @@ If you do not understand the error message, start by searching the web. Be aware
 If you cannot find a solution online, start by asking your friends and colleagues. Someone with more experience than you might be able and willing to help you. When asking for help it is important to think about how you state the problem. The key to receiving help is to make it as easy as possible to understand the issue your facing. Try to reduce what does not work to a simple example. Reproduce a problem with a simple data frame instead of one with thousands of rows. Generalize it in a way that people who do not do research in your field can understand the problem. If you are asking a question online in a forum include the output of `sessionInfo()` (it provides information about the R version, packages your using,...) and other information that can be helpful to understand the problem. stackoverflow.com has its own guidelines on how to ask a good question, which you should follow. If your question is well crafted and has not been answered before you can sometimes get an answer within 5 minutes. [https://stackoverflow.com/help/how-to-ask](https://stackoverflow.com/help/how-to-ask)
 
 Finally, many packages have a mailing list or allow you to open a query on the code repository, where you can ask specific questions. The same is true for R itself. The R-Help mailing list [https://stat.ethz.ch/mailman/listinfo/r-help](https://stat.ethz.ch/mailman/listinfo/r-help) is read by many people. However, the tone of such mailing lists can be pretty dry and unwelcoming to new users. Be sure to use the right terminology or else you might get an answer pointing out your misuse of language instead of your problem. Also, be sure your question is valid. Or else you won't get an answer.
+
+### Key points from the tutorial
+
+_RStudio on Renku and Git commands_:
+- Regularly commit any changes you make to your work. To do this tick the _Stage_ box, add a commit message and press commit.
+- Then upload the changes to the remote repository by _pushing_ it.
+- Remember to close any active environments when you have finished your work on Renku.
+
+_R scripts_:
+
+- Comments are any code prefixed by at least one hastag (`#`) will not be interpreted by R.
+- Comments should help you understand your script.
+- Add spaces aound operators and breaks to make code easier to read.
+- Use `<-`, not `=`, for allocating a value to a variable.
+- Begin files with a header to describe what the code contains and does.
+- Load all the libraries needed in the script at the beginning.
+
+_Functions_:
+- Use functions to simplify a script with many steps or for duplicated code sections.
+- Functions (particularly long ones) can be written to separate source file (text files containing executable code).
+
+_Tidy data_ is a concept that follows these rules:
+1. Each column is a variable.
+2. Each row is an observation.
+3. Each value has its own cell.
+
+_Working with data frames_:
+- To get an idea of the structure of a data frame use functions such as:
+1. Size: `dim()`, `nrow()`, `ncol()`
+2. Content: `head()`, `tail()`, `view()`
+3. Names: `names()`, `rownames()`
+4. Summary: `class()`, `str()`, `summary()`
+
+- _Selecting data and entering the tidyverse_: Data frames consist of rows and columns. To extract information either use `df[row(s), column(s)]` or with tidyverse `df %>% select(column)`.
+
+- _Vectors and classes_: The simplest data structure in R is a vector and can be numeric or character vectors.
+
+- _Lists_: Lists allow data of different types to be stored. To extract elements use double brackets `[[]]`.
+
+- _Data visualisation_: Visualising data can provide a unique way to see and understand the data.
+
+- _Loops_: Loops (such as `for` and `while`) are another essential essential feature of programming and lets us repeatedly execute the same set of commands.
+
+
+_Where to find help_: First, look within R (e.g. `?pch`), then use the internet or ask colleagues. Remember to include `sessionInfo()` to help others to understand the version of R and packages you are using.
+
 
 ### Further reading
 
