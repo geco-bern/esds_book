@@ -196,9 +196,8 @@ hhdf$TIMESTAMP_START <- ymd_hm(hhdf$TIMESTAMP_START)
 Modifying existing or creating new variables (columns) in a data frame is done in the tidyverse using the function `mutate()`.
 
 ```{r eval=FALSE}
-library(lubridate)
 hhdf %>%
-  mutate(TIMESTAMP_START = ymd_hm(TIMESTAMP_START))
+  mutate(TIMESTAMP_START == ymd_hm(TIMESTAMP_START))
 ```
 
 Mutating both our timestamp variables could be written as `mutate(TIMESTAMP_START = ymd_hm(TIMESTAMP_START), TIMESTAMP_END = ymd_hm(TIMESTAMP_END))`. Sometimes, such multiple-variable mutate statements can get quite long. A nice short version of this can be implemented using `across()`:
@@ -453,6 +452,8 @@ Find a complete reference to ggplot [here](https://ggplot2.tidyverse.org/). If y
 
 ### Aggregating
 
+Aggregating in data science refers to the process of bringing together data to form a more summarised version of the different data. This can be data from multiple sources or just a compilation of the data already present. In R this can be done within a data frame or between data frames. Here, we will group our data by a specific variable (date) and summarise the variable `GPP_NT_VUT_REF`.
+
 All data frames have two dimensions, rows and columns. Our data frame is organised along half-hourly time steps in rows. These time steps belong to different days, months, and years, although these "dimensions" are not reflected by the structure of the data frame and we do not have columns that indicate the day, month or year of each half-hourly time step. This would actually be redundant information since the date-time objects of columns `TIMESTAMP_*` contain this information. 
 
 The tidyverse makes it very easy to work with such "hidden dimensions" of a data frame. Let's say we want to calculate the mean of half-hourly GPP across each day That is, to aggregate our half-hourly data to daily data by taking a sum. You see, there are two pieces of information needed for an aggregation step: The factor (or "hidden dimension") that groups a vector of values for collapsing it into a single value, and the function used for collapsing values. This function should take a vector as an argument and return a single value as an output. These two steps are implemented by the dplyr functions `group_by()` and `summarise()` and the nice and intuitive code that solves our problem of aggregating to daily values by averaging (mean) looks like this:
@@ -534,9 +535,9 @@ ddf %>%
   ylim(-10, 25)
 ```
 
-The high values of GPP we already found to be associated with low fractions of underlying measured data in the time series plot is not explained by simultaneously high PPFD. In the plot we see a core cluster of points with fewer points outside this denser area. These outlying points are lighter and do not fit the linear relationship as well.
+We observe that there is a tendency for the `f_measured` to be higher (i.e. green and dark blue) as PPFD increases, there is no equivalent trend for GPP. The colours showing the data quality or `f_measured` are mixed across the range of the vales for GPP. The high GPP values, we previously found to be associated with low fractions of underlying measured data in the time series plot, are not explained by simultaneously high PPFD. In the plot, we see a core cluster of points in the centre of the positive trend with fewer points outside this denser area. These outlying points are lighter and do not fit the linear relationship as well.
 
-Despite scattered data points, there is a positive linear relationship between GPP and PPFD. To find the best fit of this linear relationship, meaning the straight line that best fits our data points, we will move on to modelling using a univariate linear regression. This will serve as a brief introduction, as later chapters will go into more detail on modelling.
+Despite scattered data points, there is a positive linear relationship between GPP and PPFD. To find the best fit of this linear relationship, meaning the straight line that best fits our data points, we will move on to modelling using a univariate linear regression. The section below, will serve as a brief introduction, since later chapters will go into more detail on modelling regressions.
 
 We start by making a simple linear model using the function `lm()` and adding in our desired variables:
 
@@ -554,7 +555,8 @@ ddf %>%
   ylim(-10, 25) +
   labs(x = expression(paste("PPFD (", mu, "mol m"^-2, "s"^-1, ")")), y = expression(paste("GPP (gC m"^-2, "s"^-1, ")")) ) 
 ```
-
+In red in the plot above is the linear regression fitted directly to our data using `geom_smooth()`, without needing an additional step of first making a linear model and then plotting it over the data. 
+  
 Based on our previous finding that the data quality is associated with GPP values, which is reflected in their relationship with PPFD, we can fit separate linear regression models for data where `f_measured` is greater than versus less than 0.5. For this, we can create a new variable with `mutate(more_measured = as.factor(f_measured > 0.5))`). The new variable `more_measured` contains binary information as the data is either greater or less than 0.5. By adding new factors we can add another previously "hidden" dimension to our data. And because it is a categorical variable and not a continuous one, R treats it as a *factor*. We can plot this new variable `more_measured` onto the color aesthetic as we did before. Since we specify this aesthetic below in the `ggplot()` function call, all subsequent visualisation layers will respect it, also `geom_smooth()`.
 
 ```{r}
@@ -584,9 +586,10 @@ ddf %>%
   labs(x = expression(paste("PPFD (", mu, "mol m"^-2, "s"^-1, ")")), y = expression(paste("GPP (gC m"^-2, "s"^-1, ")")) ) 
 ```
 
-We detect an interesting "separation" of points, where the increase in GPP with increasing PPFD is steeper than in others. Again, we can use our *a priori* understanding of the system to formulate hypotheses and test them by finding the appropriate visualisation type. Here, one hypothesis could be that the slope is steeper in some months than in others. This is actually more than just a vague guess.
+In the figure, we can observe a much higher density of points between PPFD values 0 and 200 and between GPP values of -2 to 5. The density gets weaker as as PPFD increases but GPP stays within the same values. We can also observe a second cluster, albeit at a lower density. This starts at a PPFD value of around 200 and at a GPP value over 5. This second cluster has a steeper slope creating an interesting "separation" of points, where the increase in GPP with increasing PPFD is steeper for some than for others. 
+  Again, we can use our *a priori* understanding of the system to formulate hypotheses and test them by finding the appropriate visualisation type. Here, one hypothesis could be that the slope is steeper in some months than in others. This is actually more than just a vague guess. **XXXX BENI: how come this is more than a vague guess? Explaining how the relationship between GPP and PPFD gets you to this hypothesis would help here.XXXX**
 
-To test this hypothesis we will visuallise the slopes of each month by fitting separate linear regression models. Note that each month encompasses data from multiple years, so clear trends will only become clear if there is a commonality between the same months of different years.
+To test this hypothesis, we will visuallise the slopes of each month by fitting separate linear regression models. Note that each month encompasses data from multiple years, so clear trends will only become clear if there is a commonality between the same months of different years.
 
 ```{r}
 ddf %>%
@@ -659,7 +662,7 @@ clean_fluxnet_dd <- function(df){
     ## convert to a nice date object
     mutate(TIMESTAMP = lubridate::ymd(TIMESTAMP)) %>%
 
-    ## not setting heavily gapfilled data to zero
+    ## not setting heavily gap-filled data to zero
 
     ## set all -9999 to NA
     na_if(-9999) %>%
@@ -668,8 +671,9 @@ clean_fluxnet_dd <- function(df){
     select(-ends_with("_QC"), NEE_VUT_REF_QC)
 }
 ```
+The cleaning function is very similar to the one we used earlier in this tutorial. The main objectives it fulfills are to select only the columns relevant for the further analysis using `select()` and the column names, then to convert the column `TIMESTAMP` into a more manageable format, then we convert `-9999` into `NA` and drop variables that are now no longer needed.
 
-... and apply the 'cleaning' function to each site's data frame as follows:
+Once, we have constructed our function, we will apply this 'cleaning' function to each site's data frame as follows:
 
 ```{r}
 list_df <- purrr::map(list_df, ~clean_fluxnet_dd(.))
@@ -684,35 +688,43 @@ head(ddf_allsites)
 
 This creates one single large data frame containing all sites' data (\>167'000 rows) and adds a column named `"siteid"` that is automatically created by using the names of the list elements of `list_df`.
 
-As above for the half-hourly data, let's check the fraction of missing data for each variable.
+As above for the half-hourly data, we will check the fraction of missing data for each variable.
 
 ```{r}
 ddf_allsites %>%
   summarise_all(funs(100*sum(is.na(.))/length(.))) %>%
   t()
 ```
+From the table above we can see that the first nine columns listed have no missing data, and a few (`CO2_F_MDS`, `GPP_NT_VUT_REF`, `NEE_VUT_REF_QC`) have less than 3% missing data. For `PPFD_IN` and `USTAR`, however, over 20% of the data in those columns in missing (`NA`).
 
-... and visualise data gaps for one site to check whether our filtering criteria are not too strong.
+We will also visualise these data gaps to check that our filtering criteria are not too strong.
 
 ```{r}
-vis_miss(
-  sample_n(ddf_allsites, 5000),
+vis_miss(ddf_allsites,
   cluster = FALSE,
   warn_large_data = FALSE
   )
 ```
 
-We see that `PPFD_IN` is often missing.
+We see that overall, there is 3.7% missing data. Specifically, `PPFD_IN` is often missing. XXXX BENI: What is the consequence of this? Please expand on this a bit. XXXX
 
 ### Strings
 
-The column `siteid` now contains strings specifying the full paths of the files that were read. We would like to extract the site name from these strings. The file names follow a clear pattern. Naming files wisely can often make life a lot simpler.
+In R, _strings_ refer to any set of characters between two double or single quotes:
+- `"This is a string in R"`
+- `'This is also a string in R'`
+
+Knowing how to create and manipulate strings can be useful if you need to manipulate a sample name or extract some information from a string. Below, we will show you how to extract a specific part of a string to create a new column. 
+
+The column `siteid` currently contains strings specifying the full paths of the files that were read in earlier. Since the file path is not information we need, we would like to extract the site name from these strings. The file names follow a clear pattern, which highlights why naming files wisely can often make life a lot simpler.
 
 ```{r}
 ddf_allsites$siteid %>% head()
 ```
 
-The paths each start with the subdirectory where they are located (`"./data/"`), then `"FLX_"`, followed by the site name (the first three entries of the table containing data from all sites are for the site `"BE-Bra"`), and then some more specifications, including the years that respective files' data cover. What is the most effective way to extract the site name from all these strings? The `stringr` package offers a set of very handy tools to work with strings, see this [cheat sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) for a summary of them. Here, we would like to extract the six characters, starting at position **15**.
+The paths each start with the subdirectory where they are located (`"./data/"`), then `"FLX_"`, followed by the site name (the first three entries of the table containing data from all sites are for the site `"BE-Bra"`), and then some more specifications, including the years that respective files' data cover. What is the most effective way to extract the site name from all these strings? The `stringr` package offers a set of very handy tools to work with strings and regular expressions, see this [cheat sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) to see how to find for specific patterns in a string and many other useful tools for manipulating strings or go [here](https://r4ds.had.co.nz/strings.html) for more general introduction with examples. 
+  
+Here, we would like to extract the six characters, starting at position 12.
 
 ```{r}
 vec_sites <- str_sub(vec_files, start = 12, end = 17)
@@ -731,18 +743,21 @@ head(ddf_allsites)
 
 ### Combining relational data
 
-In many situations, we want to combine information from multiple data frames into a single one. In our case, we are interested in knowing more about the sites for which we have time series data. We are interested in *meta-information* about the sites, for example, the vegetation type, geographical location, elevation, etc. In such cases, where information about common sets of units (here sites) is distributed across multiple data objects, we are referring to *relational data*. There has to be a link between them. In our case, this is the site identity or site name. Specifically, this means that the same labeling of site identities has to be available from all relational data objects.
+Metadata is additional information on the data that will make understanding ad working with the data easier. Metadata can take many forms from descriptive to statistical or structural. Metadata is a way to explain important elements of the data to other people who did not collect the data or previously work on it.
 
-You may ask yourself what is the purpose of keeping data in separate relational data objects. We would have to duplicate each value of site elevation, for example, when adding this info as a new column to a time series data frame of the respective site. This would inflate the memory of the object considerably without actually adding information. Therefore it can make sense to keep such differently structured data objects separate and combine them only during the analysis step.
+In many situations, we want to combine information from multiple data frames into a single one. In our case, we are interested in knowing more about the sites for which we have time series data. We are interested in *meta-information* about the sites, for example, the vegetation type, geographical location, elevation, etc. In such cases, where information about common sets of units (here sites) is distributed across multiple data objects, we are referring to *relational data*. These cannot be not completely independent data but must contain a common element that links them. In our case, this is the site identity or site name. Specifically, this means that the same labeling of site identities has to be available from all relational data objects.
 
-A comprehensive collection of FLUXNET site meta information is freely available from [Falge et al.](https://daac.ornl.gov/FLUXNET/guides/Fluxnet_site_DB.html). Let's read this file (`"fluxnet_site_info_all.csv"`).
+It may seem counterintuitive to keep an extra data in a separate data object but in some cases this can simplify the various data objects. Think for example if we wanted to have a column containing the elevation of a site. Each site has a fixed elevation, but if we were to add the elevation column to the data set containing time series data for say temperature, then the elevation for each respective site would be listed hundreds or even thousands of times for each series entry. This would inflate the memory of the object considerably without actually adding information. In this case, having a separate data frame containing information that stays the same for a site irrespective of factors such as seasons or days that can change, makes sense. This data frame would have as many rows as there are sites and include attibutes such as full site name, country, elevation, latitude, longitude, year the site started recording data and even the land cover. Therefore it helps to keep such differently structured data objects separate and combine them only during the analysis step.
+
+A comprehensive collection of FLUXNET site meta information is freely available from [Falge et al.](https://daac.ornl.gov/FLUXNET/guides/Fluxnet_site_DB.html). 
+We will now read in this file (`"fluxnet_site_info_all.csv"`).
 
 ```{r}
 df_sites <- read_csv("./data/fluxnet_site_info_all.csv")
 head(df_sites)
 ```
 
-The file contains information on many more sites (844 rows for 844 sites) than we have data for (35 sites). The key variable that combines the two is the standard site ID name that is commonly used for FLUXNET sites. In the sites table (`df_sites`), the key is called `fluxnetid`. In the temporal dataset `ddf_allsites`, the site key column is called `siteid`. To combine ("join") the two data frames, the joining "key" ID has to be named the same way (here `"siteid"`) and should contain the same set of different values (site names in our case). Hence, we have to rename the respective column in one of our data frames in order to join them.
+The file contains information on many more sites (844 rows for 844 sites) than we have data for (35 sites). The 'key' variable that the two data frames have in common is the standard site ID name that is used for FLUXNET sites. In the sites table (`df_sites`), the column identifiying the site is called `fluxnetid`. In the temporal dataset `ddf_allsites`, the site column is called `siteid`. To combine ("join") the two data frames, the joining "key" ID has to be named the same way (here `"siteid"`) and should contain the same set of different values (site names in our case). Hence, we have to rename the respective column in one of our data frames in order to join them.
 
 ```{r}
 df_sites <- df_sites %>%
@@ -771,6 +786,9 @@ ncol(ddf_allsites_joined)
 head(ddf_allsites_joined)
 head(ddf_allsites)
 ```
+
+### Key points from the tutorial
+
 
 ## Exercise
 
