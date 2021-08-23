@@ -190,7 +190,7 @@ An R script is basically a text file, named with the suffix `.R` to indicate tha
 source("my_r_script.R")
 ```
 
-You can find more useful information about scripts and workflows in [R for Data Science XXXrefXXX](https://r4ds.had.co.nz/workflow-scripts.html). 
+You can find more useful information about scripts and workflows in [R for Data Science](https://r4ds.had.co.nz/workflow-scripts.html) [@Wickham2017R]. 
 
 We should always strive to write nice scripts and good code. Good code is clean, readable, consistent, and extensible (easily modified or adapted). To achieve this, here are a few points to consider - inspired by [best practices for coding](https://www.r-bloggers.com/r-code-best-practices/) and by the [Tidyverse style guide XXXrefXXX](https://style.tidyverse.org/).
 
@@ -326,13 +326,13 @@ Functions (particularly long ones) can be written to separate source file (text 
 
 ### Tidy data
 
-Similarly as code, data can be tidy or not. Even if a data file (for example an Excel spreadsheet) may look visually appealing, its structure determines how easy it is to perform further processing steps and calculations on it. The concept of [**tidy data**](https://r4ds.had.co.nz/tidy-data.html) can be defined by the following rules ([Wickham, 2014 XXXrefXXX](http://www.jstatsoft.org/v59/i10/paper)):
+Similarly as code, data can be tidy or not. Even if a data file (for example an Excel spreadsheet) may look visually appealing, its structure determines how easy it is to perform further processing steps and calculations on it. The concept of [**tidy data** ](https://r4ds.had.co.nz/tidy-data.html) [@Wickham2017R] can be defined by the following rules [@Wickham2014] (http://www.jstatsoft.org/v59/i10/paper):
 
 1. Each column is a variable.
 2. Each row is an observation.
 3. Each value has its own cell.
 
-![Tidy data is defined by organising variables by columns, observations by rows, and each cell containing one value. Figure from Grolemund & Wickham XXXrefXXX](https://r4ds.had.co.nz/tidy-data.html)
+![Tidy data is defined by organising variables by columns, observations by rows, and each cell containing one value. Figure from Grolemund & Wickham](https://r4ds.had.co.nz/tidy-data.html) [@Wickham2017R]
 ![](./figures/tidy_data.png)
 
 Having data in a tidy format greatly facilitates all steps of data wrangling. When creating a spreadsheet, remember to design it in a tidy structure from the beginning. For example, put variable names in the first row, avoid merged cells, create separate tabs for each table, and make it *machine readable*. For example, avoid entries like ">10 g m-2 s-1". A cell should only contain one value. Here, this is "10". Create a separate column for units, and enter the information there as a character string ("g m-2 s-1"). The information conveyed by the greater-than (">") symbol should be encoded in a machine readable manner. This may not be straight forward. A possibility could be to add a column "is_minimum" and add the entry "TRUE" in the respective cell. 
@@ -369,7 +369,7 @@ It is advisable to create a separate data directory outside (e.g., `~/data/`) th
 
 Now, let's get our hands on actual data for demonstrating how data is read and written. As most of the code displayed in this book, the code chunks below are executable. You can try it out by opening the the book's R project in RStudio. 
 
-We are going to work with data from ecosystem flux measurements, taken by the eddy covariance technique, and provided as part of the FLUXNET2015 dataset (XXXrefXXX, cite https://www.nature.com/articles/s41597-020-0534-3). The data we're using below comes from a flux tower near Zürich ([CH-Lae](https://gl.ethz.ch/research/bage/fluxnet-ch.html), located on the Laegern mountain between Regensberg and Baden and run by our colleagues here at ETH.
+We are going to work with data from ecosystem flux measurements, taken by the eddy covariance technique, and provided as part of the FLUXNET2015 dataset [@Pastorello2020] [see](https://www.nature.com/articles/s41597-020-0534-3). The data we're using below comes from a flux tower near Zürich ([CH-Lae](https://gl.ethz.ch/research/bage/fluxnet-ch.html), located on the Laegern mountain between Regensberg and Baden and run by our colleagues here at ETH.
 
 The data is stored as a Comma Separated Values file (`.csv`). This is a plain-text, and therefore a non-proprietary format. To follow the FAIR data principles, distribute your data in a format that is non-proprietary and readable across platforms and applications. For example, avoid distributing your data as an *Excel* spreadsheat (`.xlsx`), or a *Matlab* data object (`.mat`), or an R data object (`.RData`, or `.rds`). 
 

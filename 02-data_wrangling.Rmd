@@ -58,7 +58,7 @@ ggplot(data = df, aes(x = time, y = temperature)) +
 
 After learning about some basic concepts and functions for data wrangling and visualisation, we will apply some of the tidyverse functions on the data. As in Chapter \@ref(ch-01), we will be using the time series data from eddy covariance flux measurements and meteorological variables measured in parallel. In this sub-section, we start with half-hourly data from a flux tower near Zürich ([CH-Lae](https://gl.ethz.ch/research/bage/fluxnet-ch.html), located on the Lägern mountain between Regensberg and Baden and run by our colleagues here at ETH). The data covers years 2004-2014 at a half-hourly time step. That is a large amount of data which can be tricky to work with in Excel. In this course, we will teach you to do data wrangling completely outside of Excel and show you how it improves your life as a (data) scientist considerably.
 
-Every research project starts with a broad overall question. In this tutorial, our aim to investigate the variations and controls of ecosystem-level gross primary production (GPP). GPP is the gross carbon assimilation by photosynthesis of all plants in the "footprint" of an eddy covariance tower and can be derived from the measurement of the vertical turbulent net flux of CO<sub>2</sub> (on the basis of vertical air movement and parallel CO<sub>2</sub> concentration measurements). "Gross" because plants simultaneously respire CO<sub>2</sub> as they assimilate it. Several assumptions have to be made to get from raw measurements (simultaneous measurements of CO<sub>2</sub> concentration and velocities of air movement in vertical direction, typically taken at 50 Hz) to the final GPP time series. In our dataset, different GPP time series are available and are derived using different assumptions. Below, we will work with the one called `GPP_NT_VUT_REF`. See Pastorello et al. (2020) (XXXrefXXX https://www.nature.com/articles/s41597-020-0534-3) for a comprehensive description of GPP estimation methods.
+Every research project starts with a broad overall question. In this tutorial, our aim to investigate the variations and controls of ecosystem-level gross primary production (GPP). GPP is the gross carbon assimilation by photosynthesis of all plants in the "footprint" of an eddy covariance tower and can be derived from the measurement of the vertical turbulent net flux of CO<sub>2</sub> (on the basis of vertical air movement and parallel CO<sub>2</sub> concentration measurements). "Gross" because plants simultaneously respire CO<sub>2</sub> as they assimilate it. Several assumptions have to be made to get from raw measurements (simultaneous measurements of CO<sub>2</sub> concentration and velocities of air movement in vertical direction, typically taken at 50 Hz) to the final GPP time series. In our dataset, different GPP time series are available and are derived using different assumptions. Below, we will work with the one called `GPP_NT_VUT_REF`. See @Pastorello2020 (https://www.nature.com/articles/s41597-020-0534-3) for a comprehensive description of GPP estimation methods.
 
 Now that we roughly know what to expect from the contents of our dataset and we have a research question in mind (controls and variations of GPP), we can start searching for answers by reading, transforming, visualising, and modelling our data. Based on what we learn from this initial exploratory data analysis, we will refine our research question, re-focus it, and follow it up with the next level of data analysis and modelling in later chapters.
 
@@ -74,19 +74,19 @@ library(tidyverse)
 library(conflicted)
 ```
 
-[**tidyverse**](https://www.tidyverse.org/) is a collection of packages and `library(tidyverse)` loads them all. For this tutorial we use in particular:
+[**tidyverse**] [@R-tidyverse] (https://www.tidyverse.org/) is a collection of packages and `library(tidyverse)` loads them all. For this tutorial we use in particular:
 
 XXXrefXXX for all packages
 
-- dplyr
-- tidyr
-- purrr
-- readr
-- lubridate
-- stringr
-- ggplot2
+- dplyr [@R-dplyr]
+- tidyr [@R-tidyr]
+- purrr [@R-purrr]
+- readr [@R-readr]
+- lubridate [@R-lubridate]
+- stringr [@R-stringr]
+- ggplot2 [@R-ggplot2]
 
-It can happen that different functions with the same name are available from different packages. To avoid conflicts and make sure we use the preferred ones, we can use the *conflicted* package XXXrefXXX and specify:
+It can happen that different functions with the same name are available from different packages. To avoid conflicts and make sure we use the preferred ones, we can use the *conflicted* package [@R-conflicted] and specify:
 ```{r}
 conflicted::conflict_prefer("select", "dplyr")
 conflicted::conflict_prefer("filter", "dplyr")
@@ -109,7 +109,7 @@ For our further data exploration, we will reduce the data frame we are working w
 
 Variable selection is not only a matter of improving processing efficiency, but is an important step for analysis and modelling and should be guided by our understanding of the data. I general, we select the variables that are expected to influence the phenomena that we are investigating based on the existing knowledge. The selection we decide upon must be documented for publications to aid reproducibility. More on variable selection will be taught in Chapter \@ref(#ch-08).
 
-Here, many of the variables in the data frame record the same information, but are derived with slightly different assumptions and gap-filling techniques. This is indicated by the suffices of the variable names, for example some variable vontain `_REF` (such as `GPP_NT_VUT_REF`), indicating it is the most representative reference value for this variable. A SUBSET version of the data, with less variables, is also provided for 'non-expert users. See [Pastorello et al. (2020)](https://www.nature.com/articles/s41597-020-0534-3) for a comprehensive description of alternative methods. For the further steps in this chapter we will now subset our original data. We select the following variables:
+Here, many of the variables in the data frame record the same information, but are derived with slightly different assumptions and gap-filling techniques. This is indicated by the suffices of the variable names, for example some variable vontain `_REF` (such as `GPP_NT_VUT_REF`), indicating it is the most representative reference value for this variable. A SUBSET version of the data, with less variables, is also provided for 'non-expert users. See [@Pastorello2020](https://www.nature.com/articles/s41597-020-0534-3) for a comprehensive description of alternative methods. For the further steps in this chapter we will now subset our original data. We select the following variables:
 
 -   Time of the measurement (all variables with names starting with `TIMESTAMP`)
 -   All meteorological variables following the final gap-filled method (all variables with names ending with `_F`)
@@ -158,7 +158,7 @@ as.character(hhdf$TIMESTAMP_START[[1]])
 
 As we can see, it is considered by R as a numeric variable with 12 digits ("double-precision", occupying 64 bits in computer memory). After printing the variable as a string, we can guess that the format is: YYYYMMDDhhmm.
 
-The **lubridate** XXXrefXXX is a package designed to help processing date and time objects Knowing the format of the timestamp variables in our dataset, we can use `ymd_hm()` to convert them to actual date-time objects.
+The **lubridate** [@R-lubridate] is a package designed to help processing date and time objects Knowing the format of the timestamp variables in our dataset, we can use `ymd_hm()` to convert them to actual date-time objects.
 
 ```{r, message=FALSE}
 library(lubridate)
@@ -384,7 +384,7 @@ hhdf <- hhdf %>%
   select(-USTAR, -SWC_F_MDS_4)
 ```
 
-We can also visualise the fraction of missing data after applying our data cleaning step, using the `vis_miss` from the **visdat** package. Since applying this function on such a large dataframe can be time consuming, we will apply it on a randomly selected subset. For this, we randomly select 5'000 entries from `hhdf` to get a feeling for how much of which data is missing. To randomly select 5'000 entries, we use the function `sample_n()`. This function samples `n` rows randomly from the provided data frame _hhdf_.
+We can also visualise the fraction of missing data after applying our data cleaning step, using the `vis_miss` from the **visdat** package [@R-visdat]. Since applying this function on such a large dataframe can be time consuming, we will apply it on a randomly selected subset. For this, we randomly select 5'000 entries from `hhdf` to get a feeling for how much of which data is missing. To randomly select 5'000 entries, we use the function `sample_n()`. This function samples `n` rows randomly from the provided data frame _hhdf_.
 
 ```{r}
 library(visdat)
@@ -587,7 +587,7 @@ ddf %>%
 ```
 
 In the figure, we can observe a much higher density of points between PPFD values 0 and 200 and between GPP values of -2 to 5. The density gets weaker as as PPFD increases but GPP stays within the same values. We can also observe a second cluster, albeit at a lower density. This starts at a PPFD value of around 200 and at a GPP value over 5. This second cluster has a steeper slope creating an interesting "separation" of points, where the increase in GPP with increasing PPFD is steeper for some than for others. 
-  Again, we can use our *a priori* understanding of the system to formulate hypotheses and test them by finding the appropriate visualisation type. Here, one hypothesis could be that the slope is steeper in some months than in others. This is actually more than just a vague guess. **XXXX BENI: how come this is more than a vague guess? Explaining how the relationship between GPP and PPFD gets you to this hypothesis would help here.XXXX**
+  Again, we can use our *a priori* understanding of the system to formulate hypotheses and test them by finding the appropriate visualisation type. Here, one hypothesis could be that the slope is steeper in some months than in others. This is actually more than just a vague guess. **XXX BENI: how come this is more than a vague guess? Explaining how the relationship between GPP and PPFD gets you to this hypothesis would help here.XXX**
 
 To test this hypothesis, we will visuallise the slopes of each month by fitting separate linear regression models. Note that each month encompasses data from multiple years, so clear trends will only become clear if there is a commonality between the same months of different years.
 
@@ -706,7 +706,7 @@ vis_miss(ddf_allsites,
   )
 ```
 
-We see that overall, there is 3.7% missing data. Specifically, `PPFD_IN` is often missing. XXXX BENI: What is the consequence of this? Please expand on this a bit. XXXX
+We see that overall, there is 3.7% missing data. Specifically, `PPFD_IN` is often missing. XXX BENI: What is the consequence of PPFD_IN often being missing? Please expand on this a bit. XXX
 
 ### Strings
 
@@ -722,7 +722,7 @@ The column `siteid` currently contains strings specifying the full paths of the 
 ddf_allsites$siteid %>% head()
 ```
 
-The paths each start with the subdirectory where they are located (`"./data/"`), then `"FLX_"`, followed by the site name (the first three entries of the table containing data from all sites are for the site `"BE-Bra"`), and then some more specifications, including the years that respective files' data cover. What is the most effective way to extract the site name from all these strings? The `stringr` package offers a set of very handy tools to work with strings and regular expressions, see this [cheat sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) to see how to find for specific patterns in a string and many other useful tools for manipulating strings or go [here](https://r4ds.had.co.nz/strings.html) for more general introduction with examples. 
+The paths each start with the subdirectory where they are located (`"./data/"`), then `"FLX_"`, followed by the site name (the first three entries of the table containing data from all sites are for the site `"BE-Bra"`), and then some more specifications, including the years that respective files' data cover. What is the most effective way to extract the site name from all these strings? The **stringr** package offers a set of very handy tools to work with strings and regular expressions, see this [cheat sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) to see how to find for specific patterns in a string and many other useful tools for manipulating strings or go [here](https://r4ds.had.co.nz/strings.html) for more general introduction with examples. 
   
 Here, we would like to extract the six characters, starting at position 12.
 
