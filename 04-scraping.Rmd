@@ -2,12 +2,13 @@
 
 
 ## Introduction
+
 This chapter covers _data scraping_ in R and yes, this is not a typo. _Scraping_ means to gather or to extract whereas _scrapping_ means to get rid of something. The goal of the sections below is to gather and convert online data into a structured format that can be easily accessed and modified in R. As a case study, we will scrape data from a website containing various information about fish species, called [FishBase](https://www.fishbase.in/search.php).
 
 We will first learn how to access the website and how to extract useful useful information from plain text. Then, we will look at how to access a table that is embedded in the website and how to generate a new table in R which holds all information we want to extract. Next up is cleaning up the scraped data for visualization and analysis. At the end we will conduct a case study where we create a model to make predictions about fish species richness.  
 
 
-### Theory
+### Key points from the lecture
 
 Let us first have a brief review of the main concept of the lecture. The web is the largest source of information and often free to access. In some cases the information is already presented in a nice format and can be easily copied into an excel spreadsheet. However, this is often not the case and data-sets are only presented in a format that is not easy to download or modify. Manually copying data from different sub pages and sections is a tedious, slow and error prone approach. We therefore need a more automated and efficient technique to access such data.
 
@@ -33,6 +34,7 @@ Next, we will demonstrate the principles of web scraping using a simple case stu
 
 
 ## Tutorial
+
 ### R-Packages and Functions
 
 We will now load all packages necessary to perform web scraping on FishBase, namely `RCurl` and `XML`. `RCurl` provides functions to allow us to compose general HTTP requests and provides convenient functions to fetch URLs via get and post requests and process the results returned by the web server.
