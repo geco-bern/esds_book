@@ -30,7 +30,7 @@ After this learning unit, you will be able to ...
 * Understand the structure of spatial data, including rasters and shapefiles.
 * Apply a range of operations to prepare data for analyses.
 
-### Key points of the lecture
+### Key points from the lecture
 
 Data operations range in complexity, here they are listed from simplest to extremely complex:  
 
@@ -82,9 +82,9 @@ Error propagation is used for datasets containing different uncertainties to det
 
 In this practical, we will be downloading and getting to know spatial data. There are three types of spatial data:
 
-* points;
-* shapefiles;
-* rasters.
+* *points*: Spatial points are data points consist of x and y coordinates representing a specific geographic location.
+* *shapefiles*: Shapefiles are a format for storing geospatial data in the form of points, lines or polygons. They contain geographic locations and attribute information on the features stored within them.
+* *rasters*: Rasters are gridded data stored in pixels or cells. Each grid cell represents a section of the geographic area the raster covers and contains a value of the variable of interest.
 
 This practical will start with a little introduction on downloading remote sensing data for our tower sites and seeing how this information can be used for analyses. Then we will get into the nitty-gritty aspects of the aforementioned spatial data types. 
 
@@ -315,7 +315,7 @@ R2 increased from 0.5229 to 0.603 when including considering NDVI * PPFD, instea
 Documenting the geographic coordinates of data allows us to assign a precise location to that data observation, which can be important for further analysis when, for example, comparing location. Coordinates come with a latitude (defining the position N or S of the equator) and longitude (defining the position E or W of the meridian). With the coordinates, we can plot data points, remembering that the latitude is equivalent to the y-axis and longitude to the x-axis.
 
 In this section, we look at the position of the Fluxnet sites. The Fluxnet network measures land-atmosphere exchanges of greenhouse gases and energy for sites across the globe using the eddy covariance technique. High-frequency measurements of vertical wind velocity and a scalar mixing ratio (CO2, H2O, temperature, etc.) provides estimates of the net exchange of the scalar. Eddy covariance is currently the standard method to measure fluxes of trace gases between ecosystems and the atmosphere (sources:
-[Fluxnet](https://fluxnet.org/about/), [Nature Article on Fluxnet Dataset](https://www.nature.com/articles/s41597-020-0534-3.pdf).
+[Fluxnet](https://fluxnet.org/about/), Nature Article by @Pastorello2020 on [Fluxnet Dataset](https://www.nature.com/articles/s41597-020-0534-3.pdf).
 
 At the beginning of this tutorial we loaded the dataset containing information on sites in Europe. We treat site locations as a geographical position. So we will extract the name, longitude and latitude of our sites.
 
@@ -341,7 +341,7 @@ ggplot() +
 
 We can make an educated guess where the points are but this plot does not tell us much by itself without a map as a reference.
 
-To visualize the location of our points we plot them on a map. We use the package `SpData` to get the world map and crop it to Europe.
+To visualize the location of our points we plot them on a map. We use the packages **sf** [@R-sf] and **SpData** [@R-SpData] to get the world map and crop it to Europe.
 
 ```{r message=FALSE, warning=FALSE}
 library(sf)
@@ -360,7 +360,7 @@ We can carry on using the data points as they are (for plotting or analysis) but
 _SpatialPoints_ consist of a matrix with _n_ rows and 2 columns, one for each coordinate (latitude & longitude). _n_ is the number of points in the data. These points also have a so-called _'projection string'_ or _'crs'_ indicating the coordinate reference system in which coordinates of points are expressed. 
 There are different ways (formulas) to project the earth (an ellipsoid) onto a 2-dimensional map. We can only perform calculations, if the same method (projection, coordinate reference system (crs)) is used. Having points in different coordinate reference systems can cause data to look skewed. It is essential to know which coordinate reference system your data is in. The most commonly used one is **WGS84 (EPSG: 4326)**. There are some useful resources to convert help you find the correct [spatial reference](https://spatialreference.org/ref/epsg/4326/).
 
-To transform points into _SpatialPoints_, we use the function `SpatialPoints` in the r package `sp`.
+To transform points into _SpatialPoints_, we use the function `SpatialPoints` in the R package **sp** [@Bivand2013;@Pebesma2005].
 
 ```{r message=FALSE, warning=FALSE}
 library(sp)
@@ -372,7 +372,9 @@ Below you can see how the R-base call `plot()`, plots the _SpatialPoints_ direct
 ```{r warning=F, message=F}
 plot(sp_sites, col = "red", pch = 16)
 ```
-If, however, we make the point's locations visually meaningful, we have to provide a map to plot as a background. The loaded shapefile of Europe will also be used in the next section called Shapefiles.
+
+If, however, we want to make the point's locations visually meaningful, we have to provide a map to plot as a background. To load a raster file in R, we will use the package **rgdal** [@R-rgdal]. The shapefile of Europe we will load, will also be used in the next section called Shapefiles.
+
 ```{r}
 library(rgdal)
 europe_shape <- readOGR(dsn="./data/shapefiles", layer="europe_map") # imports the shapefile of the European map
@@ -384,7 +386,7 @@ Now, we can see the tower locations as red circles plotted on a grey European ma
 
 ### Shapefiles
 
-Above we looked at points on the globe and transformed our data to _SpatialPoints_. This was already the first example of what forms a shapefile can come in. Shapefiles store geographic information, including location and any additional information, in shape objects. Shape objects in R are defined by _SpatialPoints_, _SpatialLines_, and _SpatialPolygons_ classes of the `sp` package. The corresponding _SpatialPointsDataFrame_, _SpatialLinesDataFrame_, and _SpatialPolygonsDataFrame_ classes allow storing shape objects together with a data frame. The number of rows in the data frame corresponds to the number of points (number of rows in coordinate matrix), lines (size of the list of Lines), or polygons (size of the list of Polygons). This allows us to associate a vector of variables (a row of the data frame) to each shape object.
+Above we looked at points on the globe and transformed our data to _SpatialPoints_. This was already the first example of what forms a shapefile can come in. Shapefiles store geographic information, including location and any additional information, in shape objects. Shape objects in R are defined by _SpatialPoints_, _SpatialLines_, and _SpatialPolygons_ classes of the **sp** package . The corresponding _SpatialPointsDataFrame_, _SpatialLinesDataFrame_, and _SpatialPolygonsDataFrame_ classes allow storing shape objects together with a data frame. The number of rows in the data frame corresponds to the number of points (number of rows in coordinate matrix), lines (size of the list of Lines), or polygons (size of the list of Polygons). This allows us to associate a vector of variables (a row of the data frame) to each shape object.
 In the next step, we load a shapefile containing the countries of the world provided by [Natural Earth](www.naturalearthdata.com), as a reference with which we can contextualize our spatial data. Since we only are looking at towers in Europe, we have cropped the raster to Europe for you.
 
 ```{r warning=F, message=F}
@@ -424,11 +426,9 @@ head(df_sites_country_info) %>% select(1:6)
 In the header above, is the new data frame _df_sites_country_info_ consisting of three columns ('site', 'lat', 'lon') from _df_sites_ and then 91 columns containing information from _europe_shape_ at the spatial locations of _pts_ (the tower sites).
 
 
-For the next part, we will be using a European map with country boarders. For this, we will make an object called _shp_df_ using the column _SOVEREIGNT_, which we saw when looking at `europe_shape@data`. This preserves only the data needed for further analysis and plotting. 
+For the next part, we will be using a European map with country boarders. For this, we will make an object called _shp_df_ using the column _SOVEREIGNT_, which we saw when looking at `europe_shape@data`. The package **broom** [@R-broom] converts objects from R into 'tidy tibbles', this will allow us to preserves only the data needed for further analysis and plotting. 
 
 ```{r message=F}
-library(maptools)
-
 shp_df <- broom::tidy(europe_shape, region = "SOVEREIGNT") # transforms the information in 'SOVREIGNT' into a tidy df
 
 head(shp_df)
@@ -526,9 +526,10 @@ points(lon_lae, lat_lae, pch = 16, col = "red")
 ```
 
 If we want to conduct analysis using two different rasters, we have to make sure they have the same resolution and are aligned on the same grid. We can read a second raster and compare the grids. We load spatio-temporal temperature rasters available from [CHELSA](https://chelsa-climate.org) to complement our flux tower measurements for further analysis.
-The temperature raster data from CHELSA provides free high-resolution climate data (temperature and precipitation) for the past and the future. The past data we use here are downscaled model output temperature and precipitation estimates of the ERA-Interim climatic reanalysis (forecast models and data assimilation systems reanalysing archived observations). While the temperature algorithm is based on statistical downscaling of atmospheric temperatures, the precipitation algorithm incorporates orographic predictors including wind fields, valley exposition, and boundary layer height, with subsequent bias correction. The data we use consists of a monthly temperature and precipitation time series over the area of Europe from 2006 to 2012 in January. To compare this new raster with the previous one we need to crop it to the same region as the tower.
+The temperature raster data from CHELSA provides free high-resolution climate data (temperature and precipitation) for the past and the future. The past data we use here are downscaled model output temperature and precipitation estimates of the ERA-Interim climatic reanalysis (forecast models and data assimilation systems reanalysing archived observations). While the temperature algorithm is based on statistical downscaling of atmospheric temperatures, the precipitation algorithm incorporates orographic predictors including wind fields, valley exposition, and boundary layer height, with subsequent bias correction. The data we use consists of a monthly temperature and precipitation time series over the area of Europe from 2006 to 2012 in January. To compare this new raster with the previous one we need to crop it to the same region as the tower. Cropping rasters can be done using the R package **raster** [@R-raster].
 
 ```{r}
+library(raster)
 raster_chelsa <- raster("./data/Chelsa_t_mean_2006-2012.tif")
 raster_chelsa_crop <- crop(raster_chelsa, bounding_box)
 ```
@@ -555,7 +556,7 @@ plot(raster_chelsa_crop, col = pal(20), xlab="longitude", ylab="latitude")
 points(lon_lae, lat_lae, pch = 16, col = "red")
 ```
 
-We have seen some of the basic functions in the package `raster`. Now we will load one more package to work with raster files. We use the package `rasterVis`. This package contains methods for enhanced visualization and interaction with raster data. It implements visualization methods for quantitative data and categorical data, both for univariate and multivariate rasters. It also provides methods to display spatiotemporal rasters, and vector fields. 
+We have seen some of the basic functions in the package **raster**. Now we will load one more package to work with raster files. We use the package **rasterVis** [@R-rasterVis]. This package contains methods for enhanced visualization and interaction with raster data. It implements visualization methods for quantitative data and categorical data, both for univariate and multivariate rasters. It also provides methods to display spatiotemporal rasters, and vector fields. To enhance the visualisation of our raster data, we will use the colour palettes from the package **RColorBrewer** [@R-RColorBrewer]
 
 ```{r message=F}
 library(rasterVis)
@@ -712,7 +713,7 @@ df_sites_temp <- extract(raster_worldclim, sp_sites, sp = TRUE) %>%
 head(df_sites_temp)
 ```
 
-We obtain the monthly mean temperature of Jan 2006 from FLUXNET data.
+We obtain the monthly mean temperature of January 2006 from FLUXNET data.
 
 ```{r message=F}
 library(lubridate)
@@ -749,7 +750,7 @@ df_sites_temp %>%
   theme_classic()
 ```
 
-We compute the mean squared error (MSE). The MSE calculates the average of the squares of errors of all the data points from a fitted line or model. Put simply this is the difference between the data points (the actual data) and the estimated points given by the line or model. The values are squared to get positive values even if the difference is negative. Smaller values reflect less variation of the data. In a model you want to minimise the MSE, as this reflects that the model's predicted or estimated points are closer to your actual data.
+We compute the mean squared error (MSE). The MSE calculates the average of the squares of errors of all the data points from a fitted line or model. Put simply this is the difference between the data points (the actual data) and the estimated points given by the line or model. The values are squared to get positive values even if the difference is negative. Smaller values reflect less variation of the data. In a model you want to minimise the MSE, as this reflects that the model's predicted or estimated points are closer to your actual data. The R package **Metrics** [@R-Metrics], has a function `mse()` to calculate the mean squared error.
 
 ```{r}
 library(Metrics)
@@ -774,7 +775,7 @@ mse(df_sites_temp$temp_fluxnet, df_sites_temp$temp_wc)
 We see that CHELSA correlates better, since the mean squared error is smaller, with the temperature values at the towers. We also see that WorldClim compared to CHELSA tends to predict colder temperatures.
 It is important to remember that CHELSA and WorldClim are both 'modelled data' and as such come with errors and uncertainties. When using environmental layers for analyses, the data source should be well researched and possible uncertainty or errors carefully considered to understand the weaknesses and limitations of the data.
 Th main differences between CHELSA and WorldClim are down to the input data of their models. As mentioned earlier CHELSA predicts its variable on down-scaled ERA-Interim data (global atmospheric reanalysis) and implements bias correction analyses.
-WorldClim's predicted variables are based on point data from weather station, which is then interpolated based on elevation, longitude and latitude. Due to the dependence on data from weather stations, the accuracy of WorldClim is more dependent on station density. For a more detailed comparison of the two climate data and why such models must be used with care, refer to [Bobrowski, Weidinger & Schickhoff, 2021](https://www.mdpi.com/2073-4433/12/5/543).
+WorldClim's predicted variables are based on point data from weather station, which is then interpolated based on elevation, longitude and latitude. Due to the dependence on data from weather stations, the accuracy of WorldClim is more dependent on station density. For a more detailed comparison of the two climate data and why such models must be used with care, refer to the @atmos12050543 paper [here](https://www.mdpi.com/2073-4433/12/5/543).
 
 
 **Checkpoint**

@@ -7,6 +7,8 @@ In this chapter, you will learn to efficiently explore data. This includes under
 The aim of data wrangling is to transform the data from the raw data into a cleansed, more relevant format. This process typically involves steps such as exploring the data, sorting the data, filtering out irrelevant or redundant variables, structuring the data in new ways and visualising the data. It is common for scientists to spend the majority of their time 'wrangling' the data. If the data wrangling process is done well, the analysis will be  considerably more efficient. Data wrangling can be in a number of programs.
   R offers very useful functionalities for achieving efficient data wrangling and visualisation, particularly using functions from the [tidyverse](https://www.tidyverse.org/). The aim of the tidyverse is to have a collection of functions and packages that share a common design philosophy and follow a set workflow, in order to make the work of data scientists more productive and reproducible. The steps in this workflow are import the data, tidy the data , understand the data (through transformation, visualisation and modelling), and finally to communicate the results. You have already used some of them in the previous chapter. This chapter will introduce some more of the basic and most important tidyverse functions, including [ggplot](https://ggplot2.tidyverse.org/). The contents of this tutorial are inspired by the (freely available online) book [*R for Data Science* by Grolemund & Wickham](https://r4ds.had.co.nz/).
 
+### Learning objectives
+
 After you have gone through the lecture and solved the exercises you should be able to:
 
 -   Define data, understand the structure of data and list examples of environmental data.
