@@ -811,9 +811,11 @@ ncol(ddf_allsites_joined)
 ```
 The two data frames _df_sites_ and _ddf_allsites_ (minus the column they are joined by) have the equivalent number of columns as the joined data frame _ddf_allsites_joined_.
 
-As you can see below, the number of columns differ between the joined and not joined data frames. Since _ddf_allsites_joined_ contains all the columns present in _ddf_allsites_, we do see common column names towards the end of the list of _ddf_allsites_joined_'s columns as this was the second argument. 
+As you can see below, the number of columns differ between the joined and not joined data frames. Since _ddf_allsites_joined_ contains all the columns present in _ddf_allsites_, we do see identical column names from column [21] onward in the list of _ddf_allsites_joined_'s columns, as _ddf_allsites_ was the second data frame in the joining argument. 
 ```{r}
 names(ddf_allsites)
+```
+```{r}
 names(ddf_allsites_joined)
 ```
 
