@@ -37,8 +37,8 @@ Next, we will demonstrate the principles of web scraping using a simple case stu
 
 ### R-Packages and Functions
 
-We will now load all packages necessary to perform web scraping on FishBase, namely `RCurl` and `XML`. `RCurl` provides functions to allow us to compose general HTTP requests and provides convenient functions to fetch URLs via get and post requests and process the results returned by the web server.
-`XML` give us approaches for both reading (get request) and creating (post request) XML and HTML documents, both locally and on the web via HTTP. Later in this tutorial, we will create some spatial visualization and load the packages `raster`, `sf` and `rgdal` to do so. Before we proceed further to accessing FishBase, we will have a quick look at the useful functions `lapply()` and `sapply()`.
+We will now load all packages necessary to perform web scraping on FishBase, namely **RCurl** [@R-RCurl] and **XML** [@R-XML]. **RCurl** provides functions to allow us to compose general HTTP requests and provides convenient functions to fetch URLs via get and post requests and process the results returned by the web server.
+**XML** give us approaches for both reading (get request) and creating (post request) XML and HTML documents, both locally and on the web via HTTP. Later in this tutorial, we will create some spatial visualization and load the packages **raster**, **sf** and **rgdal** to do so. Before we proceed further to accessing FishBase, we will have a quick look at the useful functions `lapply()` and `sapply()`.
 
 ```{r eval=TRUE, message=FALSE, results='hide'}
 lib_vec <- c("RCurl", "XML", "raster", "rgdal", "rfishbase", "tidyverse", "sf")
@@ -348,7 +348,7 @@ species_df
 ### The Fishbase Package
 #### Using an API {-}
 
- As we saw in the previous sections, web scraping can be tedious. In this subsection, we want to get data using an API which is a much easier way. We use the R package `rfishbase` to get data from [https://www.fishbase.de](https://www.fishbase.de). This package makes it very easy to look up for information on the most well-known fish species. It simplifies the data extraction process but also has some limits as we will see below. You ca have a look at the functions built into `rfishbase` by typing `help(package = "rfishbase")` into your RStudio console or have a look at the [RDocumentation](https://www.rdocumentation.org/packages/rfishbase/versions/3.0.4). Most functions have straight forward names and have a sring as input which holds the Latin name of the wanted fish species.
+ As we saw in the previous sections, web scraping can be tedious. In this subsection, we want to get data using an API which is a much easier way. We use the R package **rfishbase** [@R-rfishbase] to get data from [https://www.fishbase.de](https://www.fishbase.de). This package makes it very easy to look up for information on the most well-known fish species. It simplifies the data extraction process but also has some limits as we will see below. You ca have a look at the functions built into `rfishbase` by typing `help(package = "rfishbase")` into your RStudio console or have a look at the [RDocumentation](https://www.rdocumentation.org/packages/rfishbase/versions/3.0.4). Most functions have straight forward names and have a sring as input which holds the Latin name of the wanted fish species.
  
 Let us get some information on *Coregonus lavaretus* with this new package! We see that the super short code `species("Coregonus lavaretus")`provides us with 101 variables with entries for our fish species - think about the hand-written web scraping code this would require! To directly asses the maximal length of the species, we can directly use the `$` notation. As you might recall, this is the same length as we got above.
 
@@ -382,7 +382,7 @@ pre %>% dplyr::select(PredatorName) %>% head()
 
 #### Limits of APIs {-}
 
-One of the major limitations of an API is that we can only use already implemented functions. For example, in our case, we cannot get the IUCN Status of a given species because it is not built into `rfishbase`. In order to obtain the IUCN Status we must use another API, namely the package `rredlist`. Unfortunately, to have access to the *rredlist* API we need an authentication key which we only get for a small fee. As it is with other things in life, either you try to put in the work yourself or you can pay someone to do so (except for the amazing open source community).
+One of the major limitations of an API is that we can only use already implemented functions. For example, in our case, we cannot get the IUCN Status of a given species because it is not built into **rfishbase**. In order to obtain the IUCN Status we must use another API, namely the package **rredlist** [@R-rredlist]. Unfortunately, to have access to the *rredlist* API we need an authentication key which we only get for a small fee. As it is with other things in life, either you try to put in the work yourself or you can pay someone to do so (except for the amazing open source community).
 
 ### Summary
 
@@ -396,14 +396,14 @@ One of the major limitations of an API is that we can only use already implement
 * https://ourcodingclub.github.io/tutorials/webscraping/
 * https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/
 
-## Case Study
+### Case Study
 
 *Please note that the code below is written in base R and not tidyverse which makes the codes a bit more difficult to read. But do not worry about this and simply just enjoy the beauty of what R is capable of.*
 
 Next, we look at another case study on species richness and red list species proportions. To proceed with the case study we need to prepare our dataset. First, we need to get a list of species for the dataset. In this subsection we will see how to get all the species in a given family.
 
 
-### Creating List of Species
+#### Creating List of Species
 
 In this section, we want to get all the species of the family of *Salmonidae*. As we did above, for flexibility we will create an object _x_ with the name of the family and use `paste()` to get the link.
 We then use `getURLContent()` to get the content of the link `url` and save it in `con_sal`.
@@ -430,7 +430,7 @@ sp_per_family[1]
 ```
 
 
-### Extracting IUCN Status for all species
+#### Extracting IUCN Status for all species
 
 In this section, we are going to get the IUCN Status for a given List of species using a 'for loop'. We will extract the IUCN Status of all the species from the Netherlands.
 First, we are going to upload the dataset containing the list of the species and some other data that is going to be useful for the next sections. We will do that by using the function `read_csv()`. This data is taken from this [nature article](https://www.nature.com/articles/sdata2017141) by cropping it to Western Europe. As we only need data related to Netherlands, we will use the function `grep()` and pass _Netherlands_ as an argument.
@@ -483,7 +483,7 @@ unique(subset$IUCN)
 ```
 
 
-### Proportion of species in Netherlands
+#### Proportion of species in Netherlands
 
 We will now plot the proportion of species in each category for the Netherlands. So let us calculate the number of species in each category (from above we just have 2 outputs,* *LC* & *NT*). In general in other countries, we also have other IUCN Status, for example, VU. In this section, we will focus only on the two listed statuses. Using the function `length()` we can obtain the number of species in each category.
 
@@ -507,7 +507,7 @@ pie(slices, labels = lbls, font.main = 1,
 main = "Proportion of species per IUCN Status in Netherlands", col=c("red", "yellow", "grey")) 
 ```
 
-### Cleaning data with IUCN Status
+#### Cleaning data with IUCN Status
 
 In this part of the tutorial, we have to clean the data that we will use for the correlations. We have provided the dataset already with the IUCN status since the code needs a lot of time to run, but the procedure is exactly the same as we did in the previous sections. So, let us load the dataset, it's called *datasetIUCN*.
 
@@ -554,8 +554,8 @@ knitr::include_graphics(rep("./figures/output_186_0.png"))
 ```
 
 
-### Maps of species richness and Red List species proportions
-#### Preparing data {-}
+#### Maps of species richness and Red List species proportions
+##### Preparing data {-}
 
 We now want to map the species richness and Red List species proportions. Let us first calculate the species richness and proportion of Red List species per basin. Species richness is the number of species pro basin and the proportion of red list species is the ratio between the number of species in the red list and the number of species pro basin. We will iterate over the vector with the basin names and we will use the function `nrow()` to find the number of occurrences.  
 
@@ -603,7 +603,7 @@ europe <- continents[continents$CONTINENT == 'Europe',]
     with 53 features
     It has 94 fields
 
-#### Plotting data {-}
+##### Plotting data {-}
 
 So now let us plot the proportions of Red List species. First, we will create a new column _'proportion_colour'_ and in this column, we will store the colours. Then we will break the proportions into 10 different parts by grouping the values in the proportion column into 10 using the `cut()` function. Then we get rid of the index vector using `as.numeric()` and get all the values as numeric values. We used the `rev()` function to reverse the colours, red colour indicates the species that are getting distinct and have very less proportion pro basin and yellow indicates the species with comparatively more proportion in the basin. Finally, we store these colours to the column proportion_colour. The colour indicates the proportion of Red List species occurring in the corresponding basin. We do the same for the species richness.
 
@@ -636,7 +636,7 @@ knitr::include_graphics(rep("./figures/output_201_0.png"))
 
 From the Figure \@ref(fig:europe2), we see that the proportion of Red List species is highest in South-Western Europe. The aim of the Red List is to inform decision-makers about potentially endangered species, i.e. species whose population size has been rapidly declining during the last decades or the species that only occur in small numbers at present. The proportion of species on the Red List of each region, therefore, gives an indication of the risk of species going extinct in a region and represents an important tool for conservation strategies.
 
-#### Repeat for mapping species richness {-}
+##### Repeat for mapping species richness {-}
 
 We will repeat the above steps all together for plotting the species richness on map.
 
@@ -664,7 +664,7 @@ ggplot(fort_basin, aes(x = long, y = lat, group = group)) +
 knitr::include_graphics(rep("./figures/output_204_0.png"))
 ```
 
-### Relation of basin size and species richness
+#### Relation of basin size and species richness
 
 In the previous section, you observed the spatial patterns of fish diversity across Europe. In this section, we will try to explain these patterns. To achieve this, we will correlate the fish species richness of each basin to the surface area of the corresponding area to see how the species richness varies with respect to the surface area of the basin. We begin with plotting a simple scatterplot. We will log transform the data we have on surface area as it helps to make data conform to normality and also helps to deal with the outliers and skeweness in the data. Then we will plot this data against species richness. Since the data-deficient basins show zero observations in the dataframe, we will remove those first. 
 
