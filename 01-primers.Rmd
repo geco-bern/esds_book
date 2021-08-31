@@ -370,7 +370,7 @@ It is advisable to create a separate data directory outside (e.g., `~/data/`) th
 
 Now, let's get our hands on actual data for demonstrating how data is read and written. As most of the code displayed in this book, the code chunks below are executable. You can try it out by opening the the book's R project in RStudio. 
 
-We are going to work with data from ecosystem flux measurements, taken by the eddy covariance technique, and provided as part of the FLUXNET2015 dataset [@Pastorello2020] [see](https://www.nature.com/articles/s41597-020-0534-3). The data we're using below comes from a flux tower near Zürich ([CH-Lae](https://gl.ethz.ch/research/bage/fluxnet-ch.html), located on the Laegern mountain between Regensberg and Baden and run by our colleagues here at ETH.
+We are going to work with data from ecosystem flux measurements, taken by the eddy covariance technique, and provided as part of the FLUXNET2015 dataset [@Pastorello2020] [see](https://www.nature.com/articles/s41597-020-0534-3). The data we're using below comes from a flux tower near Zürich ([CH-Lae](https://gl.ethz.ch/research/bage/fluxnet-ch.html), located on the Laegern mountain between Regensberg and Baden and run by our colleagues here at ETH).
 
 The data is stored as a Comma Separated Values file (`.csv`). This is a plain-text, and therefore a non-proprietary format. To follow the FAIR data principles, distribute your data in a format that is non-proprietary and readable across platforms and applications. For example, avoid distributing your data as an *Excel* spreadsheat (`.xlsx`), or a *Matlab* data object (`.mat`), or an R data object (`.RData`, or `.rds`). 
 
