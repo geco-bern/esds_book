@@ -99,6 +99,7 @@ If it worked, a message such as the following will appear:
 
 Remember, this file is still only saved to the _local_ repository or environment. RStudio shows the user this with a little message:
 ![](./figures/Renku_Git_pre_Push.jpg)
+
 To upload it to the _remote_ repository, we will need to _push_ it. To do this click either _Push Branch_ or _Push_ to the right of the green arrows facing up. With this command, we upload our changes to the remote Git repository, e.g. on GitHub or GitLab. 
 ![](./figures/Renku_Git_Push.jpg)
 
