@@ -769,7 +769,7 @@ _R scripts_:
 
 - Comments are any code prefixed by at least one hastag (`#`) will not be interpreted by R.
 - Comments should help you understand your script.
-- Add spaces aound operators and breaks to make code easier to read.
+- Add spaces around operators and breaks to make code easier to read.
 - Use `<-`, not `=`, for allocating a value to a variable.
 - Begin files with a header to describe what the code contains and does.
 - Load all the libraries needed in the script at the beginning.
