@@ -116,7 +116,7 @@ col_sum
 ```
 
 ### Exercise
-Create a for loop program that estimates the sum of each row. However it has to take into account only the numbers than are greater that 2. If you get it right, you should come up with 3 for the first row and 15 for the second row.
+Create a for loop program that estimates the sum of each row. However it has to take into account only the numbers that are greater than 2. If you get it right, you should come up with 3 for the first row and 15 for the second row.
 
 ```{r}
 values <- matrix(c(3,4,1,5,2,6),nrow=2,ncol=3)
