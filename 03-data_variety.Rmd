@@ -971,13 +971,13 @@ ggplot(data = df_corr_ann, aes(x = landcover_cat, y = gpp_meanann, group = as.fa
         geom_boxplot() + 
         labs(x = "Landcover Category (raster)", y = "GPP mean [µmolCO2 m-2 s-1]") +
         theme_classic() +
-        theme(axis.text.x = element_text(angle = 90, size = 12))
+        theme(axis.text.x = element_text(angle = 90, size = 10))
 
 ggplot(data = df_corr_ann, aes(x = umd_land_cover, y = gpp_meanann, group = as.factor(umd_land_cover)))+ 
         geom_boxplot() + 
         labs(x = "Landcover Category (tower - umd)", y = "GPP mean [µmolCO2 m-2 s-1]") +
         theme_classic() +
-        theme(axis.text.x = element_text(angle = 90, size = 12))
+        theme(axis.text.x = element_text(angle = 90, size = 10))
 ```
 
 We don't see a particularly strong correlation with the two plotted landcover categories, as the mean GPP varies depeding on the landcover type. Thus we need to consider other predictors and more complex models to find better predictors of GPP. 
