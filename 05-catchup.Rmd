@@ -125,7 +125,7 @@ values
 
 ## Functional programming using purr
 
-`purrr` is tidyverse's version of the base R's apply (lapply(), sapply(),..etc) functions for iterating over objects and lists. But `purrr` is a lot more powerful than that! While the main data-type used in dplyr is the dataframe, for `purrr` it is lists. Let us look at a few map functions and how they can be used to replace apply functions / loops in R. Then we look at nested data handling and a fairly realistic workflow. Splitting the data based on some column, fitting multiple models to each split, and extracting the R^2 for these models. Let us first load in the required libraries.
+`purrr` [@R-purrr] is tidyverse's version of the base R's apply (lapply(), sapply(),..etc) functions for iterating over objects and lists. But `purrr` is a lot more powerful than that! While the main data-type used in dplyr is the dataframe, for `purrr` it is lists. Let us look at a few map functions and how they can be used to replace apply functions / loops in R. Then we look at nested data handling and a fairly realistic workflow. Splitting the data based on some column, fitting multiple models to each split, and extracting the R^2 for these models. Let us first load in the required libraries.
 
 ```{r message=FALSE, warning=FALSE}
 library('tidyverse')
@@ -226,7 +226,7 @@ iris %>%                                                               # Use iri
 ## String Manipulations
 ### Introduction to strings
 
-The `stringr` package offers a set of very handy tools to work with strings. In this document, we will show you how to do some basic string manipulations with `stringr. Further useful sources are the [stringr cheathseet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) and the Chapter 14 in the book [R for Data Science](https://r4ds.had.co.nz/strings.html).
+The `stringr` package [@R-stringr] offers a set of very handy tools to work with strings. In this document, we will show you how to do some basic string manipulations with `stringr. Further useful sources are the [stringr cheathseet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) and the Chapter 14 in the book [R for Data Science](https://r4ds.had.co.nz/strings.html).
 
 ```{r}
 # Let's load the package and save two srings
@@ -390,7 +390,7 @@ alph_char <- gregexpr(pattern= "[[:alpha:]]+",int) # find starting position and 
 (Price <- Price[[1]])
 ```
 
-Or alternatively to this entire web scraping part, we can directly use the rfishbase package:
+Or alternatively to this entire web scraping part, we can directly use the `rfishbase` package [@R-rfishbase]:
 
 ```{r message=FALSE, warning=FALSE}
 library(rfishbase)
@@ -408,7 +408,7 @@ Writing code is learning a language!
 - Learn how to express your thoughts
 - Learn how to get translations from the web (Google is your best friend!)
 
-Let's load tidyverse package and have a look at the star wars data:
+Let's load `tidyverse` and have a look at the star wars data:
 
 ```{r}
 library(tidyverse)
@@ -570,7 +570,8 @@ dat %>% unnest(starships) %>% filter(films == "Return of the Jedi") %>% top_n(-1
 ```
 
 
-## Preparing data for ggplot()
+## Preparing data for ggplot() 
+Here we will also use a new package `ggridges`[@R-ggridges], which allows you to make ridgeline plots with `ggplot2`.
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(ggplot2)
