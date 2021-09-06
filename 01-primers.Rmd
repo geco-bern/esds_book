@@ -193,7 +193,7 @@ source("my_r_script.R")
 
 You can find more useful information about scripts and workflows in [R for Data Science](https://r4ds.had.co.nz/workflow-scripts.html) [@Wickham2017R]. 
 
-We should always strive to write nice scripts and good code. Good code is clean, readable, consistent, and extensible (easily modified or adapted). To achieve this, here are a few points to consider - inspired by [best practices for coding](https://www.r-bloggers.com/r-code-best-practices/) and by the [Tidyverse style guide XXXrefXXX](https://style.tidyverse.org/).
+We should always strive to write nice scripts and good code. Good code is clean, readable, consistent, and extensible (easily modified or adapted). To achieve this, here are a few points to consider - inspired by [best practices for coding](https://www.r-bloggers.com/r-code-best-practices/) and by the [Tidyverse style guide](https://style.tidyverse.org/) [@wickham_welcome_nodate].
 
 #### Variable naming
 
