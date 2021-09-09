@@ -44,7 +44,27 @@ Cloud computing is becoming increasingly popular as it allows users to connect t
 [Renku](https://datascience.ch/renku/) is an open cloud computing platform that aims to make 'Multidisciplinary Data Science Collaborations' easier to navigate. It stores the data and code allowing multiple people to work on the same projects and keeps track of the various steps and versions of a project. By keeping track of the changes, there is a history and timeline of each persons contributions and results. Through Renku, its developers hope to make data science more reproducible, reusable and repeatable and hope to encourages and simplify collaborations.
 
 RStudio on Renku is similar to using Rstudio on any  laptop or computer, except it is hosted by the platform. 
-Start by selecting the correct project in Renku. Then select the tab _'Environments'_ and click _'New'_ to start a new interactive environment.
+Start by selecting the correct project in Renku. 
+
+Then press _'fork'_ to create a copy of the project, which serves as your personal project that you can modify.
+
+![](./figures/Renku_RStudio_1_Fork1.jpeg)
+
+Enter the title and namespace of the project and press _'fork'_ again.
+
+![](./figures/Renku_RStudio_1_Fork2.jpeg)
+
+This starts forking the project.
+
+![](./figures/Renku_RStudio_1_Fork3.jpeg)
+
+After the forking you are ready to start working on the project.
+
+![](./figures/Renku_RStudio_1_Fork4.jpeg)
+
+In the following will work with a fork simply called _'01_primers'_.
+
+Once you forked the project, select the tab _'Environments'_ and click _'New'_ to start a new interactive environment.
 ![](./figures/Renku_RStudio_1_New_Environment.jpg)
 
 Make sure to set the _Default Environment_ to `/rstudio`. The other options can be left on the default settings. The box commit will show you when the latest commit was pushed and who authored it. 
