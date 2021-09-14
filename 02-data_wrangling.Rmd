@@ -5,7 +5,8 @@
 In this chapter, you will learn to efficiently explore data. This includes understanding how the data is structured, what "dimensions" are in a dataset, how to manipulate the data and how to visualise it. Efficient data exploration and wrangling are the basis for generating hypotheses, testing them, and repeating the wrangling-visualisation-hypothesis circle over and over. This is science.
 
 The aim of data wrangling is to transform the data from the raw data into a cleansed, more relevant format. This process typically involves steps such as exploring the data, sorting the data, filtering out irrelevant or redundant variables, structuring the data in new ways and visualising the data. It is common for scientists to spend the majority of their time 'wrangling' the data. If the data wrangling process is done well, the analysis will be  considerably more efficient. Data wrangling can be in a number of programs.
-  R offers very useful functionalities for achieving efficient data wrangling and visualisation, particularly using functions from the [tidyverse](https://www.tidyverse.org/). The aim of the tidyverse is to have a collection of functions and packages that share a common design philosophy and follow a set workflow, in order to make the work of data scientists more productive and reproducible. The steps in this workflow are import the data, tidy the data , understand the data (through transformation, visualisation and modelling), and finally to communicate the results. You have already used some of them in the previous chapter. This chapter will introduce some more of the basic and most important tidyverse functions, including [ggplot](https://ggplot2.tidyverse.org/). The contents of this tutorial are inspired by the (freely available online) book [*R for Data Science* by Grolemund & Wickham](https://r4ds.had.co.nz/).
+
+R offers very useful functionalities for achieving efficient data wrangling and visualisation, particularly using functions from the [tidyverse](https://www.tidyverse.org/). The aim of the tidyverse is to have a collection of functions and packages that share a common design philosophy and follow a set workflow, in order to make the work of data scientists more productive and reproducible. The steps in this workflow are import the data, tidy the data , understand the data (through transformation, visualisation and modelling), and finally to communicate the results. You have already used some of them in the previous chapter. This chapter will introduce some more of the basic and most important tidyverse functions, including [ggplot](https://ggplot2.tidyverse.org/). The contents of this tutorial are inspired by the (freely available online) book [*R for Data Science* by Grolemund & Wickham](https://r4ds.had.co.nz/).
 
 ### Learning objectives
 
@@ -22,7 +23,7 @@ The lectures introduced the basics of data transformation with *dplyr* and data 
 
 #### Data transformation with dplyr
 
-In data science when considering the number of features, variables or attributes these are referred to as the _data dimensionality_. A simple data set containing two features such as temperature and elevation would be considere two dimesional data. To plot the data a 2D graph showing elevation on the x-axis and temperature on the y- axis and the observations within, would be straight forward. If another variable called precipitation, plotting the whole data set would require a 3D graph. Most data sets contain many attributes, making plotting in dimensions impossible. Therefore, dimensions need to be choosen or reduced. Which dimensions we choose will vary depending on the research question we have for our data set.
+In data science when considering the number of features, variables or attributes these are referred to as the _data dimensionality_. A simple data set containing two features such as temperature and elevation would be considered two dimesional data. To plot the data a 2D graph showing elevation on the x-axis and temperature on the y- axis and the observations within, would be straight forward. If another variable called precipitation, plotting the whole data set would require a 3D graph. Most data sets contain many attributes, making plotting in dimensions impossible. Therefore, dimensions need to be choosen or reduced. Which dimensions we choose will vary depending on the research question we have for our data set.
 
 _Data variation_ is defined as how much data points differ between observations. It may also be called the spread or dispersion of the data. An example would be the range of temperatures annually along an elevational gradient.
 
@@ -344,18 +345,18 @@ clean_fluxnet_hh <- function(df){
     ## set poor quality data to NA for multiple variables
     mutate(
       GPP_NT_VUT_REF = ifelse(NEE_VUT_REF_QC %in% c(0,1), GPP_NT_VUT_REF, NA),
-      TA_F = ifelse(TA_F_QC %in% c(0,1), TA_F, NA),
-      SW_IN_F = ifelse(SW_IN_F_QC %in% c(0,1), SW_IN_F, NA),
+      TA_F = ifelse(TA_F_QC %in% c(0,1,2), TA_F, NA),
+      SW_IN_F = ifelse(SW_IN_F_QC %in% c(0,1,2), SW_IN_F, NA),
       LW_IN_F = ifelse(LW_IN_F_QC %in% c(0,1,2), LW_IN_F, NA),   # relaxing filter criterion
-      VPD_F = ifelse(VPD_F_QC %in% c(0,1), VPD_F, NA),
+      VPD_F = ifelse(VPD_F_QC %in% c(0,1,2), VPD_F, NA),
       PA_F = ifelse(PA_F_QC %in% c(0,1,2), PA_F, NA),   # relaxing filter criterion
       P_F = ifelse(P_F_QC %in% c(0,1,2), P_F, NA),   # relaxing filter criterion
-      WS_F = ifelse(WS_F_QC %in% c(0,1), WS_F, NA),
-      CO2_F_MDS = ifelse(CO2_F_MDS_QC %in% c(0,1), CO2_F_MDS, NA),
-      SWC_F_MDS_1 = ifelse(SWC_F_MDS_1_QC %in% c(0,1), SWC_F_MDS_1, NA),
-      SWC_F_MDS_2 = ifelse(SWC_F_MDS_2_QC %in% c(0,1), SWC_F_MDS_2, NA),
-      SWC_F_MDS_3 = ifelse(SWC_F_MDS_3_QC %in% c(0,1), SWC_F_MDS_3, NA),
-      SWC_F_MDS_4 = ifelse(SWC_F_MDS_4_QC %in% c(0,1), SWC_F_MDS_4, NA)
+      WS_F = ifelse(WS_F_QC %in% c(0,1,2), WS_F, NA),
+      CO2_F_MDS = ifelse(CO2_F_MDS_QC %in% c(0,1,2), CO2_F_MDS, NA),
+      SWC_F_MDS_1 = ifelse(SWC_F_MDS_1_QC %in% c(0,1,2), SWC_F_MDS_1, NA),
+      SWC_F_MDS_2 = ifelse(SWC_F_MDS_2_QC %in% c(0,1,2), SWC_F_MDS_2, NA),
+      SWC_F_MDS_3 = ifelse(SWC_F_MDS_3_QC %in% c(0,1,2), SWC_F_MDS_3, NA),
+      SWC_F_MDS_4 = ifelse(SWC_F_MDS_4_QC %in% c(0,1,2), SWC_F_MDS_4, NA)
       ) %>%
     
     ## set all -9999 to NA
@@ -368,7 +369,10 @@ clean_fluxnet_hh <- function(df){
 }
 ```
 
-The code chunk above contains our function, with each step that will be applied to the data. We begin by giving the function a name (`clean_fluxnet_hh`) and defining the argument of the function. The argument of a function is simply what will be input into the function or in other words the object the function will apply the steps to. Herex, the argunment is a data frame (`df`). Then within the `{}`, each step is then defined. The first set of steps selects the variables we want to include, the next part uses the function `mutate()` to change the date and time into a better format and then changes the poor quality data for several variables to `NA`. For `LW_IN_F`, `PA_F` and `P_F`, the filtering criteria are relaxed because XXX **Beni**: why? XXX. Then the missing data value of `-9999` used for the data set is changed to `NA`, to make the further analysis easier and so functions in R to remove or omit NAs will work on our data. Lastly, no longer needed variables are removed.
+The code chunk above contains our function, with each step that will be applied to the data. We begin by giving the function a name (`clean_fluxnet_hh`) and defining the argument of the function. The argument of a function is simply what will be input into the function or in other words the object the function will apply the steps to. Here, the argunment is a data frame (`df`). Then within the `{}`, each step is then defined. The first set of steps selects the variables we want to include, the next part uses the function `mutate()` to change the date and time into a better format and then changes the poor quality data for several variables to `NA`. For the meteorological covariates, the filtering criteria are relaxed here, compared to the filtering criterium for GPP (`*_F_QC %in% c(0,1,2)` vs. `NEE_VUT_REF_QC %in% c(0,1)`). This is chosen to avoid excessive data loss due to missing covariates. In the modelling examples of later chapter, GPP is the target variable. That is, we're formulating models that predict GPP from its covariates. It's generally advisable to avoid relying on gap-filled target data for model training (fitting), hence the stricter criterium for GPP.
+
+In a next step, the missing data value of `-9999` used for the data set is changed to `NA`, to make the further analysis easier and so functions in R to remove or omit NAs will work on our data. Lastly, no longer needed variables are removed.
+
 Before, the closing `}`, we tell the function what we want the output of the function to be. Here, we want the cleaned data frame to be the output, hence `return(df)`.
 
 At this point, the function has not yet been applied to any data, it has only defined it and saved it under the name we gave it: `clean_fluxnet_hh()`. This is known as the _function definition_ as it contains the instuctions of what the function should do when it is applied to the data. Next, we can apply it to our object, the data frame `hhdf`:
@@ -419,7 +423,7 @@ Let's save this as a CSV file for later use.
 write_csv(hhdf, file = "./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN.csv")
 ```
 
-Getting an overview of the quantity of missing data in a data set and each variable is an important step. It can help us decide which variables should be included for further analyses an may even highlight issues encountered during data collection. We showed you two ways to check the amount of missing data, in a table or visually. The cutoff for including variables for this data set was if over 20% data of the data for that variable was missing. Depending on the research question filtering may need to be more or less stringent.  XXX **Beni**: what is considered a reasonable amount of data? Can you add a sentence or two on that? XXX
+Getting an overview of the quantity of missing data in a data set and each variable is an important step. It can help us decide which variables should be included for further analyses an may even highlight issues encountered during data collection. We showed you two ways to check the amount of missing data, in a table or visually. The cutoff for including variables for this data set was if over 20% data of the data for that variable was missing. Depending on the research question filtering may need to be more or less stringent. There are no general rules and it is advisable to explore sensitivity of your final results to the choice of such thresholds.
 
 ### Data visualisation I
 
@@ -610,9 +614,10 @@ ddf %>%
 ```
 
 In the figure, we can observe a much higher density of points between PPFD values 0 and 200 and between GPP values of -2 to 5. The density gets weaker as as PPFD increases but GPP stays within the same values. We can also observe a second cluster, albeit at a lower density. This starts at a PPFD value of around 200 and at a GPP value over 5. This second cluster has a steeper slope creating an interesting "separation" of points, where the increase in GPP with increasing PPFD is steeper for some than for others. 
-  Again, we can use our *a priori* understanding of the system to formulate hypotheses and test them by finding the appropriate visualisation type. Here, one hypothesis could be that the slope is steeper in some months than in others. This is actually more than just a vague guess. XXX **Beni**: how come this is more than a vague guess? Explaining how the relationship between GPP and PPFD gets you to this hypothesis would help here. XXX
 
-To test this hypothesis, we will visuallise the slopes of each month by fitting separate linear regression models. Note that each month encompasses data from multiple years, so clear trends will only become clear if there is a commonality between the same months of different years.
+Again, we can use our *a priori* understanding of the system to formulate hypotheses and test them by finding the appropriate visualisation type. Here, one hypothesis could be that the slope is steeper in some months than in others. This is actually more than just a vague guess. Since the relationship between incoming light and ecosystem photosynthesis is strongly affected by how much of this light is actually absorbed by leaves, and because the amount of green foliage varies strongly throughout a year (this is data from a mixed forest), the slope of the regression between PPFD and GPP should change between months.
+
+To test this hypothesis, we will visualize the slopes of each month by fitting separate linear regression models. Note that each month encompasses data from multiple years, so clear trends will only become clear if there is a commonality between the same months of different years.
 
 ```{r}
 ddf %>%
@@ -729,7 +734,7 @@ vis_miss(ddf_allsites,
   )
 ```
 
-We see that overall, there is 3.7% missing data. Specifically, `PPFD_IN` is often missing. XXX **Beni**: What is the consequence of PPFD_IN often being missing? Please expand on this a bit. XXX
+We see that overall, there is 3.7% missing data. Specifically, `PPFD_IN` (the photosynthetic photon flux density) is often missing. In our dataset, we also have information about shorwave radiation (`SW_IN_F`), which scales largely linearly with `PPFD_IN`. For modelling below, we can therefore use `SW_IN_F` instead. 
 
 ### Strings
 

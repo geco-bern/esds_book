@@ -557,7 +557,6 @@ Note that making a file publicly available as a `.rds` file violates the FAIR pr
 
 Each object in R is of a certain *class*, specifying some attributes and how functions act upon it. The most basic classes are:
 
-XXX needs revision: formatting, better explanation, more info on factor, add lists,  XXX
 - `numeric`. any number (except complex numbers) -> 2.375
 - `integer` (int) - integer numbers -> 2
 - `character` (chr) - any string -> "fluxes"
