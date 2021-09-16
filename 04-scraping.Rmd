@@ -41,9 +41,14 @@ We will now load all packages necessary to perform web scraping on FishBase, nam
 **XML** give us approaches for both reading (get request) and creating (post request) XML and HTML documents, both locally and on the web via HTTP. Later in this tutorial, we will create some spatial visualization and load the packages **raster**, **sf** and **rgdal** to do so. Before we proceed further to accessing FishBase, we will have a quick look at the useful functions `lapply()` and `sapply()`.
 
 ```{r eval=TRUE, message=FALSE, results='hide'}
+list_pkgs <- c("RCurl", "XML", "raster", "rgdal", "rfishbase", "tidyverse", "sf")
+new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
+if (length(new_pkgs) > 0) install.packages(new_pkgs)
+
+
 lib_vec <- c("RCurl", "XML", "raster", "rgdal", "rfishbase", "tidyverse", "sf")
 sapply(lib_vec, library, character.only = TRUE) # See below for how sapply() works
-help(package = "XML") # Use this code line in the RStudio console to learn more about loaded packages
+
 ```
 
 ```{r}

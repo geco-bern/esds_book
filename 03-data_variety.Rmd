@@ -1,6 +1,14 @@
 # Data variety {#ch-03}
 
 ```{r include=FALSE}
+list_pkgs <- c("tidyverse", "MODISTools", "sf", "rgdal", "spData", "sp", "raster", "rasterVis", "RColorBrewer", "lubridate", "Metrics", "conflicted")
+new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
+if (length(new_pkgs) > 0) install.packages(new_pkgs)
+
+
+lib_vec <- c("tidyverse", "MODISTools", "sf", "rgdal", "spData", "sp", "raster", "rasterVis", "RColorBrewer", "lubridate", "Metrics", "conflicted")
+sapply(lib_vec, library, character.only = TRUE) 
+
 # Preferences definition for conflicting packages when building bookdown
 library(conflicted)
 conflict_prefer("select", "dplyr")
