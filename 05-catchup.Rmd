@@ -1,6 +1,22 @@
 # Catch-up {#ch-05}
 This chapter is a review of various applications and functions of the code we have covered so far.
 
+We'll start as always by loading all the necessary packages:
+```{r message=FALSE, warning=FALSE}
+list_pkgs <- c("tidyverse", "datasets", "stringr", "XML", "RCurl", "ggplot2", "rfishbase", "ggridges")
+new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
+if (length(new_pkgs) > 0) install.packages(new_pkgs)
+
+library("tidyverse")
+library("datatsets")
+library("stringr")
+library("XML")
+library("RCurl")
+library("ggplot2")
+library("rfishbase")
+library("ggridges")
+```
+
 ## Loops in R
 ### Some simple examples
 ```{r}
@@ -125,7 +141,7 @@ values
 
 ## Functional programming using purr
 
-`purrr` [@R-purrr] is tidyverse's version of the base R's apply (lapply(), sapply(),..etc) functions for iterating over objects and lists. But `purrr` is a lot more powerful than that! While the main data-type used in dplyr is the dataframe, for `purrr` it is lists. Let us look at a few map functions and how they can be used to replace apply functions / loops in R. Then we look at nested data handling and a fairly realistic workflow. Splitting the data based on some column, fitting multiple models to each split, and extracting the R^2 for these models. Let us first load in the required libraries.
+`purrr` [@R-purrr] is tidyverse's version of the base R's apply (lapply(), sapply(),..etc) functions for iterating over objects and lists. But `purrr` is a lot more powerful than that! While the main data-type used in dplyr is the data frame, for `purrr` it is lists. Let us look at a few map functions and how they can be used to replace apply functions / loops in R. For this we'll use the iris data set from the R package *datasets* [@R-datasets]. Then we look at nested data handling and a fairly realistic workflow. Splitting the data based on some column, fitting multiple models to each split, and extracting the R^2 for these models. Let us first load in the required libraries.
 
 ```{r message=FALSE, warning=FALSE}
 library('tidyverse')
