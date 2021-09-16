@@ -102,7 +102,7 @@ $$ Note that here, $X$, $Y$, and $\epsilon$ are vectors of length corresponding 
 First, let's load some packages that we will use in this tutorial.
 
 ```{r message=F, warning=F}
-list_pkgs <- c("tidyverse", "ggplot2", "modelr", "forcats", "yardstick", "recipes", "caret", "broom")
+list_pkgs <- c("tidyverse", "ggplot2", "modelr", "forcats", "yardstick", "recipes", "caret", "broom", "patchwork")
 new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
 if (length(new_pkgs) > 0) install.packages(new_pkgs)
 
@@ -114,6 +114,7 @@ library(yardstick)
 library(recipes)
 library(caret)
 library(broom)
+library(patchwork)
 ```
 
 To fit a univariate linear regression model in R, we can use the `lm()` function. Already in Chapter \@ref(ch-02), we made linear models by doing:
