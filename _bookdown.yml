@@ -1,5 +1,5 @@
 book_filename: "esds_book"
-delete_merged_file: false
+delete_merged_file: true
 language:
   ui:
     chapter_name: "Chapter "

@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 12 Supervised Deep Learning I | Environmental Systems Data Science</title>
+  <meta name="description" content="Text book and exercises for the course Environmental System Data Science at ETH Zürich." />
+  <meta name="generator" content="bookdown 0.21 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 12 Supervised Deep Learning I | Environmental Systems Data Science" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Text book and exercises for the course Environmental System Data Science at ETH Zürich." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 12 Supervised Deep Learning I | Environmental Systems Data Science" />
+  
+  <meta name="twitter:description" content="Text book and exercises for the course Environmental System Data Science at ETH Zürich." />
+  
+
+<meta name="author" content="Loïc Pellissier, Joshua Payne, Benjamin Stocker" />
+
+
+<meta name="date" content="2021-03-25" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="ch-11.html"/>
+<link rel="next" href="ch-13.html"/>
+<script src="libs/header-attrs-2.6/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-description"><i class="fa fa-check"></i>Course Description</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-objectives"><i class="fa fa-check"></i>Course Objectives</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#content"><i class="fa fa-check"></i>Content</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#useful-prerequisites"><i class="fa fa-check"></i>Useful Prerequisites</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="ch-01.html"><a href="ch-01.html"><i class="fa fa-check"></i><b>1</b> Primers</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="ch-01.html"><a href="ch-01.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="ch-01.html"><a href="ch-01.html#important-points-from-the-lecture"><i class="fa fa-check"></i><b>1.1.1</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="ch-01.html"><a href="ch-01.html#tutorial"><i class="fa fa-check"></i><b>1.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="ch-01.html"><a href="ch-01.html#working-with-jupyter-notebook"><i class="fa fa-check"></i><b>1.2.1</b> Working with Jupyter notebook</a></li>
+<li class="chapter" data-level="1.2.2" data-path="ch-01.html"><a href="ch-01.html#using-git-for-version-control"><i class="fa fa-check"></i><b>1.2.2</b> Using Git for version control</a></li>
+<li class="chapter" data-level="1.2.3" data-path="ch-01.html"><a href="ch-01.html#basics-of-r-code"><i class="fa fa-check"></i><b>1.2.3</b> Basics of R code</a></li>
+<li class="chapter" data-level="1.2.4" data-path="ch-01.html"><a href="ch-01.html#reading-data-into-r"><i class="fa fa-check"></i><b>1.2.4</b> Reading data into R</a></li>
+<li class="chapter" data-level="1.2.5" data-path="ch-01.html"><a href="ch-01.html#r-objects"><i class="fa fa-check"></i><b>1.2.5</b> R Objects</a></li>
+<li class="chapter" data-level="1.2.6" data-path="ch-01.html"><a href="ch-01.html#data-visualisation"><i class="fa fa-check"></i><b>1.2.6</b> Data visualisation</a></li>
+<li class="chapter" data-level="1.2.7" data-path="ch-01.html"><a href="ch-01.html#example-code-loops"><i class="fa fa-check"></i><b>1.2.7</b> Example code: Loops</a></li>
+<li class="chapter" data-level="1.2.8" data-path="ch-01.html"><a href="ch-01.html#where-to-find-help"><i class="fa fa-check"></i><b>1.2.8</b> Where to find Help</a></li>
+<li class="chapter" data-level="1.2.9" data-path="ch-01.html"><a href="ch-01.html#further-reading"><i class="fa fa-check"></i><b>1.2.9</b> Further reading</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="ch-01.html"><a href="ch-01.html#exercise"><i class="fa fa-check"></i><b>1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="ch-02.html"><a href="ch-02.html"><i class="fa fa-check"></i><b>2</b> Data wrangling</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="ch-02.html"><a href="ch-02.html#introduction-1"><i class="fa fa-check"></i><b>2.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="ch-02.html"><a href="ch-02.html#data-transformation-with-dplyr"><i class="fa fa-check"></i><b>2.1.1</b> Data transformation with dplyr</a></li>
+<li class="chapter" data-level="2.1.2" data-path="ch-02.html"><a href="ch-02.html#data-visualisation-with-ggplot2"><i class="fa fa-check"></i><b>2.1.2</b> Data visualisation with ggplot2</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="ch-02.html"><a href="ch-02.html#tutorial-1"><i class="fa fa-check"></i><b>2.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="ch-02.html"><a href="ch-02.html#dataset-1-half-hourly-flux-data"><i class="fa fa-check"></i><b>2.2.1</b> Dataset 1 (half-hourly flux data)</a></li>
+<li class="chapter" data-level="2.2.2" data-path="ch-02.html"><a href="ch-02.html#dataset-2-daily-flux-data"><i class="fa fa-check"></i><b>2.2.2</b> Dataset 2 (daily flux data)</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="ch-02.html"><a href="ch-02.html#exercise-1"><i class="fa fa-check"></i><b>2.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="ch-03.html"><a href="ch-03.html"><i class="fa fa-check"></i><b>3</b> Data variety</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="ch-03.html"><a href="ch-03.html#introduction-2"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="ch-03.html"><a href="ch-03.html#overview"><i class="fa fa-check"></i><b>3.1.1</b> Overview</a></li>
+<li class="chapter" data-level="3.1.2" data-path="ch-03.html"><a href="ch-03.html#learning-objectives"><i class="fa fa-check"></i><b>3.1.2</b> Learning objectives</a></li>
+<li class="chapter" data-level="3.1.3" data-path="ch-03.html"><a href="ch-03.html#key-points-of-the-lecture"><i class="fa fa-check"></i><b>3.1.3</b> Key points of the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="ch-03.html"><a href="ch-03.html#tutorial-2"><i class="fa fa-check"></i><b>3.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="ch-03.html"><a href="ch-03.html#overview-1"><i class="fa fa-check"></i><b>3.2.1</b> Overview</a></li>
+<li class="chapter" data-level="3.2.2" data-path="ch-03.html"><a href="ch-03.html#modis-remote-download"><i class="fa fa-check"></i><b>3.2.2</b> MODIS remote download</a></li>
+<li class="chapter" data-level="3.2.3" data-path="ch-03.html"><a href="ch-03.html#points-on-the-globe"><i class="fa fa-check"></i><b>3.2.3</b> Points on the globe</a></li>
+<li class="chapter" data-level="3.2.4" data-path="ch-03.html"><a href="ch-03.html#shapefiles"><i class="fa fa-check"></i><b>3.2.4</b> Shapefiles</a></li>
+<li class="chapter" data-level="3.2.5" data-path="ch-03.html"><a href="ch-03.html#rasters"><i class="fa fa-check"></i><b>3.2.5</b> Rasters</a></li>
+<li class="chapter" data-level="3.2.6" data-path="ch-03.html"><a href="ch-03.html#key-points-of-the-tutorial"><i class="fa fa-check"></i><b>3.2.6</b> Key points of the tutorial</a></li>
+<li class="chapter" data-level="3.2.7" data-path="ch-03.html"><a href="ch-03.html#bonus-species-occurrence-trait-data-and-pcas"><i class="fa fa-check"></i><b>3.2.7</b> Bonus: Species Occurrence, Trait Data and PCAs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="ch-03.html"><a href="ch-03.html#exercise-2"><i class="fa fa-check"></i><b>3.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="ch-03.html"><a href="ch-03.html#part-1-plotting-elevation-differences"><i class="fa fa-check"></i><b>3.3.1</b> Part 1: Plotting Elevation differences</a></li>
+<li class="chapter" data-level="3.3.2" data-path="ch-03.html"><a href="ch-03.html#part-2-temperature-and-elevation-correlations"><i class="fa fa-check"></i><b>3.3.2</b> Part 2: Temperature and Elevation Correlations</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="ch-04.html"><a href="ch-04.html"><i class="fa fa-check"></i><b>4</b> Data Scraping</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="ch-04.html"><a href="ch-04.html#introduction-3"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="ch-04.html"><a href="ch-04.html#theory"><i class="fa fa-check"></i><b>4.1.1</b> Theory</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="ch-04.html"><a href="ch-04.html#tutorial-3"><i class="fa fa-check"></i><b>4.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="ch-04.html"><a href="ch-04.html#r-packages-and-functions"><i class="fa fa-check"></i><b>4.2.1</b> R-Packages and Functions</a></li>
+<li class="chapter" data-level="4.2.2" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-website"><i class="fa fa-check"></i><b>4.2.2</b> The FishBase website</a></li>
+<li class="chapter" data-level="4.2.3" data-path="ch-04.html"><a href="ch-04.html#accessing-fishbase"><i class="fa fa-check"></i><b>4.2.3</b> Accessing FishBase</a></li>
+<li class="chapter" data-level="4.2.4" data-path="ch-04.html"><a href="ch-04.html#scraping-numbers"><i class="fa fa-check"></i><b>4.2.4</b> Scraping Numbers</a></li>
+<li class="chapter" data-level="4.2.5" data-path="ch-04.html"><a href="ch-04.html#scraping-text-snippetrs"><i class="fa fa-check"></i><b>4.2.5</b> Scraping Text Snippetrs</a></li>
+<li class="chapter" data-level="4.2.6" data-path="ch-04.html"><a href="ch-04.html#scraping-tables"><i class="fa fa-check"></i><b>4.2.6</b> Scraping Tables</a></li>
+<li class="chapter" data-level="4.2.7" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-package"><i class="fa fa-check"></i><b>4.2.7</b> The Fishbase Package</a></li>
+<li class="chapter" data-level="4.2.8" data-path="ch-04.html"><a href="ch-04.html#summary"><i class="fa fa-check"></i><b>4.2.8</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="ch-04.html"><a href="ch-04.html#case-study"><i class="fa fa-check"></i><b>4.3</b> Case Study</a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="ch-04.html"><a href="ch-04.html#creating-list-of-species"><i class="fa fa-check"></i><b>4.3.1</b> Creating List of Species</a></li>
+<li class="chapter" data-level="4.3.2" data-path="ch-04.html"><a href="ch-04.html#extracting-iucn-status-for-all-species"><i class="fa fa-check"></i><b>4.3.2</b> Extracting IUCN Status for all species</a></li>
+<li class="chapter" data-level="4.3.3" data-path="ch-04.html"><a href="ch-04.html#proportion-of-species-in-netherlands"><i class="fa fa-check"></i><b>4.3.3</b> Proportion of species in Netherlands</a></li>
+<li class="chapter" data-level="4.3.4" data-path="ch-04.html"><a href="ch-04.html#cleaning-data-with-iucn-status"><i class="fa fa-check"></i><b>4.3.4</b> Cleaning data with IUCN Status</a></li>
+<li class="chapter" data-level="4.3.5" data-path="ch-04.html"><a href="ch-04.html#maps-of-species-richness-and-red-list-species-proportions"><i class="fa fa-check"></i><b>4.3.5</b> Maps of species richness and Red List species proportions</a></li>
+<li class="chapter" data-level="4.3.6" data-path="ch-04.html"><a href="ch-04.html#relation-of-basin-size-and-species-richness"><i class="fa fa-check"></i><b>4.3.6</b> Relation of basin size and species richness</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="ch-04.html"><a href="ch-04.html#exercise-3"><i class="fa fa-check"></i><b>4.4</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="ch-05.html"><a href="ch-05.html"><i class="fa fa-check"></i><b>5</b> Catch-up</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="ch-05.html"><a href="ch-05.html#loops-in-r"><i class="fa fa-check"></i><b>5.1</b> Loops in R</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="ch-05.html"><a href="ch-05.html#some-simple-examples"><i class="fa fa-check"></i><b>5.1.1</b> Some simple examples</a></li>
+<li class="chapter" data-level="5.1.2" data-path="ch-05.html"><a href="ch-05.html#nested-loops"><i class="fa fa-check"></i><b>5.1.2</b> Nested loops</a></li>
+<li class="chapter" data-level="5.1.3" data-path="ch-05.html"><a href="ch-05.html#exercise-4"><i class="fa fa-check"></i><b>5.1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="ch-05.html"><a href="ch-05.html#functional-programming-using-purr"><i class="fa fa-check"></i><b>5.2</b> Functional programming using purr</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="ch-05.html"><a href="ch-05.html#shortcuts-in-a-purrr-function"><i class="fa fa-check"></i><b>5.2.1</b> Shortcuts in a <code>purrr</code> function</a></li>
+<li class="chapter" data-level="5.2.2" data-path="ch-05.html"><a href="ch-05.html#workflow-nested-data-map-and-mutate"><i class="fa fa-check"></i><b>5.2.2</b> Workflow: nested data, map and mutate</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="ch-05.html"><a href="ch-05.html#string-manipulations"><i class="fa fa-check"></i><b>5.3</b> String Manipulations</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="ch-05.html"><a href="ch-05.html#introduction-to-strings"><i class="fa fa-check"></i><b>5.3.1</b> Introduction to strings</a></li>
+<li class="chapter" data-level="5.3.2" data-path="ch-05.html"><a href="ch-05.html#matching-and-extracting-patterns"><i class="fa fa-check"></i><b>5.3.2</b> Matching and extracting patterns</a></li>
+<li class="chapter" data-level="5.3.3" data-path="ch-05.html"><a href="ch-05.html#advanced-example"><i class="fa fa-check"></i><b>5.3.3</b> Advanced example</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="ch-05.html"><a href="ch-05.html#web-scraping-in-a-nut-shell"><i class="fa fa-check"></i><b>5.4</b> Web-scraping in a nut-shell</a></li>
+<li class="chapter" data-level="5.5" data-path="ch-05.html"><a href="ch-05.html#tidyverses-filter-and-select"><i class="fa fa-check"></i><b>5.5</b> Tidyverse’s filter and select</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="ch-05.html"><a href="ch-05.html#introduction-4"><i class="fa fa-check"></i><b>5.5.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.5.2" data-path="ch-05.html"><a href="ch-05.html#select"><i class="fa fa-check"></i><b>5.5.2</b> Select()</a></li>
+<li class="chapter" data-level="5.5.3" data-path="ch-05.html"><a href="ch-05.html#filter"><i class="fa fa-check"></i><b>5.5.3</b> Filter()</a></li>
+<li class="chapter" data-level="5.5.4" data-path="ch-05.html"><a href="ch-05.html#exercises"><i class="fa fa-check"></i><b>5.5.4</b> Exercises</a></li>
+<li class="chapter" data-level="5.5.5" data-path="ch-05.html"><a href="ch-05.html#solutions"><i class="fa fa-check"></i><b>5.5.5</b> Solutions</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="ch-05.html"><a href="ch-05.html#preparing-data-for-ggplot"><i class="fa fa-check"></i><b>5.6</b> Preparing data for ggplot()</a></li>
+<li class="chapter" data-level="5.7" data-path="ch-05.html"><a href="ch-05.html#base-r-functions"><i class="fa fa-check"></i><b>5.7</b> Base R functions</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="ch-06.html"><a href="ch-06.html"><i class="fa fa-check"></i><b>6</b> Supervised Machine Learning I</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="ch-06.html"><a href="ch-06.html#introduction-5"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="ch-06.html"><a href="ch-06.html#learning-objectives-1"><i class="fa fa-check"></i><b>6.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="6.1.2" data-path="ch-06.html"><a href="ch-06.html#important-points-from-the-lecture-1"><i class="fa fa-check"></i><b>6.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="ch-06.html"><a href="ch-06.html#tutorial-4"><i class="fa fa-check"></i><b>6.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="ch-06.html"><a href="ch-06.html#linear-regression"><i class="fa fa-check"></i><b>6.2.1</b> Linear regression</a></li>
+<li class="chapter" data-level="6.2.2" data-path="ch-06.html"><a href="ch-06.html#k-nearest-neighbours"><i class="fa fa-check"></i><b>6.2.2</b> K-nearest neighbours</a></li>
+<li class="chapter" data-level="6.2.3" data-path="ch-06.html"><a href="ch-06.html#essential-methods-for-the-modelling-process"><i class="fa fa-check"></i><b>6.2.3</b> Essential methods for the modelling process</a></li>
+<li class="chapter" data-level="6.2.4" data-path="ch-06.html"><a href="ch-06.html#bonus"><i class="fa fa-check"></i><b>6.2.4</b> Bonus</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="ch-06.html"><a href="ch-06.html#exercise-5"><i class="fa fa-check"></i><b>6.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="ch-07.html"><a href="ch-07.html"><i class="fa fa-check"></i><b>7</b> Supervised Machine Learning II</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="ch-07.html"><a href="ch-07.html#introduction-6"><i class="fa fa-check"></i><b>7.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="ch-07.html"><a href="ch-07.html#leaerning-objectives"><i class="fa fa-check"></i><b>7.1.1</b> Leaerning objectives</a></li>
+<li class="chapter" data-level="7.1.2" data-path="ch-07.html"><a href="ch-07.html#key-points-from-the-lecture"><i class="fa fa-check"></i><b>7.1.2</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="ch-07.html"><a href="ch-07.html#tutorial-5"><i class="fa fa-check"></i><b>7.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="ch-07.html"><a href="ch-07.html#model-training-and-the-loss-function"><i class="fa fa-check"></i><b>7.2.1</b> Model training and the loss function</a></li>
+<li class="chapter" data-level="7.2.2" data-path="ch-07.html"><a href="ch-07.html#putting-it-all-together"><i class="fa fa-check"></i><b>7.2.2</b> Putting it all together</a></li>
+<li class="chapter" data-level="7.2.3" data-path="ch-07.html"><a href="ch-07.html#model-evaluation"><i class="fa fa-check"></i><b>7.2.3</b> Model evaluation</a></li>
+<li class="chapter" data-level="7.2.4" data-path="ch-07.html"><a href="ch-07.html#model-interpretation"><i class="fa fa-check"></i><b>7.2.4</b> Model interpretation</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="ch-07.html"><a href="ch-07.html#exercise-6"><i class="fa fa-check"></i><b>7.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="ch-08.html"><a href="ch-08.html"><i class="fa fa-check"></i><b>8</b> Application 1: Variable selection</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="ch-08.html"><a href="ch-08.html#introduction-7"><i class="fa fa-check"></i><b>8.1</b> Introduction</a></li>
+<li class="chapter" data-level="8.2" data-path="ch-08.html"><a href="ch-08.html#application"><i class="fa fa-check"></i><b>8.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="ch-08.html"><a href="ch-08.html#warm-up-1-nested-for-loop"><i class="fa fa-check"></i><b>8.2.1</b> Warm-up 1: Nested for-loop</a></li>
+<li class="chapter" data-level="8.2.2" data-path="ch-08.html"><a href="ch-08.html#warm-up-2-find-the-best-single-predictor"><i class="fa fa-check"></i><b>8.2.2</b> Warm-up 2: Find the best single predictor</a></li>
+<li class="chapter" data-level="8.2.3" data-path="ch-08.html"><a href="ch-08.html#full-stepwise-regression"><i class="fa fa-check"></i><b>8.2.3</b> Full stepwise regression</a></li>
+<li class="chapter" data-level="8.2.4" data-path="ch-08.html"><a href="ch-08.html#bonus-stepwise-regression-out-of-the-box"><i class="fa fa-check"></i><b>8.2.4</b> Bonus: Stepwise regression out-of-the-box</a></li>
+<li class="chapter" data-level="8.2.5" data-path="ch-08.html"><a href="ch-08.html#bonus-best-subset-selection"><i class="fa fa-check"></i><b>8.2.5</b> Bonus: Best Subset Selection</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="ch-09.html"><a href="ch-09.html"><i class="fa fa-check"></i><b>9</b> Supervised Neural Networks I</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ch-09.html"><a href="ch-09.html#introduction-8"><i class="fa fa-check"></i><b>9.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ch-09.html"><a href="ch-09.html#learning-objectives-2"><i class="fa fa-check"></i><b>9.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="9.1.2" data-path="ch-09.html"><a href="ch-09.html#important-points-from-the-lecture-2"><i class="fa fa-check"></i><b>9.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="ch-09.html"><a href="ch-09.html#tutorial-6"><i class="fa fa-check"></i><b>9.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="ch-09.html"><a href="ch-09.html#set-up"><i class="fa fa-check"></i><b>9.2.1</b> Set-up</a></li>
+<li class="chapter" data-level="9.2.2" data-path="ch-09.html"><a href="ch-09.html#keras-for-linear-models"><i class="fa fa-check"></i><b>9.2.2</b> Keras for linear models</a></li>
+<li class="chapter" data-level="9.2.3" data-path="ch-09.html"><a href="ch-09.html#tuning-learning-rate"><i class="fa fa-check"></i><b>9.2.3</b> Tuning learning rate</a></li>
+<li class="chapter" data-level="9.2.4" data-path="ch-09.html"><a href="ch-09.html#logistic-regression"><i class="fa fa-check"></i><b>9.2.4</b> Logistic Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="ch-09.html"><a href="ch-09.html#exercise-7"><i class="fa fa-check"></i><b>9.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ch-10.html"><a href="ch-10.html"><i class="fa fa-check"></i><b>10</b> Supervised Neural Networks II</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ch-10.html"><a href="ch-10.html#introduction-9"><i class="fa fa-check"></i><b>10.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="10.1.1" data-path="ch-10.html"><a href="ch-10.html#learning-objectives-3"><i class="fa fa-check"></i><b>10.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="10.1.2" data-path="ch-10.html"><a href="ch-10.html#important-points-from-the-lecture-3"><i class="fa fa-check"></i><b>10.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="ch-10.html"><a href="ch-10.html#tutorial-7"><i class="fa fa-check"></i><b>10.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="ch-10.html"><a href="ch-10.html#import-libraries-1"><i class="fa fa-check"></i><b>10.2.1</b> Import libraries</a></li>
+<li class="chapter" data-level="10.2.2" data-path="ch-10.html"><a href="ch-10.html#construct-a-toy-dataset"><i class="fa fa-check"></i><b>10.2.2</b> Construct a toy dataset</a></li>
+<li class="chapter" data-level="10.2.3" data-path="ch-10.html"><a href="ch-10.html#build-and-train-nn"><i class="fa fa-check"></i><b>10.2.3</b> Build and train NN</a></li>
+<li class="chapter" data-level="10.2.4" data-path="ch-10.html"><a href="ch-10.html#model-performance"><i class="fa fa-check"></i><b>10.2.4</b> Model performance</a></li>
+<li class="chapter" data-level="10.2.5" data-path="ch-10.html"><a href="ch-10.html#influence-of-nn-architecture"><i class="fa fa-check"></i><b>10.2.5</b> Influence of NN architecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="ch-10.html"><a href="ch-10.html#exercise-8"><i class="fa fa-check"></i><b>10.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="ch-11.html"><a href="ch-11.html"><i class="fa fa-check"></i><b>11</b> Application 2: Neural Networks and Hyperparameter Tuning</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="ch-11.html"><a href="ch-11.html#introduction-10"><i class="fa fa-check"></i><b>11.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="ch-11.html"><a href="ch-11.html#learning-goals"><i class="fa fa-check"></i><b>11.1.1</b> Learning Goals</a></li>
+<li class="chapter" data-level="11.1.2" data-path="ch-11.html"><a href="ch-11.html#key-points-from-previous-lectures"><i class="fa fa-check"></i><b>11.1.2</b> Key Points from Previous Lectures</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="ch-11.html"><a href="ch-11.html#application-1"><i class="fa fa-check"></i><b>11.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="ch-11.html"><a href="ch-11.html#problem-statement"><i class="fa fa-check"></i><b>11.2.1</b> Problem Statement</a></li>
+<li class="chapter" data-level="11.2.2" data-path="ch-11.html"><a href="ch-11.html#data-preparation"><i class="fa fa-check"></i><b>11.2.2</b> Data preparation</a></li>
+<li class="chapter" data-level="11.2.3" data-path="ch-11.html"><a href="ch-11.html#center-and-scale"><i class="fa fa-check"></i><b>11.2.3</b> Center and scale</a></li>
+<li class="chapter" data-level="11.2.4" data-path="ch-11.html"><a href="ch-11.html#building-a-simple-model-with-keras-subtask-1"><i class="fa fa-check"></i><b>11.2.4</b> Building a simple model with keras ( SubTask 1)</a></li>
+<li class="chapter" data-level="11.2.5" data-path="ch-11.html"><a href="ch-11.html#cross-validation"><i class="fa fa-check"></i><b>11.2.5</b> Cross validation</a></li>
+<li class="chapter" data-level="11.2.6" data-path="ch-11.html"><a href="ch-11.html#parameter-tuning"><i class="fa fa-check"></i><b>11.2.6</b> Parameter Tuning</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="ch-12.html"><a href="ch-12.html"><i class="fa fa-check"></i><b>12</b> Supervised Deep Learning I</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="ch-12.html"><a href="ch-12.html#introduction-11"><i class="fa fa-check"></i><b>12.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="12.1.1" data-path="ch-12.html"><a href="ch-12.html#learning-objectives-4"><i class="fa fa-check"></i><b>12.1.1</b> Learning objectives</a></li>
+</ul></li>
+<li class="chapter" data-level="12.2" data-path="ch-12.html"><a href="ch-12.html#tutorial-8"><i class="fa fa-check"></i><b>12.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="ch-12.html"><a href="ch-12.html#building-blocks-of-cnns"><i class="fa fa-check"></i><b>12.2.1</b> Building Blocks of CNNs</a></li>
+<li class="chapter" data-level="12.2.2" data-path="ch-12.html"><a href="ch-12.html#build-the-model"><i class="fa fa-check"></i><b>12.2.2</b> Build the model</a></li>
+<li class="chapter" data-level="12.2.3" data-path="ch-12.html"><a href="ch-12.html#compile-and-train-the-model"><i class="fa fa-check"></i><b>12.2.3</b> Compile and train the model</a></li>
+<li class="chapter" data-level="12.2.4" data-path="ch-12.html"><a href="ch-12.html#reduce-overfitting"><i class="fa fa-check"></i><b>12.2.4</b> Reduce Overfitting</a></li>
+<li class="chapter" data-level="12.2.5" data-path="ch-12.html"><a href="ch-12.html#visualizing-a-cnn"><i class="fa fa-check"></i><b>12.2.5</b> Visualizing a CNN</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="ch-12.html"><a href="ch-12.html#exercise-9"><i class="fa fa-check"></i><b>12.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="ch-12.html"><a href="ch-12.html#import-libraries-and-data"><i class="fa fa-check"></i><b>12.3.1</b> Import libraries and data</a></li>
+<li class="chapter" data-level="12.3.2" data-path="ch-12.html"><a href="ch-12.html#tasks"><i class="fa fa-check"></i><b>12.3.2</b> Tasks</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="ch-13.html"><a href="ch-13.html"><i class="fa fa-check"></i><b>13</b> Supervised Deep Learning II</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="ch-13.html"><a href="ch-13.html#introduction-12"><i class="fa fa-check"></i><b>13.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="13.1.1" data-path="ch-13.html"><a href="ch-13.html#learning-objectives-5"><i class="fa fa-check"></i><b>13.1.1</b> Learning objectives</a></li>
+</ul></li>
+<li class="chapter" data-level="13.2" data-path="ch-13.html"><a href="ch-13.html#tutorial-9"><i class="fa fa-check"></i><b>13.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="13.2.1" data-path="ch-13.html"><a href="ch-13.html#dataset"><i class="fa fa-check"></i><b>13.2.1</b> Dataset</a></li>
+<li class="chapter" data-level="13.2.2" data-path="ch-13.html"><a href="ch-13.html#naive-models-old-world"><i class="fa fa-check"></i><b>13.2.2</b> Naive models (Old World)</a></li>
+<li class="chapter" data-level="13.2.3" data-path="ch-13.html"><a href="ch-13.html#neural-networks-new-world"><i class="fa fa-check"></i><b>13.2.3</b> Neural Networks (New World)</a></li>
+<li class="chapter" data-level="13.2.4" data-path="ch-13.html"><a href="ch-13.html#model-comparison"><i class="fa fa-check"></i><b>13.2.4</b> Model Comparison</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="ch-13.html"><a href="ch-13.html#exercise-10"><i class="fa fa-check"></i><b>13.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="13.3.1" data-path="ch-13.html"><a href="ch-13.html#import-libraries-2"><i class="fa fa-check"></i><b>13.3.1</b> Import libraries</a></li>
+<li class="chapter" data-level="13.3.2" data-path="ch-13.html"><a href="ch-13.html#load-data"><i class="fa fa-check"></i><b>13.3.2</b> Load data</a></li>
+<li class="chapter" data-level="13.3.3" data-path="ch-13.html"><a href="ch-13.html#preprocess-ndvi-images"><i class="fa fa-check"></i><b>13.3.3</b> Preprocess NDVI images</a></li>
+<li class="chapter" data-level="13.3.4" data-path="ch-13.html"><a href="ch-13.html#part-1"><i class="fa fa-check"></i><b>13.3.4</b> Part 1</a></li>
+<li class="chapter" data-level="13.3.5" data-path="ch-13.html"><a href="ch-13.html#part-2"><i class="fa fa-check"></i><b>13.3.5</b> Part 2</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Environmental Systems Data Science</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="ch-12" class="section level1" number="12">
+<h1><span class="header-section-number">Chapter 12</span> Supervised Deep Learning I</h1>
+<div id="introduction-11" class="section level2" number="12.1">
+<h2><span class="header-section-number">12.1</span> Introduction</h2>
+<p>In this tutorial, we’ll use convolutional neural networks for image classification. The dataset we’ll work with comes from a 2013 Kaggle competition, which you can read about <a href="https://www.kaggle.com/c/dogs-vs-cats/overview">here</a>. Kaggle is an online community for data scientists and machine learning engineers, where they can explore datasets, build models and enter contests to attempt solving data science hurdles.</p>
+<p>The dataset contains 25,000 images of dogs and cats. We’ll use just a subset of these - 6,000 images to be precise. These we’ll break down into a training set of 4,000 images, a validation set of 1000 images, and a testing set of 1000 images. This tutorial is based on Chapter 5 of <a href="https://www.manning.com/books/deep-learning-with-python#toc">Deep learning with Python</a> by F. Chollet - highly recommended reading!</p>
+<div id="learning-objectives-4" class="section level3" number="12.1.1">
+<h3><span class="header-section-number">12.1.1</span> Learning objectives</h3>
+<ul>
+<li>Use Keras to implement a deep convolutional neural network for image classification</li>
+<li>Avoid overfitting using weight regularization, dropout and data augmentation</li>
+<li>Visualize what convolutional neural networks learn via the visualization of intermediate activations</li>
+</ul>
+<p><em>Important points from the lecture</em>
+- Convolutional neural networks are a powerful kind of machine learning for image classification
+- They comprise a series of convolution and max pooling layers, the output of which is then fed into one or more dense layers
+- The lower convolution layers learn local patterns in small windows, like edges and textures
+- A spatial hierarchy of local patterns are then learned by the higher convolution layers
+- The final dense layer then learns global patterns in this spatial hierarchy of lower-level patterns
+- Convolutional neural networks are partially “white box,” because you can visualize much of what the network learns, for example by visualizing intermediate activations.</p>
+</div>
+</div>
+<div id="tutorial-8" class="section level2" number="12.2">
+<h2><span class="header-section-number">12.2</span> Tutorial</h2>
+<div id="building-blocks-of-cnns" class="section level3" number="12.2.1">
+<h3><span class="header-section-number">12.2.1</span> Building Blocks of CNNs</h3>
+<p>You probably already know this or at least guessed it but CNN stands for convolutional neural network. CNNs built for classification tasks typically make use the following types of layers (displayed in Figure <a href="ch-12.html#fig:CNN-blocks">12.1</a>:</p>
+<ul>
+<li><p><strong>Convolutional Layers</strong>: Layers implementing the actual convolution. Their outputs are feature maps which are then passed through an activation function in order to introduce non-linearities into the system. Convolutional layers can be seen as extracting features that are passed on deeper into the model thus enabling the model to learn higher-level features that make the classification task easier.</p></li>
+<li><p><strong>Pooling Layers</strong>: Downsampling or pooling layers concentrate the information so that deeper layers focus more on abstract/high-level patterns. A common choice is max-pooling, where only the maximum value occurring in a certain region is propagated to the output.</p></li>
+<li><p><strong>Dense Layers</strong>: A dense or fully-connected layer connects every node in the input to every node in the output. This is the type of layer you already used in the previous tutorial. If the input dimension is large, the amount of learnable parameters introduced by using a dense layer can quickly explode. Hence, dense layers are usually added on deeper levels of the model, where the pooling operations have already reduced the dimensionality of the data. Typically, the dense layers are added last in a classification model, performing the actual classification on the features extracted by the convolutional layers.</p></li>
+</ul>
+<div class="figure" style="text-align: center"><span id="fig:CNN-blocks"></span>
+<img src="figures/Chollet_Fig5.4.png" alt="Building blocks of a CNN. Figures taken from Chapter 5 of [Deep learning with Python](https://www.manning.com/books/deep-learning-with-python#toc). Left: Features extraction from a CNN (convolutional neural network). Right: Instance classification." width="32%" height="75%" /><img src="figures/Chollet_Fig5.2.png" alt="Building blocks of a CNN. Figures taken from Chapter 5 of [Deep learning with Python](https://www.manning.com/books/deep-learning-with-python#toc). Left: Features extraction from a CNN (convolutional neural network). Right: Instance classification." width="32%" height="75%" />
+<p class="caption">
+Figure 12.1: Building blocks of a CNN. Figures taken from Chapter 5 of <a href="https://www.manning.com/books/deep-learning-with-python#toc">Deep learning with Python</a>. Left: Features extraction from a CNN (convolutional neural network). Right: Instance classification.
+</p>
+</div>
+<p>You can think of a convolution as sliding a window, also called kernel or filter, over each pixel of an image and computing a dot product between the filter’s values and the image’s values that the window (or filter) is covering. This operation produces one output value for every location on the image over which we slide the filter. In Figure <a href="ch-12.html#fig:conv-pool">12.2</a>, in blue is the input image and in shaded blue the 3-by-3 filter that we are convolving the input image with and green is the output image. After the convolutional layer usually a max-pooling layer is applied which downsamples the feature map. Through this only certain aspects of information in our original image are extracted.</p>
+<div class="figure" style="text-align: center"><span id="fig:conv-pool"></span>
+<img src="figures/12_conv.gif" alt="Animation on the left displays the sliding filter across the input feature map ([source](https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png)). The image on the right shows a pooling layer where the highest value of a quadrant is taken as value in a reduced feature map ([source](https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png))." width="50%" height="49%" /><img src="figures/12_maxpool.png" alt="Animation on the left displays the sliding filter across the input feature map ([source](https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png)). The image on the right shows a pooling layer where the highest value of a quadrant is taken as value in a reduced feature map ([source](https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png))." width="50%" height="49%" />
+<p class="caption">
+Figure 12.2: Animation on the left displays the sliding filter across the input feature map (<a href="https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png">source</a>). The image on the right shows a pooling layer where the highest value of a quadrant is taken as value in a reduced feature map (<a href="https://computersciencewiki.org/images/8/8a/MaxpoolSample2.png">source</a>).
+</p>
+</div>
+<p>We can stack several convolutional-pooling layers. The final pooling layer output is given to a feed forward neural network (i.e dense layers) which is in charge to make the prediction.</p>
+<p>Let’s dive into our example for a practical application of this.</p>
+<div class="sourceCode" id="cb994"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb994-1"><a href="ch-12.html#cb994-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import libraries</span></span>
+<span id="cb994-2"><a href="ch-12.html#cb994-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb994-3"><a href="ch-12.html#cb994-3" aria-hidden="true" tabindex="-1"></a><span class="fu">use_condaenv</span>()</span>
+<span id="cb994-4"><a href="ch-12.html#cb994-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
+<span id="cb994-5"><a href="ch-12.html#cb994-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tensorflow)</span>
+<span id="cb994-6"><a href="ch-12.html#cb994-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb994-7"><a href="ch-12.html#cb994-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span></code></pre></div>
+<p>We’ll start by creating some useful functions which will be used later in the tutorial.</p>
+<div class="sourceCode" id="cb995"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb995-1"><a href="ch-12.html#cb995-1" aria-hidden="true" tabindex="-1"></a><span class="co"># a function that specifies the size of the plot</span></span>
+<span id="cb995-2"><a href="ch-12.html#cb995-2" aria-hidden="true" tabindex="-1"></a>fig_size <span class="ot">&lt;-</span> <span class="cf">function</span>(width, height){</span>
+<span id="cb995-3"><a href="ch-12.html#cb995-3" aria-hidden="true" tabindex="-1"></a>     <span class="fu">options</span>(<span class="at">repr.plot.width =</span> width, <span class="at">repr.plot.height =</span> height)</span>
+<span id="cb995-4"><a href="ch-12.html#cb995-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb995-5"><a href="ch-12.html#cb995-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb995-6"><a href="ch-12.html#cb995-6" aria-hidden="true" tabindex="-1"></a><span class="co"># a function that visualize the corresponding RGB image derived from a tensor</span></span>
+<span id="cb995-7"><a href="ch-12.html#cb995-7" aria-hidden="true" tabindex="-1"></a>plotRGB  <span class="ot">=</span> <span class="cf">function</span>(img_tensor){</span>
+<span id="cb995-8"><a href="ch-12.html#cb995-8" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb995-9"><a href="ch-12.html#cb995-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">#take dimension of image</span></span>
+<span id="cb995-10"><a href="ch-12.html#cb995-10" aria-hidden="true" tabindex="-1"></a>    width <span class="ot">=</span> <span class="fu">dim</span>(img_tensor)[<span class="dv">1</span>]</span>
+<span id="cb995-11"><a href="ch-12.html#cb995-11" aria-hidden="true" tabindex="-1"></a>    height <span class="ot">=</span> <span class="fu">dim</span>(img_tensor)[<span class="dv">2</span>]</span>
+<span id="cb995-12"><a href="ch-12.html#cb995-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb995-13"><a href="ch-12.html#cb995-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">#take color channels</span></span>
+<span id="cb995-14"><a href="ch-12.html#cb995-14" aria-hidden="true" tabindex="-1"></a>    red <span class="ot">=</span> <span class="fu">as.numeric</span>(img_tensor[,,<span class="dv">1</span>])</span>
+<span id="cb995-15"><a href="ch-12.html#cb995-15" aria-hidden="true" tabindex="-1"></a>    green <span class="ot">=</span> <span class="fu">as.numeric</span>(img_tensor[,,<span class="dv">2</span>])</span>
+<span id="cb995-16"><a href="ch-12.html#cb995-16" aria-hidden="true" tabindex="-1"></a>    blue <span class="ot">=</span> <span class="fu">as.numeric</span>(img_tensor[,,<span class="dv">3</span>])</span>
+<span id="cb995-17"><a href="ch-12.html#cb995-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb995-18"><a href="ch-12.html#cb995-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">#create dataframe</span></span>
+<span id="cb995-19"><a href="ch-12.html#cb995-19" aria-hidden="true" tabindex="-1"></a>    img <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span>height,<span class="at">each =</span> width), <span class="at">y =</span> <span class="fu">rep</span>(height<span class="sc">:</span><span class="dv">1</span>,<span class="at">times =</span> width) , <span class="at">r =</span> red , <span class="at">g =</span> green, <span class="at">b =</span> blue)</span>
+<span id="cb995-20"><a href="ch-12.html#cb995-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb995-21"><a href="ch-12.html#cb995-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">#plot RGB image</span></span>
+<span id="cb995-22"><a href="ch-12.html#cb995-22" aria-hidden="true" tabindex="-1"></a>    img <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>x, <span class="at">y=</span>y, <span class="at">fill=</span><span class="fu">rgb</span>(r,g,b))) <span class="sc">+</span> </span>
+<span id="cb995-23"><a href="ch-12.html#cb995-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_raster</span>()<span class="sc">+</span></span>
+<span id="cb995-24"><a href="ch-12.html#cb995-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_y_continuous</span>()<span class="sc">+</span></span>
+<span id="cb995-25"><a href="ch-12.html#cb995-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_x_continuous</span>()<span class="sc">+</span> </span>
+<span id="cb995-26"><a href="ch-12.html#cb995-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_fill_identity</span>()<span class="sc">+</span></span>
+<span id="cb995-27"><a href="ch-12.html#cb995-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_void</span>()</span>
+<span id="cb995-28"><a href="ch-12.html#cb995-28" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb995-29"><a href="ch-12.html#cb995-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb995-30"><a href="ch-12.html#cb995-30" aria-hidden="true" tabindex="-1"></a><span class="co"># a function that plot the output of the given filter activation</span></span>
+<span id="cb995-31"><a href="ch-12.html#cb995-31" aria-hidden="true" tabindex="-1"></a>plot_filter  <span class="ot">=</span> <span class="cf">function</span>(filter_activation){</span>
+<span id="cb995-32"><a href="ch-12.html#cb995-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb995-33"><a href="ch-12.html#cb995-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">#create dataframe</span></span>
+<span id="cb995-34"><a href="ch-12.html#cb995-34" aria-hidden="true" tabindex="-1"></a>    height <span class="ot">=</span> <span class="fu">dim</span>(filter_activation)[<span class="dv">1</span>]</span>
+<span id="cb995-35"><a href="ch-12.html#cb995-35" aria-hidden="true" tabindex="-1"></a>    width <span class="ot">=</span> <span class="fu">dim</span>(filter_activation)[<span class="dv">2</span>]</span>
+<span id="cb995-36"><a href="ch-12.html#cb995-36" aria-hidden="true" tabindex="-1"></a>    filter <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span>width,<span class="at">each =</span> height), <span class="at">y =</span> <span class="fu">rep</span>(height<span class="sc">:</span><span class="dv">1</span>,<span class="at">times =</span> width) , <span class="at">fill =</span>  <span class="fu">as.numeric</span>(filter_activation))</span>
+<span id="cb995-37"><a href="ch-12.html#cb995-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb995-38"><a href="ch-12.html#cb995-38" aria-hidden="true" tabindex="-1"></a>    <span class="co">#plot filter</span></span>
+<span id="cb995-39"><a href="ch-12.html#cb995-39" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">=</span> filter <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x,<span class="at">y =</span> y))<span class="sc">+</span></span>
+<span id="cb995-40"><a href="ch-12.html#cb995-40" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_raster</span>(<span class="fu">aes</span>(<span class="at">fill =</span> fill),<span class="at">show.legend =</span> <span class="cn">FALSE</span>)<span class="sc">+</span></span>
+<span id="cb995-41"><a href="ch-12.html#cb995-41" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_y_continuous</span>()<span class="sc">+</span></span>
+<span id="cb995-42"><a href="ch-12.html#cb995-42" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_x_continuous</span>()<span class="sc">+</span></span>
+<span id="cb995-43"><a href="ch-12.html#cb995-43" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_fill_viridis_c</span>()<span class="sc">+</span></span>
+<span id="cb995-44"><a href="ch-12.html#cb995-44" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_void</span>()</span>
+<span id="cb995-45"><a href="ch-12.html#cb995-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(p)</span>
+<span id="cb995-46"><a href="ch-12.html#cb995-46" aria-hidden="true" tabindex="-1"></a>    }</span></code></pre></div>
+<div class="sourceCode" id="cb996"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb996-1"><a href="ch-12.html#cb996-1" aria-hidden="true" tabindex="-1"></a><span class="co"># data directory</span></span>
+<span id="cb996-2"><a href="ch-12.html#cb996-2" aria-hidden="true" tabindex="-1"></a>base_dir <span class="ot">=</span> <span class="st">&#39;./data/SDL_I/dogs_v_cats_small&#39;</span></span>
+<span id="cb996-3"><a href="ch-12.html#cb996-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb996-4"><a href="ch-12.html#cb996-4" aria-hidden="true" tabindex="-1"></a><span class="co"># train data directory</span></span>
+<span id="cb996-5"><a href="ch-12.html#cb996-5" aria-hidden="true" tabindex="-1"></a>train_dir <span class="ot">=</span> <span class="fu">file.path</span>(base_dir,<span class="st">&#39;train&#39;</span>)</span>
+<span id="cb996-6"><a href="ch-12.html#cb996-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb996-7"><a href="ch-12.html#cb996-7" aria-hidden="true" tabindex="-1"></a><span class="co">#validation data directory</span></span>
+<span id="cb996-8"><a href="ch-12.html#cb996-8" aria-hidden="true" tabindex="-1"></a>validation_dir <span class="ot">=</span> <span class="fu">file.path</span>(base_dir,<span class="st">&#39;validation&#39;</span>)</span>
+<span id="cb996-9"><a href="ch-12.html#cb996-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb996-10"><a href="ch-12.html#cb996-10" aria-hidden="true" tabindex="-1"></a><span class="co">#test data directory</span></span>
+<span id="cb996-11"><a href="ch-12.html#cb996-11" aria-hidden="true" tabindex="-1"></a>test_dir <span class="ot">=</span> <span class="fu">file.path</span>(base_dir,<span class="st">&#39;test&#39;</span>)</span></code></pre></div>
+<p>To get an overview of our data, we’ll start by printing the number cat vs dog images in each given data set (training, validation &amp; testing).</p>
+<div class="sourceCode" id="cb997"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb997-1"><a href="ch-12.html#cb997-1" aria-hidden="true" tabindex="-1"></a><span class="co">#train set</span></span>
+<span id="cb997-2"><a href="ch-12.html#cb997-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;total training cat images:&#39;</span>, <span class="fu">length</span>(<span class="fu">list.files</span>(<span class="fu">file.path</span>(train_dir,<span class="st">&#39;cats&#39;</span>))),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>, </span>
+<span id="cb997-3"><a href="ch-12.html#cb997-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;total training dog images:&#39;</span>, <span class="fu">length</span>(<span class="fu">list.files</span>(<span class="fu">file.path</span>(train_dir,<span class="st">&#39;dogs&#39;</span>))),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## total training cat images: 0 
+##  total training dog images: 0</code></pre>
+<div class="sourceCode" id="cb999"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb999-1"><a href="ch-12.html#cb999-1" aria-hidden="true" tabindex="-1"></a><span class="co">#validation set</span></span>
+<span id="cb999-2"><a href="ch-12.html#cb999-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;total validation cat images:&#39;</span>, <span class="fu">length</span>(<span class="fu">list.files</span>(<span class="fu">file.path</span>(validation_dir,<span class="st">&#39;cats&#39;</span>))),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb999-3"><a href="ch-12.html#cb999-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;total validation dog images:&#39;</span>, <span class="fu">length</span>(<span class="fu">list.files</span>(<span class="fu">file.path</span>(validation_dir,<span class="st">&#39;dogs&#39;</span>))),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## total validation cat images: 0 
+##  total validation dog images: 0</code></pre>
+<div class="sourceCode" id="cb1001"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1001-1"><a href="ch-12.html#cb1001-1" aria-hidden="true" tabindex="-1"></a><span class="co">#test set</span></span>
+<span id="cb1001-2"><a href="ch-12.html#cb1001-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;total test cat images:&#39;</span>, <span class="fu">length</span>(<span class="fu">list.files</span>(<span class="fu">file.path</span>(test_dir,<span class="st">&#39;cats&#39;</span>))),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb1001-3"><a href="ch-12.html#cb1001-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&#39;total test dog images:&#39;</span>, <span class="fu">length</span>(<span class="fu">list.files</span>(<span class="fu">file.path</span>(test_dir,<span class="st">&#39;dogs&#39;</span>))),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## total test cat images: 0 
+##  total test dog images: 0</code></pre>
+<p>Note that this data set is class balanced, meaning that accuracy is a useful measure of model performance.</p>
+<p>A sample image from each class:
+<img src="./data/SDL_I/dogs_v_cats_small/train/cats/cat.1.jpg" />
+<img src="./data/SDL_I/dogs_v_cats_small/train/dogs/dog.2.jpg" /></p>
+<p>Keras has built-in functionality for feeding batches of training and validation data to the optimization function. This is useful if, for example, you want to make random changes to your training and validation data on the fly, in order to avoid overfitting. You’ll get to read more about this below. This functionality comes in the form of the <code>ImageDataGenerator</code> function, which you can read about <a href="https://keras.io/api/preprocessing/image/">here</a>.</p>
+<p>Let’s use <code>ImageDataGenerator</code> to generate batches of training and validation data.</p>
+<div class="sourceCode" id="cb1003"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1003-1"><a href="ch-12.html#cb1003-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify image size</span></span>
+<span id="cb1003-2"><a href="ch-12.html#cb1003-2" aria-hidden="true" tabindex="-1"></a>IMAGE_HEIGHT <span class="ot">=</span> <span class="dv">150</span></span>
+<span id="cb1003-3"><a href="ch-12.html#cb1003-3" aria-hidden="true" tabindex="-1"></a>IMAGE_WIDTH <span class="ot">=</span> <span class="dv">150</span></span>
+<span id="cb1003-4"><a href="ch-12.html#cb1003-4" aria-hidden="true" tabindex="-1"></a>IMAGE_CHANNELS <span class="ot">=</span> <span class="dv">3</span></span>
+<span id="cb1003-5"><a href="ch-12.html#cb1003-5" aria-hidden="true" tabindex="-1"></a>IMAGE_SIZE <span class="ot">=</span> <span class="fu">c</span>(IMAGE_HEIGHT,IMAGE_WIDTH)</span>
+<span id="cb1003-6"><a href="ch-12.html#cb1003-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1003-7"><a href="ch-12.html#cb1003-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Specify batch size for each set</span></span>
+<span id="cb1003-8"><a href="ch-12.html#cb1003-8" aria-hidden="true" tabindex="-1"></a>N_TRAIN <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">list.files</span>(train_dir,<span class="at">recursive =</span> T))</span>
+<span id="cb1003-9"><a href="ch-12.html#cb1003-9" aria-hidden="true" tabindex="-1"></a>N_VALIDATION <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">list.files</span>(validation_dir,<span class="at">recursive =</span> T))</span>
+<span id="cb1003-10"><a href="ch-12.html#cb1003-10" aria-hidden="true" tabindex="-1"></a>N_TEST <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">list.files</span>(test_dir,<span class="at">recursive =</span> T))</span>
+<span id="cb1003-11"><a href="ch-12.html#cb1003-11" aria-hidden="true" tabindex="-1"></a>BATCH_SIZE_TRAIN <span class="ot">=</span> <span class="dv">32</span></span>
+<span id="cb1003-12"><a href="ch-12.html#cb1003-12" aria-hidden="true" tabindex="-1"></a>BATCH_SIZE_VALIDATION <span class="ot">=</span> <span class="dv">50</span></span>
+<span id="cb1003-13"><a href="ch-12.html#cb1003-13" aria-hidden="true" tabindex="-1"></a>BATCH_SIZE_TEST <span class="ot">=</span> <span class="dv">50</span></span>
+<span id="cb1003-14"><a href="ch-12.html#cb1003-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1003-15"><a href="ch-12.html#cb1003-15" aria-hidden="true" tabindex="-1"></a><span class="co">#Rescale images by 1/255 to get numbers between 0 and 1</span></span>
+<span id="cb1003-16"><a href="ch-12.html#cb1003-16" aria-hidden="true" tabindex="-1"></a>train_datagen <span class="ot">=</span> <span class="fu">image_data_generator</span>(<span class="at">rescale =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">255</span>)</span>
+<span id="cb1003-17"><a href="ch-12.html#cb1003-17" aria-hidden="true" tabindex="-1"></a>test_datagen <span class="ot">=</span> <span class="fu">image_data_generator</span>(<span class="at">rescale=</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">255</span>)</span>
+<span id="cb1003-18"><a href="ch-12.html#cb1003-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1003-19"><a href="ch-12.html#cb1003-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Create a generator for the training data</span></span>
+<span id="cb1003-20"><a href="ch-12.html#cb1003-20" aria-hidden="true" tabindex="-1"></a>train_generator <span class="ot">=</span> <span class="fu">flow_images_from_directory</span>(</span>
+<span id="cb1003-21"><a href="ch-12.html#cb1003-21" aria-hidden="true" tabindex="-1"></a>                        <span class="at">directory =</span> train_dir,</span>
+<span id="cb1003-22"><a href="ch-12.html#cb1003-22" aria-hidden="true" tabindex="-1"></a>                        <span class="at">generator =</span> train_datagen,</span>
+<span id="cb1003-23"><a href="ch-12.html#cb1003-23" aria-hidden="true" tabindex="-1"></a>                        <span class="at">target_size =</span> IMAGE_SIZE,</span>
+<span id="cb1003-24"><a href="ch-12.html#cb1003-24" aria-hidden="true" tabindex="-1"></a>                        <span class="at">batch_size =</span> BATCH_SIZE_TRAIN,</span>
+<span id="cb1003-25"><a href="ch-12.html#cb1003-25" aria-hidden="true" tabindex="-1"></a>                        <span class="at">class_mode =</span> <span class="st">&quot;binary&quot;</span></span>
+<span id="cb1003-26"><a href="ch-12.html#cb1003-26" aria-hidden="true" tabindex="-1"></a>                        )</span>
+<span id="cb1003-27"><a href="ch-12.html#cb1003-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1003-28"><a href="ch-12.html#cb1003-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1003-29"><a href="ch-12.html#cb1003-29" aria-hidden="true" tabindex="-1"></a><span class="co">#Create a generator for the validation data</span></span>
+<span id="cb1003-30"><a href="ch-12.html#cb1003-30" aria-hidden="true" tabindex="-1"></a>validation_generator <span class="ot">=</span> <span class="fu">flow_images_from_directory</span>(</span>
+<span id="cb1003-31"><a href="ch-12.html#cb1003-31" aria-hidden="true" tabindex="-1"></a>                            <span class="at">directory =</span> validation_dir,</span>
+<span id="cb1003-32"><a href="ch-12.html#cb1003-32" aria-hidden="true" tabindex="-1"></a>                            <span class="at">generator =</span> test_datagen,</span>
+<span id="cb1003-33"><a href="ch-12.html#cb1003-33" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_size =</span> IMAGE_SIZE,</span>
+<span id="cb1003-34"><a href="ch-12.html#cb1003-34" aria-hidden="true" tabindex="-1"></a>                            <span class="at">batch_size =</span> BATCH_SIZE_TEST,</span>
+<span id="cb1003-35"><a href="ch-12.html#cb1003-35" aria-hidden="true" tabindex="-1"></a>                            <span class="at">class_mode =</span> <span class="st">&quot;binary&quot;</span></span>
+<span id="cb1003-36"><a href="ch-12.html#cb1003-36" aria-hidden="true" tabindex="-1"></a>                          )</span>
+<span id="cb1003-37"><a href="ch-12.html#cb1003-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1003-38"><a href="ch-12.html#cb1003-38" aria-hidden="true" tabindex="-1"></a><span class="co">#Create a generator for the test data</span></span>
+<span id="cb1003-39"><a href="ch-12.html#cb1003-39" aria-hidden="true" tabindex="-1"></a>test_generator <span class="ot">=</span> <span class="fu">flow_images_from_directory</span>(</span>
+<span id="cb1003-40"><a href="ch-12.html#cb1003-40" aria-hidden="true" tabindex="-1"></a>                            <span class="at">directory =</span> test_dir,</span>
+<span id="cb1003-41"><a href="ch-12.html#cb1003-41" aria-hidden="true" tabindex="-1"></a>                            <span class="at">generator =</span> test_datagen,</span>
+<span id="cb1003-42"><a href="ch-12.html#cb1003-42" aria-hidden="true" tabindex="-1"></a>                            <span class="at">target_size =</span> IMAGE_SIZE,</span>
+<span id="cb1003-43"><a href="ch-12.html#cb1003-43" aria-hidden="true" tabindex="-1"></a>                            <span class="at">batch_size =</span> BATCH_SIZE_TEST,</span>
+<span id="cb1003-44"><a href="ch-12.html#cb1003-44" aria-hidden="true" tabindex="-1"></a>                            <span class="at">class_mode =</span> <span class="st">&quot;binary&quot;</span></span>
+<span id="cb1003-45"><a href="ch-12.html#cb1003-45" aria-hidden="true" tabindex="-1"></a>                          )</span>
+<span id="cb1003-46"><a href="ch-12.html#cb1003-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1003-47"><a href="ch-12.html#cb1003-47" aria-hidden="true" tabindex="-1"></a><span class="co">#Let&#39;s have a look at one batch of data from train_generator:</span></span>
+<span id="cb1003-48"><a href="ch-12.html#cb1003-48" aria-hidden="true" tabindex="-1"></a>batch <span class="ot">=</span> <span class="fu">iter_next</span>(train_generator)</span>
+<span id="cb1003-49"><a href="ch-12.html#cb1003-49" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;data batch shape:&#39;</span>, <span class="fu">dim</span>(batch[[<span class="dv">1</span>]]),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1003-50"><a href="ch-12.html#cb1003-50" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;labels batch shape:&#39;</span>, <span class="fu">dim</span>(batch[[<span class="dv">2</span>]]),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<p>Notice the dimensions of the tensor <code>data_batch</code>:
+- The <em>first</em> dimension is the number of images in the batch.
+- The <em>second</em> and <em>third</em> dimensions are the dimensions of each image.
+- The <em>fourth</em> dimension is 3 because these are color images - one for each RGB (red-blue-green) channel.</p>
+</div>
+<div id="build-the-model" class="section level3" number="12.2.2">
+<h3><span class="header-section-number">12.2.2</span> Build the model</h3>
+<p>Let’s write a function to build a deep convolutional neural network with the following specifications:</p>
+<ul>
+<li>4 convolution layers with 32, 64, 128, and 128 filters per layer. Each with a ReLU activation function.</li>
+<li>A max pooling layer after each convolution layer that halves each feature map.</li>
+<li>A dense layer with 512 neurons, each with a ReLU activation function.</li>
+<li>A single output neuron with a sigmoid activation function.</li>
+</ul>
+<p>The function takes two input parameters: (1) the L2 regularization rate and (2) the dropout rate. We’ll look into these in detail later.</p>
+<div class="sourceCode" id="cb1004"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1004-1"><a href="ch-12.html#cb1004-1" aria-hidden="true" tabindex="-1"></a>build_model <span class="ot">=</span> <span class="cf">function</span>(<span class="at">L2_rate =</span> <span class="dv">0</span>, <span class="at">drop_rate =</span> <span class="dv">0</span>){</span>
+<span id="cb1004-2"><a href="ch-12.html#cb1004-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1004-3"><a href="ch-12.html#cb1004-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Name the model</span></span>
+<span id="cb1004-4"><a href="ch-12.html#cb1004-4" aria-hidden="true" tabindex="-1"></a>  model.name <span class="ot">=</span> <span class="fu">paste</span>(<span class="st">&#39;convnet_L2_&#39;</span>,L2_rate,<span class="st">&#39;_dropout_&#39;</span>,drop_rate,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)  </span>
+<span id="cb1004-5"><a href="ch-12.html#cb1004-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-6"><a href="ch-12.html#cb1004-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#sequential model</span></span>
+<span id="cb1004-7"><a href="ch-12.html#cb1004-7" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">=</span> <span class="fu">keras_model_sequential</span>(<span class="at">name =</span> model.name)</span>
+<span id="cb1004-8"><a href="ch-12.html#cb1004-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1004-9"><a href="ch-12.html#cb1004-9" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">=</span> model <span class="sc">%&gt;%</span></span>
+<span id="cb1004-10"><a href="ch-12.html#cb1004-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Add the first convolution layer, with 32 3x3 filters and ReLU activation</span></span>
+<span id="cb1004-11"><a href="ch-12.html#cb1004-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Note that you only need to provide the input dimensions for the 1st layer.</span></span>
+<span id="cb1004-12"><a href="ch-12.html#cb1004-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Note also that we don&#39;t add regularization to this layer. The reason is it has fewer parameters</span></span>
+<span id="cb1004-13"><a href="ch-12.html#cb1004-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">#than subsequent layers and is therefore less likely to be a source of overfitting. However, you</span></span>
+<span id="cb1004-14"><a href="ch-12.html#cb1004-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">#could add regularization here too, if you&#39;d like.</span></span>
+<span id="cb1004-15"><a href="ch-12.html#cb1004-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_conv_2d</span>(<span class="at">filter =</span> <span class="dv">32</span> , <span class="at">kernel_size =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">3</span>),<span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>,<span class="at">input_shape =</span> <span class="fu">c</span>(IMAGE_SIZE,IMAGE_CHANNELS)) <span class="sc">%&gt;%</span></span>
+<span id="cb1004-16"><a href="ch-12.html#cb1004-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-17"><a href="ch-12.html#cb1004-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Add a max pooling layer with 2x2 windows. This will halve the dimension of data.</span></span>
+<span id="cb1004-18"><a href="ch-12.html#cb1004-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_max_pooling_2d</span>(<span class="at">pool_size =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb1004-19"><a href="ch-12.html#cb1004-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-20"><a href="ch-12.html#cb1004-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Add a convolution layer with 64 3x3 filters and ReLU activation </span></span>
+<span id="cb1004-21"><a href="ch-12.html#cb1004-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_conv_2d</span>(<span class="at">filters =</span> <span class="dv">64</span>,<span class="at">kernel_size =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">3</span>),<span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1004-22"><a href="ch-12.html#cb1004-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-23"><a href="ch-12.html#cb1004-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Add a max pooling layer with 2x2 windows. This will halve the dimension of data.</span></span>
+<span id="cb1004-24"><a href="ch-12.html#cb1004-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_max_pooling_2d</span>(<span class="at">pool_size =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb1004-25"><a href="ch-12.html#cb1004-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-26"><a href="ch-12.html#cb1004-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Add a convolution layer with 128 3x3 filters and ReLU activation</span></span>
+<span id="cb1004-27"><a href="ch-12.html#cb1004-27" aria-hidden="true" tabindex="-1"></a>    <span class="co">#add L2 regularization</span></span>
+<span id="cb1004-28"><a href="ch-12.html#cb1004-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_conv_2d</span>(<span class="at">filter =</span> <span class="dv">128</span>, <span class="at">kernel_size =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">3</span>),<span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>,<span class="at">kernel_regularizer =</span>  <span class="fu">regularizer_l2</span>(<span class="at">l =</span>  L2_rate)) <span class="sc">%&gt;%</span></span>
+<span id="cb1004-29"><a href="ch-12.html#cb1004-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-30"><a href="ch-12.html#cb1004-30" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Add a max pooling layer with 2x2 windows. This will halve the dimension of data.</span></span>
+<span id="cb1004-31"><a href="ch-12.html#cb1004-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_max_pooling_2d</span>(<span class="at">pool_size =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb1004-32"><a href="ch-12.html#cb1004-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-33"><a href="ch-12.html#cb1004-33" aria-hidden="true" tabindex="-1"></a>    <span class="co">#add a dropout layer</span></span>
+<span id="cb1004-34"><a href="ch-12.html#cb1004-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dropout</span>(<span class="at">rate =</span> drop_rate)<span class="sc">%&gt;%</span></span>
+<span id="cb1004-35"><a href="ch-12.html#cb1004-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-36"><a href="ch-12.html#cb1004-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Add a convolution layer with 128 3x3 filters and ReLU activation</span></span>
+<span id="cb1004-37"><a href="ch-12.html#cb1004-37" aria-hidden="true" tabindex="-1"></a>    <span class="co">#add L2 regularization</span></span>
+<span id="cb1004-38"><a href="ch-12.html#cb1004-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_conv_2d</span>(<span class="at">filter =</span> <span class="dv">128</span>, <span class="at">kernel_size =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">3</span>),<span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>,<span class="at">kernel_regularizer =</span>  <span class="fu">regularizer_l2</span>(<span class="at">l =</span>  L2_rate)) <span class="sc">%&gt;%</span></span>
+<span id="cb1004-39"><a href="ch-12.html#cb1004-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-40"><a href="ch-12.html#cb1004-40" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Add a max pooling layer with 2x2 windows. This will halve the dimension of data.</span></span>
+<span id="cb1004-41"><a href="ch-12.html#cb1004-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_max_pooling_2d</span>(<span class="at">pool_size =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb1004-42"><a href="ch-12.html#cb1004-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-43"><a href="ch-12.html#cb1004-43" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Squash the output of the final max pooling layer into a 1D vector</span></span>
+<span id="cb1004-44"><a href="ch-12.html#cb1004-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_flatten</span>()<span class="sc">%&gt;%</span></span>
+<span id="cb1004-45"><a href="ch-12.html#cb1004-45" aria-hidden="true" tabindex="-1"></a>    <span class="co">#add a dropout layer here</span></span>
+<span id="cb1004-46"><a href="ch-12.html#cb1004-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dropout</span>(<span class="at">rate =</span> drop_rate)<span class="sc">%&gt;%</span></span>
+<span id="cb1004-47"><a href="ch-12.html#cb1004-47" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-48"><a href="ch-12.html#cb1004-48" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Use this 1D vector as input to a single dense layer with 512 neurons</span></span>
+<span id="cb1004-49"><a href="ch-12.html#cb1004-49" aria-hidden="true" tabindex="-1"></a>    <span class="co">#add L2 regularization</span></span>
+<span id="cb1004-50"><a href="ch-12.html#cb1004-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">512</span>,<span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>,<span class="at">kernel_regularizer =</span>  <span class="fu">regularizer_l2</span>(<span class="at">l =</span>  L2_rate)) <span class="sc">%&gt;%</span></span>
+<span id="cb1004-51"><a href="ch-12.html#cb1004-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-52"><a href="ch-12.html#cb1004-52" aria-hidden="true" tabindex="-1"></a>    <span class="co">#add a dropout layer</span></span>
+<span id="cb1004-53"><a href="ch-12.html#cb1004-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dropout</span>(<span class="at">rate =</span> drop_rate)<span class="sc">%&gt;%</span></span>
+<span id="cb1004-54"><a href="ch-12.html#cb1004-54" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1004-55"><a href="ch-12.html#cb1004-55" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Finally, add a single neuron with a sigmoid activation function</span></span>
+<span id="cb1004-56"><a href="ch-12.html#cb1004-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>,<span class="at">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</span>
+<span id="cb1004-57"><a href="ch-12.html#cb1004-57" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1004-58"><a href="ch-12.html#cb1004-58" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Print out a model summary  </span></span>
+<span id="cb1004-59"><a href="ch-12.html#cb1004-59" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summary</span>(model)     </span>
+<span id="cb1004-60"><a href="ch-12.html#cb1004-60" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1004-61"><a href="ch-12.html#cb1004-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (model) </span>
+<span id="cb1004-62"><a href="ch-12.html#cb1004-62" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="compile-and-train-the-model" class="section level3" number="12.2.3">
+<h3><span class="header-section-number">12.2.3</span> Compile and train the model</h3>
+<p>Now let’s write a function to compile and train our model, using the data generators created above to feed the images into the training function. We’ll measure loss using binary cross-entropy and calculate accuracy during training as a measure of model performance. Remember, this is a useful measure for this dataset because there are an equal number of dog and cat photos.</p>
+<p>There is however something new in this function: namely a <em>callback</em> function. As used here, this callback function monitors validation loss during training. If it does not improve over specified number of epochs (usually 5), training is terminated. This way, if training has stopped improving, you don’t have to wait for the specified maximum number of epochs for training to stop. We will use this functionality later on when we train our final model. You can read more about this callback function <a href="https://keras.io/api/callbacks/early_stopping/">here</a>.</p>
+<div class="sourceCode" id="cb1005"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1005-1"><a href="ch-12.html#cb1005-1" aria-hidden="true" tabindex="-1"></a>compile_and_train <span class="ot">=</span> <span class="cf">function</span>(model, learning_rate, max_epochs, <span class="at">early_stopping =</span> F){</span>
+<span id="cb1005-2"><a href="ch-12.html#cb1005-2" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1005-3"><a href="ch-12.html#cb1005-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Compile the model</span></span>
+<span id="cb1005-4"><a href="ch-12.html#cb1005-4" aria-hidden="true" tabindex="-1"></a>    model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(<span class="at">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>, </span>
+<span id="cb1005-5"><a href="ch-12.html#cb1005-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">optimizer =</span> <span class="fu">optimizer_adam</span>(<span class="at">lr =</span> learning_rate), </span>
+<span id="cb1005-6"><a href="ch-12.html#cb1005-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">metrics =</span> <span class="fu">list</span>(<span class="st">&#39;acc&#39;</span>)</span>
+<span id="cb1005-7"><a href="ch-12.html#cb1005-7" aria-hidden="true" tabindex="-1"></a>                  ) </span>
+<span id="cb1005-8"><a href="ch-12.html#cb1005-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">#create callback object</span></span>
+<span id="cb1005-9"><a href="ch-12.html#cb1005-9" aria-hidden="true" tabindex="-1"></a>    callbacks_cnn <span class="ot">=</span> <span class="fu">list</span>()</span>
+<span id="cb1005-10"><a href="ch-12.html#cb1005-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1005-11"><a href="ch-12.html#cb1005-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">#If early stopping is requested</span></span>
+<span id="cb1005-12"><a href="ch-12.html#cb1005-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (early_stopping){</span>
+<span id="cb1005-13"><a href="ch-12.html#cb1005-13" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1005-14"><a href="ch-12.html#cb1005-14" aria-hidden="true" tabindex="-1"></a>        <span class="co">#create callback that reduces the learning rate when no improvement is observed after 3 epochs</span></span>
+<span id="cb1005-15"><a href="ch-12.html#cb1005-15" aria-hidden="true" tabindex="-1"></a>        callbacks_cnn <span class="ot">=</span> <span class="fu">append</span>(callbacks_cnn,<span class="fu">callback_reduce_lr_on_plateau</span>(<span class="at">monitor =</span> <span class="st">&quot;val_loss&quot;</span>,<span class="at">patience =</span> <span class="dv">3</span> ,<span class="at">factor =</span> <span class="fl">0.1</span>))</span>
+<span id="cb1005-16"><a href="ch-12.html#cb1005-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1005-17"><a href="ch-12.html#cb1005-17" aria-hidden="true" tabindex="-1"></a>        <span class="co">#create callback for early stopping</span></span>
+<span id="cb1005-18"><a href="ch-12.html#cb1005-18" aria-hidden="true" tabindex="-1"></a>        callbacks_cnn <span class="ot">=</span> <span class="fu">append</span>(callbacks_cnn,<span class="fu">callback_early_stopping</span>(<span class="at">monitor=</span><span class="st">&#39;val_loss&#39;</span>,<span class="at">patience =</span> <span class="dv">5</span>,<span class="at">mode =</span> <span class="st">&#39;min&#39;</span>))</span>
+<span id="cb1005-19"><a href="ch-12.html#cb1005-19" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1005-20"><a href="ch-12.html#cb1005-20" aria-hidden="true" tabindex="-1"></a>        <span class="co">#create folder to save the models</span></span>
+<span id="cb1005-21"><a href="ch-12.html#cb1005-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">dir.create</span>(<span class="st">&quot;./saved_models&quot;</span>)</span>
+<span id="cb1005-22"><a href="ch-12.html#cb1005-22" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb1005-23"><a href="ch-12.html#cb1005-23" aria-hidden="true" tabindex="-1"></a>        <span class="co">#create callbacks to save the best model when the training process terminates</span></span>
+<span id="cb1005-24"><a href="ch-12.html#cb1005-24" aria-hidden="true" tabindex="-1"></a>        callbacks_cnn <span class="ot">=</span> <span class="fu">append</span>(callbacks_cnn,</span>
+<span id="cb1005-25"><a href="ch-12.html#cb1005-25" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">callback_model_checkpoint</span>(<span class="fu">file.path</span>(<span class="st">&quot;./&quot;</span>,<span class="st">&#39;saved_models&#39;</span>,<span class="fu">paste</span>(model<span class="sc">$</span>name,<span class="st">&quot;.h5&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)),</span>
+<span id="cb1005-26"><a href="ch-12.html#cb1005-26" aria-hidden="true" tabindex="-1"></a>                                                         <span class="at">monitor=</span><span class="st">&#39;val_loss&#39;</span>,<span class="at">save_best_only =</span> T,<span class="at">mode =</span> <span class="st">&#39;min&#39;</span>))</span>
+<span id="cb1005-27"><a href="ch-12.html#cb1005-27" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1005-28"><a href="ch-12.html#cb1005-28" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1005-29"><a href="ch-12.html#cb1005-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Train the model, using the data generators created above</span></span>
+<span id="cb1005-30"><a href="ch-12.html#cb1005-30" aria-hidden="true" tabindex="-1"></a>    history <span class="ot">=</span> model <span class="sc">%&gt;%</span> </span>
+<span id="cb1005-31"><a href="ch-12.html#cb1005-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">fit_generator</span>(    </span>
+<span id="cb1005-32"><a href="ch-12.html#cb1005-32" aria-hidden="true" tabindex="-1"></a>        train_generator,</span>
+<span id="cb1005-33"><a href="ch-12.html#cb1005-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">steps_per_epoch =</span> <span class="fu">as.integer</span>(N_TRAIN<span class="sc">/</span>BATCH_SIZE_TRAIN), </span>
+<span id="cb1005-34"><a href="ch-12.html#cb1005-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">epochs =</span> max_epochs,</span>
+<span id="cb1005-35"><a href="ch-12.html#cb1005-35" aria-hidden="true" tabindex="-1"></a>        <span class="at">validation_data =</span> validation_generator,</span>
+<span id="cb1005-36"><a href="ch-12.html#cb1005-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">validation_steps =</span> <span class="fu">as.integer</span>(N_VALIDATION<span class="sc">/</span>BATCH_SIZE_VALIDATION),</span>
+<span id="cb1005-37"><a href="ch-12.html#cb1005-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">callbacks =</span> callbacks_cnn</span>
+<span id="cb1005-38"><a href="ch-12.html#cb1005-38" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1005-39"><a href="ch-12.html#cb1005-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1005-40"><a href="ch-12.html#cb1005-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span> (history)</span>
+<span id="cb1005-41"><a href="ch-12.html#cb1005-41" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Now let’s compile and train our model, using a learning rate of 0.001, a maximum number of 20 epochs, but for now without early stopping, regularization, or dropout. This will take some time. Go make a cup of tea, coffee or even hot chocolate.</p>
+<div class="sourceCode" id="cb1006"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1006-1"><a href="ch-12.html#cb1006-1" aria-hidden="true" tabindex="-1"></a>model_baseline <span class="ot">=</span> <span class="fu">build_model</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb1006-2"><a href="ch-12.html#cb1006-2" aria-hidden="true" tabindex="-1"></a>history_baseline <span class="ot">=</span> <span class="fu">compile_and_train</span>(model_baseline, <span class="fl">1e-3</span>, <span class="dv">20</span>, F)</span></code></pre></div>
+<p><strong>Checkpoint</strong>
+Take some time to digest this model summary. Make sure you understand and can answer the following questions:</p>
+<ul>
+<li><strong>A</strong>: Why is the dimensionality of the output of the first convolution layer (148, 148, 32) rather than (150, 150, 32)?</li>
+<li><strong>B</strong>: Why does the first convolution layer have 896 free parameters?</li>
+<li><strong>C</strong>: Why don’t the max-pooling layers have any free parameters?</li>
+<li><strong>D</strong>: Why does the last layer contain only a single neuron with a sigmoid activation function?</li>
+</ul>
+<p><strong>Solutions</strong></p>
+<ul>
+<li><strong>A</strong>: Because the size of the filter is 3 x 3</li>
+<li><strong>B</strong>: There are 3x3 = 9 parameters for each filter, times 3 channels (RGB), plus one bias term per filter. Thus: 32 x (9x3+1)</li>
+<li><strong>C</strong>: There are no parameters associated with these layers. The max operation is hard-coded.</li>
+<li><strong>D</strong>: This is a classification problem.</li>
+</ul>
+<p>Let’s have a look at loss and accuracy during training. Both are measured on the training data and the validation data.</p>
+<div class="sourceCode" id="cb1007"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1007-1"><a href="ch-12.html#cb1007-1" aria-hidden="true" tabindex="-1"></a><span class="co">#load history of trained models</span></span>
+<span id="cb1007-2"><a href="ch-12.html#cb1007-2" aria-hidden="true" tabindex="-1"></a>history <span class="ot">=</span> <span class="fu">readRDS</span>(<span class="st">&#39;./data/SDL_I/saved_models/models_history.rds&#39;</span>)</span>
+<span id="cb1007-3"><a href="ch-12.html#cb1007-3" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(<span class="dv">8</span>,<span class="dv">8</span>)</span>
+<span id="cb1007-4"><a href="ch-12.html#cb1007-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(history<span class="sc">$</span>baseline) <span class="sc">+</span> <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">20</span>)</span></code></pre></div>
+<p><img src="figures/output_32_1.png" /></p>
+<p>What do you observe?</p>
+<p>Notice that toward the end of model training, training accuracy approaches 1, whereas validation accuracy plateaus at a lower value, around 0.75. Similarly, training loss approaches 0, yet after around 8 epochs, validation loss begins to increase.</p>
+</div>
+<div id="reduce-overfitting" class="section level3" number="12.2.4">
+<h3><span class="header-section-number">12.2.4</span> Reduce Overfitting</h3>
+<p>These are classic symptoms of overfitting. In the lectures, we’ve learned about some techniques to avoid overfitting. Specifically, early stopping, regularization, and dropout.
+In the function <code>compile_and_train_model</code>, you can turn on early stopping by setting the parameter <code>early_stopping</code> to 1. This will force early stopping if validation loss does not decrease for 5 epochs. You can also add regularization and dropout using the first two input parameters. Below, we’ll also use another approach that is particularly amenable to image classification, namely data augmentation, and to which dropout can be applied to further improve model performance (this will be our final trained model).</p>
+<div id="weight-regularization" class="section level4" number="12.2.4.1">
+<h4><span class="header-section-number">12.2.4.1</span> Weight Regularization</h4>
+<p>Given some training data and a network architecture, multiple sets of weight
+values (multiple models) could explain the data. Simpler models are less likely to overfit than complex ones.</p>
+<p>A simple model in this context is a model with fewer parameters. Thus a common way to mitigate overfitting is to put constraints on the complexity of a network by forcing its weights to take only small values, which makes the distribution of weight values more regular. This is called <em>weight regularization</em>, and it’s
+done by adding to the loss function of the network a cost associated with having large weights. For this course, we will focus on L2 regularization.</p>
+<ul>
+<li><strong>L2 regularization</strong>: The cost added is proportional to the square of the value of the weight coefficients (the L2 norm of the weights). L2 regularization is also called <em>weight decay</em> in the context of neural networks.</li>
+</ul>
+<p>The L2 rate specifies how much we desire to shrink the weights. A value of 0 indicates no regularization while a large rate value (heavy regularization) can cause the weights to take a value very small (close to 0 which can lead to underfitting). Therefore we should choose the L2 rate very carefully.</p>
+<p>A quick note here: <em>weight regularization</em> can be applied to every model we have seen in this course so far (it is not only related to neural networks as dropout).</p>
+<p>Let’s now create a model with an <em>L2 rate</em> that equals 0.005.</p>
+<div class="sourceCode" id="cb1008"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1008-1"><a href="ch-12.html#cb1008-1" aria-hidden="true" tabindex="-1"></a>model_L2 <span class="ot">=</span> <span class="fu">build_model</span>(<span class="at">L2_rate =</span> <span class="fl">0.005</span>)</span>
+<span id="cb1008-2"><a href="ch-12.html#cb1008-2" aria-hidden="true" tabindex="-1"></a>history_L2_reg <span class="ot">=</span> <span class="fu">compile_and_train</span>(model_L2, <span class="fl">1e-3</span>, <span class="dv">20</span>, F)</span></code></pre></div>
+<div class="sourceCode" id="cb1009"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1009-1"><a href="ch-12.html#cb1009-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Model: &quot;convnet_L2_0.005_dropout_0&quot;</span></span>
+<span id="cb1009-2"><a href="ch-12.html#cb1009-2" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-3"><a href="ch-12.html#cb1009-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Layer (type)                                     Output Shape                                Param #          </span></span>
+<span id="cb1009-4"><a href="ch-12.html#cb1009-4" aria-hidden="true" tabindex="-1"></a><span class="do">## ==============================================================================================================</span></span>
+<span id="cb1009-5"><a href="ch-12.html#cb1009-5" aria-hidden="true" tabindex="-1"></a><span class="do">## conv2d (Conv2D)                                  (None, 148, 148, 32)                        896              </span></span>
+<span id="cb1009-6"><a href="ch-12.html#cb1009-6" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-7"><a href="ch-12.html#cb1009-7" aria-hidden="true" tabindex="-1"></a><span class="do">## max_pooling2d (MaxPooling2D)                     (None, 74, 74, 32)                          0                </span></span>
+<span id="cb1009-8"><a href="ch-12.html#cb1009-8" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-9"><a href="ch-12.html#cb1009-9" aria-hidden="true" tabindex="-1"></a><span class="do">## conv2d_1 (Conv2D)                                (None, 72, 72, 64)                          18496            </span></span>
+<span id="cb1009-10"><a href="ch-12.html#cb1009-10" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-11"><a href="ch-12.html#cb1009-11" aria-hidden="true" tabindex="-1"></a><span class="do">## max_pooling2d_1 (MaxPooling2D)                   (None, 36, 36, 64)                          0                </span></span>
+<span id="cb1009-12"><a href="ch-12.html#cb1009-12" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-13"><a href="ch-12.html#cb1009-13" aria-hidden="true" tabindex="-1"></a><span class="do">## conv2d_2 (Conv2D)                                (None, 34, 34, 128)                         73856            </span></span>
+<span id="cb1009-14"><a href="ch-12.html#cb1009-14" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-15"><a href="ch-12.html#cb1009-15" aria-hidden="true" tabindex="-1"></a><span class="do">## max_pooling2d_2 (MaxPooling2D)                   (None, 17, 17, 128)                         0                </span></span>
+<span id="cb1009-16"><a href="ch-12.html#cb1009-16" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-17"><a href="ch-12.html#cb1009-17" aria-hidden="true" tabindex="-1"></a><span class="do">## dropout (Dropout)                                (None, 17, 17, 128)                         0                </span></span>
+<span id="cb1009-18"><a href="ch-12.html#cb1009-18" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-19"><a href="ch-12.html#cb1009-19" aria-hidden="true" tabindex="-1"></a><span class="do">## conv2d_3 (Conv2D)                                (None, 15, 15, 128)                         147584           </span></span>
+<span id="cb1009-20"><a href="ch-12.html#cb1009-20" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-21"><a href="ch-12.html#cb1009-21" aria-hidden="true" tabindex="-1"></a><span class="do">## max_pooling2d_3 (MaxPooling2D)                   (None, 7, 7, 128)                           0                </span></span>
+<span id="cb1009-22"><a href="ch-12.html#cb1009-22" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-23"><a href="ch-12.html#cb1009-23" aria-hidden="true" tabindex="-1"></a><span class="do">## flatten (Flatten)                                (None, 6272)                                0                </span></span>
+<span id="cb1009-24"><a href="ch-12.html#cb1009-24" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-25"><a href="ch-12.html#cb1009-25" aria-hidden="true" tabindex="-1"></a><span class="do">## dropout_1 (Dropout)                              (None, 6272)                                0                </span></span>
+<span id="cb1009-26"><a href="ch-12.html#cb1009-26" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-27"><a href="ch-12.html#cb1009-27" aria-hidden="true" tabindex="-1"></a><span class="do">## dense (Dense)                                    (None, 512)                                 3211776          </span></span>
+<span id="cb1009-28"><a href="ch-12.html#cb1009-28" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-29"><a href="ch-12.html#cb1009-29" aria-hidden="true" tabindex="-1"></a><span class="do">## dropout_2 (Dropout)                              (None, 512)                                 0                </span></span>
+<span id="cb1009-30"><a href="ch-12.html#cb1009-30" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span>
+<span id="cb1009-31"><a href="ch-12.html#cb1009-31" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_1 (Dense)                                  (None, 1)                                   513              </span></span>
+<span id="cb1009-32"><a href="ch-12.html#cb1009-32" aria-hidden="true" tabindex="-1"></a><span class="do">## ==============================================================================================================</span></span>
+<span id="cb1009-33"><a href="ch-12.html#cb1009-33" aria-hidden="true" tabindex="-1"></a><span class="do">## Total params: 3,453,121</span></span>
+<span id="cb1009-34"><a href="ch-12.html#cb1009-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Trainable params: 3,453,121</span></span>
+<span id="cb1009-35"><a href="ch-12.html#cb1009-35" aria-hidden="true" tabindex="-1"></a><span class="do">## Non-trainable params: 0</span></span>
+<span id="cb1009-36"><a href="ch-12.html#cb1009-36" aria-hidden="true" tabindex="-1"></a><span class="do">## ______________________________________________________________________________________________________________</span></span></code></pre></div>
+<p>Let’s have again a look at loss and accuracy during training, both measured on the training data and the validation data.</p>
+<div class="sourceCode" id="cb1010"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1010-1"><a href="ch-12.html#cb1010-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(<span class="dv">8</span>,<span class="dv">8</span>)</span>
+<span id="cb1010-2"><a href="ch-12.html#cb1010-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(history<span class="sc">$</span>L2_reg) <span class="sc">+</span> <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">20</span>)</span></code></pre></div>
+<p><img src="figures/output_40_1.png" /></p>
+<p>It seems that overfitting has been prevented with L2 regularization since validation loss keeps decreasing as long as training loss also decreases.</p>
+</div>
+<div id="dropout" class="section level4" number="12.2.4.2">
+<h4><span class="header-section-number">12.2.4.2</span> Dropout</h4>
+<p><em>Dropout</em> is a simple and effective way to reduce overfitting. The idea behind this method is to add noise to the output of certain layers during training, thereby reducing the chance they memorize spurious (false or fake) correlations in the training data.</p>
+<p>In practice, dropout works by simply changing a certain fraction of outputs in the specified layers to zero, thus ‘dropping them out.’ This fraction is specified by the <em>dropout rate</em>, which is typically set between 0.2 and 0.5. Exactly which neurons get dropped out randomly changes for each example. To compensate for the decreased number of active neurons in layers with dropout, the layer’s outputs are scaled by the inverse of the (<code>1-dropout rate</code>). This is shown graphically in Figure <a href="ch-12.html#fig:dropout">12.3</a> with the dropout rate being 0.5.</p>
+<div class="figure" style="text-align: center"><span id="fig:dropout"></span>
+<img src="figures/dropout.png" alt="Visualization of dropout using a 0.5 dropout rate." width="75%" />
+<p class="caption">
+Figure 12.3: Visualization of dropout using a 0.5 dropout rate.
+</p>
+</div>
+<p>Dropout applied to an activation matrix at training time, with rescaling happening during training. At test time, the activation matrix is unchanged.</p>
+<div class="sourceCode" id="cb1011"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1011-1"><a href="ch-12.html#cb1011-1" aria-hidden="true" tabindex="-1"></a>model_dropout <span class="ot">=</span> <span class="fu">build_model</span>(<span class="dv">0</span>, <span class="fl">0.5</span>)</span>
+<span id="cb1011-2"><a href="ch-12.html#cb1011-2" aria-hidden="true" tabindex="-1"></a>history_dropout <span class="ot">=</span> <span class="fu">compile_and_train</span>(model_dropout, <span class="fl">1e-3</span>, <span class="dv">20</span>, F)</span></code></pre></div>
+<div class="sourceCode" id="cb1012"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1012-1"><a href="ch-12.html#cb1012-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(<span class="dv">8</span>,<span class="dv">8</span>)</span>
+<span id="cb1012-2"><a href="ch-12.html#cb1012-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(history<span class="sc">$</span>drop) <span class="sc">+</span> <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">20</span>)</span></code></pre></div>
+<p><img src="figures/output_45_1.png" /></p>
+<p>What do you observe? Compare this to the figures above using L2 regularization.</p>
+</div>
+<div id="data-augmentation" class="section level4" number="12.2.4.3">
+<h4><span class="header-section-number">12.2.4.3</span> Data augmentation</h4>
+<p>Overfitting commonly occurs on small training sets. For image data, that we are considering here, one approach to avoid such overfitting is <em>data augmentation</em>. In this approach, you generate new images via a random transformation of the training images. You thus augment your training set by generating new, believable looking images. By doing so, your model will never see the same image twice during training.</p>
+<p>Keras makes this easy with the class ImageDataGenerator. Just by tweaking a few lines of our <code>train_datagen</code> function, we can augment our dataset during training. Let’s take a look at this.</p>
+<div class="sourceCode" id="cb1013"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1013-1"><a href="ch-12.html#cb1013-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Image generatos for data augmentation</span></span>
+<span id="cb1013-2"><a href="ch-12.html#cb1013-2" aria-hidden="true" tabindex="-1"></a>train_datagen <span class="ot">=</span> <span class="fu">image_data_generator</span>(</span>
+<span id="cb1013-3"><a href="ch-12.html#cb1013-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">rescale =</span> <span class="fl">1.</span><span class="sc">/</span><span class="dv">255</span>,</span>
+<span id="cb1013-4"><a href="ch-12.html#cb1013-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">rotation_range =</span> <span class="dv">15</span>,</span>
+<span id="cb1013-5"><a href="ch-12.html#cb1013-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">width_shift_range =</span> <span class="fl">0.1</span>,</span>
+<span id="cb1013-6"><a href="ch-12.html#cb1013-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">height_shift_range =</span> <span class="fl">0.1</span>,</span>
+<span id="cb1013-7"><a href="ch-12.html#cb1013-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">shear_range =</span> <span class="fl">0.1</span>,</span>
+<span id="cb1013-8"><a href="ch-12.html#cb1013-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">zoom_range =</span> <span class="fl">0.2</span>,</span>
+<span id="cb1013-9"><a href="ch-12.html#cb1013-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">horizontal_flip =</span> T,</span>
+<span id="cb1013-10"><a href="ch-12.html#cb1013-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">fill_mode =</span> <span class="st">&#39;nearest&#39;</span></span>
+<span id="cb1013-11"><a href="ch-12.html#cb1013-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1013-12"><a href="ch-12.html#cb1013-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1013-13"><a href="ch-12.html#cb1013-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a generator for the training data</span></span>
+<span id="cb1013-14"><a href="ch-12.html#cb1013-14" aria-hidden="true" tabindex="-1"></a>train_generator <span class="ot">=</span> <span class="fu">flow_images_from_directory</span>(</span>
+<span id="cb1013-15"><a href="ch-12.html#cb1013-15" aria-hidden="true" tabindex="-1"></a>                        <span class="at">directory =</span> train_dir,</span>
+<span id="cb1013-16"><a href="ch-12.html#cb1013-16" aria-hidden="true" tabindex="-1"></a>                        <span class="at">generator =</span> train_datagen,</span>
+<span id="cb1013-17"><a href="ch-12.html#cb1013-17" aria-hidden="true" tabindex="-1"></a>                        <span class="at">target_size =</span> IMAGE_SIZE,</span>
+<span id="cb1013-18"><a href="ch-12.html#cb1013-18" aria-hidden="true" tabindex="-1"></a>                        <span class="at">batch_size =</span> BATCH_SIZE_TRAIN,</span>
+<span id="cb1013-19"><a href="ch-12.html#cb1013-19" aria-hidden="true" tabindex="-1"></a>                        <span class="at">class_mode =</span> <span class="st">&quot;binary&quot;</span></span>
+<span id="cb1013-20"><a href="ch-12.html#cb1013-20" aria-hidden="true" tabindex="-1"></a>                        )</span></code></pre></div>
+<p>Let’s have a closer look at the parameters of this function.</p>
+<ul>
+<li><p><code>rescale</code>: You’ve seen this in our first use of ‘ImageDataGenerator.’ This simply rescales the RGB values to be between 0 and 1.</p></li>
+<li><p><code>rotation_range</code>: is the range in degrees of permitted image rotations.</p></li>
+<li><p><code>width_shift_range</code>: shifts the image to the left or to the right by the fraction of the total width specified (i.e., 0.1 in this example).</p></li>
+<li><p><code>height_shift_range</code>: shifts the image up or down by the fraction of the total width specified (i.e., 0.1 in this example).</p></li>
+<li><p><code>shear_range</code>: distorts the image along an axis, in effect approximating a change in the position of the photographer.</p></li>
+<li><p><code>zoom_range</code>: zooms in and out of the image.</p></li>
+<li><p><code>horizontal_flip</code>: randomly flips the image along the horizontal axis.</p></li>
+<li><p><code>fill_mode</code>: This defines how pixels are to be filled, for example when the image is shifted such that some pixels become empty.</p></li>
+</ul>
+<p>You can read more details about this function <a href="https://keras.io/api/preprocessing/image/">here</a>.</p>
+<p>If you’d like to see more examples of how the parameters of this function affect images, see <a href="https://fairyonice.github.io/Learn-about-ImageDataGenerator.html">this blog post</a>.</p>
+<p>To get your own feel for what this function does, and to enjoy some funny cat pictures, execute the code cell below with different cats by just changing the index to the list <em>fnames</em> on line 5.</p>
+<div class="sourceCode" id="cb1014"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1014-1"><a href="ch-12.html#cb1014-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Get the file names of the test images for cats</span></span>
+<span id="cb1014-2"><a href="ch-12.html#cb1014-2" aria-hidden="true" tabindex="-1"></a>fnames <span class="ot">=</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(train_dir,<span class="st">&#39;cats&#39;</span>),<span class="at">full.names =</span> T)</span>
+<span id="cb1014-3"><a href="ch-12.html#cb1014-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1014-4"><a href="ch-12.html#cb1014-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Choose a cat</span></span>
+<span id="cb1014-5"><a href="ch-12.html#cb1014-5" aria-hidden="true" tabindex="-1"></a>cat <span class="ot">=</span> <span class="dv">1000</span></span>
+<span id="cb1014-6"><a href="ch-12.html#cb1014-6" aria-hidden="true" tabindex="-1"></a>img_path<span class="ot">=</span> fnames[cat]</span>
+<span id="cb1014-7"><a href="ch-12.html#cb1014-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1014-8"><a href="ch-12.html#cb1014-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Read, resize, and rescale the image</span></span>
+<span id="cb1014-9"><a href="ch-12.html#cb1014-9" aria-hidden="true" tabindex="-1"></a>img <span class="ot">=</span> <span class="fu">image_load</span>(img_path, <span class="at">target_size =</span> IMAGE_SIZE)</span>
+<span id="cb1014-10"><a href="ch-12.html#cb1014-10" aria-hidden="true" tabindex="-1"></a>img_tensor <span class="ot">=</span> <span class="fu">image_to_array</span>(img)</span>
+<span id="cb1014-11"><a href="ch-12.html#cb1014-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">array_reshape</span>(img_tensor,<span class="at">dim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,IMAGE_SIZE,IMAGE_CHANNELS))</span>
+<span id="cb1014-12"><a href="ch-12.html#cb1014-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1014-13"><a href="ch-12.html#cb1014-13" aria-hidden="true" tabindex="-1"></a><span class="co">#Visualize the image</span></span>
+<span id="cb1014-14"><a href="ch-12.html#cb1014-14" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(<span class="dv">10</span>,<span class="dv">6</span>)</span>
+<span id="cb1014-15"><a href="ch-12.html#cb1014-15" aria-hidden="true" tabindex="-1"></a>i <span class="ot">=</span> <span class="dv">6</span></span>
+<span id="cb1014-16"><a href="ch-12.html#cb1014-16" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">=</span> <span class="fu">list</span>()</span>
+<span id="cb1014-17"><a href="ch-12.html#cb1014-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>i){</span>
+<span id="cb1014-18"><a href="ch-12.html#cb1014-18" aria-hidden="true" tabindex="-1"></a>    batch <span class="ot">=</span> <span class="fu">iter_next</span>(<span class="fu">flow_images_from_data</span>(<span class="at">generator =</span> train_datagen,<span class="at">x =</span> x,<span class="at">batch_size =</span> <span class="dv">1</span>))</span>
+<span id="cb1014-19"><a href="ch-12.html#cb1014-19" aria-hidden="true" tabindex="-1"></a>    plots[[j]]<span class="ot">=</span><span class="fu">plotRGB</span>(batch[<span class="dv">1</span>,,,])</span>
+<span id="cb1014-20"><a href="ch-12.html#cb1014-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1014-21"><a href="ch-12.html#cb1014-21" aria-hidden="true" tabindex="-1"></a>p <span class="ot">=</span> plots[[<span class="dv">1</span>]] </span>
+<span id="cb1014-22"><a href="ch-12.html#cb1014-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>(i<span class="dv">-1</span>)){</span>
+<span id="cb1014-23"><a href="ch-12.html#cb1014-23" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">=</span> p <span class="sc">+</span> plots[[j<span class="sc">+</span><span class="dv">1</span>]]</span>
+<span id="cb1014-24"><a href="ch-12.html#cb1014-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1014-25"><a href="ch-12.html#cb1014-25" aria-hidden="true" tabindex="-1"></a>p  <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">nrow =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="figures/output_50_0.png" /></p>
+<p>Get the idea? Data augmentation stretches, moves, rotates, shears, and inverts your raw data images to produce new images, with the goal of never showing your model the same image twice during training.</p>
+<p>Now let’s put our new <code>train_datagen</code> function to work.</p>
+<div class="sourceCode" id="cb1015"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1015-1"><a href="ch-12.html#cb1015-1" aria-hidden="true" tabindex="-1"></a>model_data_augment <span class="ot">=</span> <span class="fu">build_model</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb1015-2"><a href="ch-12.html#cb1015-2" aria-hidden="true" tabindex="-1"></a>history_data_augment <span class="ot">=</span> <span class="fu">compile_and_train</span>(model_data_augment, <span class="fl">1e-3</span>, <span class="dv">20</span>, F)</span></code></pre></div>
+<div class="sourceCode" id="cb1016"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1016-1"><a href="ch-12.html#cb1016-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Model: &quot;convnet_L2_0_dropout_0&quot;</span></span>
+<span id="cb1016-2"><a href="ch-12.html#cb1016-2" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-3"><a href="ch-12.html#cb1016-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Layer (type)                        Output Shape                    Param #     </span></span>
+<span id="cb1016-4"><a href="ch-12.html#cb1016-4" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb1016-5"><a href="ch-12.html#cb1016-5" aria-hidden="true" tabindex="-1"></a><span class="do">## conv2d_12 (Conv2D)                  (None, 148, 148, 32)            896         </span></span>
+<span id="cb1016-6"><a href="ch-12.html#cb1016-6" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-7"><a href="ch-12.html#cb1016-7" aria-hidden="true" tabindex="-1"></a><span class="do">## max_pooling2d_12 (MaxPooling2D)     (None, 74, 74, 32)              0           </span></span>
+<span id="cb1016-8"><a href="ch-12.html#cb1016-8" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-9"><a href="ch-12.html#cb1016-9" aria-hidden="true" tabindex="-1"></a><span class="do">## conv2d_13 (Conv2D)                  (None, 72, 72, 64)              18496       </span></span>
+<span id="cb1016-10"><a href="ch-12.html#cb1016-10" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-11"><a href="ch-12.html#cb1016-11" aria-hidden="true" tabindex="-1"></a><span class="do">## max_pooling2d_13 (MaxPooling2D)     (None, 36, 36, 64)              0           </span></span>
+<span id="cb1016-12"><a href="ch-12.html#cb1016-12" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-13"><a href="ch-12.html#cb1016-13" aria-hidden="true" tabindex="-1"></a><span class="do">## conv2d_14 (Conv2D)                  (None, 34, 34, 128)             73856       </span></span>
+<span id="cb1016-14"><a href="ch-12.html#cb1016-14" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-15"><a href="ch-12.html#cb1016-15" aria-hidden="true" tabindex="-1"></a><span class="do">## max_pooling2d_14 (MaxPooling2D)     (None, 17, 17, 128)             0           </span></span>
+<span id="cb1016-16"><a href="ch-12.html#cb1016-16" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-17"><a href="ch-12.html#cb1016-17" aria-hidden="true" tabindex="-1"></a><span class="do">## dropout_9 (Dropout)                 (None, 17, 17, 128)             0           </span></span>
+<span id="cb1016-18"><a href="ch-12.html#cb1016-18" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-19"><a href="ch-12.html#cb1016-19" aria-hidden="true" tabindex="-1"></a><span class="do">## conv2d_15 (Conv2D)                  (None, 15, 15, 128)             147584      </span></span>
+<span id="cb1016-20"><a href="ch-12.html#cb1016-20" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-21"><a href="ch-12.html#cb1016-21" aria-hidden="true" tabindex="-1"></a><span class="do">## max_pooling2d_15 (MaxPooling2D)     (None, 7, 7, 128)               0           </span></span>
+<span id="cb1016-22"><a href="ch-12.html#cb1016-22" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-23"><a href="ch-12.html#cb1016-23" aria-hidden="true" tabindex="-1"></a><span class="do">## flatten_3 (Flatten)                 (None, 6272)                    0           </span></span>
+<span id="cb1016-24"><a href="ch-12.html#cb1016-24" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-25"><a href="ch-12.html#cb1016-25" aria-hidden="true" tabindex="-1"></a><span class="do">## dropout_10 (Dropout)                (None, 6272)                    0           </span></span>
+<span id="cb1016-26"><a href="ch-12.html#cb1016-26" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-27"><a href="ch-12.html#cb1016-27" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_6 (Dense)                     (None, 512)                     3211776     </span></span>
+<span id="cb1016-28"><a href="ch-12.html#cb1016-28" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-29"><a href="ch-12.html#cb1016-29" aria-hidden="true" tabindex="-1"></a><span class="do">## dropout_11 (Dropout)                (None, 512)                     0           </span></span>
+<span id="cb1016-30"><a href="ch-12.html#cb1016-30" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb1016-31"><a href="ch-12.html#cb1016-31" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_7 (Dense)                     (None, 1)                       513         </span></span>
+<span id="cb1016-32"><a href="ch-12.html#cb1016-32" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb1016-33"><a href="ch-12.html#cb1016-33" aria-hidden="true" tabindex="-1"></a><span class="do">## Total params: 3,453,121</span></span>
+<span id="cb1016-34"><a href="ch-12.html#cb1016-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Trainable params: 3,453,121</span></span>
+<span id="cb1016-35"><a href="ch-12.html#cb1016-35" aria-hidden="true" tabindex="-1"></a><span class="do">## Non-trainable params: 0</span></span>
+<span id="cb1016-36"><a href="ch-12.html#cb1016-36" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span></code></pre></div>
+<p>Let’s again plot the learning curves</p>
+<div class="sourceCode" id="cb1017"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1017-1"><a href="ch-12.html#cb1017-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(<span class="dv">8</span>,<span class="dv">8</span>)</span>
+<span id="cb1017-2"><a href="ch-12.html#cb1017-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(history<span class="sc">$</span>augment) <span class="sc">+</span> <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">20</span>)</span></code></pre></div>
+<p><img src="figures/output_55_1.png" /></p>
+<p>As you can see clearly above, overfitting is avoided by using the data augmentation technique.</p>
+<p>This was a lot of information and different techniques of how to avoid overfitting. So, to avoid complete confusion and provide a visual comparison, we will summarize all the different models below. This way you can see how the different techniques for reducing overfitting can change the behaviour of training and validation metrics.</p>
+<div class="sourceCode" id="cb1018"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1018-1"><a href="ch-12.html#cb1018-1" aria-hidden="true" tabindex="-1"></a>p_base <span class="ot">=</span> <span class="fu">plot</span>(history<span class="sc">$</span>baseline) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Baseline&#39;</span>) <span class="sc">+</span><span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">17</span>,<span class="at">hjust =</span> <span class="fl">0.5</span>)) </span>
+<span id="cb1018-2"><a href="ch-12.html#cb1018-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1018-3"><a href="ch-12.html#cb1018-3" aria-hidden="true" tabindex="-1"></a>p_L2 <span class="ot">=</span> <span class="fu">plot</span>(history<span class="sc">$</span>L2_reg) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;L2 Regularization&#39;</span>) <span class="sc">+</span><span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">17</span>,<span class="at">hjust =</span> <span class="fl">0.5</span>)) </span>
+<span id="cb1018-4"><a href="ch-12.html#cb1018-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1018-5"><a href="ch-12.html#cb1018-5" aria-hidden="true" tabindex="-1"></a>p_dropout <span class="ot">=</span> <span class="fu">plot</span>(history<span class="sc">$</span>drop) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Dropout&#39;</span>) <span class="sc">+</span><span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">17</span>,<span class="at">hjust =</span> <span class="fl">0.5</span>)) </span>
+<span id="cb1018-6"><a href="ch-12.html#cb1018-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1018-7"><a href="ch-12.html#cb1018-7" aria-hidden="true" tabindex="-1"></a>p_data_augment <span class="ot">=</span> <span class="fu">plot</span>(history<span class="sc">$</span>augment) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&#39;Data Augmentation&#39;</span>) <span class="sc">+</span><span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">17</span>,<span class="at">hjust =</span> <span class="fl">0.5</span>)) </span>
+<span id="cb1018-8"><a href="ch-12.html#cb1018-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1018-9"><a href="ch-12.html#cb1018-9" aria-hidden="true" tabindex="-1"></a>p_base <span class="sc">+</span> p_L2 <span class="sc">+</span> p_dropout <span class="sc">+</span> p_data_augment <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">nrow =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="figures/output_58_1.png" /></p>
+<p>Now, it’s time to train our final model so it can be used in the next section. We will be using data augmentation and dropout. Further, we’ll use early stopping and a maximum of 100 epochs. The best model will be saved automatically with the callback <code>callback_model_checkpoint</code></p>
+<div class="sourceCode" id="cb1019"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1019-1"><a href="ch-12.html#cb1019-1" aria-hidden="true" tabindex="-1"></a>model_final <span class="ot">=</span> <span class="fu">build_model</span>(<span class="dv">0</span>, <span class="fl">0.5</span>)</span>
+<span id="cb1019-2"><a href="ch-12.html#cb1019-2" aria-hidden="true" tabindex="-1"></a>history_final <span class="ot">=</span> <span class="fu">compile_and_train</span>(model_final, <span class="fl">1e-3</span>, <span class="dv">100</span>, T)</span></code></pre></div>
+<div class="sourceCode" id="cb1020"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1020-1"><a href="ch-12.html#cb1020-1" aria-hidden="true" tabindex="-1"></a><span class="do">##   Model: &quot;convnet_L2_0_dropout_0.5&quot;</span></span>
+<span id="cb1020-2"><a href="ch-12.html#cb1020-2" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-3"><a href="ch-12.html#cb1020-3" aria-hidden="true" tabindex="-1"></a><span class="do">##   Layer (type)                        Output Shape                    Param #     </span></span>
+<span id="cb1020-4"><a href="ch-12.html#cb1020-4" aria-hidden="true" tabindex="-1"></a><span class="do">##   ================================================================================</span></span>
+<span id="cb1020-5"><a href="ch-12.html#cb1020-5" aria-hidden="true" tabindex="-1"></a><span class="do">##   conv2d_16 (Conv2D)                  (None, 148, 148, 32)            896         </span></span>
+<span id="cb1020-6"><a href="ch-12.html#cb1020-6" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-7"><a href="ch-12.html#cb1020-7" aria-hidden="true" tabindex="-1"></a><span class="do">##   max_pooling2d_16 (MaxPooling2D)     (None, 74, 74, 32)              0           </span></span>
+<span id="cb1020-8"><a href="ch-12.html#cb1020-8" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-9"><a href="ch-12.html#cb1020-9" aria-hidden="true" tabindex="-1"></a><span class="do">##   conv2d_17 (Conv2D)                  (None, 72, 72, 64)              18496       </span></span>
+<span id="cb1020-10"><a href="ch-12.html#cb1020-10" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-11"><a href="ch-12.html#cb1020-11" aria-hidden="true" tabindex="-1"></a><span class="do">##   max_pooling2d_17 (MaxPooling2D)     (None, 36, 36, 64)              0           </span></span>
+<span id="cb1020-12"><a href="ch-12.html#cb1020-12" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-13"><a href="ch-12.html#cb1020-13" aria-hidden="true" tabindex="-1"></a><span class="do">##   conv2d_18 (Conv2D)                  (None, 34, 34, 128)             73856       </span></span>
+<span id="cb1020-14"><a href="ch-12.html#cb1020-14" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-15"><a href="ch-12.html#cb1020-15" aria-hidden="true" tabindex="-1"></a><span class="do">##   max_pooling2d_18 (MaxPooling2D)     (None, 17, 17, 128)             0           </span></span>
+<span id="cb1020-16"><a href="ch-12.html#cb1020-16" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-17"><a href="ch-12.html#cb1020-17" aria-hidden="true" tabindex="-1"></a><span class="do">##   dropout_12 (Dropout)                (None, 17, 17, 128)             0           </span></span>
+<span id="cb1020-18"><a href="ch-12.html#cb1020-18" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-19"><a href="ch-12.html#cb1020-19" aria-hidden="true" tabindex="-1"></a><span class="do">##   conv2d_19 (Conv2D)                  (None, 15, 15, 128)             147584      </span></span>
+<span id="cb1020-20"><a href="ch-12.html#cb1020-20" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-21"><a href="ch-12.html#cb1020-21" aria-hidden="true" tabindex="-1"></a><span class="do">##   max_pooling2d_19 (MaxPooling2D)     (None, 7, 7, 128)               0           </span></span>
+<span id="cb1020-22"><a href="ch-12.html#cb1020-22" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-23"><a href="ch-12.html#cb1020-23" aria-hidden="true" tabindex="-1"></a><span class="do">##   flatten_4 (Flatten)                 (None, 6272)                    0           </span></span>
+<span id="cb1020-24"><a href="ch-12.html#cb1020-24" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-25"><a href="ch-12.html#cb1020-25" aria-hidden="true" tabindex="-1"></a><span class="do">##   dropout_13 (Dropout)                (None, 6272)                    0           </span></span>
+<span id="cb1020-26"><a href="ch-12.html#cb1020-26" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-27"><a href="ch-12.html#cb1020-27" aria-hidden="true" tabindex="-1"></a><span class="do">##   dense_8 (Dense)                     (None, 512)                     3211776     </span></span>
+<span id="cb1020-28"><a href="ch-12.html#cb1020-28" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-29"><a href="ch-12.html#cb1020-29" aria-hidden="true" tabindex="-1"></a><span class="do">##   dropout_14 (Dropout)                (None, 512)                     0           </span></span>
+<span id="cb1020-30"><a href="ch-12.html#cb1020-30" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span>
+<span id="cb1020-31"><a href="ch-12.html#cb1020-31" aria-hidden="true" tabindex="-1"></a><span class="do">##   dense_9 (Dense)                     (None, 1)                       513         </span></span>
+<span id="cb1020-32"><a href="ch-12.html#cb1020-32" aria-hidden="true" tabindex="-1"></a><span class="do">##   ================================================================================</span></span>
+<span id="cb1020-33"><a href="ch-12.html#cb1020-33" aria-hidden="true" tabindex="-1"></a><span class="do">##   Total params: 3,453,121</span></span>
+<span id="cb1020-34"><a href="ch-12.html#cb1020-34" aria-hidden="true" tabindex="-1"></a><span class="do">##   Trainable params: 3,453,121</span></span>
+<span id="cb1020-35"><a href="ch-12.html#cb1020-35" aria-hidden="true" tabindex="-1"></a><span class="do">##   Non-trainable params: 0</span></span>
+<span id="cb1020-36"><a href="ch-12.html#cb1020-36" aria-hidden="true" tabindex="-1"></a><span class="do">##   ________________________________________________________________________________</span></span></code></pre></div>
+<div class="sourceCode" id="cb1021"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1021-1"><a href="ch-12.html#cb1021-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">load_model_hdf5</span>(<span class="st">&#39;./data/SDL_I/saved_models/final_model.h5&#39;</span>)</span></code></pre></div>
+<p>Let’s also evaluate the perfomance on the test set.</p>
+<div class="sourceCode" id="cb1022"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1022-1"><a href="ch-12.html#cb1022-1" aria-hidden="true" tabindex="-1"></a> validation_eval <span class="ot">=</span> <span class="fu">evaluate_generator</span>(model, validation_generator,<span class="at">steps =</span> <span class="fu">as.integer</span>(N_VALIDATION<span class="sc">/</span>BATCH_SIZE_VALIDATION))</span>
+<span id="cb1022-2"><a href="ch-12.html#cb1022-2" aria-hidden="true" tabindex="-1"></a> test_eval <span class="ot">=</span> <span class="fu">evaluate_generator</span>(model, test_generator,<span class="at">steps =</span> <span class="fu">as.integer</span>(N_TEST<span class="sc">/</span>BATCH_SIZE_TEST))</span>
+<span id="cb1022-3"><a href="ch-12.html#cb1022-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1022-4"><a href="ch-12.html#cb1022-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate model on validation and test data</span></span>
+<span id="cb1022-5"><a href="ch-12.html#cb1022-5" aria-hidden="true" tabindex="-1"></a> <span class="fu">cat</span>(<span class="st">&quot;Validation accuracy: &quot;</span>,validation_eval<span class="sc">$</span>acc,<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1022-6"><a href="ch-12.html#cb1022-6" aria-hidden="true" tabindex="-1"></a> <span class="fu">cat</span>(<span class="st">&quot;Test accuracy: &quot;</span>,test_eval<span class="sc">$</span>acc,<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Validation accuracy: 0.846</code></pre>
+<pre><code>## Test accuracy: 0.849</code></pre>
+<p>Great, we have a well performing model. Now let’s interpret what the CNN learns.</p>
+</div>
+</div>
+<div id="visualizing-a-cnn" class="section level3" number="12.2.5">
+<h3><span class="header-section-number">12.2.5</span> Visualizing a CNN</h3>
+<p>There are multiple ways to visualize what convolutional neural networks learn, here are three examples:</p>
+<ol style="list-style-type: decimal">
+<li><p><em><strong>Visualizing intermediate activations</strong></em> - this shows you how successive convolutional layers transform their input.</p></li>
+<li><p><em><strong>Visualizing convolutional filters</strong></em> - this shows you what visual pattern or concept a filter responds to.</p></li>
+<li><p><em><strong>Visualizing heatmaps of class activation in an image</strong></em> - this shows you which parts of an image were identified as belonging to a particular class.</p></li>
+</ol>
+<p>The activation of a layer is the output of the activation function for that layer, given some input. This shows how an input is decomposed by the different filters learned by a convolutional neural network.</p>
+<p>Let’s visualize the intermediate activations of the last convolutional neural network you trained - the one with data augmentation and dropout. We’ll start by loading the model and, as a reminder, printing its summary.</p>
+<p>Now let’s grab a random image of a cat from the test set, get it in the right format, and visualize it.</p>
+<div class="sourceCode" id="cb1025"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1025-1"><a href="ch-12.html#cb1025-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the file names of the test images for cats</span></span>
+<span id="cb1025-2"><a href="ch-12.html#cb1025-2" aria-hidden="true" tabindex="-1"></a>fnames <span class="ot">=</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(test_dir,<span class="st">&#39;dogs&#39;</span>),<span class="at">full.names =</span> T)</span>
+<span id="cb1025-3"><a href="ch-12.html#cb1025-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1025-4"><a href="ch-12.html#cb1025-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Choose a cat</span></span>
+<span id="cb1025-5"><a href="ch-12.html#cb1025-5" aria-hidden="true" tabindex="-1"></a>cat <span class="ot">=</span> <span class="dv">50</span></span>
+<span id="cb1025-6"><a href="ch-12.html#cb1025-6" aria-hidden="true" tabindex="-1"></a>img_path<span class="ot">=</span> fnames[cat]</span>
+<span id="cb1025-7"><a href="ch-12.html#cb1025-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1025-8"><a href="ch-12.html#cb1025-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Read, resize, and rescale the image</span></span>
+<span id="cb1025-9"><a href="ch-12.html#cb1025-9" aria-hidden="true" tabindex="-1"></a>img <span class="ot">=</span> <span class="fu">image_load</span>(img_path, <span class="at">target_size =</span> IMAGE_SIZE)</span>
+<span id="cb1025-10"><a href="ch-12.html#cb1025-10" aria-hidden="true" tabindex="-1"></a>img_tensor <span class="ot">=</span> <span class="fu">image_to_array</span>(img)</span>
+<span id="cb1025-11"><a href="ch-12.html#cb1025-11" aria-hidden="true" tabindex="-1"></a>img_tensor <span class="ot">=</span> img_tensor <span class="sc">*</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">255</span></span>
+<span id="cb1025-12"><a href="ch-12.html#cb1025-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1025-13"><a href="ch-12.html#cb1025-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize the image</span></span>
+<span id="cb1025-14"><a href="ch-12.html#cb1025-14" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(<span class="dv">7</span>,<span class="dv">7</span>)</span>
+<span id="cb1025-15"><a href="ch-12.html#cb1025-15" aria-hidden="true" tabindex="-1"></a><span class="fu">plotRGB</span>(img_tensor)</span></code></pre></div>
+<p>To visualize the intermediate activations, you’ll create a Keras model that takes an image as input and outputs the activations of all the convolution layers. This is simply a model that shows you how the neurons in each layer of your trained network respond to a particular image.</p>
+<div class="sourceCode" id="cb1026"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1026-1"><a href="ch-12.html#cb1026-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Extract the outputs of the top eight convolution layers</span></span>
+<span id="cb1026-2"><a href="ch-12.html#cb1026-2" aria-hidden="true" tabindex="-1"></a>n_layers <span class="ot">=</span> <span class="dv">8</span></span>
+<span id="cb1026-3"><a href="ch-12.html#cb1026-3" aria-hidden="true" tabindex="-1"></a>layers_outputs <span class="ot">=</span> <span class="fu">list</span>()</span>
+<span id="cb1026-4"><a href="ch-12.html#cb1026-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_layers){</span>
+<span id="cb1026-5"><a href="ch-12.html#cb1026-5" aria-hidden="true" tabindex="-1"></a>    layers_outputs[[i]] <span class="ot">=</span> <span class="fu">get_layer</span>(model,<span class="at">index =</span> i)<span class="sc">$</span>output</span>
+<span id="cb1026-6"><a href="ch-12.html#cb1026-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1026-7"><a href="ch-12.html#cb1026-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1026-8"><a href="ch-12.html#cb1026-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Create a model that returns the activation of the top eight convolution layers, </span></span>
+<span id="cb1026-9"><a href="ch-12.html#cb1026-9" aria-hidden="true" tabindex="-1"></a><span class="co">#given an input image</span></span>
+<span id="cb1026-10"><a href="ch-12.html#cb1026-10" aria-hidden="true" tabindex="-1"></a>activation_model <span class="ot">=</span> <span class="fu">keras_model</span>(<span class="at">inputs =</span> model<span class="sc">$</span>input, <span class="at">outputs =</span> layers_outputs)</span>
+<span id="cb1026-11"><a href="ch-12.html#cb1026-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1026-12"><a href="ch-12.html#cb1026-12" aria-hidden="true" tabindex="-1"></a><span class="co">#Get the activations of the top eight convolution layers, given the cat </span></span>
+<span id="cb1026-13"><a href="ch-12.html#cb1026-13" aria-hidden="true" tabindex="-1"></a><span class="co">#image selected above</span></span>
+<span id="cb1026-14"><a href="ch-12.html#cb1026-14" aria-hidden="true" tabindex="-1"></a>activations <span class="ot">=</span> <span class="fu">predict</span>(activation_model,<span class="fu">array_reshape</span>(img_tensor,<span class="at">dim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,IMAGE_SIZE,IMAGE_CHANNELS)))</span></code></pre></div>
+<div class="sourceCode" id="cb1027"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1027-1"><a href="ch-12.html#cb1027-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Get the first layer activations</span></span>
+<span id="cb1027-2"><a href="ch-12.html#cb1027-2" aria-hidden="true" tabindex="-1"></a>first_layer_activation <span class="ot">=</span> activations[[<span class="dv">1</span>]]</span>
+<span id="cb1027-3"><a href="ch-12.html#cb1027-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1027-4"><a href="ch-12.html#cb1027-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Get filter i from the first layer</span></span>
+<span id="cb1027-5"><a href="ch-12.html#cb1027-5" aria-hidden="true" tabindex="-1"></a>i <span class="ot">=</span> <span class="dv">3</span></span>
+<span id="cb1027-6"><a href="ch-12.html#cb1027-6" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(<span class="dv">7</span>,<span class="dv">7</span>)</span>
+<span id="cb1027-7"><a href="ch-12.html#cb1027-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_filter</span>(first_layer_activation[<span class="dv">1</span>,,,i])</span></code></pre></div>
+<p><img src="figures/output_72_0.png" /></p>
+<p>What do you observe?
+It appears this 3rd filter encodes an edge detector.</p>
+<p>How about other filters?
+Rerun the code cell for different filters. You can do this by changing the value of <em>i</em>, currently <em>i=3</em>, on line 5 of the code cell above to any number between 1 and 32.</p>
+<p>See anything else that interests you?</p>
+<p>Let’s go ahead and visualize the intermediate activations of all of the filters of all of the convolution layers.</p>
+<p>Go and choose pic 50 from dogs. What do you observe? Can you see how the filter works as a leash detector? This makes a lot of sense considering that dogs are seldom without a leash and cats always! That can be a very powerful feature for our classifier.</p>
+<div class="sourceCode" id="cb1028"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1028-1"><a href="ch-12.html#cb1028-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Get the layer names</span></span>
+<span id="cb1028-2"><a href="ch-12.html#cb1028-2" aria-hidden="true" tabindex="-1"></a>layer_names <span class="ot">=</span> <span class="fu">list</span>()</span>
+<span id="cb1028-3"><a href="ch-12.html#cb1028-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ( i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_layers){</span>
+<span id="cb1028-4"><a href="ch-12.html#cb1028-4" aria-hidden="true" tabindex="-1"></a>    layer_names[[i]] <span class="ot">=</span> <span class="fu">get_layer</span>(model,<span class="at">index =</span> i)<span class="sc">$</span>name</span>
+<span id="cb1028-5"><a href="ch-12.html#cb1028-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1028-6"><a href="ch-12.html#cb1028-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1028-7"><a href="ch-12.html#cb1028-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1028-8"><a href="ch-12.html#cb1028-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Set the number of images per row</span></span>
+<span id="cb1028-9"><a href="ch-12.html#cb1028-9" aria-hidden="true" tabindex="-1"></a>images_per_row <span class="ot">=</span> <span class="dv">16</span></span>
+<span id="cb1028-10"><a href="ch-12.html#cb1028-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1028-11"><a href="ch-12.html#cb1028-11" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">=</span> <span class="fu">list</span>()</span>
+<span id="cb1028-12"><a href="ch-12.html#cb1028-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1028-13"><a href="ch-12.html#cb1028-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_layers){</span>
+<span id="cb1028-14"><a href="ch-12.html#cb1028-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1028-15"><a href="ch-12.html#cb1028-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Number of features in this feature map</span></span>
+<span id="cb1028-16"><a href="ch-12.html#cb1028-16" aria-hidden="true" tabindex="-1"></a>    n_features <span class="ot">=</span> <span class="fu">dim</span>(activations[[i]])[<span class="dv">4</span>]</span>
+<span id="cb1028-17"><a href="ch-12.html#cb1028-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1028-18"><a href="ch-12.html#cb1028-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">#The feature map has the shape (I, size, size, n_features)</span></span>
+<span id="cb1028-19"><a href="ch-12.html#cb1028-19" aria-hidden="true" tabindex="-1"></a>    size <span class="ot">=</span> <span class="fu">dim</span>(activations[[i]])[<span class="dv">2</span>]</span>
+<span id="cb1028-20"><a href="ch-12.html#cb1028-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1028-21"><a href="ch-12.html#cb1028-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Number of columns for display</span></span>
+<span id="cb1028-22"><a href="ch-12.html#cb1028-22" aria-hidden="true" tabindex="-1"></a>    n_rows <span class="ot">=</span> <span class="fu">as.integer</span>(n_features<span class="sc">/</span>images_per_row)</span>
+<span id="cb1028-23"><a href="ch-12.html#cb1028-23" aria-hidden="true" tabindex="-1"></a>    display_grid <span class="ot">=</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,<span class="at">nrow =</span> size <span class="sc">*</span> n_rows,<span class="at">ncol =</span> images_per_row <span class="sc">*</span> size)</span>
+<span id="cb1028-24"><a href="ch-12.html#cb1028-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1028-25"><a href="ch-12.html#cb1028-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(row <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_rows){</span>
+<span id="cb1028-26"><a href="ch-12.html#cb1028-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span>(col <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>images_per_row){</span>
+<span id="cb1028-27"><a href="ch-12.html#cb1028-27" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1028-28"><a href="ch-12.html#cb1028-28" aria-hidden="true" tabindex="-1"></a>            <span class="co">#Get the activation response</span></span>
+<span id="cb1028-29"><a href="ch-12.html#cb1028-29" aria-hidden="true" tabindex="-1"></a>            filter_image <span class="ot">=</span> activations[[i]][<span class="dv">1</span>,,,(row<span class="dv">-1</span>) <span class="sc">*</span> images_per_row <span class="sc">+</span> col]</span>
+<span id="cb1028-30"><a href="ch-12.html#cb1028-30" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1028-31"><a href="ch-12.html#cb1028-31" aria-hidden="true" tabindex="-1"></a>            <span class="co">#Do some post-processing to make the image easier to see</span></span>
+<span id="cb1028-32"><a href="ch-12.html#cb1028-32" aria-hidden="true" tabindex="-1"></a>            filter_image <span class="ot">=</span> filter_image <span class="sc">-</span> <span class="fu">mean</span>(filter_image)</span>
+<span id="cb1028-33"><a href="ch-12.html#cb1028-33" aria-hidden="true" tabindex="-1"></a>            filter_image <span class="ot">=</span> filter_image<span class="sc">*</span><span class="dv">64</span></span>
+<span id="cb1028-34"><a href="ch-12.html#cb1028-34" aria-hidden="true" tabindex="-1"></a>            filter_image <span class="ot">=</span> filter_image <span class="sc">+</span> <span class="dv">128</span></span>
+<span id="cb1028-35"><a href="ch-12.html#cb1028-35" aria-hidden="true" tabindex="-1"></a>            filter_image <span class="ot">=</span> <span class="fu">pmax</span>(<span class="fu">pmin</span>(filter_image, <span class="dv">255</span>), <span class="dv">0</span>)</span>
+<span id="cb1028-36"><a href="ch-12.html#cb1028-36" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb1028-37"><a href="ch-12.html#cb1028-37" aria-hidden="true" tabindex="-1"></a>            <span class="co">#Add to the grid of images</span></span>
+<span id="cb1028-38"><a href="ch-12.html#cb1028-38" aria-hidden="true" tabindex="-1"></a>            display_grid[((row<span class="dv">-1</span>)<span class="sc">*</span>size<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(row<span class="sc">*</span>size),((col<span class="dv">-1</span>)<span class="sc">*</span>size<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(col<span class="sc">*</span>size)] <span class="ot">=</span> filter_image</span>
+<span id="cb1028-39"><a href="ch-12.html#cb1028-39" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb1028-40"><a href="ch-12.html#cb1028-40" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1028-41"><a href="ch-12.html#cb1028-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1028-42"><a href="ch-12.html#cb1028-42" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Only visualize the intermediate activations of the convolutional layers</span></span>
+<span id="cb1028-43"><a href="ch-12.html#cb1028-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">length</span>(<span class="fu">grep</span>(<span class="st">&#39;conv&#39;</span>,layer_names[[i]]))<span class="sc">!=</span><span class="dv">0</span>){</span>
+<span id="cb1028-44"><a href="ch-12.html#cb1028-44" aria-hidden="true" tabindex="-1"></a>        conv_layers <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>)</span>
+<span id="cb1028-45"><a href="ch-12.html#cb1028-45" aria-hidden="true" tabindex="-1"></a>        plots[[<span class="fu">which</span>(i <span class="sc">==</span> conv_layers)]] <span class="ot">=</span> <span class="fu">plot_filter</span>(display_grid)</span>
+<span id="cb1028-46"><a href="ch-12.html#cb1028-46" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1028-47"><a href="ch-12.html#cb1028-47" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1028-48"><a href="ch-12.html#cb1028-48" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1028-49"><a href="ch-12.html#cb1028-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1028-50"><a href="ch-12.html#cb1028-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot all the filters for each layer</span></span>
+<span id="cb1028-51"><a href="ch-12.html#cb1028-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1028-52"><a href="ch-12.html#cb1028-52" aria-hidden="true" tabindex="-1"></a><span class="co"># 1st layer</span></span>
+<span id="cb1028-53"><a href="ch-12.html#cb1028-53" aria-hidden="true" tabindex="-1"></a>n_filters <span class="ot">=</span> <span class="fu">dim</span>(activations[[<span class="dv">1</span>]])[<span class="dv">4</span>]</span>
+<span id="cb1028-54"><a href="ch-12.html#cb1028-54" aria-hidden="true" tabindex="-1"></a>n_rows <span class="ot">=</span> <span class="fu">as.integer</span>(n_filters<span class="sc">/</span>images_per_row)</span>
+<span id="cb1028-55"><a href="ch-12.html#cb1028-55" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(images_per_row <span class="sc">+</span><span class="dv">1</span>,n_rows <span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb1028-56"><a href="ch-12.html#cb1028-56" aria-hidden="true" tabindex="-1"></a>plots[[<span class="dv">1</span>]]<span class="sc">+</span><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;1st CNN Layer&quot;</span>)<span class="sc">+</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">22</span>,<span class="at">hjust =</span> <span class="fl">0.5</span>))</span>
+<span id="cb1028-57"><a href="ch-12.html#cb1028-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1028-58"><a href="ch-12.html#cb1028-58" aria-hidden="true" tabindex="-1"></a><span class="co"># 2nd layer</span></span>
+<span id="cb1028-59"><a href="ch-12.html#cb1028-59" aria-hidden="true" tabindex="-1"></a>n_filters <span class="ot">=</span> <span class="fu">dim</span>(activations[[<span class="dv">3</span>]])[<span class="dv">4</span>]</span>
+<span id="cb1028-60"><a href="ch-12.html#cb1028-60" aria-hidden="true" tabindex="-1"></a>n_rows <span class="ot">=</span> <span class="fu">as.integer</span>(n_filters<span class="sc">/</span>images_per_row)</span>
+<span id="cb1028-61"><a href="ch-12.html#cb1028-61" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(images_per_row <span class="sc">+</span><span class="dv">1</span>,n_rows<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb1028-62"><a href="ch-12.html#cb1028-62" aria-hidden="true" tabindex="-1"></a>plots[[<span class="dv">2</span>]]<span class="sc">+</span><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;2nd CNN Layer&quot;</span>)<span class="sc">+</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">22</span>,<span class="at">hjust =</span> <span class="fl">0.5</span>))</span>
+<span id="cb1028-63"><a href="ch-12.html#cb1028-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1028-64"><a href="ch-12.html#cb1028-64" aria-hidden="true" tabindex="-1"></a><span class="co"># 3rd layer</span></span>
+<span id="cb1028-65"><a href="ch-12.html#cb1028-65" aria-hidden="true" tabindex="-1"></a>n_filters <span class="ot">=</span> <span class="fu">dim</span>(activations[[<span class="dv">5</span>]])[<span class="dv">4</span>]</span>
+<span id="cb1028-66"><a href="ch-12.html#cb1028-66" aria-hidden="true" tabindex="-1"></a>n_rows <span class="ot">=</span> <span class="fu">as.integer</span>(n_filters<span class="sc">/</span>images_per_row)</span>
+<span id="cb1028-67"><a href="ch-12.html#cb1028-67" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(images_per_row <span class="sc">+</span><span class="dv">1</span>,n_rows<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb1028-68"><a href="ch-12.html#cb1028-68" aria-hidden="true" tabindex="-1"></a>plots[[<span class="dv">3</span>]]<span class="sc">+</span><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;3rd CNN Layer&quot;</span>)<span class="sc">+</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">22</span>,<span class="at">hjust =</span> <span class="fl">0.5</span>))</span>
+<span id="cb1028-69"><a href="ch-12.html#cb1028-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1028-70"><a href="ch-12.html#cb1028-70" aria-hidden="true" tabindex="-1"></a><span class="co"># 4th layer</span></span>
+<span id="cb1028-71"><a href="ch-12.html#cb1028-71" aria-hidden="true" tabindex="-1"></a>n_filters <span class="ot">=</span> <span class="fu">dim</span>(activations[[<span class="dv">7</span>]])[<span class="dv">4</span>]</span>
+<span id="cb1028-72"><a href="ch-12.html#cb1028-72" aria-hidden="true" tabindex="-1"></a>n_rows <span class="ot">=</span> <span class="fu">as.integer</span>(n_filters<span class="sc">/</span>images_per_row)</span>
+<span id="cb1028-73"><a href="ch-12.html#cb1028-73" aria-hidden="true" tabindex="-1"></a><span class="fu">fig_size</span>(images_per_row <span class="sc">+</span><span class="dv">1</span>,n_rows<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb1028-74"><a href="ch-12.html#cb1028-74" aria-hidden="true" tabindex="-1"></a>plots[[<span class="dv">4</span>]]<span class="sc">+</span><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;4th CNN Layer&quot;</span>)<span class="sc">+</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">22</span>,<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code></pre></div>
+<p><img src="figures/output_76_0.png" />
+<img src="figures/output_76_1.png" />
+<img src="figures/output_76_2.png" />
+<img src="figures/output_76_3.png" /></p>
+<p>To guide you a little, here are a few things to note:</p>
+<ul>
+<li><p>The first layer is a collection of edge detectors. The activations maintain most of the information present in the original image. They still look like cats.</p></li>
+<li><p>As you go to deeper layers, the activations become increasingly abstract and harder to interpret. They encode higher-level concepts, like “cat ear.” These activations carry increasingly less information about the raw content of the image and increasingly more information about the class of the image.</p></li>
+<li><p>As you go into even deeper layers, there is a greater proportion of empty activations. This means the patterns encoded by these higher-level layers are not found in this particular image.</p></li>
+</ul>
+<p>These three points relate to a universal characteristic of data representation in convolutional neural networks. As you go deeper into the network, the features extracted by each layer become increasingly abstract. They carry less information about the specific input image and more about its label. In this way, convolutional neural networks act as information distillation pipelines.</p>
+<p>Go back a few cells and see what happens with other cats. It’s really fun to see what these filters are picking up!</p>
+</div>
+</div>
+<div id="exercise-9" class="section level2" number="12.3">
+<h2><span class="header-section-number">12.3</span> Exercise</h2>
+<p>The purpose of this exercise is to create a CNN model for a multiclass classification problem.</p>
+<p>So far, a binary classification problem was considered. However, in practice, there are several cases where more than 2 classes have to be considered. For example, the <a href="https://en.wikipedia.org/wiki/MNIST_database">mnist</a> dataset consists of handwritten digit images and in total contains 10 different classes (number 0 to number 9).</p>
+<p>The goal of this exercise is to create a model that takes the handwritten image as input and predicts the number which is written in this image.</p>
+<p>Regarding the modelling part of multiclass classification problem the only thing that changes, compared to a binary classification problem, is the number of nodes and the activation function on the output layer. Also, a different loss function has to be considered (‘categorical_crossentropy’). In other words, the number of nodes of the output layer should equal the number of discrete classes (10 in our case).
+Furthermore, the activation function of the output layer is the ‘softmax’ activation which converts each output node to a probability of the corresponding class. Therefore, for a prediction, we choose the class where its node gives the maximum probability.</p>
+<p>Furthermore, a skeleton code is provided which does the preprocessing and creates a baseline model.</p>
+<p>Your task is to create a CNN architecture that outperforms the baseline model. The data are class balanced so accuracy can be used in this case. You should use dropout and/or regularization to avoid overfitting. Also, comment on the number of trainable parameters for each model.</p>
+<div id="import-libraries-and-data" class="section level3" number="12.3.1">
+<h3><span class="header-section-number">12.3.1</span> Import libraries and data</h3>
+<div class="sourceCode" id="cb1029"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1029-1"><a href="ch-12.html#cb1029-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb1029-2"><a href="ch-12.html#cb1029-2" aria-hidden="true" tabindex="-1"></a><span class="fu">use_condaenv</span>()</span>
+<span id="cb1029-3"><a href="ch-12.html#cb1029-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
+<span id="cb1029-4"><a href="ch-12.html#cb1029-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tensorflow)</span>
+<span id="cb1029-5"><a href="ch-12.html#cb1029-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1029-6"><a href="ch-12.html#cb1029-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsample)</span></code></pre></div>
+<p>IMPORTANT NOTE: READ CAREFULLY!</p>
+<p>Do not skip this part or you’ll run into issues later on!
+In a moment, after you’ve read the following instructions carefully, you should:
+- run the code chunk immediately below this text (<code>keras_model_sequential()</code>).
+- look down in the <em>Console</em> it asks if you want to install some packages: (“Would you like to install Miniconda? [Y/n]:”).
+- write <em>n</em> and press enter. You should see the following code in the console: <code>Would you like to install Miniconda? [Y/n]: n</code>.
+Now, you can normally continue with the exercise.</p>
+<p>If you were too eager and already pressed <em>Y</em> (yes) and enter, don’t panic! Just close your environment, re-open it and make sure that next time you go with <em>n</em> (no).</p>
+</div>
+<div id="tasks" class="section level3" number="12.3.2">
+<h3><span class="header-section-number">12.3.2</span> Tasks</h3>
+<div class="sourceCode" id="cb1030"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1030-1"><a href="ch-12.html#cb1030-1" aria-hidden="true" tabindex="-1"></a><span class="fu">keras_model_sequential</span>()</span></code></pre></div>
+<p><em>Load mnist dataset:</em></p>
+<div class="sourceCode" id="cb1031"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1031-1"><a href="ch-12.html#cb1031-1" aria-hidden="true" tabindex="-1"></a>mnist <span class="ot">=</span> <span class="fu">dataset_mnist</span>()</span>
+<span id="cb1031-2"><a href="ch-12.html#cb1031-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1031-3"><a href="ch-12.html#cb1031-3" aria-hidden="true" tabindex="-1"></a><span class="co"># take train and test set</span></span>
+<span id="cb1031-4"><a href="ch-12.html#cb1031-4" aria-hidden="true" tabindex="-1"></a>train <span class="ot">=</span> mnist<span class="sc">$</span>train</span>
+<span id="cb1031-5"><a href="ch-12.html#cb1031-5" aria-hidden="true" tabindex="-1"></a>test <span class="ot">=</span> mnist<span class="sc">$</span>test</span></code></pre></div>
+<ol style="list-style-type: decimal">
+<li>Plot an image</li>
+</ol>
+<div class="sourceCode" id="cb1032"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1032-1"><a href="ch-12.html#cb1032-1" aria-hidden="true" tabindex="-1"></a>index_image <span class="ot">=</span> <span class="dv">5</span> <span class="do">## change this index to see different image.</span></span>
+<span id="cb1032-2"><a href="ch-12.html#cb1032-2" aria-hidden="true" tabindex="-1"></a>input_matrix <span class="ot">=</span> train<span class="sc">$</span>x[index_image,,]</span>
+<span id="cb1032-3"><a href="ch-12.html#cb1032-3" aria-hidden="true" tabindex="-1"></a>output_matrix <span class="ot">&lt;-</span> <span class="fu">apply</span>(input_matrix, <span class="dv">2</span>, rev)</span>
+<span id="cb1032-4"><a href="ch-12.html#cb1032-4" aria-hidden="true" tabindex="-1"></a>output_matrix <span class="ot">&lt;-</span> <span class="fu">t</span>(output_matrix)</span>
+<span id="cb1032-5"><a href="ch-12.html#cb1032-5" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(output_matrix, <span class="at">col=</span><span class="fu">gray.colors</span>(<span class="dv">256</span>), <span class="at">xlab=</span><span class="fu">paste</span>(<span class="st">&#39;Image for digit &#39;</span>, train<span class="sc">$</span>y[index_image]), <span class="at">ylab=</span><span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Specify image size and number of classes</li>
+</ol>
+<div class="sourceCode" id="cb1033"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1033-1"><a href="ch-12.html#cb1033-1" aria-hidden="true" tabindex="-1"></a>img_size <span class="ot">=</span> <span class="fu">dim</span>(train<span class="sc">$</span>x)[<span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb1033-2"><a href="ch-12.html#cb1033-2" aria-hidden="true" tabindex="-1"></a>img_channels <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb1033-3"><a href="ch-12.html#cb1033-3" aria-hidden="true" tabindex="-1"></a>n_classes <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">unique</span>(train<span class="sc">$</span>y))</span>
+<span id="cb1033-4"><a href="ch-12.html#cb1033-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;Image size: &#39;</span>,<span class="fu">c</span>(img_size,img_channels),<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1033-5"><a href="ch-12.html#cb1033-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;Total classes: &#39;</span>,n_classes)</span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Create a validation set using stratified split and rescale input to [0,1]</li>
+</ol>
+<div class="sourceCode" id="cb1034"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1034-1"><a href="ch-12.html#cb1034-1" aria-hidden="true" tabindex="-1"></a><span class="co">#make stratified split</span></span>
+<span id="cb1034-2"><a href="ch-12.html#cb1034-2" aria-hidden="true" tabindex="-1"></a>split <span class="ot">=</span> <span class="fu">initial_split</span>(<span class="fu">data.frame</span>(<span class="st">&#39;y&#39;</span><span class="ot">=</span>train<span class="sc">$</span>y),<span class="at">prop =</span> <span class="fl">0.8</span>,<span class="at">strata =</span> <span class="st">&#39;y&#39;</span>)</span>
+<span id="cb1034-3"><a href="ch-12.html#cb1034-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1034-4"><a href="ch-12.html#cb1034-4" aria-hidden="true" tabindex="-1"></a><span class="co">#train set</span></span>
+<span id="cb1034-5"><a href="ch-12.html#cb1034-5" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">=</span> train<span class="sc">$</span>x[split<span class="sc">$</span>in_id,,]</span>
+<span id="cb1034-6"><a href="ch-12.html#cb1034-6" aria-hidden="true" tabindex="-1"></a><span class="do">##rescale to [0,1]</span></span>
+<span id="cb1034-7"><a href="ch-12.html#cb1034-7" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">=</span> x_train<span class="sc">/</span><span class="dv">255</span></span>
+<span id="cb1034-8"><a href="ch-12.html#cb1034-8" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">=</span> train<span class="sc">$</span>y[split<span class="sc">$</span>in_id]</span>
+<span id="cb1034-9"><a href="ch-12.html#cb1034-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1034-10"><a href="ch-12.html#cb1034-10" aria-hidden="true" tabindex="-1"></a><span class="co">#validation set</span></span>
+<span id="cb1034-11"><a href="ch-12.html#cb1034-11" aria-hidden="true" tabindex="-1"></a>x_val <span class="ot">=</span> train<span class="sc">$</span>x[<span class="sc">-</span>split<span class="sc">$</span>in_id,,]</span>
+<span id="cb1034-12"><a href="ch-12.html#cb1034-12" aria-hidden="true" tabindex="-1"></a><span class="do">##rescale to [0,1]</span></span>
+<span id="cb1034-13"><a href="ch-12.html#cb1034-13" aria-hidden="true" tabindex="-1"></a>x_val <span class="ot">=</span> x_val<span class="sc">/</span><span class="dv">255</span></span>
+<span id="cb1034-14"><a href="ch-12.html#cb1034-14" aria-hidden="true" tabindex="-1"></a>y_val <span class="ot">=</span> train<span class="sc">$</span>y[<span class="sc">-</span>split<span class="sc">$</span>in_id]</span>
+<span id="cb1034-15"><a href="ch-12.html#cb1034-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1034-16"><a href="ch-12.html#cb1034-16" aria-hidden="true" tabindex="-1"></a><span class="co">#test set</span></span>
+<span id="cb1034-17"><a href="ch-12.html#cb1034-17" aria-hidden="true" tabindex="-1"></a>x_test <span class="ot">=</span> test<span class="sc">$</span>x</span>
+<span id="cb1034-18"><a href="ch-12.html#cb1034-18" aria-hidden="true" tabindex="-1"></a><span class="do">##rescale to [0,1]</span></span>
+<span id="cb1034-19"><a href="ch-12.html#cb1034-19" aria-hidden="true" tabindex="-1"></a>x_test <span class="ot">=</span> x_test<span class="sc">/</span><span class="dv">255</span></span>
+<span id="cb1034-20"><a href="ch-12.html#cb1034-20" aria-hidden="true" tabindex="-1"></a>y_test <span class="ot">=</span> test<span class="sc">$</span>y</span></code></pre></div>
+<ol start="4" style="list-style-type: decimal">
+<li>Encode classes to one-hot vectors</li>
+</ol>
+<div class="sourceCode" id="cb1035"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1035-1"><a href="ch-12.html#cb1035-1" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">=</span> <span class="fu">to_categorical</span>(y_train, n_classes)</span>
+<span id="cb1035-2"><a href="ch-12.html#cb1035-2" aria-hidden="true" tabindex="-1"></a>y_val <span class="ot">=</span>  <span class="fu">to_categorical</span>(y_val,n_classes)</span>
+<span id="cb1035-3"><a href="ch-12.html#cb1035-3" aria-hidden="true" tabindex="-1"></a>y_test <span class="ot">=</span> <span class="fu">to_categorical</span>(y_test, n_classes)</span>
+<span id="cb1035-4"><a href="ch-12.html#cb1035-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1035-5"><a href="ch-12.html#cb1035-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(y_train)</span></code></pre></div>
+<ol start="5" style="list-style-type: decimal">
+<li>Create and train the baseline model</li>
+</ol>
+<p>A simple approach would be to create a vector (flatten the 2d input matrix) from the input image and then to apply a feed-forward neural network (i.e. dense layers). You are already provided with a trained model (because it takes a long time to train it from scratch), so you do not have to run the fit function. You just have to load the model.</p>
+<p>You don’t have to run the following chunk but have a look at this model nevertheless.</p>
+<div class="sourceCode" id="cb1036"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1036-1"><a href="ch-12.html#cb1036-1" aria-hidden="true" tabindex="-1"></a>ffnn_model <span class="ot">=</span> <span class="fu">keras_model_sequential</span>()</span>
+<span id="cb1036-2"><a href="ch-12.html#cb1036-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1036-3"><a href="ch-12.html#cb1036-3" aria-hidden="true" tabindex="-1"></a>ffnn_model <span class="sc">%&gt;%</span> <span class="fu">layer_flatten</span>(<span class="at">input_shape =</span> img_size) <span class="sc">%&gt;%</span></span>
+<span id="cb1036-4"><a href="ch-12.html#cb1036-4" aria-hidden="true" tabindex="-1"></a>          <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1024</span>,<span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb1036-5"><a href="ch-12.html#cb1036-5" aria-hidden="true" tabindex="-1"></a>          <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">512</span>,<span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb1036-6"><a href="ch-12.html#cb1036-6" aria-hidden="true" tabindex="-1"></a>          <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">256</span>,<span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1036-7"><a href="ch-12.html#cb1036-7" aria-hidden="true" tabindex="-1"></a>          <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">128</span>,<span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1036-8"><a href="ch-12.html#cb1036-8" aria-hidden="true" tabindex="-1"></a>          <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">10</span>,<span class="at">activation =</span> <span class="st">&#39;softmax&#39;</span>)</span>
+<span id="cb1036-9"><a href="ch-12.html#cb1036-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1036-10"><a href="ch-12.html#cb1036-10" aria-hidden="true" tabindex="-1"></a>ffnn_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb1036-11"><a href="ch-12.html#cb1036-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&#39;categorical_crossentropy&#39;</span>,</span>
+<span id="cb1036-12"><a href="ch-12.html#cb1036-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="fu">optimizer_adam</span>(<span class="at">lr =</span> <span class="fl">0.001</span>),</span>
+<span id="cb1036-13"><a href="ch-12.html#cb1036-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&#39;accuracy&#39;</span>)</span>
+<span id="cb1036-14"><a href="ch-12.html#cb1036-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1036-15"><a href="ch-12.html#cb1036-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1036-16"><a href="ch-12.html#cb1036-16" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="fu">file.path</span>(<span class="st">&#39;saved_models&#39;</span>))</span>
+<span id="cb1036-17"><a href="ch-12.html#cb1036-17" aria-hidden="true" tabindex="-1"></a>save_ffnn <span class="ot">=</span> <span class="fu">file.path</span>(<span class="st">&#39;saved_models&#39;</span>,<span class="st">&#39;baseline.h5&#39;</span>) </span>
+<span id="cb1036-18"><a href="ch-12.html#cb1036-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1036-19"><a href="ch-12.html#cb1036-19" aria-hidden="true" tabindex="-1"></a>callbacks_ffnn <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">callback_early_stopping</span>(<span class="at">monitor=</span><span class="st">&#39;val_loss&#39;</span>,<span class="at">patience =</span> <span class="dv">5</span>,<span class="at">mode =</span> <span class="st">&#39;min&#39;</span>),</span>
+<span id="cb1036-20"><a href="ch-12.html#cb1036-20" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">callback_model_checkpoint</span>(save_ffnn,<span class="at">monitor=</span><span class="st">&#39;val_loss&#39;</span>,<span class="at">save_best_only =</span> T,<span class="at">mode =</span> <span class="st">&#39;min&#39;</span>))</span>
+<span id="cb1036-21"><a href="ch-12.html#cb1036-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1036-22"><a href="ch-12.html#cb1036-22" aria-hidden="true" tabindex="-1"></a><span class="co">#history_ffnn = fit(ffnn_model,x_train, y_train, epochs = 20, batch_size = 128,</span></span>
+<span id="cb1036-23"><a href="ch-12.html#cb1036-23" aria-hidden="true" tabindex="-1"></a><span class="co">#                  validation_data = list(x_val,y_val),callbacks = callbacks_ffnn)</span></span></code></pre></div>
+<ol start="6" style="list-style-type: decimal">
+<li>Load the saved Baseline model and evaluate the performance on validation and test set</li>
+</ol>
+<div class="sourceCode" id="cb1037"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1037-1"><a href="ch-12.html#cb1037-1" aria-hidden="true" tabindex="-1"></a>model_ffnn <span class="ot">=</span> <span class="fu">load_model_hdf5</span>(<span class="st">&quot;./data/SDL_I/saved_models/baseline.h5&quot;</span>)</span>
+<span id="cb1037-2"><a href="ch-12.html#cb1037-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1037-3"><a href="ch-12.html#cb1037-3" aria-hidden="true" tabindex="-1"></a><span class="co">#evalute accuracy</span></span>
+<span id="cb1037-4"><a href="ch-12.html#cb1037-4" aria-hidden="true" tabindex="-1"></a>val_acc <span class="ot">=</span> <span class="fu">evaluate</span>(model_ffnn,x_val,y_val)[[<span class="dv">2</span>]]</span>
+<span id="cb1037-5"><a href="ch-12.html#cb1037-5" aria-hidden="true" tabindex="-1"></a>test_acc <span class="ot">=</span> <span class="fu">evaluate</span>(model_ffnn,x_test,y_test)[[<span class="dv">2</span>]]</span>
+<span id="cb1037-6"><a href="ch-12.html#cb1037-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1037-7"><a href="ch-12.html#cb1037-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;Validation Accuracy: &#39;</span>, val_acc,<span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span>
+<span id="cb1037-8"><a href="ch-12.html#cb1037-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;Test Accuracy: &#39;</span>,test_acc,<span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span></code></pre></div>
+<p><em>Next steps to code:</em></p>
+<ol style="list-style-type: decimal">
+<li>Create a CNN architecture</li>
+<li>Train the model
+Hint: reshape your inputs so that they match the desired dimension of the input_shape in <code>layer_conv_2d</code>. Use callbacks for early stopping and model checkpoint (look at the baseline model).</li>
+<li>Load the saved model, evaluate performance on validation and test set</li>
+<li>Print summary of both models and comment on the number of parameters</li>
+</ol>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="ch-11.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="ch-13.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
