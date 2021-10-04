@@ -1,0 +1,45 @@
+---
+title: "Recap Wrangling"
+author: "Beni"
+date: "10/4/2021"
+output: html_document
+---
+
+## Tidy data
+
+After manually tidying the data sheet, it looks like this:
+```{r}
+library(tidyverse)
+df <- read_csv("~/polybox/Shared/Data Science Lecture Planning - shared folder/4 Datasets/groenigen14sci_tidy_example.csv")
+df
+```
+
+There are still two aspects that violate the tidy data paradigm.
+
+First, the column `Experiment` contains information for multiple aspects: the experiment name (in the example above: 'China OTC'), and the nitrogen fertilisation treatment ('low N'). This should be separated into two columns:
+```{r}
+df <- df %>% 
+  separate(Experiment, sep = " - ", into = c("experiment", "nfert"))
+df
+```
+
+The second non-tidy aspect is that the same variable (soil organic matter content) appears in two columns, one representing the mean of multiple measurements under ambient CO2 (`aco2_mean`, number of individual measurements given by `n_a`), and one representing the mean of measurements under elevated CO2 (`eco2_mean`, number given by `n_e`). This is a practical format here because we can easily calculate quantities that are a function of both. For example, calculating the log-response ratio as:
+```{r}
+df %>% 
+  mutate(logrr = log(eco2_mean / aco2_mean))
+```
+
+However, for plotting with `ggplot`, where the information whether it's from ambient or from elevated CO2 is mapped onto the 'color' aesthetic, we need to convert this from "wide format" into a "long format".
+```{r}
+df_long <- df %>% 
+  pivot_longer(c(aco2_mean, eco2_mean), names_to = "co2_treatment", values_to = "mean")
+df_long
+```
+
+This can now be plotted, whereby `co2_treatment` is mapped onto the `color` aesthetic, and with an automatically generated legend.
+```{r}
+df_long %>% 
+  ggplot(aes(x = mean, y = ..density.., color = co2_treatment)) +
+  geom_density()
+```
+
