@@ -121,6 +121,10 @@ This also illustrates why the pre-processing step has to be considered as a blue
 Let's finally turn to the implementation with KNN. First, we make the initial data split.
 
 ```{r message=F}
+list_pkgs <- c("ggplot2", "patchwork", "caret", "recipes", "broom", "tidyverse", "vip", "pdp")
+new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
+if (length(new_pkgs) > 0) install.packages(new_pkgs)
+
 # As always we start by loading the packages we'll need
 library(ggplot2)
 library(patchwork)
@@ -128,6 +132,8 @@ library(caret)
 library(recipes)
 library(broom)
 library(tidyverse)
+library(vip)
+library(pdp)
 ```
 
 ```{r}
@@ -355,9 +361,9 @@ In the examples for this course, we have thus far focussed on regression models.
 
 Quantifying metrics is one part of model evaluation. The other part is to get an intuitive understanding of the model-observation agreement and where and why they fail. Getting there is an integral part of exploratory data analysis. One of the first steps after obtaining results from your initial model is to investigate its residuals (the difference between predicted and observed values) and their pattern. If you can detect a clear pattern or trend in your residuals, then your model has room for improvement. 
 
-Our example dataset contains time series of multiple variables. Above, we have not used time as a predictor but values in the dataframe are ordered by time along rows. An obvious first step is to look at residuals and their relationship with time (or simply row number in our case).
+Our example data set contains time series of multiple variables. Above, we have not used time as a predictor but values in the data frame are ordered by time along rows. An obvious first step is to look at residuals and their relationship with time (or simply row number in our case).
 
-A handy function to add predictions and residuals from a fitted model to the data (must contain the variables used in the model), is [`augment`](https://broom.tidymodels.org/reference/data.frame_tidiers.html) from the tidyverse [*broom*](https://broom.tidymodels.org/index.html) package. It adds informations about observations to a dataset. 
+A handy function to add predictions and residuals from a fitted model to the data (must contain the variables used in the model), is [`augment`](https://broom.tidymodels.org/reference/data.frame_tidiers.html) from the tidyverse [*broom*](https://broom.tidymodels.org/index.html) package [@R-broom]. It adds information about observations to a data set. 
 
 Let's fit a linear regression model `GPP_NT_VUT_REF ~ PPFD_IN` and look at the residuals.
 
@@ -457,7 +463,7 @@ ggplot()+
          linetype = guide_legend(order = 2))
 ```
 
-Variable importance in a fitted model can be assessed in R using the **vip** package. If we provide a linear regression model as argument, it automatically uses the absolute value of the *t*-statistic for quantifying the variable importance.
+Variable importance in a fitted model can be assessed in R using the **vip** package [@R-vip]. If we provide a linear regression model as argument, it automatically uses the absolute value of the *t*-statistic for quantifying the variable importance.
 
 ```{r}
 library(vip)
@@ -581,7 +587,7 @@ vip(
 
 #### Partial dependence plots
 
-While variable importance analysis is helpful for understanding which predictors are helping us predict, *partial dependence plots* (PDPs) yield information on what the relationship between one individual predictor and the target variable looks like. It quantifies how the response of the target variable changes when we vary one particular predictor and hold all the remaining predictors at a constant value. If this is still a little muddy, the pseudo-code of this algorithm should make things clear (from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/iml.html#partial-dependence)). 
+While variable importance analysis is helpful for understanding which predictors are helping us predict, *partial dependence plots* (PDPs) yield information on what the relationship between one individual predictor and the target variable looks like. It quantifies how the response of the target variable changes when we vary one particular predictor and hold all the remaining predictors at a constant value. If this is still a little muddy, the pseudo-code of this algorithm should make things clear (see [this](https://bradleyboehmke.github.io/HOML/iml.html#partial-dependence) by @boehmke_hands-machine_2019). 
 
 ```{r eval=F}
 For a selected predictor (x)
@@ -601,7 +607,7 @@ Considering Figure \@ref(fig:pdp), to compute the PDP of target variable with re
 knitr::include_graphics("./figures/pdp-illustration.png")
 ```
 
-Lucky for us, this code has already been implemented in the `pdp` package in R.  We use the `partial()` function to plot the partial dependence plot for a single predictor variable, `PPFD_IN` or `VPD_F`, or for a subset of both these variables. Since our models are linear, we expect the PDP curves to be linear as well. The first curve shows a positive linear relationship between `PPFD_IN` and the target y_hat (`GPP_NT_VUT_REF`), i.e. as the `PPFD_IN` increases, the target increases. Whereas the second curve shows us that there is a negative linear dependence between `VPD_F` and `GPP_NT_VUT_REF`. The final plot shows a 2D partial dependence plot with `PPFD_IN` and `VPD_F`, and this follows a linear relationship too. As expected, we get the highest value for our target variable in the lower right corner and the smallest value in the upper left corner.
+Lucky for us, this code has already been implemented in the **pdp** package in R [@R-pdp].  We use the `partial()` function to plot the partial dependence plot for a single predictor variable, `PPFD_IN` or `VPD_F`, or for a subset of both these variables. Since our models are linear, we expect the PDP curves to be linear as well. The first curve shows a positive linear relationship between `PPFD_IN` and the target y_hat (`GPP_NT_VUT_REF`), i.e. as the `PPFD_IN` increases, the target increases. Whereas the second curve shows us that there is a negative linear dependence between `VPD_F` and `GPP_NT_VUT_REF`. The final plot shows a 2D partial dependence plot with `PPFD_IN` and `VPD_F`, and this follows a linear relationship too. As expected, we get the highest value for our target variable in the lower right corner and the smallest value in the upper left corner.
 
 ```{r}
 library(pdp)
@@ -613,7 +619,7 @@ partial(linmod3, "VPD_F", plot = TRUE)
 partial(linmod3, c("PPFD_IN", "VPD_F"), plot = TRUE)
 ```
 
-The `pdp` package works with various model classes. For classes that are not available, a prediction wrapper function has to be specified as described for example [here](https://bradleyboehmke.github.io/HOML/iml.html#implementation-6). If you want to learn more about PDP, have a look the online book by [Christoph Molnar](https://christophm.github.io/interpretable-ml-book/).
+The `pdp` package works with various model classes. For classes that are not available, a prediction wrapper function has to be specified as described for example [here](https://bradleyboehmke.github.io/HOML/iml.html#implementation-6) [@boehmke_hands-machine_2019]. If you want to learn more about PDP, have a look the [online book](https://christophm.github.io/interpretable-ml-book/) by @molnar_interpretable_2019.
 
 Note: The computational demand of partial dependence analysis rapidly increases as the number of search grid points (`j` in the algorithm description above) rises. 
 

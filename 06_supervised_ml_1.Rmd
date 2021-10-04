@@ -102,6 +102,10 @@ $$ Note that here, $X$, $Y$, and $\epsilon$ are vectors of length corresponding 
 First, let's load some packages that we will use in this tutorial.
 
 ```{r message=F, warning=F}
+list_pkgs <- c("tidyverse", "ggplot2", "modelr", "forcats", "yardstick", "recipes", "caret", "broom", "patchwork")
+new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
+if (length(new_pkgs) > 0) install.packages(new_pkgs)
+
 library(tidyverse)
 library(ggplot2)
 library(modelr)
@@ -110,6 +114,7 @@ library(yardstick)
 library(recipes)
 library(caret)
 library(broom)
+library(patchwork)
 ```
 
 To fit a univariate linear regression model in R, we can use the `lm()` function. Already in Chapter \@ref(ch-02), we made linear models by doing:
@@ -176,7 +181,7 @@ The RMSE is also reported in the output of `summary()` as the `Residual standard
 sigma(linmod1)^2
 ```
 
-Although `summary()` provides a nice, human-readable output, you may find it unpractical to work with. A set of relevant quantities are returned in a tidy format using `tidy()` from the broom package:
+Although `summary()` provides a nice, human-readable output, you may find it unpractical to work with. A set of relevant quantities are returned in a tidy format using `tidy()` from the **broom** package [@R-broom]:
 
 ```{r}
 library(broom)
@@ -193,7 +198,7 @@ A further limitation is that least squares regression requires $n>p$. In words: 
 
 When multiple predictors are linearly correlated, then linear regression cannot discern individual effects and individual predictors may appear statistically insignificant when they would be significant if covarying predicotrs were not included in the model. Such instability can get propagated to predictions. Again, stepwise regression can be used to remedy this problem. However, when one predictor covaries with multiple other predictors, this may not work. For many applications in environmental sciences, we deal with limited numbers of predictors. We can use our own knowledge to examine potentially problematic covariations and make an informed pre-selection rather than throwing all predictors we can possibly think of at our models. Such a pre-selection can be guided by the model performance on a validation data set (more on that below).
 
-An alternative strategy is to use *dimension reduction* methods. Principal Component regression reduces the data to capture only the complementary axes along which our data varies and therefore collapses covarying predictors into a single one that represents their common axis of variation. Partial Least Squares regression works similarly but modifies the principal components so that they are maximally correlated to the target variable. You can read more on their implementation in R [here](https://bradleyboehmke.github.io/HOML/linear-regression.html#PCR).
+An alternative strategy is to use *dimension reduction* methods. Principal Component regression reduces the data to capture only the complementary axes along which our data varies and therefore collapses covarying predictors into a single one that represents their common axis of variation. Partial Least Squares regression works similarly but modifies the principal components so that they are maximally correlated to the target variable. You can read more on their implementation in R [here](https://bradleyboehmke.github.io/HOML/linear-regression.html#PCR) in the book *Hands-on Machine Learning with R* by @boehmke_hands-machine_2019.
 
 **Checkpoint**
 
@@ -232,7 +237,7 @@ $$
 
 ### Essential methods for the modelling process
 
-Building a ML model is an iterative process and it is typically not possible to know which ML algorithm will perform best when you start with the process. It is also essential that you understand your data in order to apply appropriate pre-processing steps, splitting your data wisely into training and testing sets, building a robust model, and achieving an informative model evaluation. This section introduces essential methods of the modelling process that allow you to walk a safe (and hopefully still spectacular) path. This section is inspired by the fantastic tutorial [*Hands On Machine Learning in R* by Boehmke & Gladwell](https://bradleyboehmke.github.io/HOML).
+Building a ML model is an iterative process and it is typically not possible to know which ML algorithm will perform best when you start with the process. It is also essential that you understand your data in order to apply appropriate pre-processing steps, splitting your data wisely into training and testing sets, building a robust model, and achieving an informative model evaluation. This section introduces essential methods of the modelling process that allow you to walk a safe (and hopefully still spectacular) path. This section is inspired by the fantastic tutorial [*Hands On Machine Learning in R*](https://bradleyboehmke.github.io/HOML) [@boehmke_hands-machine_2019].
 
 #### Model formulation
 
@@ -242,7 +247,7 @@ Remember that the aim of supervised ML is to find a model $\hat{Y} = f(X)$ so th
 lm(GPP_NT_VUT_REF ~ PPFD_IN + VPD_F + TA_F, data = df)
 ```
 
-Actually, the way we formulate a model is independent of the algorithm, or *engine* that takes care of fitting $f(X)$. The R package [**caret**](https://topepo.github.io/caret/) provides a unified interface for using different ML algorithms implemented in separate packages. In other words, it acts as a *wrapper* for multiple different model fitting, or ML algorithms. This has the advantage that it unifies the interface (the way arguments are provided). caret also provides implementations for a set of commonly used tools for data processing (which we won't use here), model training, and evaluation. We'll use caret for model training with the function `train()` (more on model training in Chapter \@ref(ch-07)). Note however, that using a specific algorithm, which is implemented in a specific package outside caret, also requires that the respective package be installed and loaded. Using caret for specifying the same linear regression model as above, using the base-R `lm()` function, can be done with caret in a generalized form as:
+Actually, the way we formulate a model is independent of the algorithm, or *engine* that takes care of fitting $f(X)$. The R package [**caret**](https://topepo.github.io/caret/) [@R-caret] provides a unified interface for using different ML algorithms implemented in separate packages. In other words, it acts as a *wrapper* for multiple different model fitting, or ML algorithms. This has the advantage that it unifies the interface (the way arguments are provided). caret also provides implementations for a set of commonly used tools for data processing (which we won't use here), model training, and evaluation. We'll use caret for model training with the function `train()` (more on model training in Chapter \@ref(ch-07)). Note however, that using a specific algorithm, which is implemented in a specific package outside caret, also requires that the respective package be installed and loaded. Using caret for specifying the same linear regression model as above, using the base-R `lm()` function, can be done with caret in a generalized form as:
 
 ```{r message=F, warning=F}
 library(caret)
@@ -291,7 +296,7 @@ In environmental sciences, the number of predictors is often smaller than the sa
 
 An important aspect to consider when splitting our data is to make sure that all "states" of the system for which we have data are approximately equally represented in training and testing sets. This is to make sure that the algorithm learns relationships $f(X)$ also under rare conditions $X$, for example meteorological extreme events.
 
-Several alternative functions for the data splitting step are available from different packages in R. Figure \@ref(fig:sample) shows an example for their implementation using base R (`sample`), caret (`createDataPartition`), and rsample (`initial_split`, combined with `training` and `testing`) and their resulting distribution of soil water content values (`SWC_F_MDS_1`) in training and testing sets.
+Several alternative functions for the data splitting step are available from different packages in R. Figure \@ref(fig:sample) shows an example for their implementation using base R (`sample`), **caret** (`createDataPartition`), and **rsample** (`initial_split`, combined with `training` and `testing` [@R-rsample]) and their resulting distribution of soil water content values (`SWC_F_MDS_1`) in training and testing sets.
 
 ```{r eval=F}
 ## using base-R
@@ -339,7 +344,7 @@ knitr::include_graphics("./figures/datasplitting_strata.png")
 
 ### Bonus
 
-To generalize this and achieve a sort of "stratification" with respect to all predictors, we can use the [`maxDissim`](https://topepo.github.io/caret/data-splitting.html#splitting-based-on-the-predictors) function from the **caret** package (uses the **proxy** package). It samples the most dissimilar data points after an initial pick and thus achieves a good representation of the entire feature space in our training set.
+To generalize this and achieve a sort of "stratification" with respect to all predictors, we can use the [`maxDissim`](https://topepo.github.io/caret/data-splitting.html#splitting-based-on-the-predictors) function from the **caret** package (uses the **proxy** package [@R-proxy]). It samples the most dissimilar data points after an initial pick and thus achieves a good representation of the entire feature space in our training set.
 
 ```{r eval=F}
 library(proxy)
@@ -360,6 +365,8 @@ Target engineering refers to pre-processing of the target variable. Its applicat
 
 In our data set of half-hourly ecosystem flux and meteorological measurements, the variable `WS_F` (wind speed) is skewed. The target variable that we have considered so far (`GPP_NT_VUT_REF`) is not skewed. In a case where we would consider `WS_F` to be our target variable, we would thus consider applying a log-transformation.
 
+To make our figures easily comparable we will combine the two panels into one plot using the R package **patchwork** [@R-patchwork].
+
 ```{r message=F, warning=F}
 library(patchwork)  # to combine two plots into separate panels of a single plot
 
@@ -378,7 +385,7 @@ gg1 + gg2   # the + is from the patchwork library
 
 When defining any pre-processing step, it should be specified as a "recipe" or "blueprint", and not actually executed on the data itself before we start with the model training. Such a "recipe" can then be applied to any new data, while the parameters of the data pre-processing transformations are different each time. The reason for not actually executing the data transformation is *data leakage*. It happens when information from the validation data somehow finds its way into the training step. Don't worry if this sounds incomprehensible. We'll learn more about it below. For now, you can focus on the types of pre-processing steps, what they do, and how they are implemented as part of a pre-processing "recipe" in R.
 
-The [**recipes**](https://recipes.tidymodels.org/) package offers a powerful way to specify pre-processing steps in R and is gaining traction as part of the [tidymodels](https://www.tidymodels.org/) ecosystem. It allows us to sequentially build a pre-processing pipeline using the pipe (`%>%`) operator.
+The [**recipes**](https://recipes.tidymodels.org/) package [@R-recipes] offers a powerful way to specify pre-processing steps in R and is gaining traction as part of the [tidymodels](https://www.tidymodels.org/) ecosystem. It allows us to sequentially build a pre-processing pipeline using the pipe (`%>%`) operator.
 
 ```{r}
 library(recipes)
@@ -393,7 +400,7 @@ y(\lambda) = \begin{cases}
 \frac{Y^\lambda-1}{\lambda}, &\; y \neq 0\\ 
 \log(Y),                     &\; y = 0
 \end{cases}
-$$ $\lambda$ is treated as a parameter that is fitted such that the resulting distribution of values $y$ approaches the normal distribution. To specify a Box-Cox-transformation as part of the pre-processing, we can use `step_BoxCox()` from the recipes package. How do transformed values look like? The strict separation of the pre-processing recipe from its execution on the data also forces us to be explict about what part of the data (training vs. validation/testing subsets) are used for determining pre-processing parameters. Let's be clear about this in the next example and apply the initial data split first here and use the training subset for the recipe.
+$$ $\lambda$ is treated as a parameter that is fitted such that the resulting distribution of values $y$ approaches the normal distribution. To specify a Box-Cox-transformation as part of the pre-processing, we can use `step_BoxCox()` from the recipes package. How do transformed values look like? The strict separation of the pre-processing recipe from its execution on the data also forces us to be explicit about what part of the data (training vs. validation/testing subsets) are used for determining pre-processing parameters. Let's be clear about this in the next example and apply the initial data split first here and use the training subset for the recipe.
 
 ```{r}
 library(rsample)
@@ -437,7 +444,7 @@ recipe(WS_F ~ ., data = df) %>%
 
 #### Standardization
 
-Several algorithms explicitly require data to be standardized. That is, values of all predictors vary within a comparable range. The necessity of this step becomes obvious when considering KNN, where the magnitude of the distance is strongly influenced by the order of magnitude of the predictor values. To get a quick overview of the distribution of all variables (columns) in our data frame, we can use the skimr package.
+Several algorithms explicitly require data to be standardized. That is, values of all predictors vary within a comparable range. The necessity of this step becomes obvious when considering KNN, where the magnitude of the distance is strongly influenced by the order of magnitude of the predictor values. To get a quick overview of the distribution of all variables (columns) in our data frame, we can use the **skimr** package [@R-skimr].
 
 ```{r eval=FALSE}
 library(skimr)
@@ -503,7 +510,7 @@ recipe(GPP_NT_VUT_REF ~ ., data = df) %>%
 
 **Checkpoint**
 
-Apply a one-hot encoding to the to the variable Species from the data set iris (from the package data sets). Load the data by `library(datasets)`. The dataset's name is `iris`. Visualize the result.
+Apply a one-hot encoding to the to the variable Species from the data set iris (from the package **datasets** [@R-datasets] ). Load the data by `library(datasets)`. The dataset's name is `iris`. Visualize the result.
 
 **Solution**
 
@@ -631,4 +638,4 @@ In R, this conversion from a wide to a long table (usable with ggplot) is done i
 values_redicted <- predict(modl, newdata = df)
 ```
 
-This returns a vector of predicted values of the same length as rows in `df`. To get the RMSE of predicted vs. observed values, you can use the function `rmse()` from the tidyverse package *yardstick*. Check `?yardstick::rmse` for more information.
+This returns a vector of predicted values of the same length as rows in `df`. To get the RMSE of predicted vs. observed values, you can use the function `rmse()` from the tidyverse package **yardstick** [@R-yardstick]. Check `?yardstick::rmse` for more information.
