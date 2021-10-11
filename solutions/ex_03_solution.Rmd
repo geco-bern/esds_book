@@ -20,6 +20,7 @@ df <- read_csv("../data/ex03_data.csv")
 **b. Load both the _'ETOPO.tif'_ raster and the _'europe_shape'_ shapefile. Plot the shape of Europe over the raster.**
 (Since we used the shapefile in the tutorial too, it isn't located in the same folder as the data for this exercise. You'll have to use the correct pathway to load it, if you are unsure about how to find this use the 'Files' tab on the right can help you figure it out.)
 ```{r}
+## XXX would be good to use the same data and functions for continent outline as in Ex. 1e: geom_sf(data = world)
 library(raster)
 library(rgdal)
 rtopo <- raster("../data/ETOPO.tif")
@@ -41,6 +42,16 @@ plot(elevations_etopo~df$elevation, pch=16,
                      xlab = "Correct elevations",
                      ylab = "ETOPO elevations") +
 abline(a = 0, b = 1, col = "red") 
+```
+
+Or with ggplot, this is
+```{r}
+ggplot(data = df, aes(elevations_etopo, elevation)) +
+  geom_point() +
+  labs(x = "Correct elevations (m)",
+       y = "ETOPO elevations (m)") + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dotted") +
+  theme_classic()   # personal preference over default theme
 ```
 
 ***
@@ -91,31 +102,43 @@ df <- tibble(df, elevations_etopo)
 **a. Correlate the ETOPO elevations at the towers sites with the temperatures measured at the towers.**
 
 ```{r}
-reg1 <- lm(temperature~elevations_etopo, data=df) 
+reg1 <- lm(temperature ~ elevations_etopo, data = df) 
 ```
 
 We plot our data with the linear model.
 ```{r out.width = "75%"}
-plot(temperature~elevations_etopo, data =df, pch=16,
-                     xlab = "ETOPO elevations",
-                     ylab = "Temperatures in Celsius") +
+plot(temperature ~ elevations_etopo, data = df, pch = 16,
+                     xlab = "ETOPO elevation",
+                     ylab = "Temperature (°C)") +
 abline(reg1, col = "red") 
 ```
 
 ***
+
 **b. Correlate the elevations measured at the tower sites with the temperatures measured at the towers.**
 
 ```{r}
-reg2 <- lm(temperature~elevation, data=df) 
+reg2 <- lm(temperature ~ elevation, data = df) 
 ```
 
 We plot our data with the linear model.
 ```{r out.width = "75%"}
-plot(temperature~elevation, data =df, pch=16,
-                     xlab = "Correct elevations",
-                     ylab = "Temperatures in Celsius") +
+plot(temperature ~ elevation, data = df, pch=16,
+                     xlab = "Measured elevation (m)",
+                     ylab = "Temperature (°C)") +
 abline(reg2, col = "red") 
 ```
+
+With ggplot, we can use `geom_smooth(method = "lm")` to add a linear regression fit as a "smoothing" line through the points.
+```{r}
+ggplot(data = df, aes(elevation, temperature)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(x = "Measured elevation (m)", y = "Temperature (°C)") +
+  theme_classic()
+```
+
+
 
 ***
 **c. What is the mean squared errors of the two models above. Which of the two correlates better?**
@@ -130,9 +153,11 @@ mean(reg2$residuals^2)
 
 Correct elevations suits a bit better, but there is no big difference.
 
-We can plot the residuals on the european map.
+We can plot the residuals on the European map.
 
 ```{r}
+## xxx please explain pospal(), can you find a simpler solution for displaying a continuous color scale
+## and make sure the color scale is added to the plot as a legend.
 pospal <- colorRampPalette(c("royalblue2", "orangered1"))
 datColabs1 <- pospal(10)[as.numeric(cut(reg1$residuals,breaks = 10))] 
 
