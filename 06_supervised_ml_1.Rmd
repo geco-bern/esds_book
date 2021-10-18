@@ -211,7 +211,7 @@ lm(GPP_NT_VUT_REF ~ PPFD_IN, data = df %>% mutate(GPP_NT_VUT_REF = GPP_NT_VUT_RE
 lm(GPP_NT_VUT_REF ~ PPFD_IN, data = df)
 ```
 
-Of course, this simply corresponds to an upward shift of all points by 1, and thefore an upward shift of the regression line by 1. The slope $\beta_1$ doesn't change, but the y-axis intercept $\beta_0$ increases by 1.
+Of course, this simply corresponds to an upward shift of all points by 1, and therfore an upward shift of the regression line by 1. The slope $\beta_1$ doesn't change, but the y-axis intercept $\beta_0$ increases by 1.
 
 ### K-nearest neighbours
 
@@ -397,8 +397,8 @@ The formula, specified as an argument in the `recipe()` function, defines variab
 
 A log-transformation doesn't necessarily result in a perfect normal distribution of transformed values. The *Box-Cox* can get us closer. It can be considered a generalization of the log-transformation. Values are transformed according to the following function: $$
 y(\lambda) = \begin{cases}  
-\frac{Y^\lambda-1}{\lambda}, &\; y \neq 0\\ 
-\log(Y),                     &\; y = 0
+\frac{Y^\lambda-1}{\lambda}, &\; \lambda \neq 0\\ 
+\log(Y),                     &\; \lambda = 0
 \end{cases}
 $$ $\lambda$ is treated as a parameter that is fitted such that the resulting distribution of values $y$ approaches the normal distribution. To specify a Box-Cox-transformation as part of the pre-processing, we can use `step_BoxCox()` from the recipes package. How do transformed values look like? The strict separation of the pre-processing recipe from its execution on the data also forces us to be explicit about what part of the data (training vs. validation/testing subsets) are used for determining pre-processing parameters. Let's be clear about this in the next example and apply the initial data split first here and use the training subset for the recipe.
 
@@ -530,7 +530,7 @@ rec$template$Species_virginica
 
 Several ML algorithms require missing values to be removed. That is, if any of the cells in one row has a missing value, the entire cell gets removed. We've seen how this is implemented in Chapter \@ref(ch-02) for example with `na.omit()` or `tidyr::drop_na()`. Data may be missing for several reasons. Some yield random patterns of missing data, others not. In the latter case, we can speak of *informative missingness* (Kuhn & Johnson, 2003) and its information can be used for predictions. For categorical data, we may replace such data with `"none"` (instead of `NA`), while randomly missing data may be dropped altogether. Some ML algorithms (mainly tree-based methods, e.g., random forest) can handle missing values. However, when comparing the performance of alternative ML algorithms, they should be tested with the same data and removing missing data should be done beforehand.
 
-Visualising missing data is essential for making decisions about dropping rows with missing data versus removing predictors from the model (which would imply too much data removal). The cells with missing data in a data frame can be visualised either using ggplot and `geom_raster()` or similarly (with additional information about the percentage of missing data for each variable) with `vis_miss()` from the `visdat` package. Note: the code below is set to `raw` since the notebook sturggles to handle the amount of values in *hhdf*. We have provided the results as images instead.
+Visualising missing data is essential for making decisions about dropping rows with missing data versus removing predictors from the model (which would imply too much data removal). The cells with missing data in a data frame can be visualised either using ggplot and `geom_raster()` or similarly (with additional information about the percentage of missing data for each variable) with `vis_miss()` from the `visdat` package. Note: the code below is set to `raw` since the notebook struggles to handle the amount of values in *hhdf*. We have provided the results as images instead.
 
 ```{r eval=F}
 load("./data/FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN.csv")
