@@ -87,9 +87,8 @@ In Figure \@ref(fig:simple-complex), the right plot shows low bias and high vari
 
 In its simplest form, the univariate linear regression, we assume a linear relationship between $X$ and $Y$: $$
 Y_i = \beta_0 + \beta_1 X_i + \epsilon_i, \;\;\; i = 1, 2, ...n \;,
-$$ where $Y_i$ is the i-th observation of the target variable, and $X_i$ is the i-th value of the (single) predictor variable. The errors $\epsilon_i$ are assumed to be independent from each other (no autocorrelation), normally distributed, have mean of zero and a constant variance. $\beta_0$ and $\beta_1$ are constant coefficients (model parameters). Fitting a linear regression is finding the values for $\beta_0$ and $\beta_1$ so that the sum of the square errors is minimized, that is: $$
-\sum_i \epsilon_i^2 = \sum_i (Y_i - \beta_0 - \beta_1 X_i)^2 = \text{min}.
-$$
+$$ where $Y_i$ is the i-th observation of the target variable, and $X_i$ is the i-th value of the (single) predictor variable. The errors $\epsilon_i$ are assumed to be independent from each other (no autocorrelation), normally distributed, have mean of zero and a constant variance. $\beta_0$ and $\beta_1$ are constant coefficients (model parameters). Fitting a linear regression is finding the values for $\beta_0$ and $\beta_1$ so that the sum of the square errors is minimized, that is:
+$$ \sum_i \epsilon_i^2 = \sum_i (Y_i - \beta_0 - \beta_1 X_i)^2 = \text{min}. $$
 
 Since the expected value of $\epsilon$ is zero (because it's normally distributed with mean zero), predictions of a linear regression model are obtained by $Y_\text{new} = \beta_0 + \beta_1 X_\text{new}$.
 
