@@ -116,7 +116,7 @@ We've learned about the danger of *data leakage*. It happens when information fr
 knitr::include_graphics("./figures/minimize-leakage.png")
 ```
 
-This also illustrates why the pre-processing step has to be considered as a blueprint that is applied to several different subsets of the data during model training. Of course, this also means that the pre-processing is not to actually be executed on the data before training, but will be executed, following the same general rules, several times anew during training.
+This also illustrates why the pre-processing step has to be considered as a blueprint that is applied to several different subsets of the data during model training. Of course, this also means that the pre-processing is not to actually be executed on the data before training, but will be executed, following the same general rules, several times during a new training.
 
 Let's finally turn to the implementation with KNN. First, we make the initial data split.
 
