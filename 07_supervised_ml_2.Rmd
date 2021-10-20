@@ -481,7 +481,7 @@ Verify that the bars plotted in the vip plot correspond to the t-statistic of th
 summary(linmod3)  # compare with values under `t-value`
 ```
 
-The results of the feature importance plot using `vip()`, agree with the statistics obtaind from the `summary()` function. The variables `LW_IN_F` and `VPD_F` have largest $|t|$ statistic values (thus, the values on the tail ends of the t-distribution have low measure), which results in a small p-value, thus indicating that these are the most important features. On the other end, the variable `P_F` has the smallest $|t|$ statistc, which results in a large p-value, thus indicating that this variable is not as important.  
+The results of the feature importance plot using `vip()`, agree with the statistics obtained from the `summary()` function. The variables `LW_IN_F` and `VPD_F` have largest $|t|$ statistic values (thus, the values on the tail ends of the t-distribution have low measure), which results in a small p-value, thus indicating that these are the most important features. On the other end, the variable `P_F` has the smallest $|t|$ statistc, which results in a large p-value, thus indicating that this variable is not as important.  
 
 To sum this up, variable importance can be measured for linear regression models using the *t*-statistic. 
 
