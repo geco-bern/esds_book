@@ -3,297 +3,258 @@ title: "Exercise 06 - Solution"
 output: html_document
 ---
 
-# Supervised Machine Learning I
+# Solutions {#solutions}
 
-**1. Model formulation**
+Now that you are familiar with the basic steps for supervised machine learning, you can get your hands on the data yourself and implement code for addressing the modelling task outlined in Chapter \@ref(motivation). 
 
-**a. Load the file** `"ddf_ch_lae.RData"` and rename the data frame to `df`. First, drop columns `NEE_VUT_REF_QC` and `TIMESTAMP` and then remove any row with missing values. To have all necessary data wrangling functions available, it may be handy to load the "super-package" *tidyverse* (which contains multiple individual packages).
-```{r}
+## Reading and cleaning
+
+Read the CSV file `"./data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv"`, select all variables with name ending with `"_F"`, the variables `"TIMESTAMP"`, `"GPP_NT_VUT_REF"`, and `"NEE_VUT_REF_QC"`, and drop all variables that contain `"JSB"` in their name. Then convert the variable `"TIMESTAMP"` to a date-time object with the function `ymd()` from the *lubridate* package, and interpret all values `-9999` as missing values. Then, set all values of `"GPP_NT_VUT_REF"` to missing if the corresponding quality control variable indicates that less than 90% are measured data points. Finally, drop the variable `"NEE_VUT_REF_QC"` - we won't use it anymore.
+
+```{r warning=FALSE, message=FALSE}
 library(tidyverse)
 
-## Load daily data and rename for use below
-load("../data/ddf_ch_lae.RData") # loads 'ddf_ch_lae'
-#load("ddf_ch_lae.RData")
+ddf <- read_csv("../data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv") %>% 
+  
+  ## select only the variables we are interested in
+  select(starts_with("TIMESTAMP"),
+         ends_with("_F"),   # all meteorological variables
+         GPP_NT_VUT_REF,
+         NEE_VUT_REF_QC,
+         -contains("JSB")) %>%
 
-df <- ddf_ch_lae %>% 
-  select(-NEE_VUT_REF_QC, -TIMESTAMP) %>%  # not numeric features
-  drop_na()                                # drop rows with missing data
+  ## convert to a nice date object
+  mutate(TIMESTAMP = lubridate::ymd(TIMESTAMP)) %>%
+
+  ## set all -9999 to NA
+  na_if(-9999) %>%
+
+  ## drop QC variables (no longer needed), except NEE_VUT_REF_QC
+  select(-ends_with("_QC"), NEE_VUT_REF_QC) %>% 
+
+  mutate(GPP_NT_VUT_REF = ifelse(NEE_VUT_REF_QC < 0.9, NA, GPP_NT_VUT_REF)) %>% 
+  select(-NEE_VUT_REF_QC)
 ```
 
-**b. Train a linear regression model** to predict `GPP_NT_VUT_REF` from  the variables `PPFD_IN`, `PA_F`, `TA_F` in the dataframe `df`, using (a) the suitable base-R function and (b) the caret function `train()` with argument `trControl = trainControl("none")` (This fits one model to the entire training set without resampling. You'll learn more about what this is in Chapter 7).
+## Data splitting
 
-**c. Questions:** Compare the fitted models with the function `summary()` and answer the following questions:
+Split the data a training and testing set, that contain 70% and 30% of the total available data, respectively.
 
-- What are the values for the intercept $\beta_0$ and the slope $\beta_1$?
-  __Answer:__ Intercept ($\beta_0$) is reported by the summary output ('(Intercept)', Column 'Estimate'). Slope is reported as 'Estimate' for the name of the corresponding predictor.*
+```{r warning=FALSE, message=FALSE}
+library(rsample)
+set.seed(1982)  # for reproducibility
+split <- initial_split(ddf, prop = 0.7)
+ddf_train <- training(split)
+ddf_test <- testing(split)
+```
 
-- Do the two packages yield identical estimates of the coefficients?
-  __Answer:__ Yes, they should. Compare by doing `summary(<linear_model_fitted_in_caret>)` and `summary(<linear_model_fitted_by_lm>)`. Or by using `coef()`.*.
 
-- What is the root mean square error of the fitted model?
-  __Answer:__ This can be extracted by `sigma(<linear_model_fitted_by_lm>)`*
+## Linear model
 
-- Is the relationship between `GPP_NT_VUT_REF` and `PPFD_IN` positive or negative? Is it significant?
-  __Answer:__ hether the relationship is positive (increasing `GPP_NT_VUT_REF` with increasing `PPFD_IN`) or negative, can be determined by looking at the coefficients. It's positive for `PPFD_IN`. The model formulations are implemented as follows:*
+### Training
 
-```{r}
-library(caret)
+Fit a linear regression model using the base-R function `lm()` and the training set. The target variable is `"GPP_NT_VUT_REF"`, and predictor variables are all available meterological variables in the dataset. Answer the following questions:
 
-## caret
-linmod_caret <- train(
-  form = GPP_NT_VUT_REF ~ PPFD_IN + PA_F + TA_F, 
-  data = df, 
-  method = "lm",
-  trControl = trainControl("none")
- )
+- What is the $R^2$ of predicted vs. observed `"GPP_NT_VUT_REF"`?
+- Is the linear regression slope significantly different from zero for all predictors?
+- Is a linear regression model with "poor" predictors removed better supported by the data than a model including all predictors?
 
-## base-R
-linmod_baser <- lm(GPP_NT_VUT_REF ~ PPFD_IN + PA_F + TA_F, data = df)
+```{r warning=FALSE, message=FALSE}
+## fit linear regression model
+linmod_baser <- lm(
+  form = GPP_NT_VUT_REF ~ ., 
+  data = ddf_train %>% 
+    drop_na() %>% 
+    select(-TIMESTAMP)
+)
 
-## compare coefficients and model metrics
-summary(linmod_caret)
+## show summary information of the model
 summary(linmod_baser)
 
-## They are identical. Well done.
+## Models can be compared, for example by the Bayesian Information Criterion (BIC). 
+## It penalizes complex models and is optimal (lowest) where the trade-off between 
+## explanatory power on the training set vs. number of predictors is best. The BIC
+## tends to be more conservative than the AIC.
+BIC(linmod_baser)
 ```
 
-***
-**2. One-hot encoding**
+The variable `PA_F` was not significant in the linear model. Therefore, we won't use it for the models below.
 
-**a. Bake a recipe:** Using the dataset with daily data from multiple sites `ddf_allsites.RData`, apply a One-hot encoding and a dummy encoding on the column containing vegetation type information (`igbp_land_use`), using the recipes package. Execute the recipe by applying the functions `prep()` and `bake()`. You may avoid the data splitting here and apply all functions on the same dataframe.
+```{r warning=FALSE, message=FALSE}
+## Fit an lm model on the same data, but with PA_F removed.
+linmod_baser_nopaf <- lm(
+  form = GPP_NT_VUT_REF ~ ., 
+  data = ddf_train %>% 
+    drop_na() %>% 
+    select(-TIMESTAMP, -PA_F)
+)
 
-```{r}
-library(recipes)
+## The R-squared is slightly lower here (0.6903) than in the model with all predictors (0.6904)
+summary(linmod_baser_nopaf)
 
-## First load and select a subset of variables.
-load("../data/ddf_allsites.RData")
-
-#load("ddf_allsites.RData")
-ddf <- ddf_allsites %>% 
-  unnest(data) %>% 
-  select(igbp_land_use, one_of(names(df))) %>% 
-  mutate(igbp_land_use = as.factor(igbp_land_use))  # to make sure it's interpreted as nominal
-
-## Formulate recipe as a formula and pre-processing step
-myrecipe_onehot <- recipe(GPP_NT_VUT_REF ~ ., data = ddf) %>% 
-  step_dummy(all_nominal(), one_hot = TRUE)
-myrecipe_dummy <- recipe(GPP_NT_VUT_REF ~ ., data = ddf) %>% 
-  step_dummy(all_nominal(), one_hot = FALSE)
-
-## Use prep() to determine the pre-processing parameters based on data 'ddf'
-myprep_onehot <- prep(myrecipe_onehot, training = ddf)  # use the same dataframe as for recipe
-myprep_dummy  <- prep(myrecipe_dummy,  training = ddf)
-
-## Use bake() to transform the data 'ddf' with parameters determined by prep().
-mybake_onehot <- bake(myprep_onehot, new_data = ddf) # use the same dataframe as for recipe
-mybake_dummy  <- bake(myprep_dummy,  new_data = ddf)
+## ... but the BIC is clearly lower, indicating that the model with PA_F removed is better.
+BIC(linmod_baser_nopaf)
 ```
 
-**b. Question:** How many columns does the un-processed original data frame have and how many columns are in the freshly "baked" data frames created by the One-hot encoding and how many in the one from the dummy-encoding? Explain the differences.
-```{r}
-## original data has 12 columns
-ncol(ddf)
 
-## igbp_land_use has 9 categories (unique values)
-ddf %>% pull(igbp_land_use) %>% unique() %>% length()
+### Prediction
 
-## 12 + 9 - 1 = 20 (minus one because original column is replaced by 9 new ones)
-ncol(mybake_onehot)
+With the model containing all predictors and fitted on `ddf_train`, make predictions using first `ddf_train` and then `ddf_test`. Compute the $R^2$ and the root-mean-square error, and visualise modelled vs. observed values to evaluate both predictions. 
 
-## Dummy-encoding drops one because it's obsolete (can be derived from the remaining 8) => 19
-ncol(mybake_dummy)
-```
+Do you expect the linear regression model trained on `ddf_train` to predict substantially better on `ddf_train` than on `ddf_test`? Why (not)?
 
-**c. Comparison:** Determine which column was created by the One-hot-encoding but not by the dummy-encoding.
-```{r}
-names_dummy <- names(mybake_dummy %>% select(starts_with("igbp_land_use")))
-names_onehot <- names(mybake_onehot %>% select(starts_with("igbp_land_use")))
+Hints:
 
-## the following variable is not in the dataframe created with dummy encoding ('mybake_dummy')
-obsolete <- names_onehot[which(!(names_onehot %in% names_dummy))]
-print(obsolete)
-```
+- To calculate predictions, use the generic function `predict()` with the argument `newdata = ...`. 
+- The $R^2$ can be extracted from the model object as `summary(model_object)$r.squared`, or is (as the RMSE) given in the metrics data frame returned by `metrics()` from the *yardstick* library. 
+- For visualisation the model performance, consider a scatterplot, or (better) a plot that reveals the density of overlapping points. (We're plotting information from over 4000 data points here!)
 
-***
-**3. Sequential pre-processing**
+```{r warning=FALSE, message=FALSE}
+library(patchwork)
+library(yardstick)
 
-**a. Question:** You have learned about several pre-processing steps. The implementation of these steps was demonstrated using the recipes package which allows you to be specific about the order in which the pre-processing steps are applied. Does the order matter?
-__Answer:__ Pre-processing steps and their order are specifiec by sequentially adding steps, combined by the pipe operator (`%>%`). It's sensible to drop zero-variance predictors first to avoid later steps are executed on them. The dummy-encoding must come last. Otherwise, 0 and 1 values are re-scaled and are converted to numeric. Whether centering is done before scaling or the other way round is not relevant. Below is the full implementation.*
-
-**b. Daily data:** Apply the following three pre-processing steps on the daily dataset you used above (for the problem on 'One-hot encoding') and make sure that, after all three steps are applied by your specified order, the columns created by the dummy-encoding can be interpreted as logical variables.
-
-- Filter out zero or near-zero variance features.
-- Standardize (center and scale) numeric features.
-- Dummy encode categorical features.
-
-```{r}
-library(recipes)
-
-## First load and select a subset of variables.
-load("../data/ddf_allsites.RData")
-
-ddf <- ddf_allsites %>% 
-  tidyr::unnest(data) %>% 
-  select(igbp_land_use, one_of(names(df))) %>% 
-  mutate(igbp_land_use = as.factor(igbp_land_use))  # to make sure it's interpreted as nominal
-
-myrecipe <- recipe(GPP_NT_VUT_REF ~ ., data = ddf) %>% 
+## made into a function to reuse code below
+eval_model <- function(mod, df_train, df_test){
   
-  ## it's sensible to drop zero-variance predictors first to avoid later steps are executed on them
+  ## add predictions to the data frames
+  df_train <- df_train %>% 
+    drop_na() %>% 
+    mutate(fitted =  predict(mod, newdata = .))
+  
+  df_test <- df_test %>% 
+    drop_na() %>% 
+    mutate(fitted =  predict(mod, newdata = .))
+  
+  ## get metrics tables
+  metrics_train <- df_train %>% 
+    yardstick::metrics(GPP_NT_VUT_REF, fitted)
+  
+  metrics_test <- df_test %>% 
+    yardstick::metrics(GPP_NT_VUT_REF, fitted)
+  
+  ## extract values from metrics tables
+  rmse_train <- metrics_train %>% 
+    filter(.metric == "rmse") %>% 
+    pull(.estimate)
+  rsq_train <- metrics_train %>% 
+    filter(.metric == "rsq") %>% 
+    pull(.estimate)
+  
+  rmse_test <- metrics_test %>% 
+    filter(.metric == "rmse") %>% 
+    pull(.estimate)
+  rsq_test <- metrics_test %>% 
+    filter(.metric == "rsq") %>% 
+    pull(.estimate)
+  
+  ## visualise with a hexagon binning and a customised color scale,
+  ## adding information of metrics as sub-titles
+  gg1 <- df_train %>% 
+    ggplot(aes(GPP_NT_VUT_REF, fitted)) +
+    geom_hex() +
+    scale_fill_gradientn(
+      colours = colorRampPalette( c("gray65", "navy", "red", "yellow"))(5)) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dotted") +
+    labs(subtitle = bquote( italic(R)^2 == .(format(rsq_train, digits = 2)) ~~
+                            RMSE == .(format(rmse_train, digits = 3))),
+         title = "Training set") +
+    theme_classic()
+  
+  gg2 <- df_test %>% 
+    ggplot(aes(GPP_NT_VUT_REF, fitted)) +
+    geom_hex() +
+    scale_fill_gradientn(
+      colours = colorRampPalette( c("gray65", "navy", "red", "yellow"))(5)) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dotted") +
+    labs(subtitle = bquote( italic(R)^2 == .(format(rsq_test, digits = 2)) ~~
+                            RMSE == .(format(rmse_test, digits = 3))),
+         title = "Test set") +
+    theme_classic()
+  
+  return(gg1 + gg2)
+}
+
+eval_model(mod = linmod_baser, df_train = ddf_train, df_test = ddf_test)
+```
+
+Here, the function `eval_model()` returned an object that is made up of two plots (`return(gg1 + gg2)` in the function definition). This combination of plots by `+` is enabled by the [**patchwork**](https://patchwork.data-imaginist.com/) library. The individual plot objects (`gg1` and `gg2`) are returned by the `ggplot()` functions. The visualisation here is density plot of hexagonal bins. It shows the number of points inside each bin, encoded by the color (see legend "count"). We want the highest density of points along the 1:1 line (the dotted line). Predictions match observations perfectly for points lying on the 1:1 line. Alternatively, we could also use a scatterplot to visualise the model evaluation. However, a large number of points would overlie each other. As typical machine learning applications make use of large number of data, such evaluation plots would typically face the problem of overlying points and density plots are a solution. 
+
+Metrics are given in the subtitle of the plots. Note that the $R^2$ and the RMSE measure different aspects of model-data agreement. Here, the measure the correlation (fraction of variation explained), and the average error. We should generally consider multiple metrics measuring multiple aspects of the prediction-observation fit to evaluate models.
+
+
+**Encoding of factor levels:**
+
+```{r}
+library(recipes)
+
+df <- starwars %>% 
+  dplyr::select(height, mass, species) %>% 
+  drop_na()
+
+## Original data has 3 columns
+ncol(df)
+
+## Recipe to get one-hot encoding
+ohe_baked <- recipe(~., data = df) %>% 
+  step_dummy(species, one_hot = T) %>% 
+  prep(., trainig = df) %>% 
+  bake(., new_data = df)
+
+## Recipe to get dummy encoding
+dmy_baked <- recipe(~., data = df) %>% 
+  step_dummy(species, one_hot = F) %>% 
+  prep(., trainig = df) %>% 
+  bake(., new_data = df)
+
+## ohe_baked has one column more than dmy_baked:
+cat(" Original: ", ncol(df), "columns \n Levels of 'species':", df$species %>% unique() %>% length(), "levels \n OHE: ", ncol(ohe_baked), "columns \n Dummy:", ncol(dmy_baked), "columns")
+
+## "species_Aleena" has been dropped in dummy encoding
+ohe_baked %>% dplyr::select(!any_of(names(dmy_baked))) %>% names()
+```
+
+Of the 31 levels of the factor variable `species`, 31 columns have been created and added to the dataframe. Additionally, the original `species` column has been dropped. Thus, the original dataframe is extended from 3 columns to 33 columns in the in the one-hot encoding (3 + 31 - 1 = 33). In the dummy-encoding, one column is dropped because it is already implied by the remaining columns. In other words, the species "Aleena" is defined as when all other columns have only 0's as entries.
+
+**Sequential pre-processing**
+```{r}
+## Pre-processing
+df_baked <- recipe(~., data = df) %>% 
+  
+  ## It's sensible to drop zero-variance predictors first to avoid later steps are executed on them
   step_zv(all_predictors()) %>%
-  step_center(all_numeric(), -all_outcomes()) %>%
-  step_scale(all_numeric(), -all_outcomes()) %>% 
+  step_center(all_numeric()) %>%
+  step_scale(all_numeric()) %>%
   
-  ## the dummy-encoding must come last otherwise, 0 and 1 values are re-scaled and are converted to numeric
-  step_dummy(all_nominal(), one_hot = FALSE)
+  ## the dummy-encoding must come last otherwise the previous steps will be falsely applied
+  step_dummy(all_nominal(), one_hot = FALSE) %>% 
+  
+  prep(., training = df) %>% 
+  bake(., new_data = df)
 ```
 
-**c. Visualise the distribution of numeric variables.** Do not include the ones created by the dummy-encoding. Plot the original and pre-processed dataset using an appropriate plot type.
-__Answer:__ To get the standardized values, we first need to apply `prep()` and `bake()` with the recipe specified above (and using the same data as above). For `pivot_longer()`, we need to select the columns that should be gathered into a long format. We can simply do this in two steps: First `select()` the columns 2 to 12 (to drop `igbp_land_use`) and then gather (new) column numbers 1 to 11. The rest is done as described in Chapter 2 for the same example.*
+Pre-processing steps and their order are specified by sequentially adding steps, combined by the pipe operator (`%>%`). It's sensible to drop zero-variance predictors first to avoid later steps are executed on them. The dummy-encoding must come last. Otherwise, 0 and 1 values are re-scaled and are converted to numeric. Whether centering is done before scaling or the other way round is not relevant. Below is the full implementation.*
 
 ```{r}
-## 3c. 
-library(ggplot2)
-library(tidyr)
-library(ggridges)
+## Plotting
+library(patchwork)
 
-myprep <- prep(myrecipe, training = ddf)
-mybake <- bake(myprep, new_data = ddf)
+gg_org <- df %>%
+  pivot_longer(cols = c("height", "mass"), names_to = "variable", values_to = "value") %>% 
+  ggplot() +
+  aes(x = value, y = ..density..) +
+  geom_density() +
+  facet_wrap(~variable, scales = "free") +
+  ggtitle("Original distribution of numerical values")
 
-ddf %>% 
-  select(2:12) %>% 
-  pivot_longer(cols = 1:11, names_to = "variable", values_to = "value") %>% 
-  ggplot(aes(x = variable, y = value)) +
-  geom_boxplot() +
-  labs(title = "Before standardization") +
-  ylim(-30,600) +
-  coord_flip()
-# ggsave("fig/boxplots_rawdata.pdf", width = 6, height = 4)
-# ggsave("fig/boxplots_rawdata.png", width = 6, height = 4)
+gg_baked <- df_baked %>%
+  pivot_longer(cols = c("height", "mass"), names_to = "variable", values_to = "value") %>% 
+  ggplot() +
+  aes(x = value, y = ..density..) +
+  geom_density() +
+  facet_wrap(~variable, scales = "free") +
+  ggtitle("Distribution of numerical values after baking")
 
-mybake %>% 
-  select(1:11) %>% 
-  pivot_longer(cols = 1:11, names_to = "variable", values_to = "value") %>% 
-  ggplot(aes(x = variable, y = value)) +
-  geom_boxplot() +
-  ylim(-3,3) +
-  labs(title = "After standardization") +
-  coord_flip()
-# ggsave("fig/boxplots_normalised.pdf", width = 6, height = 4)
-# ggsave("fig/boxplots_normalised.png", width = 6, height = 4)
+gg_org / gg_baked
 ```
 
-**Hint:**
-We have learned in Chapter two that ggplot2 is designed to implement the *grammar of graphics* where variables are mapped onto aesthetics. If we want to create, for example, separate boxplots for each variable, arranged side-by-side along the x-axis, we want to specify the x-axis aesthetics to be the variable identity (something like `aes(x = variable)`). However, in our dataset, we have multiple variables (eleven to be precise) in separate columns. Strictly speaking, this is not entirely *tidy* and therefore, it's not quite straight-forward to create a ggplot graphics with data from multiple separate columns and organise them along one of the available aesthetics (here, x-axis). We have to take an additional step and combine the multiple columns into a single one. The new-rearranged and very *tidy* dataframe then has a new column (e.g., called `value`) that contains all the values of all the variables, and another new column (e.g. called `variable`) that specifies which variable the value belongs to. This re-arrangement can also be described as converting a table in *wide* format (wide because of its large number of columns) to a *long* format (long because of its large number of rows). This transformation is illustrated below.
-
-```{r pivot, echo=FALSE, fig.cap='Visualizsation of turning a table from wide format (right) into long format (left). Figure from [R for Data Science](https://cmdlinetips.com/2020/02/r-for-data-science-book-gets-tidyr-1-0-0-friendly/).'}
-knitr::include_graphics("../figures/fig_pivot_longer_wide_to_long_tidy.jpg")
-```
-
-In R, this conversion from a wide to a long table (usable with ggplot) is done in one line by `pivot_longer()` from the tidyr package (part of the tidyverse).
-```{r}
-## wide format
-ddf %>% 
-  select(2:4)  # for demonstration
-
-## long format
-ddf %>% 
-  select(2:4) %>%  # for demonstration
-  pivot_longer(cols = 1:3, names_to = "variable", values_to = "value")
-```
-
-
-***
-**4. K-nearest neighbours**
-
-**a. Load the file** `"ddf_ch_lae.RData"` and split the dataset into 70% used for training and 30% for testing. Fit three KNN models of the form `GPP_NT_VUT_REF ~ .` with $k = (1, 25, 250)$ on the training set and evaluate the RMSE on the training and on the validation set.
-
-**b. For the model training**, use the caret function `train()` with arguments `trControl = trainControl("none")` and `tuneGrid = data.frame(k = 25)` (in the case of k = 25). Explain your observations. 
-
-**c. Questions:**
-
-- Which case (data set, k) has the lowest RMSE? Why?
-  __Answer:__ The lowest RMSE (zero) is achieved for the model with k=1 on the training set. In this case, the prediction is equal to the observed value of the target variable for the single closest point. This just follows from the definition of the KNN algorithm.*
-- Is there a pattern in the difference between RMSE derived from `df_train` and `df_test`, depending on k?
-  __Answer:__ For low k, the RMSE on the training set tends to zero and to very large numbers (overfitting!) for the validation set. For high k the RMSE on the training set tends to asymptotically increasing values both on the training and validation sets.*
-- How do the three models relatre to the bias-variance trade-off? Regarding their performance on the training set evaluation, which model has the highest bias? Which one has the highest variance?
-  __Answer:__ A low-k model represents high variance, a high-k model represents high-bias.*
-- How does this relate to their performance on the validation set? Please explain.
-  __Answer:__ High variance performs worst on the validation set. This is because it fits errors in the training set and is hence not well generalisable.*
-
-**Hint:**
-
-To evaluate the performance of a fitted model on a dataset `df`, you can use the object returned by the function `train()` (`modl` in the example below) in combination with `predict()` as:
-
-```{r eval = FALSE}
-values_redicted <- predict(modl, newdata = df)
-```
-
-This returns a vector of predicted values of the same length as rows in `df`. To get the RMSE of predicted vs. observed values, you can use the function `rmse()` from the tidyverse package *yardstick*. Check `?yardstick::rmse` for more information.
-
-```{r}
-## using df as above
-library(rsample)
-library(caret)
-set.seed(123)  # for reproducibility - not mandatory
-
-## make initial split for separation into training and testing sets
-split_rsample <- initial_split(df, prop = 0.7)
-df_train <- training(split_rsample)
-df_test <- testing(split_rsample)
-
-## train separate models with different k
-modl_knn_1 <- train(
-  form = GPP_NT_VUT_REF ~ ., 
-  data = df_train, 
-  method = "knn",
-  tuneGrid = data.frame(k = 1),
-  trControl = trainControl("none")
-)
-modl_knn_25 <- train(
-  form = GPP_NT_VUT_REF ~ ., 
-  data = df_train, 
-  method = "knn",
-  tuneGrid = data.frame(k = 25),
-  trControl = trainControl("none")
-)
-modl_knn_250 <- train(
-  form = GPP_NT_VUT_REF ~ ., 
-  data = df_train, 
-  method = "knn",
-  tuneGrid = data.frame(k = 250),
-  trControl = trainControl("none")
-)
-
-## using the trained models, predict values on the training set
-df_train <- df_train %>% 
-  mutate(gpp_pred_k1 = predict(modl_knn_1, newdata = .),
-         gpp_pred_k25 = predict(modl_knn_25, newdata = .),
-         gpp_pred_k250 = predict(modl_knn_250, newdata = .))
-
-## using the trained models, predict values on the validation set
-df_test <- df_test %>% 
-  mutate(gpp_pred_k1 = predict(modl_knn_1, newdata = .),
-         gpp_pred_k25 = predict(modl_knn_25, newdata = .),
-         gpp_pred_k250 = predict(modl_knn_250, newdata = .))
-
-## create a table with RMSE for each k and training/testing sets
-yardstick::rmse(df_train, GPP_NT_VUT_REF, gpp_pred_k1) %>% 
-  mutate(k = 1, data = "df_train") %>% 
-  bind_rows(.,
-            yardstick::rmse(df_train, GPP_NT_VUT_REF, gpp_pred_k25) %>% 
-              mutate(k = 25, data = "df_train")) %>% 
-  bind_rows(.,
-            yardstick::rmse(df_train, GPP_NT_VUT_REF, gpp_pred_k250) %>% 
-              mutate(k = 250, data = "df_train")) %>% 
-  bind_rows(.,
-            yardstick::rmse(df_test, GPP_NT_VUT_REF, gpp_pred_k1) %>% 
-              mutate(k = 1, data = "df_test")) %>% 
-  bind_rows(.,
-            yardstick::rmse(df_test, GPP_NT_VUT_REF, gpp_pred_k25) %>% 
-              mutate(k = 25, data = "df_test")) %>% 
-  bind_rows(.,
-            yardstick::rmse(df_test, GPP_NT_VUT_REF, gpp_pred_k250) %>% 
-              mutate(k = 250, data = "df_test")) %>% 
-  select(data, k, .estimate)
-```
+We can see that the distribution remained the same but the actual values shifted to vary around 0.
