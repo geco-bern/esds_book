@@ -1,7 +1,7 @@
 # Supervised Machine Learning II {#ch-07}
 
 ## Introduction
-### Leaerning objectives
+### Learning objectives
 After this learning unit, you will be able to ...
 
 - Explain the effect of hyper-parameter tuning in the context of the K-nearest neighbour algorithm.
@@ -11,7 +11,7 @@ After this learning unit, you will be able to ...
 
 ### Key points from the lecture
 
-** Training data ** is the data that is used to train our model, "to fit a curve to the data points".
+**Training data** is the data that is used to train our model, "to fit a curve to the data points".
 
 **Testing data** is set aside at the initial split and not "touched" during model training. It is key to test a model’s predictive power or whether it is overfitted. 
 
@@ -26,214 +26,152 @@ To tune a model, you can set *hyperparameters* that determine model structure or
 **Data leakage** is when data from the testing dataset creeps into the training data. To avoid this the testing set must be left completely untouched! 
 
 ## Tutorial
-### Model training and the loss function
+### Model formulation using `train()`
 
-Model training in supervised ML is guided by the match (or mismatch) between the predicted and observed target variable(s), that is, between $\hat{Y}$ and $Y$. The *loss* function quantifies this mismatch ($L(\hat{Y}, Y)$), and the algorithm takes care of progressively reducing the loss during model training. Let's say the ML model contains two parameters and predictions can be considered a function of the two ($\hat{Y}(w_1, w_2)$). $Y$ is actually constant. Thus, the loss function is effectively a function $L(w_1, w_2)$. Therefore, we can consider the model training as a search of the parameter space of the machine learning model $(w_1, w_2)$ to find the minimum of the loss. Common loss functions are the root mean square error (RMSE), or the mean square error, or the mean absolute error.
+In the previous tutorial you learned how to wrangle, split and pre-process data (remember the recipes) and how to formulate a linear model in base R. To learn more about model creation, let us first repeat the data preparation from the previous tutorial:
 
-```{r, echo = FALSE, fig.cap = "Visualization of a loss function as a plane spanned by the two parameters $w_1$ and $w_2$."}
-knitr::include_graphics("./figures/loss_plane.png")
+```{r message=FALSE, warning=FALSE}
+## Load data and extrat relevant subset
+library(tidyverse)
+
+ddf <- read_csv("./data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv") %>% 
+  select(starts_with("TIMESTAMP"),
+         ends_with("_F"),
+         GPP_NT_VUT_REF,
+         NEE_VUT_REF_QC,
+         -contains("JSB")) %>%
+  mutate(TIMESTAMP = lubridate::ymd(TIMESTAMP)) %>%
+  na_if(-9999) %>%
+  select(-ends_with("_QC"), NEE_VUT_REF_QC) %>% 
+  mutate(GPP_NT_VUT_REF = ifelse(NEE_VUT_REF_QC < 0.9, NA, GPP_NT_VUT_REF)) %>% 
+  select(-NEE_VUT_REF_QC) %>% 
+  drop_na()
+
+## Split data into testing and training data
+library(rsample)
+
+set.seed(1982)  # for reproducibility
+split <- initial_split(ddf, prop = 0.7)
+ddf_train <- training(split)
+ddf_test <- testing(split)
+
+## Base R formulation for linear model
+lm(GPP_NT_VUT_REF ~ SW_IN_F + VPD_F + TA_F, data = ddf)
 ```
 
-Loss minimization is a general feature of ML model training. Practically all ML algorithms have some "knobs" to turn in order to achieve efficient model training and predictive performance. What these knobs are, depends on the ML algorithm.
+The way we formulate a model is independent of the algorithm, or *engine* that takes care of fitting $f(X)$. As mentioned in the previous tutorial, the R package [**caret**](https://topepo.github.io/caret/) provides a unified interface for using different ML algorithms implemented in separate packages.
 
-In Video 6B you learned how the loss minimization, at least for some ML methods (e.g., artificial neural networks), is guided by *gradient descent*. It offers a principle for determining in what direction to jump and search the parameter space. *Gradient descent* changes parameters relative to a reference such that for a given "distance" of the "jump", the loss is reduced by as much as possible. In other words, it descends along the steepest gradient of the loss hyperplane (the yellow-red plane in the figure above). You can imagine this as the trajectory of a ball rolling into the loss "depression".
+In other words, **caret** acts as a *wrapper* for multiple different model fitting, or ML algorithms. This has the advantage that it unifies the interface (the way arguments are provided). **caret** also provides implementations for a set of commonly used tools for data processing, model training, and evaluation. We'll use **caret** for model training with the function `train()`. Using caret for specifying the same linear regression model as above, the base-R `lm()` function, can be done with caret in a generalized form as:
 
-Model training is implemented in R for different algorithms in different packages. Some algorithms are even implemented by multiple packages (e.g., `nnet` and `neuralnet` for artificial neural networks). As described in Chapter \@ref(ch-06), the **caret** package provides "wrappers" that handle a large selection of different ML model implementations in different packages with a unified interface (see [here](https://topepo.github.io/caret/available-models.html) for an overview of available models). The **caret** function `train()` is the centre piece. Its argument `metric` specifies the loss function and defaults to RMSE for regression models and accuracy for classification (see sub-section on metrics below). A complete implementation of model training with caret is demonstrated further below.
+```{r message=F, warning=F}
+library(caret)
+train(
+  form = GPP_NT_VUT_REF ~ SW_IN_F + VPD_F + TA_F, 
+  data = ddf %>% drop_na(), 
+  method = "lm"
+)
+```
+
+Of course, this is an overkill compared to just writing `lm(...)`. But the advantage of the unified interface is that we can simply replace the `method` argument to use a different ML algorithm. For example, to use a random forest model implemented by the **ranger** package, we can write:
+
+```{r eval=F}
+train(
+  form = GPP_NT_VUT_REF ~ SW_F_IN + VPD_F + TA_F, 
+  data = ddf, 
+  method = "ranger",
+  ...
+)
+```
+
+The `...` hints at the fact that there are a few more arguments to be specified for training a random forest model with ranger. We learn more about these arguments below in Chapter \@ref(training).
+
+Another great advantage of using **caret** to formulate our models is that it takes recipes from the **recipes** packages as input. This way, we can make sure that the exact same pre-processing steps are taken for the training data, testing data and as will be introduced later, the validation data.
+
+```{r eval=FALSE, message=FALSE, warning=FALSE}
+library(recipes)
+pp <- recipe(GPP_NT_VUT_REF ~ SW_IN_F + VPD_F + TA_F, data = ddf_train) %>% 
+  step_center(all_numeric(), -all_outcomes()) %>%
+  step_scale(all_numeric(), -all_outcomes())
+```
+
+The object `pp` can then be supplied to `train()` as its first argument:
+```{r, eval=FALSE}
+train(
+  pp, 
+  data = ddf_train, 
+  method = "ranger",
+  ...
+)
+```
+
+
+### Model training 
+
+Model training in supervised ML is guided by the match (or mismatch) between the predicted and observed target variable(s), that is, between $\hat{Y}$ and $Y$. The *loss* function quantifies this mismatch ($L(\hat{Y}, Y)$), and the algorithm takes care of progressively reducing the loss during model training.
+
+Let's say the ML model contains two parameters and predictions can be considered a function of the two ($\hat{Y}(w_1, w_2)$). $Y$ is actually constant. Thus, the loss function is effectively a function $L(w_1, w_2)$. Therefore, we can consider the model training as a search of the parameter space of the machine learning model $(w_1, w_2)$ to find the minimum of the loss. Common loss functions are the root mean square error (RMSE), or the mean square error (MSE), or the mean absolute error (MAE). Loss minimization is a general feature of ML model training.
+
+```{r, echo = FALSE, fig.cap = "Visualization of a loss function as a plane spanned by the two parameters $w_1$ and $w_2$."}
+knitr::include_graphics("figures/loss_plane.png")
+```
+
+Model training is implemented in R for different algorithms in different packages. Some algorithms are even implemented by multiple packages (e.g., `nnet` and `neuralnet` for artificial neural networks). Again **caret** comes to the rescue as it offers a large selection of ML model implementations from different packages (see [here](https://topepo.github.io/caret/available-models.html) for an overview of available models). The `train()` function takes an argument `metric`, which specifies the loss function and defaults to the RMSE for regression models and to accuracy for classification (see chapter on metrics below).
 
 #### Hyperparameter tuning
 
-As for practically all ML algorithms, there are free parameters that determine their characteristics and how the learning operates - *hyperparameters*. Turning back to the analogue of the ball and the loss depression, imagine the effect of how fast the ball mentioned before is rolling. If it rolls too fast (that is if the "jump" of the parameter search is too large), it descends into the depression fast but may shoot beyond the minimum and it has to do a "180-degrees turn" and continue the search. That's not very efficient. On the other extreme, a very slowly rolling ball (the parameter space is searched with small jumps) will take much longer to arrive at the bottom of the depression. Hence, there is an optimum in between. This "size of the jump" is called the *learning rate*, and it usually has to be tuned for optimal performance of model training of artificial neural networks. Other ML algorithms have other types of hyperparameters. While some hyperparameters determine the performance of the model training, other hyperparameters are decisive for the model's predictive skills. Hyperparameters are not to be confused with the model coefficients. For example, in linear regression, the number of predictors can be considered a hyperparameter, while the values of $\beta$ are the coefficients. In general, hyperparameters determine the *structure* of the algorithm.
+Practically all ML algorithms have some "knobs" to turn in order to achieve efficient model training and predictive performance. Such "knobs" are called *hyperparameters* and depend on the ML algorithm.
 
-Let's turn to the K-nearest neighbour (KNN) algorithm as an example. In KNN, the hyperparameter is $k$. That is, the number of neighbours to consider taking their mean. With KNN, there is always an optimum $k$. Obviously, if $k = n$, we consider all observations as neighbours and each prediction is simply the mean of all observed target values $Y$, irrespective of the predictor values. This cannot be optimal and such a model will likely underfit. On the other extreme, with $k = 1$, the model will be strongly affected by the noise in the single nearest neighbour and its generalisability will suffer. This should be reflected in a poor performance on the validation data. Indeed, it is, as the Figure \@ref(fig:hyper) illustrates.
+For k-nearest neighbour (KNN), it is `k` - the number of neighbours to consider for determining distances. There is always an optimum $k$. Obviously, if $k = n$, we consider all observations as neighbours and each prediction is simply the mean of all observed target values $Y$, irrespective of the predictor values. This cannot be optimal and such a model is likely underfit. On the other extreme, with $k = 1$, the model will be strongly affected by the noise in the single nearest neighbour and its generalisability will suffer. This should be reflected in a poor performance on the validation data. 
 
-```{r hyper, echo = FALSE, fig.cap = "Improvement in RMSE on validation data with increasing number of neighbours."}
-knitr::include_graphics("./figures/knn_hyperparameter_tuning.png")
+For random forests from the **ranger** package, hyperparameters are:
+
+- `mtry`: the number of variables to consider to make decisions, often taken as $p/3$, where $p$ is the number of predictors.
+- `min.node.size`: the number of data points at the "bottom" of each decision tree
+- `splitrule`: the function applied to data in each branch of a tree, used for determining the goodness of a decision
+
+Hyperparameters usually have to be "tuned" and their optimal values depend on the data. Therefore they cannot be known *a priori* but must be found on-the-go. In **caret**, hyperparameter tuning is implemented as part of the `train()` function. Values of hyperparameters to consider are to be specified by the argument `tuneGrid`, which takes a data frame with column(s) named according to the name(s) of the hyperparameter(s) and rows for each combination of hyperparameters to consider. To specify the three hyperparameters of a random forest model would look like this:
+
+```{r eval=F}
+train(
+  form = GPP_NT_VUT_REF ~ SW_F_IN + VPD_F + TA_F, 
+  data = ddf, 
+  method = "ranger",
+  tuneGrid = expand.grid( .mtry = floor(6 / 3),
+                          .min.node.size = c(3, 5, 9,15, 30),
+                          .splitrule = c("variance", "maxstat")),
+  ...
+)
 ```
 
-You will encounter different hyperparameters for neural networks in later chapters.
-
-In **caret**, hyperparameter tuning is implemented as part of the `train()` function. Values of hyperparameters to consider are to be specified by the argument `tuneGrid`, which takes a data frame with column(s) named according to the name(s) of the hyperparameter(s) and rows for each combination of hyperparameters to consider. More explicit examples follow below.
+Here, `expand.grid()` is used to provide a data frame with all possible combinations of individual vectors (e.g. min node size) and their provided values (e.g. 3, 5, 9, 15, 30). For a KNN, it suffices to enter a dataframe with one vector of numbers as argument to `tuneGrid` (e.g., `data.frame(k = c(2, 5, 10, 15, 18, 20, 22, 24, 26, 30, 35, 40, 60, 100))`). The `train()` function will then create a KNN for each of these numbers to find the optimal k.
 
 #### Resampling
 
-At the beginning of this tutorial, we demonstrated a case of overfitting. In the example with KNN above, the increasing error on the validation data (measured by RMSE) is an indication of poor *generalisability*. The goal of model training is to achieve the best possible generalisation performance. That is, the lowest validation error measured by applying the trained model on the testing data set from the initial split. Note the distinction: validation data is what is used during model training, testing data is held out at the initial split and not used during model training.
+The goal of model training is to achieve the best possible model generalisability. That is, the best possible model performance when predicting to data that was not used for training - the test data. Resampling mimicks the comparison of predictions to the test data. Instead of using all training data, the training data is *resampled* into a number further splits into pairs of training and *validation* data. Model training is then guided by minimising the average loss determined on each resample of the validation data. Having multiple resamples (multiple *folds* of training-validation splits) avoids the loss minimization from being misguided by random peculiarities in the training and/or validation data.
 
-But how can the generalisability be assessed when the testing set is held out completely during the training step? To measure the model's generalisability and "direct" the ML algorithm to minimize the validation error during the training step, we can further split the training set into one or more training and validation sub-set. This is called *resampling*. The model performance determined on this resampled validation set is then a good estimate of the generalisation error we get when evaluated against the testing data that was set aside from the initial split.
+A common resampling method is *k-fold cross validation*, where the training data is split into *k* equally sized subsets (*folds*). Then, there will be *k* iterations, where each fold is used for validation once (while the remaining folds are used for training). An extreme case is *leave-one-out cross validation*, where *k* corresponds to the number of data points. 
 
-The challenge to be met here is that we further reduce the number of data points in the resampled training and validation sets which may lead to evaluation statistics not being sufficiently robust and bears the potential that we're training to some peculiarities in the (relatively small) validation set. In order to control for this, common practice is to do multiple resamples (multiple *folds* of training-validation splits) which is the *repeat* part of repeated CV.
-
-By repeating cross-validation we are picking different folds for training and validating. For each repetition, we can determine the validation error, i.e., how well the trained model performed on the validation fold. Taking the mean performance across all repetitions gives us the average performance we would expect for the model to have on unseen data. This provides a general assessment of how good the model may perform. To actually check for its performance, we can use the training data set that we excluded from the beginning and was not used in the CV process.
-
-Taking the mean validation error across all repetitions, we can This is called *k-fold cross validation*.
-
-```{r, echo = FALSE, fig.cap = "Example of 5-fold cross validation. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/process.html#k-fold-cross-validation). Note that the orange boxes called *Test* refer to a test fold which we refer to as validation set. Be precise here, this *Test* is not the held-out test data set!"}
-knitr::include_graphics("./figures/cv.png")
+```{r, echo = FALSE}
+## figure from https://bradleyboehmke.github.io/HOML/process.html
+knitr::include_graphics("figures/cv.png")
 ```
 
-There is no formal rule about the number of folds and hence the number of data points in each training and testing fold. _Leave-one-out_ cross validation is an extreme variant of k-fold cross validation, where k equals the number of data points in the full set of training data.
-
-To do a hyperparameter tuning and k-fold cross validation during model training in R, we don't have to implement the loops ourselves. The resampling procedure can be specified in the **caret** function `train()` with the argument `trControl`. The object that this argument takes is the output of a function call to `trainControl()`. This can be implemented in two steps. For example, to do a 10-fold cross-validation, repeated five times, we can write:
-
-```{r eval = F}
-my_cv <- trainControl(
-  method = "repeatedcv",
-  number = 10,
-  repeats = 5
-)
-
-train(..., trControl = my_cv)
-```
-
-**Bonus Material**
-
-An example of model training in environmental sciences is where we have time series data from multiple sites and we are interested in making a prediction of temporal dynamics at an entirely new site. In this case, the data has an additional "dimension" (location in addition to time), and the generalisability with respect to location has to be determined where the data splitting is done along data belonging to different sites. In other words, we have to make sure that one site's data is entirely either in the training *or* testing set, but never in both. Otherwise, the validation error, measuring the generalisability of the model to a new site, is too optimistic.
-
-This can be done using the [`groupKFold`](https://topepo.github.io/caret/data-splitting.html#simple-splitting-with-important-groups) function of the **caret** package as follows, using a site identify vector that has the same length as the training data has rows (`df_train$siteid` below).
+To do a k-fold cross validation during model training in R, we don't have to implement the loops around folds ourselves. The resampling procedure can be specified in the **caret** function `train()` with the argument `trControl`. The object that this argument takes is the output of a function call to `trainControl()`. This can be implemented in two steps. For example, to do a 10-fold cross-validation, we can write:
 
 ```{r eval=F}
-cv <- trainControl(
-  method = "cv",  # not repeated CV
-  index = groupKFold(df_train$siteid, k = 10)
+train(
+  pp, 
+  data = ddf_train, 
+  method = "ranger",
+  tuneGrid = expand.grid( .mtry = floor(6 / 3),
+                          .min.node.size = c(3, 5, 9,15, 30),
+                          .splitrule = c("variance", "maxstat")),
+  trControl = trainControl(method = "cv", number = 10),
+  ...
 )
 ```
 
-
-### Putting it all together
-
-Now, we know enough to turn to the implementation of a full model training workflow in R. Below, we implement the example of hyperparameter tuning of the KNN algorithm for which you saw the visualisation above. The workhorse for model training with **caret** is the function `train()`. Let's recap its arguments:
-
-- A formula specifying the model of the form `<target> ~ <predictor1> + <predictor2> + ...`; or `x` (a data frame with predictors) and `y` (a vector of the target variable, see section *Model formulation* in Chapter \@ref(ch-06)); or a recipe (object returned by a `recipes::recipe()` function call).
-- `data`: The data set containing the target and predictor variables as separate columns. This is required only when using a formula or recipe as the first argument.
-- `method`: The machine learning algorithm (the "engine") to be used. We'll use `"knn"` here. For an overview of available algorithms see [here](http://topepo.github.io/caret/train-models-by-tag.html).
-- `metric`: The loss function. For regression problems, it defaults to `"RMSE"`.
-- `preProcess`: The pre-processing instructions given as a vector of strings. This can also be a "recipe", i.e., the output of a function call to `recipe()` of the recipes package (see sub-section *Pre-processing* in Chapter \@ref(ch-06))
-- `tuneGrid`: A data frame with combinations of hyperparameter values. The columns are named the same as the tuning parameters. In the KNN example below, this is simply `k`.
-- `trControl`: The output of a function call to `trainControl()` (see above).
-
-We've learned about the danger of *data leakage*. It happens when information from the testing data somehow finds its way into the training step. This is relevant not only for leakage from the testing set to the training set determined from the initial split but also for the resampling splits within each resample fold. Therefore, we should apply the pre-processing blueprint independently on each fold. For example, we should do the centering and scaling by subtracting the mean and dividing by the standard deviation, where the mean and standard deviation are calculated separately on each fold of the training resamples (not including the validation resample). This is illustrated in Figure \@ref(fig:leakage).
-
-```{r leakage, echo = FALSE, fig.cap= "Visualization of how data leakage can be avoided. Figure taken from Figure from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/engineering.html#proper-implementation)."}
-knitr::include_graphics("./figures/minimize-leakage.png")
-```
-
-This also illustrates why the pre-processing step has to be considered as a blueprint that is applied to several different subsets of the data during model training. Of course, this also means that the pre-processing is not to actually be executed on the data before training, but will be executed, following the same general rules, several times during a new training.
-
-Let's finally turn to the implementation with KNN. First, we make the initial data split.
-
-```{r message=F}
-list_pkgs <- c("ggplot2", "patchwork", "caret", "recipes", "broom", "tidyverse", "vip", "pdp")
-new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
-if (length(new_pkgs) > 0) install.packages(new_pkgs)
-
-# As always we start by loading the packages we'll need
-library(ggplot2)
-library(patchwork)
-library(caret)
-library(recipes)
-library(broom)
-library(tidyverse)
-library(vip)
-library(pdp)
-```
-
-```{r}
-## Load daily data from all sites
-load("./data/ddf_allsites_nested_joined.RData")
-#load("ddf_allsites.RData")
-
-## Load daily data and rename for use below
-load("./data/ddf_ch_lae.RData") # loads 'ddf_ch_lae'
-#load("ddf_ch_lae.RData")
-
-df <- ddf_ch_lae %>% 
-  dplyr::select(-NEE_VUT_REF_QC, -TIMESTAMP) %>%  # not numeric features
-  drop_na()                                # drop rows with missing data
-```
-
-```{r}
-set.seed(123)  # for reproducibility
-
-index_caret <- createDataPartition(
-  df$GPP_NT_VUT_REF, p = 0.7,
-  list = FALSE
-  )
-
-df_train <- df %>%
-  slice(index_caret)
-
-df_test <- df %>%
-  slice(-index_caret)
-```
-
-We then define the pre-processing blueprint as `pp`.
-
-```{r}
-pp <- recipe(GPP_NT_VUT_REF ~ ., data = df_train) %>%
-  step_center(all_numeric(), -all_outcomes()) %>%        # normalizes numeric data to have a mean of zero
-  step_scale(all_numeric(), -all_outcomes())             # normalizes numeric data to have a standard deviation of one
-```
-
-Next, we specify the parameters determining the model training. Here, we're doing a 10-fold cross validation, repeated five times.
-
-```{r}
-my_cv <- trainControl(
-  method = "repeatedcv",      # method define the resampling method such as 'boot', 'none', 'cv', etc.
-  number = 10,                # number of folds or number of resampling iterations
-  repeats = 5                 # the number of complete sets of folds to compute (only for repeated k-fold cross-validation)
-)
-```
-
-Then the hyperparameter search is specified.
-
-```{r}
-# Create grid of hyperparameter values
-hyper_grid <- data.frame(k = c(2, 5, 10, 15, 18, 20, 22, 24, 26, 30, 35, 40, 60, 100))
-```
-
-This object will be provided to `train()` through its argument `tuneGrid`. It requires a data frame where column names correspond to the hyperparameters available for the particular model, and rows are for each combination of hyperparameters to be assessed.
-
-We can now combine it all with the `train()` function. We supply the pre-processing blueprint `pp` as the first argument to the train function. Using recipes in combination with **caret** offers a nice way to combine the clear way of specifying the pre-processing blueprint with recipes and the handy `train()` function of **caret**.
-
-```{r eval=F}
-set.seed(123)
-knn_fit <- train(
-  pp,
-  data = df_train,
-  method = "knn",
-  trControl = my_cv,
-  tuneGrid = hyper_grid,
-  metric = "RMSE"
-)
-
-knn_plot <- ggplot(knn_fit) + labs( title = "KNN", subtitle = "RMSE on validation data")
-
-knn_plot
-```
-
-![](./figures/knn_plot.png)
-```{r echo=F}
-knn_fit <- readRDS(file = "./data/knn_fit_ml2.rds")
-```
-
-This illustrates the generalisation error estimated from repeated k-fold cross-validation as a function of the number of neighbours. As shown in the table above, the lowest RMSE of 2.487583 was achieved with `k=24`. This model was then saved directly in the variable `knn_fit` 
-
-Let's apply the final _best-performing model_ on the validation data from the initial split that was held out completely during model training. The final model is automatically used when predicting values with new data using the generic `predict()` function.
-
-```{r message=F}
-df_test$GPP_NT_VUT_REF_predicted <- predict(knn_fit, newdata = df_test)
-
-df_test %>%
-  ggplot(aes(x = GPP_NT_VUT_REF_predicted, y = GPP_NT_VUT_REF)) +
-  geom_point() +
-  geom_abline(intercept=0, slope=1, linetype="dotted") +
-  theme_classic() +
-  labs(x = "Predicted GPP", y = "Observed GPP") +
-  geom_smooth(method='lm', color="red", size=0.5, se=FALSE)
-
-df_test %>% yardstick::metrics(GPP_NT_VUT_REF, GPP_NT_VUT_REF_predicted)
-```
-
-This looks reasonable. The KNN model, using 10 predictors for modelling daily GPP at the SwissFluxNet site CH-Lae (Lägern) achieves an R$^2$ of 0.67 and an RMSE of 2.46 gC m$^-2$ d$^-1$. The slope of the relationship between observed vs. modelled values falls very closely onto the 1:1 line (dotted), indicating that the model captured the relationships reliably across the full range of values. Let's keep the evaluation metrics as a reference in mind and remember it in later chapters when we model this data with other algorithms. Interestingly, the evaluation on the testing set from the initial split is even slightly better than estimated from the k-fold cross validation.
+In certain cases, data points stem from different "groups", and generalisability across groups is critical. In such cases, data from a given group must not be used both in the training and validation sets. Instead, splits should be made along group delineations. The *caret* function `groupKFold()` offers the solution for this case.
 
 ### Model evaluation
 
@@ -350,7 +288,7 @@ Also in this case our goal is to minimize the BIC. This metric has the feature t
 
 #### Metrics for classification
 
-In the examples for this course, we have thus far focussed on regression models. For classification, different metrics for measuring the agreement between predicted and observed values are used. They will be introduced in a later chapter. If you're curious already now, good overviews are provided in the following links:
+In the examples for this course, we have thus far focused on regression models. For classification, different metrics for measuring the agreement between predicted and observed values are used. They will be introduced in a later chapter. If you're curious already now, good overviews are provided in the following links:
 
 - [Hands On Machine Learning in R, Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/process.html#model-eval) for brief definitions.
 - [Wikipedia on Confusion Matrix](https://en.wikipedia.org/wiki/Confusion_matrix)
@@ -365,14 +303,14 @@ Our example data set contains time series of multiple variables. Above, we have 
 
 A handy function to add predictions and residuals from a fitted model to the data (must contain the variables used in the model), is [`augment`](https://broom.tidymodels.org/reference/data.frame_tidiers.html) from the tidyverse [*broom*](https://broom.tidymodels.org/index.html) package [@R-broom]. It adds information about observations to a data set. 
 
-Let's fit a linear regression model `GPP_NT_VUT_REF ~ PPFD_IN` and look at the residuals.
+Let's fit a linear regression model `GPP_NT_VUT_REF ~ SW_IN_F` and look at the residuals.
 
 ```{r}
 library(broom)
 
-linmod1 <- lm(GPP_NT_VUT_REF ~ PPFD_IN, data = df)
+linmod1 <- lm(GPP_NT_VUT_REF ~ SW_IN_F, data = ddf)
 
-df1 <- augment(linmod1, data = df)
+df1 <- augment(linmod1, data = ddf)
 
 df1 %>% 
   mutate(id = row_number()) %>% 
@@ -380,15 +318,14 @@ df1 %>%
   geom_point(size = 1, alpha = .4) +
   xlab("Row number") +
   ylab("Residuals") +
-  labs(title = "Univariate linear regression", subtitle = "GPP_NT_VUT_REF ~ PPFD_IN")
+  labs(title = "Univariate linear regression", subtitle = "GPP_NT_VUT_REF ~ SW_IN_F")
 ```
 
-Apparently, there is a clear pattern in the residuals with an apparent autocorrelation (the residual in one data point is correlated with the residual in its preceeding data point). This suggests that there is temporal information that we did not account for in our model. This could either be from additional predictors, not included here, that have a temporal pattern (note that we only included one predictor in this model), or from the inherent dynamics of the system itself, which is not captured by the predictors (e.g., memory effects).
+Apparently, there is a clear pattern in the residuals with an apparent autocorrelation (the residual in one data point is correlated with the residual in its preceding data point). This suggests that there is temporal information that we did not account for in our model. This could either be from additional predictors, not included here, that have a temporal pattern (note that we only included one predictor in this model), or from the inherent dynamics of the system itself, which is not captured by the predictors (e.g., memory effects).
 
 We can also plot residuals versus additional, potentially influential but not included predictors to guide the revision of the model. However, it is often not possible to determine effects by eye, especially if interactions between variables are important. We learn about methods to sequentially add predictors to a linear regression model in the 'Application' session (see Chapter \@ref(ch-08)).
 
-
-### Model interpretation
+### Bonus: Model interpretation
 
 Until now, we have seen how to build and train models, tune the hyperparameters and evaluate models. ML models work so well because they can effectively make use of large amounts of data and are flexible enough to model non-linear relationships and interactions, and predict rare and faint phenomena. This is their great advantage over classical statistical methods. However, this flexibility is underpinned by a high model complexity and a large number of parameters. This complexity also contrasts with traditional statistical methods, e.g., linear regression where fitted coefficients ($\beta_i$ in Chapter \@ref(ch-06)) can directly be interpreted and yield information about the sensitivity of the target variable to the different predictors and even about the statistical significance of their effect (we haven't looked at that part). In contrast, the complexity of ML models renders their interpretation difficult. The ML algorithms' predictive power comes at the cost of reduced *model interpretability*. ML models often appear to be "black boxes" which may limit their usefulness in typical applications in research, where we're often not only interested in *predicting*, but also in *understanding* how the model arrived at its predictions. We are often interested in identifying patterns in the data that would otherwise not be visible, but that the algorithm apparently identified and learned.
 
@@ -434,8 +371,6 @@ You see that the linear regression fit yields estimates of the coefficients $\be
 This is illustrated below.
 
 ```{r warning=F, message=F}
-library(ggplot2)
-
 n <- 100
 grid <- seq(-7, 7, length.out = 1000)
 t_dist <- dt(grid, df = n-3)           # 3 is the number of estimated coefficients
@@ -467,7 +402,7 @@ Variable importance in a fitted model can be assessed in R using the **vip** pac
 
 ```{r}
 library(vip)
-linmod3 <- lm(GPP_NT_VUT_REF ~ ., data = df)
+linmod3 <- lm(GPP_NT_VUT_REF ~ ., data = ddf %>% dplyr::select(-TIMESTAMP))
 vip(linmod3)
 ```
 
@@ -481,7 +416,7 @@ Verify that the bars plotted in the vip plot correspond to the t-statistic of th
 summary(linmod3)  # compare with values under `t-value`
 ```
 
-The results of the feature importance plot using `vip()`, agree with the statistics obtained from the `summary()` function. The variables `LW_IN_F` and `VPD_F` have largest $|t|$ statistic values (thus, the values on the tail ends of the t-distribution have low measure), which results in a small p-value, thus indicating that these are the most important features. On the other end, the variable `P_F` has the smallest $|t|$ statistic, which results in a large p-value, thus indicating that this variable is not as important.  
+The results of the feature importance plot using `vip()`, agree with the statistics obtaind from the `summary()` function. The variables `LW_IN_F` and `VPD_F` have largest $|t|$ statistic values (thus, the values on the tail ends of the t-distribution have low measure), which results in a small p-value, thus indicating that these are the most important features. On the other end, the variable `P_F` has the smallest $|t|$ statistc, which results in a large p-value, thus indicating that this variable is not as important.  
 
 To sum this up, variable importance can be measured for linear regression models using the *t*-statistic. 
 
@@ -509,25 +444,25 @@ Arguments to the function vip(), for permutation based feature importance
 - `linmod3`: A fitted model object 
 - `train` : the training data to be used to compute the feature importances 
 - `method` : `"permute"` for permutation based method 
-- `target` : specifying the target variable for the train dataset
+- `target` : specifying the target variable for the train datset
 - `metric` : `"RMSE"` root mean squared error for the regression based task 
 - `n_sim` : number of times the simulation is to be repeated, the result is averaged over all the simulations ; choose greater values to increase the stability of estimates 
 - `sample_frac` : specifies the proportion of the training data to be used in each simulation. Default value is NULL i.e. all of training data is used  
 - `pred_wrapper` : Prediction function that requires two arguments, `object` and `newdata`. The output of this function should be determined by the metric being used
     - A numeric vector of predicted outcomes for a regression task
-    - A vector of predicted class labels, or a matrix of predicted class probabilities for a classification task 
+    - A vector of predicted class labels, or a matrix of predicted class probabilitites for a classification task 
 - `type` : Character string specifying how to compare the baseline and permuted performance metrics; default value is `'difference'`, and the other option is `'ratio'`
 
 *Note: In case of large datasets, `n_sim` and `sample_frac` can be used to reduce the execution time of the algorithm, as permutation based approaches can become slow as the number of predictors grows.*
 
 ```{r}
-pfun <- function(object, newdata) predict(object, newdata = newdata) # inline function defined to output the predictions for newdata given a particular model object 
-
+# inline function defined to output the predictions for newdata given a particular model object 
+pfun <- function(object, newdata) predict(object, newdata = newdata) 
 
 ## variable importance plot using the permute method, with type == 'ratio' 
 vip(
   linmod3,
-  train = df,
+  train = ddf %>% dplyr::select(-TIMESTAMP),
   method = "permute",
   target = "GPP_NT_VUT_REF",
   metric = "RMSE",
@@ -540,7 +475,7 @@ vip(
 ## variable importance plot using the permute method, with type == 'difference' 
 vip(
   linmod3,
-  train = df,
+  train = ddf %>% dplyr::select(-TIMESTAMP),
   method = "permute",
   target = "GPP_NT_VUT_REF",
   metric = "RMSE",
@@ -551,19 +486,49 @@ vip(
 )
 ```
 
-Now we can compare the importance plots obtained from the model-specific t-statistic approach and the model agnostic permutation based method. The feature importances obtained from both approaches differ a little, because of the underlying differences in the feature importance evaluation. Despite of the differences, both methods robustly return the key important features, particularly their ranks.
+Now we can compare the importance plots obtained from the model-specific t-statistic approach and the model agnostic permuation based method. The feature importances obtained from both approaches differ a little, because of the underlying differences in the feature importance evaluation. Despite of the differences, both methods robustly return the key important features, particularly their ranks.
 
 **Checkpoint**
 
-Compute the variable importance for the best fit knn model, which we obtained earlier in the tutorial, using the `vip()` function in default mode. Repeat the same with permutation based method, with type as 'difference' and 'ratio'. Do the two return the same top-4 features ? Verify.
+Compute the variable importance for the best fit knn model, which we obtained earlier in the tutorial, using the `vip()` function in default mode. Repeat the same with permuatation based method, with type as 'difference' and 'ratio'. Do the two return the same top-4 features ? Verify.
 
 **Solution**
 
 ```{r}
+## Data wrangling done above
+
+## Set up recipe
+library(recipes)
+pp <- recipe(GPP_NT_VUT_REF ~ ., data = ddf_train %>% dplyr::select(-TIMESTAMP)) %>%
+  step_center(all_numeric(), -all_outcomes()) %>%        # normalizes numeric data to have a mean of zero
+  step_scale(all_numeric(), -all_outcomes())      
+
+## Set up knn
+my_cv <- trainControl(
+  method = "repeatedcv",      # method define the resampling method such as 'boot', 'none', 'cv', etc.
+  number = 10,                # number of folds or number of resampling iterations
+  repeats = 5                 # the number of complete sets of folds to compute (only for repeated k-fold cross-validation)
+)
+
+hyper_grid <- data.frame(k = c(2, 5, 10, 15, 18, 20, 22, 24, 26, 30, 35, 40, 60, 100))
+
+set.seed(123)
+knn_fit <- train(
+  pp,
+  data = ddf_train %>% dplyr::select(-TIMESTAMP),
+  method = "knn",
+  trControl = my_cv,
+  tuneGrid = hyper_grid,
+  metric = "RMSE"
+)
+
+## variable importance plot without the permute method
 vip(knn_fit)
+
+## variable importance plot using the permute method, with type == 'ratio' 
 vip(
   knn_fit,
-  train = df,
+  train = ddf %>% dplyr::select(-TIMESTAMP),
   method = "permute",
   target = "GPP_NT_VUT_REF",
   metric = "RMSE",
@@ -572,9 +537,11 @@ vip(
   pred_wrapper = pfun, 
   type = 'difference' 
 )
+
+## variable importance plot using the permute method, with type == 'difference' 
 vip(
   knn_fit,
-  train = df,
+  train = ddf %>% dplyr::select(-TIMESTAMP),
   method = "permute",
   target = "GPP_NT_VUT_REF",
   metric = "RMSE",
@@ -602,21 +569,21 @@ For a selected predictor (x)
 
 As the steps explain, PDPs plot the change in the average predicted value ($\hat{y}$) as a function of a specified feature. As you will see in later chapters, PDPs become more useful when non-linear relationships are present. However, PDPs of linear models help illustrate how a fixed change in $x_i$ relates to a fixed linear change in $\hat{y_i}$ while taking into account the average effect of all the other features in the model. For linear regression models, the slope of the PDP is equal to the corresponding coefficient of the model.
 
-Considering Figure \@ref(fig:pdp), to compute the PDP of target variable with respect to Gr_Liv_Area, we modify the values of this variable for all the rows in the data set, for each [j1, j2, ..., j20] in the grid. Feed this modified dataset to the pre-trained model and compute the mean of our target variable (mean taken over all rows). Finally at the end of the algorithm we have 20 mean responses of the target variable for 20 different values of Gr_Liv_Area. Finally we plot the mean response of the target variable with respect to the changing variable Gr_Liv_Area to get the partial dependence plot. 
+Considering Figure \@ref(fig:pdp), to compute the PDP of target variable with respect to Gr_Liv_Area, we modify the values of this variable for all the rows in the data set, for each [j1, j2, ..., j20] in the grid. Feed this modified dataset to the pre-trained model and compute the mean of our target variable (mean taken over all rows). Finally at the end of the algorithm we have 20 mean responses of the target variable for 20 different values of Gr_Liv_Area. Finally we plot the mean response of the target variable with respect to the changing variable Gr_Liv_Area to get the parital dependence plot. 
 ```{r pdp, echo = FALSE, fig.cap = "Visualiation of a partial dependence plot (from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/images/pdp-illustration.png))."}
 knitr::include_graphics("./figures/pdp-illustration.png")
 ```
 
-Lucky for us, this code has already been implemented in the **pdp** package in R [@R-pdp].  We use the `partial()` function to plot the partial dependence plot for a single predictor variable, `PPFD_IN` or `VPD_F`, or for a subset of both these variables. Since our models are linear, we expect the PDP curves to be linear as well. The first curve shows a positive linear relationship between `PPFD_IN` and the target y_hat (`GPP_NT_VUT_REF`), i.e. as the `PPFD_IN` increases, the target increases. Whereas the second curve shows us that there is a negative linear dependence between `VPD_F` and `GPP_NT_VUT_REF`. The final plot shows a 2D partial dependence plot with `PPFD_IN` and `VPD_F`, and this follows a linear relationship too. As expected, we get the highest value for our target variable in the lower right corner and the smallest value in the upper left corner.
+Lucky for us, this code has already been implemented in the **pdp** package in R [@R-pdp].  We use the `partial()` function to plot the partial dependence plot for a single predictor variable, `SW_IN_F` or `VPD_F`, or for a subset of both these variables. Since our models are linear, we expect the PDP curves to be linear as well. The first curve shows a positive linear relationship between `SW_IN_F` and the target y_hat (`GPP_NT_VUT_REF`), i.e. as the `SW_IN_F` increases, the target increases. Whereas the second curve shows us that there is a negative linear dependence between `VPD_F` and `GPP_NT_VUT_REF`. The final plot shows a 2D partial dependence plot with `SW_IN_F` and `VPD_F`, and this follows a linear relationship too. As expected, we get the highest value for our target variable in the lower right corner and the smallest value in the upper left corner.
 
 ```{r}
 library(pdp)
 
-partial(linmod3, "PPFD_IN", plot = TRUE)
+partial(linmod3, "SW_IN_F", plot = TRUE)
 
 partial(linmod3, "VPD_F", plot = TRUE)
 
-partial(linmod3, c("PPFD_IN", "VPD_F"), plot = TRUE)
+partial(linmod3, c("SW_IN_F", "VPD_F"), plot = TRUE)
 ```
 
 The `pdp` package works with various model classes. For classes that are not available, a prediction wrapper function has to be specified as described for example [here](https://bradleyboehmke.github.io/HOML/iml.html#implementation-6) [@boehmke_hands-machine_2019]. If you want to learn more about PDP, have a look the [online book](https://christophm.github.io/interpretable-ml-book/) by @molnar_interpretable_2019.
@@ -626,64 +593,120 @@ Note: The computational demand of partial dependence analysis rapidly increases 
 *For the interested: If you do not want to average the y_hat, predictions over all the rows for each value of $X_i$, look into Individual conditional expectation (ICE) curves, which rather than averaging the predicted values across all observations, observe and plot the individual observation-level predictions.*
 
 ## Exercise
+### Setup
 
-**1. Adjusted-$R^2$**
+The following exercise builds on the exercise of the previous tutorial. So let's load the work done there first:
 
-a. Implement the formula for the adjusted-$R^2$ using simple "low-level" functions and $R^2$ defined as
+```{r}
+## Load data and extrat relevant subset
+library(tidyverse)
 
-  - the coefficient of determination and then
-  - as the square of the Pearson's correlation coefficient.
+ddf <- read_csv("./data/FLX_CH-Dav_FLUXNET2015_FULLSET_DD_1997-2014_1-3.csv") %>% 
+  select(starts_with("TIMESTAMP"),
+         ends_with("_F"),
+         GPP_NT_VUT_REF,
+         NEE_VUT_REF_QC,
+         -contains("JSB")) %>%
+  mutate(TIMESTAMP = lubridate::ymd(TIMESTAMP)) %>%
+  na_if(-9999) %>%
+  select(-ends_with("_QC"), NEE_VUT_REF_QC) %>% 
+  mutate(GPP_NT_VUT_REF = ifelse(NEE_VUT_REF_QC < 0.9, NA, GPP_NT_VUT_REF)) %>% 
+  select(-NEE_VUT_REF_QC) %>% 
+  drop_na()
 
-b. Compare the values of the two with what is returned by `summary(lm(..))$adj.r.squared`. Which one of the two is used by `summary(lm(..))`? For your investigations, generate correlated random data and apply functions on it.
+## Split data into testing and training data
+library(rsample)
 
-***
-**2. Cross validation**
+set.seed(1982)  # for reproducibility
+split <- initial_split(ddf, prop = 0.7)
+ddf_train <- training(split)
+ddf_test <- testing(split)
+```
 
-Assess the generalisability of three alternatives of a linear regression model for `GPP_NT_VUT_REF`:
+### Linear Model
 
-a. with one predictor (`PPFD_IN`),
-b. three predictors (`PPFD_IN`, `VPD_F`, and `TA_F,`),
-c. all available predictors.
+In the previous exercise, you fitted a linear regression model using the base-R function `lm()` and the training set. The target variable was `"GPP_NT_VUT_REF"`, and predictor variables were all available meterological variables in the dataset.
 
-Which model works best in terms of its generalisability, assessed by 5-fold cross-validation and using the RMSE as the loss function?
+First, repeat these same steps but use **caret** and the function `train()` for fitting the same linear regression model (with all predictors) on the same data. Does it yield identical results as using `lm()` directly? You will have to set the argument `trControl` accordingly to avoid resampling, and instead fit the model on the all data in `ddf_train`. You can use `summary()` also on the object returned by the function `train()`.
 
-Use the caret function `train()` with RMSE as the loss function and use the data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors!).
+Second, repeat the visualisation and display of model metrics. Feel free to copy-paste from the previous exercise /solutions. You are repeating this step mainly to refresh the previous results and to compare them to your work on the next tasks.
 
-**Hint**
+```{r}
+## write your code here
+```
 
-To get the generalisation performance assessed during cross-validation (and not on the data held out from an initial split - which is not done here), you can use `summary(resamples(list(model1 = output_train1, ...)))`, where `output_train1` is the output of a `train()` function call with resampling. We see that by including all predictors, we get the best model performance in terms of it cross-validation results, i.e., the lowest root mean square error (RMSE) and the highest $R^2$, averaged across folds.
 
-***
-**3. Exploratory modelling**
+## KNN
+### Check data
 
-Using the same data set as above (daily data for CH-Lae), find the model with the best performance, measured by evaluation against testing data held out from an initial split (30-70%). Use your own creativity to pre-process features and select variables, and chose between either a KNN or a multivariate linear regression, or any other ML model if you like (see models available with caret [here](https://topepo.github.io/caret/available-models.html)). Use all methods you've learned so far and impress your peers. Who gets the best generalisable model? Document and justify all steps you take. Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
+The variable `PA_F` was not significant in the linear model. Find a way to show that the variable has a weird distribution and exclude it from further analysis.
 
-***
-**4. Resampling - Bonus problem**
+```{r}
+## write your code here
+```
 
-a. Define a resampling function of the form `my_resample_folds_nested(df, k)` generating $k$ folds and taking a data frame `df` as arguments. This function should return a nested data frame with $k$ rows and two columns `train` and `test` that contain nested dataframes for training and testing data with each fold. Use data from file `ddf_ch_lae.RData` (avoid `TIMESTAMP` and `NEE_VUT_REF_QC` as predictors).
-b. Print the dimensions of the whole data frame and run head() of fold two of the column 'train' of the nested data frame (this is just to make the peer review easier).
 
-*"Relief option:"* You may create two separate flat data frames, one with testing, and one with training data, where one column specifies which fold each row belongs to. 
+### Training
 
-**Steps:**
+Fit two KNN models on `ddf_train` (excluding `"PA_F"`), one with $k = 2$ and one with $k = 30$, both without resampling. Use the RMSE as the loss function. Center and scale data as part of the pre-processing and model formulation specification using the function `recipe()`.
 
-1. Use the caret function `createFolds` to split a vector of row indices into a list of length corresponding to the number of folds, where each list element cotains the indices of the training resamples for the respective fold.
-2. Use the dplyr function `slice()` to subset a dataframe by row numbers.
-3. Use `group_by()` in combination with `nest()` for nesting data frames for each of the $k$ folds and end up with a dataframe that has $k$ rows.
-4. Fit a linear model of the form `GPP_NT_VUT_REF ~ PPFD_IN`
-    - directly on all the data in `df` and
-    - on the resampled **training** folds. 
-5. Evaluate the models by calculating metrics (squared Pearson's correlation coefficient, and RMSE) of predictions made
-    - for the full dataframe `df`
-    - for each respective **testing** fold separately. For this, report the mean across metrics calculated on each testing fold. 
+```{r}
+## write your code here
+```
 
-If this sounds confusing: Just implement a k-fold cross-validation as described also in the tutorial and report the cross-validation metrics.
+### Prediction
 
-**Hints:**
-*Feel free to come up with a solution that doesn't make use of these hints.*
+With the two models fitted above, predict `"GPP_NT_VUT_REF"` for both and training and the testing sets, and evaluate them as above (metrics and visualisation). 
 
-- You may use `mutate( newcol = purrr::map( nested_col, ~function_name(.)) )` to apply a function `function_name()` on each of the nested data frames in column `nested_col`. The `.` refers to the position at which the argument `nested_col` goes.
-- You may use the broom function `augment()` to add a column `.fitted` to a data frame, given a model object that was generated using predictors that are available as columns in the respective data frame.
-- You may use `mutate( newcol = purrr::map2( arg1, arg2, ~function_name(.x, .y)) )` to apply a function `function_name()` that takes two arguments from other columns in the same data frame. The `.x` and `.y` refer to the position at which the two arguments go.
+Which model do you expect to perform better on the training set and which to perform better on the testing set? Why? Do you find evidence for overfitting in any of the models?
 
+```{r}
+## write your code here
+```
+
+### Sample hyperparameters
+
+Train a KNN model with hyperparameter ($k$) tuned, and with five-fold cross validation, using the training set. As the loss function, use RMSE. Sample the following values for $k$: 2, 5, 10, 15, 18, 20, 22, 24, 26, 30, 35, 40, 60, 100. Visualise the RMSE as a function of $k$.
+
+Hint:
+
+- The visualisation of cross-validation results can be visualised with the `plot(model_object)` of `ggplot(model_object)`.
+
+```{r}
+## write your code here
+```
+
+
+## Random forest
+
+### Training
+
+Fit a random forest model with `ddf_train` and all predictors excluding `"PA_F"` and five-fold cross validation. Use RMSE as the loss function.
+
+Hints:
+
+- Use the package *ranger* which implements the random forest algorithm. 
+- See [here](https://topepo.github.io/caret/available-models.html) for information about hyperparameters available for tuning with caret.
+- Set the argument `savePredictions = "final"` of function `trainControl()`.
+
+```{r}
+## write your code here
+```
+
+### Prediction
+
+Evaluate the trained model on the training and on the test set, giving metrics and a visualisation as above.
+
+How are differences in performance to be interpreted? Compare the performances of linear regression, KNN, and random forest, considering the evaluation on the test set.
+
+```{r}
+## write your code here
+```
+
+Show the model performance (metrics and visualisation) on the validation sets all cross validation folds combined.
+
+Do you expect it to be more similar to the model performance on the training set or the testing set in the evaluation above? Why?
+
+```{r}
+## write your code here
+```
