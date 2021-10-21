@@ -550,7 +550,7 @@ The aim of supervised ML is to find a model $\hat{Y} = f(X)$ so that $\hat{Y}$ a
 In R, it is common to use the *formula* notation to specify the target and predictor variables. You have probably encountered formulas before, e.g., for a linear regression using the `lm()` function. To specify a linear regression model for `GPP_NT_VUT_REF` with three predictors `SW_F_IN`, `VPD_F`, and `TA_F`, we write:
 
 ```{r eval=F}
-lm(GPP_NT_VUT_REF ~ SW_F_IN + VPD_F + TA_F, data = ddf)
+lm(GPP_NT_VUT_REF ~ SW_IN_F + VPD_F + TA_F, data = ddf)
 ```
 
 As mentioned throughout this tutorial, the *caret* package provides a unified interface to define different ML models and pre-processing recipes. In the next tutorial, we will learn more about how to do so. In this tutorial's exercise you will deepen your understanding of data wrangling, splitting and pre-processing as well as setting up LM using the formula notation.
