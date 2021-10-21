@@ -116,7 +116,7 @@ We've learned about the danger of *data leakage*. It happens when information fr
 knitr::include_graphics("./figures/minimize-leakage.png")
 ```
 
-This also illustrates why the pre-processing step has to be considered as a blueprint that is applied to several different subsets of the data during model training. Of course, this also means that the pre-processing is not to actually be executed on the data before training, but will be executed, following the same general rules, several times anew during training.
+This also illustrates why the pre-processing step has to be considered as a blueprint that is applied to several different subsets of the data during model training. Of course, this also means that the pre-processing is not to actually be executed on the data before training, but will be executed, following the same general rules, several times during a new training.
 
 Let's finally turn to the implementation with KNN. First, we make the initial data split.
 
@@ -481,7 +481,7 @@ Verify that the bars plotted in the vip plot correspond to the t-statistic of th
 summary(linmod3)  # compare with values under `t-value`
 ```
 
-The results of the feature importance plot using `vip()`, agree with the statistics obtaind from the `summary()` function. The variables `LW_IN_F` and `VPD_F` have largest $|t|$ statistic values (thus, the values on the tail ends of the t-distribution have low measure), which results in a small p-value, thus indicating that these are the most important features. On the other end, the variable `P_F` has the smallest $|t|$ statistc, which results in a large p-value, thus indicating that this variable is not as important.  
+The results of the feature importance plot using `vip()`, agree with the statistics obtained from the `summary()` function. The variables `LW_IN_F` and `VPD_F` have largest $|t|$ statistic values (thus, the values on the tail ends of the t-distribution have low measure), which results in a small p-value, thus indicating that these are the most important features. On the other end, the variable `P_F` has the smallest $|t|$ statistic, which results in a large p-value, thus indicating that this variable is not as important.  
 
 To sum this up, variable importance can be measured for linear regression models using the *t*-statistic. 
 
@@ -509,13 +509,13 @@ Arguments to the function vip(), for permutation based feature importance
 - `linmod3`: A fitted model object 
 - `train` : the training data to be used to compute the feature importances 
 - `method` : `"permute"` for permutation based method 
-- `target` : specifying the target variable for the train datset
+- `target` : specifying the target variable for the train dataset
 - `metric` : `"RMSE"` root mean squared error for the regression based task 
 - `n_sim` : number of times the simulation is to be repeated, the result is averaged over all the simulations ; choose greater values to increase the stability of estimates 
 - `sample_frac` : specifies the proportion of the training data to be used in each simulation. Default value is NULL i.e. all of training data is used  
 - `pred_wrapper` : Prediction function that requires two arguments, `object` and `newdata`. The output of this function should be determined by the metric being used
     - A numeric vector of predicted outcomes for a regression task
-    - A vector of predicted class labels, or a matrix of predicted class probabilitites for a classification task 
+    - A vector of predicted class labels, or a matrix of predicted class probabilities for a classification task 
 - `type` : Character string specifying how to compare the baseline and permuted performance metrics; default value is `'difference'`, and the other option is `'ratio'`
 
 *Note: In case of large datasets, `n_sim` and `sample_frac` can be used to reduce the execution time of the algorithm, as permutation based approaches can become slow as the number of predictors grows.*
@@ -551,11 +551,11 @@ vip(
 )
 ```
 
-Now we can compare the importance plots obtained from the model-specific t-statistic approach and the model agnostic permuation based method. The feature importances obtained from both approaches differ a little, because of the underlying differences in the feature importance evaluation. Despite of the differences, both methods robustly return the key important features, particularly their ranks.
+Now we can compare the importance plots obtained from the model-specific t-statistic approach and the model agnostic permutation based method. The feature importances obtained from both approaches differ a little, because of the underlying differences in the feature importance evaluation. Despite of the differences, both methods robustly return the key important features, particularly their ranks.
 
 **Checkpoint**
 
-Compute the variable importance for the best fit knn model, which we obtained earlier in the tutorial, using the `vip()` function in default mode. Repeat the same with permuatation based method, with type as 'difference' and 'ratio'. Do the two return the same top-4 features ? Verify.
+Compute the variable importance for the best fit knn model, which we obtained earlier in the tutorial, using the `vip()` function in default mode. Repeat the same with permutation based method, with type as 'difference' and 'ratio'. Do the two return the same top-4 features ? Verify.
 
 **Solution**
 
@@ -602,7 +602,7 @@ For a selected predictor (x)
 
 As the steps explain, PDPs plot the change in the average predicted value ($\hat{y}$) as a function of a specified feature. As you will see in later chapters, PDPs become more useful when non-linear relationships are present. However, PDPs of linear models help illustrate how a fixed change in $x_i$ relates to a fixed linear change in $\hat{y_i}$ while taking into account the average effect of all the other features in the model. For linear regression models, the slope of the PDP is equal to the corresponding coefficient of the model.
 
-Considering Figure \@ref(fig:pdp), to compute the PDP of target variable with respect to Gr_Liv_Area, we modify the values of this variable for all the rows in the data set, for each [j1, j2, ..., j20] in the grid. Feed this modified dataset to the pre-trained model and compute the mean of our target variable (mean taken over all rows). Finally at the end of the algorithm we have 20 mean responses of the target variable for 20 different values of Gr_Liv_Area. Finally we plot the mean response of the target variable with respect to the changing variable Gr_Liv_Area to get the parital dependence plot. 
+Considering Figure \@ref(fig:pdp), to compute the PDP of target variable with respect to Gr_Liv_Area, we modify the values of this variable for all the rows in the data set, for each [j1, j2, ..., j20] in the grid. Feed this modified dataset to the pre-trained model and compute the mean of our target variable (mean taken over all rows). Finally at the end of the algorithm we have 20 mean responses of the target variable for 20 different values of Gr_Liv_Area. Finally we plot the mean response of the target variable with respect to the changing variable Gr_Liv_Area to get the partial dependence plot. 
 ```{r pdp, echo = FALSE, fig.cap = "Visualiation of a partial dependence plot (from [Bradley & Boehmke](https://bradleyboehmke.github.io/HOML/images/pdp-illustration.png))."}
 knitr::include_graphics("./figures/pdp-illustration.png")
 ```
@@ -651,7 +651,7 @@ Use the caret function `train()` with RMSE as the loss function and use the data
 
 **Hint**
 
-To get the generalisation performance assessed during cross-validation (and not on the data held out from an initial split - which is not done here), you can use `summary(resamples(list(model1 = output_train1, ...)))`, where `output_train1` is the ouput of a `train()` function call with resampling. We see that by including all predictors, we get the best model performance in terms of it cross-validation results, i.e., the lowest root mean square error (RMSE) and the highest $R^2$, averaged across folds.
+To get the generalisation performance assessed during cross-validation (and not on the data held out from an initial split - which is not done here), you can use `summary(resamples(list(model1 = output_train1, ...)))`, where `output_train1` is the output of a `train()` function call with resampling. We see that by including all predictors, we get the best model performance in terms of it cross-validation results, i.e., the lowest root mean square error (RMSE) and the highest $R^2$, averaged across folds.
 
 ***
 **3. Exploratory modelling**

@@ -50,9 +50,10 @@ for (i in 1:nrow(A)){
   
 
   B <- B[-which(B == max(B))] # update the B vector removing the biggest values
+  summ <- bind_rows(summ, data.frame(row_number = i, avg = mean(B)))
 }
 
-  summ <- bind_rows(summ, data.frame(row_number = i, avg = mean(B)))
+
   
 summ
 ```
@@ -193,7 +194,7 @@ _Hints_:
    - Your code will most certainly have bugs at first. To debug efficiently, write code first in a simple R script and use the debugging options in RStudio (see [here](https://support.rstudio.com/hc/en-us/articles/205612627-Debugging-with-RStudio)).
   
    
-+ Value retriving
++ Value retrieving
 
   - To get AIC and BIC values for a given model, use the base-R functions `AIC()` and `BIC()`. 
   
