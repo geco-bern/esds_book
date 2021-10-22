@@ -627,19 +627,34 @@ ddf_test <- testing(split)
 
 In the previous exercise, you fitted a linear regression model using the base-R function `lm()` and the training set. The target variable was `"GPP_NT_VUT_REF"`, and predictor variables were all available meterological variables in the dataset.
 
-First, repeat these same steps but use **caret** and the function `train()` for fitting the same linear regression model (with all predictors) on the same data. Does it yield identical results as using `lm()` directly? You will have to set the argument `trControl` accordingly to avoid resampling, and instead fit the model on the all data in `ddf_train`. You can use `summary()` also on the object returned by the function `train()`.
+**First**, repeat these same steps but use **caret** and the function `train()` for fitting the same linear regression model (with all predictors) on the same data. You will have to set the argument `trControl` accordingly to avoid resampling, and instead fit the model on all data in `ddf_train`. Does it yield identical results as using `lm()` directly? 
 
-Second, repeat the visualisation and display of model metrics. Feel free to copy-paste from the previous exercise /solutions. You are repeating this step mainly to refresh the previous results and to compare them to your work on the next tasks.
+**Second**, repeat the visualisation and display of model metrics. Feel free to copy-paste from the previous exercise /solutions. You are repeating this step mainly to refresh the previous results and to compare them to your work on the next tasks.
+
+**Third**, in the previous exercise we found that `PA_F` was not significant. Build another linear model with `train()` but this time without using `PA_F` as predictor. Can you find a model metric that supports dropping `PA_F`from further analysis?
+
+Hints:
+
+- To specify the argument `trControl` you will have to use the function `trainControl`. See the tutorial for the correct ssyntax and enter `?trainControl` into the console to find out how to specify the right method.
+- You can use `summary()` also on the object returned by the function `train()` (similar to the object returned by `lm()`).
+- To support dropping `PA_F`, you might want to consider one of the introduced information criteria.
 
 ```{r}
 ## write your code here
+## 1. Setting up a linear model with train()
+
+## 2. Repeat visualisation and display of model metrics from Exercise 06
+
+## 3. Compare model performance with and without `PA_F` as predictor
 ```
 
 
 ## KNN
 ### Check data
 
-The variable `PA_F` was not significant in the linear model. Find a way to show that the variable has a weird distribution and exclude it from further analysis.
+The variable `PA_F` was not significant in the linear model. Find a way to show that the variable has a "weird" distribution and exclude it from further analysis.
+
+Hint: To exclude `PA_F` from further analysis, make use of a recipe that you can use for the KNN and random forest model (which you will have to formulate below).
 
 ```{r}
 ## write your code here
@@ -659,6 +674,8 @@ Fit two KNN models on `ddf_train` (excluding `"PA_F"`), one with $k = 2$ and one
 With the two models fitted above, predict `"GPP_NT_VUT_REF"` for both and training and the testing sets, and evaluate them as above (metrics and visualisation). 
 
 Which model do you expect to perform better on the training set and which to perform better on the testing set? Why? Do you find evidence for overfitting in any of the models?
+
+Hint: Make use of the visualization code that you used above and in Exercise 06.
 
 ```{r}
 ## write your code here
@@ -698,6 +715,8 @@ Hints:
 Evaluate the trained model on the training and on the test set, giving metrics and a visualisation as above.
 
 How are differences in performance to be interpreted? Compare the performances of linear regression, KNN, and random forest, considering the evaluation on the test set.
+
+Hint: Make use of the visualization code that you used above and in Exercise 06.
 
 ```{r}
 ## write your code here
