@@ -57,7 +57,6 @@ Fit a linear regression model using the base-R function `lm()` and the training 
 
 - What is the $R^2$ of predicted vs. observed `"GPP_NT_VUT_REF"`?
 - Is the linear regression slope significantly different from zero for all predictors?
-- Is a linear regression model with "poor" predictors removed better supported by the data than a model including all predictors?
 
 ```{r warning=FALSE, message=FALSE}
 ## fit linear regression model
@@ -70,12 +69,6 @@ linmod_baser <- lm(
 
 ## show summary information of the model
 summary(linmod_baser)
-
-## Models can be compared, for example by the Bayesian Information Criterion (BIC). 
-## It penalizes complex models and is optimal (lowest) where the trade-off between 
-## explanatory power on the training set vs. number of predictors is best. The BIC
-## tends to be more conservative than the AIC.
-BIC(linmod_baser)
 ```
 
 The variable `PA_F` was not significant in the linear model. Therefore, we won't use it for the models below.
@@ -88,12 +81,6 @@ linmod_baser_nopaf <- lm(
     drop_na() %>% 
     select(-TIMESTAMP, -PA_F)
 )
-
-## The R-squared is slightly lower here (0.6903) than in the model with all predictors (0.6904)
-summary(linmod_baser_nopaf)
-
-## ... but the BIC is clearly lower, indicating that the model with PA_F removed is better.
-BIC(linmod_baser_nopaf)
 ```
 
 
@@ -232,7 +219,7 @@ df_baked <- recipe(~., data = df) %>%
   bake(., new_data = df)
 ```
 
-Pre-processing steps and their order are specified by sequentially adding steps, combined by the pipe operator (`%>%`). It's sensible to drop zero-variance predictors first to avoid later steps are executed on them. The dummy-encoding must come last. Otherwise, 0 and 1 values are re-scaled and are converted to numeric. Whether centering is done before scaling or the other way round is not relevant. Below is the full implementation.*
+Pre-processing steps and their order are specified by sequentially adding steps, combined by the pipe operator (`%>%`). It's sensible to drop zero-variance predictors first to avoid later steps are executed on them. The dummy-encoding must come last. Otherwise, 0 and 1 values are re-scaled and are converted to numeric. Whether centering is done before scaling or the other way round is not relevant.
 
 ```{r}
 ## Plotting
@@ -257,4 +244,4 @@ gg_baked <- df_baked %>%
 gg_org / gg_baked
 ```
 
-We can see that the distribution remained the same but the actual values shifted to vary around 0.
+We can see that the distribution remained the same but the actual values shifted to vary around 0 for both features.
