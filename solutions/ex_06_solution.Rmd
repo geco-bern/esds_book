@@ -5,7 +5,7 @@ output: html_document
 
 # Solutions {#solutions}
 
-Now that you are familiar with the basic steps for supervised machine learning, you can get your hands on the data yourself and implement code for addressing the modelling task outlined in Chapter \@ref(motivation). 
+Now that you are familiar with the basic steps for supervised machine learning, you can get your hands on the data yourself and implement code for addressing the modelling task outlined in Chapter \@ref(motivation).
 
 ## Reading and cleaning
 
@@ -48,16 +48,15 @@ ddf_train <- training(split)
 ddf_test <- testing(split)
 ```
 
-
 ## Linear model
 
 ### Training
 
 Fit a linear regression model using the base-R function `lm()` and the training set. The target variable is `"GPP_NT_VUT_REF"`, and predictor variables are all available meterological variables in the dataset. Answer the following questions:
 
-- What is the $R^2$ of predicted vs. observed `"GPP_NT_VUT_REF"`?
-- Is the linear regression slope significantly different from zero for all predictors?
-- Is a linear regression model with "poor" predictors removed better supported by the data than a model including all predictors?
+-   What is the $R^2$ of predicted vs. observed `"GPP_NT_VUT_REF"`?
+-   Is the linear regression slope significantly different from zero for all predictors?
+-   Is a linear regression model with "poor" predictors removed better supported by the data than a model including all predictors?
 
 ```{r warning=FALSE, message=FALSE}
 ## fit linear regression model
@@ -96,18 +95,17 @@ summary(linmod_baser_nopaf)
 BIC(linmod_baser_nopaf)
 ```
 
-
 ### Prediction
 
-With the model containing all predictors and fitted on `ddf_train`, make predictions using first `ddf_train` and then `ddf_test`. Compute the $R^2$ and the root-mean-square error, and visualise modelled vs. observed values to evaluate both predictions. 
+With the model containing all predictors and fitted on `ddf_train`, make predictions using first `ddf_train` and then `ddf_test`. Compute the $R^2$ and the root-mean-square error, and visualise modelled vs. observed values to evaluate both predictions.
 
 Do you expect the linear regression model trained on `ddf_train` to predict substantially better on `ddf_train` than on `ddf_test`? Why (not)?
 
 Hints:
 
-- To calculate predictions, use the generic function `predict()` with the argument `newdata = ...`. 
-- The $R^2$ can be extracted from the model object as `summary(model_object)$r.squared`, or is (as the RMSE) given in the metrics data frame returned by `metrics()` from the *yardstick* library. 
-- For visualisation the model performance, consider a scatterplot, or (better) a plot that reveals the density of overlapping points. (We're plotting information from over 4000 data points here!)
+-   To calculate predictions, use the generic function `predict()` with the argument `newdata = ...`.
+-   The $R^2$ can be extracted from the model object as `summary(model_object)$r.squared`, or is (as the RMSE) given in the metrics data frame returned by `metrics()` from the *yardstick* library.
+-   For visualisation the model performance, consider a scatterplot, or (better) a plot that reveals the density of overlapping points. (We're plotting information from over 4000 data points here!)
 
 ```{r warning=FALSE, message=FALSE}
 library(patchwork)
@@ -177,10 +175,9 @@ eval_model <- function(mod, df_train, df_test){
 eval_model(mod = linmod_baser, df_train = ddf_train, df_test = ddf_test)
 ```
 
-Here, the function `eval_model()` returned an object that is made up of two plots (`return(gg1 + gg2)` in the function definition). This combination of plots by `+` is enabled by the [**patchwork**](https://patchwork.data-imaginist.com/) library. The individual plot objects (`gg1` and `gg2`) are returned by the `ggplot()` functions. The visualisation here is density plot of hexagonal bins. It shows the number of points inside each bin, encoded by the color (see legend "count"). We want the highest density of points along the 1:1 line (the dotted line). Predictions match observations perfectly for points lying on the 1:1 line. Alternatively, we could also use a scatterplot to visualise the model evaluation. However, a large number of points would overlie each other. As typical machine learning applications make use of large number of data, such evaluation plots would typically face the problem of overlying points and density plots are a solution. 
+Here, the function `eval_model()` returned an object that is made up of two plots (`return(gg1 + gg2)` in the function definition). This combination of plots by `+` is enabled by the [**patchwork**](https://patchwork.data-imaginist.com/) library. The individual plot objects (`gg1` and `gg2`) are returned by the `ggplot()` functions. The visualisation here is density plot of hexagonal bins. It shows the number of points inside each bin, encoded by the color (see legend "count"). We want the highest density of points along the 1:1 line (the dotted line). Predictions match observations perfectly for points lying on the 1:1 line. Alternatively, we could also use a scatterplot to visualise the model evaluation. However, a large number of points would overlie each other. As typical machine learning applications make use of large number of data, such evaluation plots would typically face the problem of overlying points and density plots are a solution.
 
 Metrics are given in the subtitle of the plots. Note that the $R^2$ and the RMSE measure different aspects of model-data agreement. Here, the measure the correlation (fraction of variation explained), and the average error. We should generally consider multiple metrics measuring multiple aspects of the prediction-observation fit to evaluate models.
-
 
 **Encoding of factor levels:**
 
@@ -216,6 +213,7 @@ ohe_baked %>% dplyr::select(!any_of(names(dmy_baked))) %>% names()
 Of the 31 levels of the factor variable `species`, 31 columns have been created and added to the dataframe. Additionally, the original `species` column has been dropped. Thus, the original dataframe is extended from 3 columns to 33 columns in the in the one-hot encoding (3 + 31 - 1 = 33). In the dummy-encoding, one column is dropped because it is already implied by the remaining columns. In other words, the species "Aleena" is defined as when all other columns have only 0's as entries.
 
 **Sequential pre-processing**
+
 ```{r}
 ## Pre-processing
 df_baked <- recipe(~., data = df) %>% 
@@ -232,7 +230,7 @@ df_baked <- recipe(~., data = df) %>%
   bake(., new_data = df)
 ```
 
-Pre-processing steps and their order are specified by sequentially adding steps, combined by the pipe operator (`%>%`). It's sensible to drop zero-variance predictors first to avoid later steps are executed on them. The dummy-encoding must come last. Otherwise, 0 and 1 values are re-scaled and are converted to numeric. Whether centering is done before scaling or the other way round is not relevant. Below is the full implementation.*
+Pre-processing steps and their order are specified by sequentially adding steps, combined by the pipe operator (`%>%`). It's sensible to drop zero-variance predictors first to avoid later steps are executed on them. The dummy-encoding must come last. Otherwise, 0 and 1 values are re-scaled and are converted to numeric. Whether centering is done before scaling or the other way round is not relevant. Below is the full implementation.\*
 
 ```{r}
 ## Plotting
