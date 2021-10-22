@@ -582,7 +582,6 @@ Fit a linear regression model using the base-R function `lm()` and the training 
 
 - What is the $R^2$ of predicted vs. observed `"GPP_NT_VUT_REF"`?
 - Is the linear regression slope significantly different from zero for all predictors?
-- Is a linear regression model where insignificant predictors are removed better than a model that includes all predictors?
 
 ```{r}
 ## write your code here
@@ -611,10 +610,10 @@ To get a better understanding of writing and baking recipes for pre-processing, 
 **Encoding of factor levels:**
 
 - Load the dataset and select the features height, mass and species
-- Drop all na entries from the dataset
-- Apply an one-hot encoding and a dummy encoding on the feature species
+- Drop all `NA` entries from the dataset
+- Apply a one-hot encoding and a dummy encoding on the feature species
 - Answer the following questions:
-  - How many columns does the un-processed original data frame have and how many columns are in the freshly "baked" data frames created by the One-hot encoding and how many in the one from the dummy-encoding? Explain the differences.
+  - How many columns does the un-processed original data frame have and how many columns are in the freshly "baked" data frames created by the one-hot encoding and how many in the one from the dummy-encoding? Explain the differences.
   - Which column was created by the One-hot-encoding but not by the dummy-encoding?
   
 ```{r}
@@ -625,12 +624,12 @@ df <- starwars
 **Sequential pre-processing:**
 
 - Load the dataset and select the features height, mass and species
-- Drop all na entries from the dataset
+- Drop all `NA` entries from the dataset
 - Write and bake a recipe with the following steps (use the dataset after 2. for this):
   - Filter out zero or near-zero variance features
   - Standardize (center and scale) numeric features
   - Dummy encode categorical features.
-- Visualise the distribution of the numerical
+- Visualise the distribution of the numerical feature height and mass.
 - Answer the question: Does the order in which pre-processing steps are defined in the recipe matter?
 
 ```{r}
