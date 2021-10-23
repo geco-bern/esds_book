@@ -47,7 +47,7 @@ options(repr.plot.width = 10, repr.plot.height = 7)
 ```
 
 #### Load your data
-Load the hourly data from the eddy covariance flux towers. You'll be qite familiar with this by now. 
+Load the hourly data from the eddy covariance flux towers. You'll be quite familiar with this by now. 
 
 For this first example, we'll only load one feature (PPFD_IN - incoming photosynthetic photon flux density) and our dependent variable (GPP_NT_VUT_REF - gross primary production). 
 
