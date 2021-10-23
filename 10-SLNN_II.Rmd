@@ -1201,10 +1201,10 @@ For this exercise your task is to create 3 neural network models and to compare 
   2. Visualize the data and print the proportion of data belonging to each class.
   3. Split into training and test set using Stratified split.
   4. Create 3 different neural network models of your taste ranging from a simple to a very complex one.
-  5. For each model calculate accuracy, presicion, recall and f-score on the test data.
-  6. For each model plot the desicions on the test data.
+  5. For each model calculate accuracy, precision, recall and f-score on the test data.
+  6. For each model plot the decisions on the test data.
   7. For the best performing model make the ROC curve and calculate the corresponding AUC.
-  8. Train the best performing model 5 times. For each time calculate the probability output on the test data. Average the probabilities over the 5 models and then make decisions. Print accuracy, presicion, recall and f-score on the test data.
+  8. Train the best performing model 5 times. For each time calculate the probability output on the test data. Average the probabilities over the 5 models and then make decisions. Print accuracy, precision, recall and f-score on the test data.
   
 The required libraries and some useful functions are already imported in the following chunks. For the ROC curve you can also use the `pROC` package.
 
