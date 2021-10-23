@@ -150,7 +150,7 @@ Here we'll build and consider more complex network architectures. To do so, we'l
 
 *Neural Networks: A closer look*
 
-Before we procceed further let's have a closer look on neural networks and what keras hides from the user. To this end, we will manually create a neural network with 1 hidden layer with 5 units and an output layer (with 1 unit).
+Before we proceed further let's have a closer look on neural networks and what keras hides from the user. To this end, we will manually create a neural network with 1 hidden layer with 5 units and an output layer (with 1 unit).
 
 Let 's assume that we have d features (x) and therefore $W_1$(weights) is a matrix with dimension $d\times 5$ and $b_1$ has a dimension $5\times 1$(biases). Then the output of the 1st hidden layer is
 
@@ -163,7 +163,7 @@ So,
 $$1st\_hidden\_out = activation(1st\_hidden)$$
 
     
-For the ouput layer we just take the values of 1st\_hidden\_out (now those are our new 'features') and we apply a matrix multiplication as we did with our features. 
+For the output layer we just take the values of 1st\_hidden\_out (now those are our new 'features') and we apply a matrix multiplication as we did with our features. 
 
 $$ output\_layer = 1st\_hidden\_out W_2 + b_2$$ 
     
@@ -721,7 +721,7 @@ As it is obvious from the graph, precision and recall experience an opposite beh
 
 Namely, precision increases as the classification threshold gets larger while recall drops. In contrast, for a low classification threshold precision decreases and recall reaches a high value. 
 
-Intutuively, this behaivor was expected since if the model predict very easily the positive class (low classification threshold) then we have a lot of false positives and thus a low precision. However in this case, we identify most of the positives instances and therefore we achieve a high recall. 
+Intuitively, this behavior was expected since if the model predict very easily the positive class (low classification threshold) then we have a lot of false positives and thus a low precision. However in this case, we identify most of the positives instances and therefore we achieve a high recall. 
 
 On the other hand, if we desire our model to be very confident while predicting the positive class (high classification threshold) we expect a high precision. But in this case, we are eager to misclassify a lot of positive examples and therefore a low recall is anticipated.
 
@@ -734,7 +734,7 @@ On the other hand, if we desire our model to be very confident while predicting 
 
 **Solution**
 
-1. Consider that you create a model for company X where the aim is to decide who is allowed to pass the company's office entrance. The input of the model is a real time face photo and the prediction is Yes or No. You do not want to allow strangers to get inside the offices. You only want company's related people. In this case your model should not have false positives. So you demand a high classication threshold and therefore a high precision. 
+1. Consider that you create a model for company X where the aim is to decide who is allowed to pass the company's office entrance. The input of the model is a real time face photo and the prediction is Yes or No. You do not want to allow strangers to get inside the offices. You only want company's related people. In this case your model should not have false positives. So you demand a high classification threshold and therefore a high precision. 
 
 2. Let 's say that you are working on a hospital helping doctors to predict if a patient has a specific illness. Your model takes as input a value of a test and predicts if the patient is positive or negative. In this case, you care more about to find all those patients who are indeed positives. So you want a low classification threshold and thus a high recall model. In case you have some false positives  you can just inform the patient to make some other different health tests.
 
@@ -749,7 +749,7 @@ All that differs between them is one term in the denominator - _false positives_
 
 So why the tradeoff? Because the number of false positives and the number of false negatives depends on the classification threshold. For example, when the threshold is low, the model will often predict positive, yielding many false positives, but few false negatives. When the threshold is high, the model will often predict negative, yielding many false negatives, but few false positives.
     
-The model performance under various thresholds is often assessed by the **AUC-ROC** (Area Under the Reciever Operating Characteristic curve) which plots Recall as a function of False Positive Rate. 
+The model performance under various thresholds is often assessed by the **AUC-ROC** (Area Under the Receiver Operating Characteristic curve) which plots Recall as a function of False Positive Rate. 
     
 * **False Positive Rate** : $\frac{\mbox{FP}}{\mbox{TN + FP}} =  \frac{\mbox{FP}}{\mbox{N}}$ 
 
