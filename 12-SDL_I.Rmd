@@ -521,7 +521,7 @@ Let's have a closer look at the parameters of this function.
  
 - `width_shift_range`: shifts the image to the left or to the right by the fraction of the total width specified (i.e., 0.1 in this example). 
  
-- `height_shift_range`: shifts the image up or down by the fraction of the total width specified (i.e., 0.1 in this example). 
+- `height_shift_range`: shifts the image up or down by the fraction of the total height specified (i.e., 0.1 in this example). 
  
 - `shear_range`: distorts the image along an axis, in effect approximating a change in the position of the photographer.  
  
