@@ -23,7 +23,7 @@ After this exercise session you shall be able to
 - Model training minimises the loss. In other words, it optimises the agreement between predicted and observed values.
 - There are several ways to measure loss. RMSE (Root Mean Squared Error) is one such measure. It is used in regression problems.  
 - Gradient descent is a method that searches for model parameters that minimize loss.
-- Machine learning algorithms have hyper-parameters. These are parameters that are set by the user rather than learned during training. An example is the learning rate in gradient descent. In the case of Aritificial Neural Networks, this can be the number of nodes per hidden layer, or the number of hidden layers. 
+- Machine learning algorithms have hyper-parameters. These are parameters that are set by the user rather than learned during training. An example is the learning rate in gradient descent. In the case of Artificial Neural Networks, this can be the number of nodes per hidden layer, or the number of hidden layers. 
 
 - To tune a model, you can set hyperparameters that determine model structure or calibrate the coefficients. 
 - Generalisability refers to the model’s performance on data not seen during the training - the testing data.
@@ -39,7 +39,7 @@ For this exercise we can use the reduced and cleaned dataset with half-hourly da
 - Use these inputs to create a neural network with just one hidden layer.
 - Use cross validation to optimise hyper-parameters such as number of hidden nodes, choice of activation function etc.
 - Use mean squared error (MSE) loss as a metric for monitoring the performance, plot the MSE loss as a function of the number of epochs.
-- Plot the MSE loss as a funtion of the hyperparameters used.
+- Plot the MSE loss as a function of the hyperparameters used.
 - *The list of tasks mentioned here are not exhaustive, you'll be guided through the application and asked questions along the way!*
 
 ### Data preparation 
@@ -76,7 +76,7 @@ str(df)
 Recall the tutorial on *data wrangling*. We alreadt performed some data-preprocessing there. We had replaced the missing value flag -9999 by NAs for the target variable **GPP_NT_VUT_REF**. 
 We had used the categorical variable **NEE_VUT_REF_QC**, representing the quality control, to further edit some of the values of the target variable **GPP_NT_VUT_REF**. For all those rows where $NEE\_VUT\_REF\_QC \in \{3,4\}$, i.e. poor quality of measurements, we have already replaced the target variable **GPP_NT_VUT_REF** with NAs.
 
-Thus we remove all the rows where the target variable is NA. As the target GPP_NT_VUT_REF is missing, we cannot learn or test against this data, so we remove all the rows where the target variable is missing. After we do this, the information that we previously encoded in NEE_VUT_REF_QC has already been used to filter out the rows with poor quality control measures. The variable NEE_VUT_REF_QC does not carry any additional information that would be helpful in predicting the target varibale. Consequently, we can discard this variable. 
+Thus we remove all the rows where the target variable is NA. As the target GPP_NT_VUT_REF is missing, we cannot learn or test against this data, so we remove all the rows where the target variable is missing. After we do this, the information that we previously encoded in NEE_VUT_REF_QC has already been used to filter out the rows with poor quality control measures. The variable NEE_VUT_REF_QC does not carry any additional information that would be helpful in predicting the target variable. Consequently, we can discard this variable. 
 
 Side Note: NEE_VUT_REF_QC was the only categorical feature in our dataset, and by discarding it we got lucky. Neural networks in keras require input data in the form of matrices, and if we had any other categorical variables present in our data, we would have to encode these e.g. One-Hot Encoding vectors
 
@@ -115,7 +115,7 @@ nrow(df %>% drop_na())
 
 The number of rows with NAs are not that large compared to the current size of the dataset. So we can afford to discard these rows without reducing the size of our dataset by much, and we still have enough data to carry out analysis. 
 
-*Sidenote:* It can happen in some cases that by doing so we lose a majority of our dataset, because  each row has atleast 1 column with NA. If the number of rows reduced significantly by this operation, we would use some data imputation technique to fill-in these NA values. But also note that by doing so, we are introducing some bias to our model, by the data imputation technique we choose.
+*Sidenote:* It can happen in some cases that by doing so we lose a majority of our dataset, because  each row has at least 1 column with NA. If the number of rows reduced significantly by this operation, we would use some data imputation technique to fill-in these NA values. But also note that by doing so, we are introducing some bias to our model, by the data imputation technique we choose.
 
 
 ```{r}
@@ -279,7 +279,7 @@ history <- fit(
 history <- readRDS("./data/history.rds")
 ```
 
-Now that the model training is complete we can look at the history, plot the training history, and look at our trained weights. Pay attention to the trained weight matrices and try to recoginse the transformation weights and the bias units.  
+Now that the model training is complete we can look at the history, plot the training history, and look at our trained weights. Pay attention to the trained weight matrices and try to recognise the transformation weights and the bias units.  
 
 ```{r eval = F}
 # print(history)
@@ -521,7 +521,7 @@ cv_performance_list <- list()
 #Perform 5 fold cross validation
 for(i in 1:5){
   cat(sprintf("CV Fold --> %i/5\n", i))
-  #Segement the data by fold 
+  #Segment the data by fold 
   ## hint : indices <- which(folds==i,arr.ind=TRUE)
   indices <- which(folds==i,arr.ind=TRUE)
 
@@ -687,12 +687,12 @@ What is the average cross validation error obtained for this configuration of th
 ### Parameter Tuning
 Here we will write a function that does the cross-validation for paramater tuning. The content of the cross-validation code remains the same as we have seen before. This is the same code written as a function that also takes the hyper-parameter to be tuned as an argument.
 Your task is to optimise the number of hidden units. 
-First we will orgainse all the steps done until now to write the function. 
+First we will organise all the steps done until now to write the function. 
 
 ```{r eval = F}
 # Function Name: cross_validate_model()  
 # Inputs: Training split, number of hidden units, and number of epochs  
-# Output: The avergae cross validation loss across all 5 folds. 
+# Output: The average cross validation loss across all 5 folds. 
 
 ## Hint: All you have to do is organise the steps we followed in the crossvalidation section as a function to make it reproducible  
 cross_validate_model <- function(train_split, num_units, num_epochs){
@@ -760,6 +760,7 @@ cross_validate_model <- function(train_split, num_units, num_epochs){
         cat("Evaluation error on the held out fold: " , eval_result$mean_squared_error,"\n")
   
     }
+}
 ```
 
 
@@ -848,11 +849,11 @@ plot(num_units, tune_results, type = "b")
 min_loss <- min(tune_results)
 min_loss_index <- which.min(tune_results)
 num_units_best <- num_units[min_loss_index]
-sprintf("Number of units for mininmal average cross validation error: %i", num_units_best)
+sprintf("Number of units for minimal average cross validation error: %i", num_units_best)
 ```
 
 ```{r}
-## [1] "Number of units for mininmal average cross validation error: 100"
+## [1] "Number of units for minimal average cross validation error: 100"
 ```
 
 What is the most practical number of hidden units in your opinion? (Consider the tradeoff between the reduction in MSE loss with the increase in hidden units and the increase in training time and model complexity, and number of parameters to be learnt)

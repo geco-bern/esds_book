@@ -637,7 +637,7 @@ df <- starwars
 
 -   Drop all `NA` entries from the dataset
 
--   Write and bake a recipe with the following steps (use the dataset after 2. for this):
+-   Write and bake a recipe with the following steps:
 
     -   Filter out zero or near-zero variance features
     -   Standardize (center and scale) numeric features
