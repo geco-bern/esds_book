@@ -355,3 +355,6 @@ linear-model-3
 fig:unnamed-chunk-6
 fig:metrics
 fig:pdp
+a-selection-of-model-types
+target-engineering-bonus
+zero-variance-predictors-bonus

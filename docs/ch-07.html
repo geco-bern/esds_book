@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 8 Supervised Machine Learning II | Environmental Systems Data Science</title>
   <meta name="description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
-  <meta name="generator" content="bookdown 0.22.10 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 8 Supervised Machine Learning II | Environmental Systems Data Science" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Loïc Pellissier, Joshua Payne, Benjamin Stocker" />
 
 
-<meta name="date" content="2021-10-21" />
+<meta name="date" content="2021-10-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,8 +33,9 @@
   
 <link rel="prev" href="ch-06.html"/>
 <link rel="next" href="ch-08.html"/>
-<script src="libs/header-attrs-2.9/header-attrs.js"></script>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -42,7 +43,6 @@
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-
 
 
 
@@ -482,7 +482,7 @@ div.csl-indent {
 </div>
 <div id="key-points-from-the-lecture-4" class="section level3" number="8.1.2">
 <h3><span class="header-section-number">8.1.2</span> Key points from the lecture</h3>
-<p><strong>Training data</strong> is the data that is used to train our model, “to fit a curve to the data points”.</p>
+<p><strong>Training data</strong> is the data that is used to train our model, “to fit a curve to the data points.”</p>
 <p><strong>Testing data</strong> is set aside at the initial split and not “touched” during model training. It is key to test a model’s predictive power or whether it is overfitted.</p>
 <p><strong>Validation data</strong> is used for determining the loss during model training. The reason for distinguishing between testing and validation data is to assure we’re not misleading model training by some peculiarities of the training data and we get an assessment of generalisability based on data that was not seen during model training. This distinction might be somewhat confusing for now, have a look at this <a href="https://machinelearningmastery.com/difference-test-validation-datasets/">blog post</a> for additional explanations.</p>
 <p><strong>Model training</strong> minimises the loss. In other words, it optimises the agreement between predicted and observed values. The loss is most commonly measured by the root mean square error (RMSE).</p>
@@ -547,8 +547,8 @@ div.csl-indent {
 ## Summary of sample sizes: 5893, 5893, 5893, 5893, 5893, 5893, ... 
 ## Resampling results:
 ## 
-##   RMSE      Rsquared  MAE     
-##   1.590162  0.668384  1.230912
+##   RMSE     Rsquared  MAE     
+##   1.58713  0.668969  1.228773
 ## 
 ## Tuning parameter &#39;intercept&#39; was held constant at a value of TRUE</code></pre>
 <p>Of course, this is an overkill compared to just writing <code>lm(...)</code>. But the advantage of the unified interface is that we can simply replace the <code>method</code> argument to use a different ML algorithm. For example, to use a random forest model implemented by the <strong>ranger</strong> package, we can write:</p>
@@ -621,7 +621,7 @@ Figure 8.1: Visualization of a loss function as a plane spanned by the two param
 <span id="cb9-8"><a href="ch-07.html#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">10</span>),</span>
 <span id="cb9-9"><a href="ch-07.html#cb9-9" aria-hidden="true" tabindex="-1"></a>  ...</span>
 <span id="cb9-10"><a href="ch-07.html#cb9-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>In certain cases, data points stem from different “groups”, and generalisability across groups is critical. In such cases, data from a given group must not be used both in the training and validation sets. Instead, splits should be made along group delineations. The <em>caret</em> function <code>groupKFold()</code> offers the solution for this case.</p>
+<p>In certain cases, data points stem from different “groups,” and generalisability across groups is critical. In such cases, data from a given group must not be used both in the training and validation sets. Instead, splits should be made along group delineations. The <em>caret</em> function <code>groupKFold()</code> offers the solution for this case.</p>
 </div>
 </div>
 <div id="model-evaluation" class="section level3" number="8.2.3">
@@ -657,9 +657,9 @@ Like the MSE, the RMSE also measures accuracy (the magnitude of the errors) and 
 <span id="cb10-4"><a href="ch-07.html#cb10-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">y_pred =</span> x)</span>
 <span id="cb10-5"><a href="ch-07.html#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-6"><a href="ch-07.html#cb10-6" aria-hidden="true" tabindex="-1"></a>yardstick<span class="sc">::</span><span class="fu">rmse</span>(df_demo, y_obs, y_pred) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(.estimate)</span></code></pre></div>
-<pre><code>## [1] 1.163722</code></pre>
+<pre><code>## [1] 1.01994</code></pre>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="ch-07.html#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">mean</span>((df_demo<span class="sc">$</span>y_pred <span class="sc">-</span> df_demo<span class="sc">$</span>y_obs)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
-<pre><code>## [1] 1.163722</code></pre>
+<pre><code>## [1] 1.01994</code></pre>
 <ul>
 <li><p><strong><span class="math inline">\(R^2\)</span></strong>, also called the <em>coefficient of determination</em>, describes the proportion of variation in <span class="math inline">\(y\)</span> that is captured by modelled values <span class="math inline">\(\hat{y}\)</span>. In this case, the goal is to maximize the metric, thus trying the explain as much variation as possible. In contrast to the MSE and RMSE, <span class="math inline">\(R^2\)</span> measures consistency, or correlation, or goodness of fit, and not accuracy. It is traditionally defined as:
 <span class="math display">\[
@@ -681,22 +681,22 @@ r = \frac{\sum_i (y_i - \bar{y}) (\hat{y_i} - \hat{\bar{y}}) }{\sqrt{ \sum_i(y_i
 <span id="cb14-5"><a href="ch-07.html#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-6"><a href="ch-07.html#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## the equation given above for the coefficient of determination corresponds to &#39;rsq_trad()&#39;</span></span>
 <span id="cb14-7"><a href="ch-07.html#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">-</span> <span class="fu">sum</span>((df_demo<span class="sc">$</span>y_pred <span class="sc">-</span> df_demo<span class="sc">$</span>y_obs)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> <span class="fu">sum</span>((df_demo<span class="sc">$</span>y_obs <span class="sc">-</span> <span class="fu">mean</span>(df_demo<span class="sc">$</span>y_obs))<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
-<pre><code>## [1] 0.5759042</code></pre>
+<pre><code>## [1] 0.4611166</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="ch-07.html#cb16-1" aria-hidden="true" tabindex="-1"></a>yardstick<span class="sc">::</span><span class="fu">rsq_trad</span>(df_demo, y_obs, y_pred) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(.estimate)</span></code></pre></div>
-<pre><code>## [1] 0.5759042</code></pre>
+<pre><code>## [1] 0.4611166</code></pre>
 <p>The square of the Pearson’s correlation coefficient, as defined above, is implemented by the yardstick function <code>rsq()</code>, and corresponds also to the value reported for <code>Multiple R-squared</code> by <code>summary()</code> on a linear model object, or simply to <code>cor(...)^2</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="ch-07.html#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## the equation given above for the squared Pearson&#39;s correlation coefficient corresponds to &#39;rsq()&#39;, &#39;cor()^2&#39;, and `summary()$r.squared</span></span>
 <span id="cb18-2"><a href="ch-07.html#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="ch-07.html#cb18-3" aria-hidden="true" tabindex="-1"></a>(<span class="fu">sum</span>((df_demo<span class="sc">$</span>y_pred <span class="sc">-</span> <span class="fu">mean</span>(df_demo<span class="sc">$</span>y_pred))<span class="sc">*</span>(df_demo<span class="sc">$</span>y_obs <span class="sc">-</span> <span class="fu">mean</span>(df_demo<span class="sc">$</span>y_obs))))<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span></span>
 <span id="cb18-4"><a href="ch-07.html#cb18-4" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">sum</span>((df_demo<span class="sc">$</span>y_obs <span class="sc">-</span> <span class="fu">mean</span>(df_demo<span class="sc">$</span>y_obs))<span class="sc">^</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">sum</span>((df_demo<span class="sc">$</span>y_pred <span class="sc">-</span> <span class="fu">mean</span>(df_demo<span class="sc">$</span>y_pred))<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
-<pre><code>## [1] 0.5818107</code></pre>
+<pre><code>## [1] 0.506538</code></pre>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="ch-07.html#cb20-1" aria-hidden="true" tabindex="-1"></a>yardstick<span class="sc">::</span><span class="fu">rsq</span>(df_demo, y_obs, y_pred) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(.estimate)</span></code></pre></div>
-<pre><code>## [1] 0.5818107</code></pre>
+<pre><code>## [1] 0.506538</code></pre>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="ch-07.html#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(y_obs <span class="sc">~</span> y_pred, <span class="at">data =</span> df_demo))<span class="sc">$</span>r.squared</span></code></pre></div>
-<pre><code>## [1] 0.5818107</code></pre>
+<pre><code>## [1] 0.506538</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="ch-07.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(df_demo<span class="sc">$</span>y_obs, df_demo<span class="sc">$</span>y_pred)<span class="sc">^</span><span class="dv">2</span></span></code></pre></div>
-<pre><code>## [1] 0.5818107</code></pre>
-<p>The <span class="math inline">\(R^2\)</span> generally increases when predictors are added to a model, even if predictors are not informative. This is particularly critical in the context of machine learning when we compare alternative models that differ by their number of predictors. In other words, the <span class="math inline">\(R^2\)</span> of a model with a large number of predictors tends to give an overconfident estimate of its predictive power. We have encountered cross-validation which yields good predictive power. This is the “gold-standard”. But when the number of data points is small, cross validation estimates may not be robust. Without resorting to cross validation, the effect of spuriously improving the evaluation metric by adding uninformative predictors can also be mitigated by penalising by the number of predictors <span class="math inline">\(p\)</span>. Different metrics are available.</p>
+<pre><code>## [1] 0.506538</code></pre>
+<p>The <span class="math inline">\(R^2\)</span> generally increases when predictors are added to a model, even if predictors are not informative. This is particularly critical in the context of machine learning when we compare alternative models that differ by their number of predictors. In other words, the <span class="math inline">\(R^2\)</span> of a model with a large number of predictors tends to give an overconfident estimate of its predictive power. We have encountered cross-validation which yields good predictive power. This is the “gold-standard.” But when the number of data points is small, cross validation estimates may not be robust. Without resorting to cross validation, the effect of spuriously improving the evaluation metric by adding uninformative predictors can also be mitigated by penalising by the number of predictors <span class="math inline">\(p\)</span>. Different metrics are available.</p>
 <ul>
 <li><p><strong>Adjusted <span class="math inline">\(R^2\)</span></strong>: The adjusted <span class="math inline">\(R^2\)</span> discounts values by the number of predictors as
 <span class="math display">\[
@@ -876,7 +876,7 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <p>To sum this up, variable importance can be measured for linear regression models using the <em>t</em>-statistic.</p>
 <p>While <em>t</em>-statistic values provide information for feature importance analysis that is straight-forward to quantify and interpret, corresponding information has to be extracted by other means for other ML algorithms (e.g., accuracy degradation in random forests). This makes it difficult to compare their results across different classes of ML models.</p>
 <p><strong>Model-Agnostic approaches</strong></p>
-<p>Model-Agnostic approaches offer a solution to the intercomparability problem for feature importance analysis. These treat the ML algorithm as a “black-box”, and the separation of the specific model types from their interpretability measure enables us to compare the feature importance across different models and ML algorithms. <em>Permutation-based feature importance</em> is such an algorithm. Its idea is that if we <em>permute</em> (re-shuffle) the values of a feature in the training data, we effectively destroy the relationship between that particular feature and the target variable. Thus, if the feature is important, the model performance should degrade substantially. In contrast, for unimportant features, permuting their values should not degrade the model performance much.</p>
+<p>Model-Agnostic approaches offer a solution to the intercomparability problem for feature importance analysis. These treat the ML algorithm as a “black-box,” and the separation of the specific model types from their interpretability measure enables us to compare the feature importance across different models and ML algorithms. <em>Permutation-based feature importance</em> is such an algorithm. Its idea is that if we <em>permute</em> (re-shuffle) the values of a feature in the training data, we effectively destroy the relationship between that particular feature and the target variable. Thus, if the feature is important, the model performance should degrade substantially. In contrast, for unimportant features, permuting their values should not degrade the model performance much.</p>
 <p>Algorithmically speaking, this works as follows:</p>
 <ul>
 <li>We first compute the loss for the original model to establish a reference loss.</li>
@@ -935,7 +935,7 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <p><img src="esds_book_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
 <p>Now we can compare the importance plots obtained from the model-specific t-statistic approach and the model agnostic permuation based method. The feature importances obtained from both approaches differ a little, because of the underlying differences in the feature importance evaluation. Despite of the differences, both methods robustly return the key important features, particularly their ranks.</p>
 <p><strong>Checkpoint</strong></p>
-<p>Compute the variable importance for the best fit knn model, which we obtained earlier in the tutorial, using the <code>vip()</code> function in default mode. Repeat the same with permuatation based method, with type as ‘difference’ and ‘ratio’. Do the two return the same top-4 features ? Verify.</p>
+<p>Compute the variable importance for the best fit knn model, which we obtained earlier in the tutorial, using the <code>vip()</code> function in default mode. Repeat the same with permuatation based method, with type as ‘difference’ and ‘ratio.’ Do the two return the same top-4 features ? Verify.</p>
 <p><strong>Solution</strong></p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="ch-07.html#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Data wrangling done above</span></span>
 <span id="cb39-2"><a href="ch-07.html#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1004,7 +1004,7 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 </div>
 <div id="partial-dependence-plots" class="section level4" number="8.2.4.2">
 <h4><span class="header-section-number">8.2.4.2</span> Partial dependence plots</h4>
-<p>While variable importance analysis is helpful for understanding which predictors are helping us predict, <em>partial dependence plots</em> (PDPs) yield information on what the relationship between one individual predictor and the target variable looks like. It quantifies how the response of the target variable changes when we vary one particular predictor and hold all the remaining predictors at a constant value. If this is still a little muddy, the pseudo-code of this algorithm should make things clear (see <a href="https://bradleyboehmke.github.io/HOML/iml.html#partial-dependence">this</a> by <span class="citation">Brad Boehmke and Greenwell (<a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">2019</a>)</span>).</p>
+<p>While variable importance analysis is helpful for understanding which predictors are helping us predict, <em>partial dependence plots</em> (PDPs) yield information on what the relationship between one individual predictor and the target variable looks like. It quantifies how the response of the target variable changes when we vary one particular predictor and hold all the remaining predictors at a constant value. If this is still a little muddy, the pseudo-code of this algorithm should make things clear (see <a href="https://bradleyboehmke.github.io/HOML/iml.html#partial-dependence">this</a> by <span class="citation"><a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">Brad Boehmke and Greenwell</a> (<a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">2019</a>)</span>).</p>
 <div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="ch-07.html#cb46-1" aria-hidden="true" tabindex="-1"></a>For a selected <span class="fu">predictor</span> (x)</span>
 <span id="cb46-2"><a href="ch-07.html#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> Construct a grid of j evenly spaced values across the range of x<span class="sc">:</span> {x1, x2, ..., xj}</span>
 <span id="cb46-3"><a href="ch-07.html#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> For i <span class="cf">in</span> {<span class="dv">1</span>,...,j} do</span>
@@ -1034,7 +1034,7 @@ Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bra
 <p><img src="esds_book_files/figure-html/unnamed-chunk-21-2.png" width="672" /></p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="ch-07.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">partial</span>(linmod3, <span class="fu">c</span>(<span class="st">&quot;SW_IN_F&quot;</span>, <span class="st">&quot;VPD_F&quot;</span>), <span class="at">plot =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p><img src="esds_book_files/figure-html/unnamed-chunk-21-3.png" width="672" /></p>
-<p>The <code>pdp</code> package works with various model classes. For classes that are not available, a prediction wrapper function has to be specified as described for example <a href="https://bradleyboehmke.github.io/HOML/iml.html#implementation-6">here</a> <span class="citation">(<a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">Brad Boehmke and Greenwell 2019</a>)</span>. If you want to learn more about PDP, have a look the <a href="https://christophm.github.io/interpretable-ml-book/">online book</a> by <span class="citation">Molnar (<a href="#ref-molnar_interpretable_2019" role="doc-biblioref">2019</a>)</span>.</p>
+<p>The <code>pdp</code> package works with various model classes. For classes that are not available, a prediction wrapper function has to be specified as described for example <a href="https://bradleyboehmke.github.io/HOML/iml.html#implementation-6">here</a> <span class="citation">(<a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">Brad Boehmke and Greenwell 2019</a>)</span>. If you want to learn more about PDP, have a look the <a href="https://christophm.github.io/interpretable-ml-book/">online book</a> by <span class="citation"><a href="#ref-molnar_interpretable_2019" role="doc-biblioref">Molnar</a> (<a href="#ref-molnar_interpretable_2019" role="doc-biblioref">2019</a>)</span>.</p>
 <p>Note: The computational demand of partial dependence analysis rapidly increases as the number of search grid points (<code>j</code> in the algorithm description above) rises.</p>
 <p><em>For the interested: If you do not want to average the y_hat, predictions over all the rows for each value of <span class="math inline">\(X_i\)</span>, look into Individual conditional expectation (ICE) curves, which rather than averaging the predicted values across all observations, observe and plot the individual observation-level predictions.</em></p>
 </div>
@@ -1060,26 +1060,27 @@ Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bra
 <span id="cb53-13"><a href="ch-07.html#cb53-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GPP_NT_VUT_REF =</span> <span class="fu">ifelse</span>(NEE_VUT_REF_QC <span class="sc">&lt;</span> <span class="fl">0.9</span>, <span class="cn">NA</span>, GPP_NT_VUT_REF)) <span class="sc">%&gt;%</span> </span>
 <span id="cb53-14"><a href="ch-07.html#cb53-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>NEE_VUT_REF_QC) <span class="sc">%&gt;%</span> </span>
 <span id="cb53-15"><a href="ch-07.html#cb53-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span></code></pre></div>
+<pre><code>## Rows: 6574 Columns: 334</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## dbl (334): TIMESTAMP, TA_F_MDS, TA_F_MDS_QC, TA_F_MDS_NIGHT, TA_F_MDS_NIGHT_...</code></pre>
 <pre><code>## 
-## ── Column specification ────────────────────────────────────────────────────────
-## cols(
-##   .default = col_double()
-## )
-## ℹ Use `spec()` for the full column specifications.</code></pre>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="ch-07.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Split data into testing and training data</span></span>
-<span id="cb55-2"><a href="ch-07.html#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsample)</span>
-<span id="cb55-3"><a href="ch-07.html#cb55-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-4"><a href="ch-07.html#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1982</span>)  <span class="co"># for reproducibility</span></span>
-<span id="cb55-5"><a href="ch-07.html#cb55-5" aria-hidden="true" tabindex="-1"></a>split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(ddf, <span class="at">prop =</span> <span class="fl">0.7</span>)</span>
-<span id="cb55-6"><a href="ch-07.html#cb55-6" aria-hidden="true" tabindex="-1"></a>ddf_train <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
-<span id="cb55-7"><a href="ch-07.html#cb55-7" aria-hidden="true" tabindex="-1"></a>ddf_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span></code></pre></div>
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="ch-07.html#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Split data into testing and training data</span></span>
+<span id="cb57-2"><a href="ch-07.html#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsample)</span>
+<span id="cb57-3"><a href="ch-07.html#cb57-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-4"><a href="ch-07.html#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1982</span>)  <span class="co"># for reproducibility</span></span>
+<span id="cb57-5"><a href="ch-07.html#cb57-5" aria-hidden="true" tabindex="-1"></a>split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(ddf, <span class="at">prop =</span> <span class="fl">0.7</span>)</span>
+<span id="cb57-6"><a href="ch-07.html#cb57-6" aria-hidden="true" tabindex="-1"></a>ddf_train <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
+<span id="cb57-7"><a href="ch-07.html#cb57-7" aria-hidden="true" tabindex="-1"></a>ddf_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span></code></pre></div>
 </div>
 <div id="linear-model-1" class="section level3" number="8.3.2">
 <h3><span class="header-section-number">8.3.2</span> Linear Model</h3>
 <p>In the previous exercise, you fitted a linear regression model using the base-R function <code>lm()</code> and the training set. The target variable was <code>"GPP_NT_VUT_REF"</code>, and predictor variables were all available meterological variables in the dataset.</p>
 <p>First, repeat these same steps but use <strong>caret</strong> and the function <code>train()</code> for fitting the same linear regression model (with all predictors) on the same data. Does it yield identical results as using <code>lm()</code> directly? You will have to set the argument <code>trControl</code> accordingly to avoid resampling, and instead fit the model on the all data in <code>ddf_train</code>. You can use <code>summary()</code> also on the object returned by the function <code>train()</code>.</p>
 <p>Second, repeat the visualisation and display of model metrics. Feel free to copy-paste from the previous exercise /solutions. You are repeating this step mainly to refresh the previous results and to compare them to your work on the next tasks.</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="ch-07.html#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="ch-07.html#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 </div>
 <div id="knn" class="section level2" number="8.4">
@@ -1087,18 +1088,18 @@ Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bra
 <div id="check-data" class="section level3" number="8.4.1">
 <h3><span class="header-section-number">8.4.1</span> Check data</h3>
 <p>The variable <code>PA_F</code> was not significant in the linear model. Find a way to show that the variable has a weird distribution and exclude it from further analysis.</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="ch-07.html#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="ch-07.html#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 <div id="training-1" class="section level3" number="8.4.2">
 <h3><span class="header-section-number">8.4.2</span> Training</h3>
 <p>Fit two KNN models on <code>ddf_train</code> (excluding <code>"PA_F"</code>), one with <span class="math inline">\(k = 2\)</span> and one with <span class="math inline">\(k = 30\)</span>, both without resampling. Use the RMSE as the loss function. Center and scale data as part of the pre-processing and model formulation specification using the function <code>recipe()</code>.</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="ch-07.html#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="ch-07.html#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 <div id="prediction-1" class="section level3" number="8.4.3">
 <h3><span class="header-section-number">8.4.3</span> Prediction</h3>
 <p>With the two models fitted above, predict <code>"GPP_NT_VUT_REF"</code> for both and training and the testing sets, and evaluate them as above (metrics and visualisation).</p>
 <p>Which model do you expect to perform better on the training set and which to perform better on the testing set? Why? Do you find evidence for overfitting in any of the models?</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="ch-07.html#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="ch-07.html#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 <div id="sample-hyperparameters" class="section level3" number="8.4.4">
 <h3><span class="header-section-number">8.4.4</span> Sample hyperparameters</h3>
@@ -1107,7 +1108,7 @@ Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bra
 <ul>
 <li>The visualisation of cross-validation results can be visualised with the <code>plot(model_object)</code> of <code>ggplot(model_object)</code>.</li>
 </ul>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="ch-07.html#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="ch-07.html#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 </div>
 <div id="random-forest-1" class="section level2" number="8.5">
@@ -1121,16 +1122,16 @@ Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bra
 <li>See <a href="https://topepo.github.io/caret/available-models.html">here</a> for information about hyperparameters available for tuning with caret.</li>
 <li>Set the argument <code>savePredictions = "final"</code> of function <code>trainControl()</code>.</li>
 </ul>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="ch-07.html#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="ch-07.html#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 <div id="prediction-2" class="section level3" number="8.5.2">
 <h3><span class="header-section-number">8.5.2</span> Prediction</h3>
 <p>Evaluate the trained model on the training and on the test set, giving metrics and a visualisation as above.</p>
 <p>How are differences in performance to be interpreted? Compare the performances of linear regression, KNN, and random forest, considering the evaluation on the test set.</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="ch-07.html#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="ch-07.html#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 <p>Show the model performance (metrics and visualisation) on the validation sets all cross validation folds combined.</p>
 <p>Do you expect it to be more similar to the model performance on the training set or the testing set in the evaluation above? Why?</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="ch-07.html#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="ch-07.html#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 
 </div>
 </div>
@@ -1163,7 +1164,6 @@ Robinson, David, Alex Hayes, and Simon Couch. 2021. <em>Broom: Convert Statistic
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -1204,7 +1204,7 @@ gitbook.start({
 },
 "download": null,
 "search": {
-"engine": "lunr",
+"engine": "fuse",
 "options": null
 },
 "toc": {
