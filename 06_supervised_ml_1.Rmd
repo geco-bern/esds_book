@@ -31,7 +31,9 @@ Machine learning refers to a class of algorithms that automatically generate sta
 
 Machine learning (ML) may appear magical. The ability of ML algorithms to detect patterns and make predictions is fascinating. However, several challenges have to be met in the process of formulating, training, and evaluating the models. In this practical we will discuss some basics of supervised ML and how to achieve best predictive results.
 
-In general, the aim of supervised ML is to find a model $\hat{Y} = f(X)$ that is *trained* (calibrated) using observed relationships between a set of *features* (also known as *predictors*, or *labels*, or *independent variables*) $X$ and the *target* variable $Y$. Note, that $Y$ is observed. The hat on $\hat{Y}$ indicates that it is an estimate, provided by the model $f$ . Some algorithms can even handle predictions of multiple target variables simultaneously (e.g., neural networks). ML algorithms consist of (more or less) flexible mathematical models with a certain structure and set of parameters. At the simple extreme end of the model spectrum is the univariate linear regression. You may not want to call this a ML algorithm because there is no iterative learning involved in fitting a linear regression model. Nevertheless, also a univariate linear regression provides a prediction $\hat{Y} = f(X)$, just like other (proper) ML algorithms do. The functional form of a linear regression is not particularly flexible (just a straight line for the best fit between predictors and targets) and it has only two parameters (slope and intercept). At the other extreme end are, for example, deep neural networks. They are extremely flexible, can learn highly non-linear relationships and deal with interactions between a large number of predictors. They also contain very large numbers of parameters, typically on the order of thousands. You can imagine that this allows these types of algorithms to very effectively learn from the data, but also bears the risk of *overfitting*.
+In general, the aim of supervised ML is to find a model $\hat{Y} = f(X)$ that is *trained* (calibrated) using observed relationships between a set of *features* (also known as *predictors*, or *labels*, or *independent variables*) $X$ and the *target* variable $Y$. Note, that $Y$ is observed. The hat on $\hat{Y}$ indicates that it is an estimate, provided by the model $f$ . Some algorithms can even handle predictions of multiple target variables simultaneously (e.g., neural networks). ML algorithms consist of (more or less) flexible mathematical models with a certain structure and set of parameters. At the simple extreme end of the model spectrum is the univariate linear regression. You may not want to call this a ML algorithm because there is no iterative learning involved in fitting a linear regression model. Nevertheless, also a univariate linear regression provides a prediction $\hat{Y} = f(X)$, just like other (proper) ML algorithms do.
+
+The functional form of a univariate linear regression is not particularly flexible (just a straight line for the best fit between predictors and targets) and it has only two parameters (slope and intercept). At the other extreme end are, for example, deep neural networks. They are extremely flexible, can learn highly non-linear relationships and deal with interactions between a large number of predictors. They also contain very large numbers of parameters, typically on the order of thousands. You can imagine that this allows these types of algorithms to very effectively learn from the data, but also bears the risk of *overfitting*.
 
 What is overfitting? The following example illustrates it. Let's assume that there is some true underlying relationship between a predictor $x$ and the target variable $y$. We don't know this relationship (in the code below, this is `true_fun()`) and the observations contain a (normally distributed) error (`y = true_fun(x) + 0.1 * rnorm(n_samples)`). Based on our training data (`df_train`), we fit polynomial models of degree 1, 4, and 15 to the observations. A polynomial of degree N is given by: $$
 y = \sum_{n=0}^N a_n x^n
@@ -179,7 +181,7 @@ The phenomenon of fitting/overfitting as a function of the model "flexibility" i
 
 The next chapters introduce methods to achieve the best model generalisability and to find the sweet spot between high bias and high variance. The steps to get there include the splitting of data into training and testing sets, pre-processing of data and model training which "steers" the model towards what is considered a good model fit in terms of its generalisation power.
 
-You have learned in video 6a about the basic setup of supervised ML, with input data containing the features (or predictors) $X$, predicted ($\hat{Y}$) and observed target values ($Y$, also known as *labels*). In video 6b (title 6c: loss and it's minimization), you learned about the loss function which quantifies the agreement between $Y$ and $\hat{Y}$ and defines the objective of the model training. Here, you'll learn how all of this can be implemented in R. Depending on your application or research question, it may also be of interest to evaluate the relationships embodied in $f(X)$ or to quantify the importance of different predictors in our model. This is referred to as *model interpretation* and is introduced in the respectively named subsection. Finally, we'll get into *feature selection* in the next Application session.
+You have learned in video 6a about the basic setup of supervised ML, with input data containing the features (or predictors) $X$, predicted ($\hat{Y}$) and observed target values ($Y$, also known as *labels*). In video 6b on loss and it's minimization, you learned about the loss function which quantifies the agreement between $Y$ and $\hat{Y}$ and defines the objective of the model training. Here, you'll learn how all of this can be implemented in R. Depending on your application or research question, it may also be of interest to evaluate the relationships embodied in $f(X)$ or to quantify the importance of different predictors in our model. This is referred to as *model interpretation* and is introduced in the respectively named subsection. Finally, we'll get into *feature selection* in the next Application session.
 
 The topic of supervised machine learning methods covers enough material to fill two sessions. Therefore, we split this part in two. Model training, implementing the an entire modelling workflow, model evaluation and interpretation will be covered in the next session's tutorial (Supervised Machine Learning Methods II).
 
@@ -348,7 +350,7 @@ ddf_train %>%
 
 #### The use of recipes
 
-Skewed data, outliers, and values covering multiple orders of magnitude can create difficulties for certain ML algorithms, e.g., or K-nearest neighbours, or neural networks. Other algorithms, like tree-based methods (e.g., Random Forest), are more robust against such issues.
+Skewed data, outliers, and values covering multiple orders of magnitude can create difficulties for certain ML algorithms, e.g.,  K-nearest neighbours or neural networks. Other algorithms, like tree-based methods (e.g., Random Forest), are more robust against such issues.
 
 When defining any pre-processing step, it should be specified as a "recipe" or "blueprint", and not actually executed on the data itself before we start with the model training. Such a "recipe" can then be applied to any new data, while the parameters of the data pre-processing transformations are different each time. We will introduce an example below where we divide all values in the testing and training dataset by the standard deviation of the respective dataset. Note that, because the two datasets hold different values, they also have different standard deviations. The same "recipe" (i.e., division by standard deviation) will be applied to both datasets but the transformation is done with a different parameter (i.e., the different standard deviations in either dataset).
 
@@ -628,7 +630,7 @@ To get a better understanding of writing and baking recipes for pre-processing, 
 
 ```{r}
 ## write your code here
-df <- starwars
+df <- starwars # tidyverse has to be loaded for this code line!
 ```
 
 **Sequential pre-processing:**
@@ -643,7 +645,7 @@ df <- starwars
     -   Standardize (center and scale) numeric features
     -   Dummy encode categorical features.
 
--   Visualise the distribution of the numerical
+-   Visualise the distribution of the numerical variables
 
 -   Answer the question: Does the order in which pre-processing steps are defined in the recipe matter?
 
