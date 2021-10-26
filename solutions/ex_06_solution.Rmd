@@ -1,6 +1,8 @@
 ---
-title: "Exercise 06 - Solution"
-output: html_document
+title: "Solution 06: Supervised ML 1"
+output: 
+  html_document:
+    number_sections: true
 ---
 
 # Solutions {#solutions}
@@ -92,7 +94,7 @@ Hints:
 
 -   To calculate predictions, use the generic function `predict()` with the argument `newdata = ...`.
 -   The $R^2$ can be extracted from the model object as `summary(model_object)$r.squared`, or is (as the RMSE) given in the metrics data frame returned by `metrics()` from the *yardstick* library.
--   For visualisation the model performance, consider a scatterplot, or (better) a plot that reveals the density of overlapping points. (We're plotting information from over 4000 data points here!)
+-   For a visualisation of the model performance, consider a scatterplot, or (better) a plot that reveals the density of overlapping points. (We're plotting information from over 4000 data points here!)
 
 ```{r warning=FALSE, message=FALSE}
 library(patchwork)
@@ -166,7 +168,24 @@ Here, the function `eval_model()` returned an object that is made up of two plot
 
 Metrics are given in the subtitle of the plots. Note that the $R^2$ and the RMSE measure different aspects of model-data agreement. Here, the measure the correlation (fraction of variation explained), and the average error. We should generally consider multiple metrics measuring multiple aspects of the prediction-observation fit to evaluate models.
 
+## Pre-processing
+
+To get a better understanding of writing and baking recipes for pre-processing, load the dataset `starwars` from the `dplyr` package. Note that for this part of the exercise you do not need to split the data, just work with the full dataset. Also, you find all code-lines needed to write your recipe throughout this tutorial.
+
+Your task are the following:
+
 **Encoding of factor levels:**
+
+-   Load the dataset and select the features height, mass and species
+
+-   Drop all `NA` entries from the dataset
+
+-   Apply an one-hot encoding and a dummy encoding on the feature species
+
+-   Answer the following questions:
+
+    -   How many columns does the un-processed original data frame have and how many columns are in the freshly "baked" data frames created by the One-hot encoding and how many in the one from the dummy-encoding? Explain the differences.
+    -   Which column was created by the One-hot-encoding but not by the dummy-encoding?
 
 ```{r}
 library(recipes)
@@ -199,7 +218,21 @@ ohe_baked %>% dplyr::select(!any_of(names(dmy_baked))) %>% names()
 
 Of the 31 levels of the factor variable `species`, 31 columns have been created and added to the dataframe. Additionally, the original `species` column has been dropped. Thus, the original dataframe is extended from 3 columns to 33 columns in the in the one-hot encoding (3 + 31 - 1 = 33). In the dummy-encoding, one column is dropped because it is already implied by the remaining columns. In other words, the species "Aleena" is defined as when all other columns have only 0's as entries.
 
-**Sequential pre-processing**
+**Sequential pre-processing:**
+
+-   Load the dataset and select the features height, mass and species
+
+-   Drop all `NA` entries from the dataset
+
+-   Write and bake a recipe with the following steps:
+
+    -   Filter out zero or near-zero variance features
+    -   Standardize (center and scale) numeric features
+    -   Dummy encode categorical features.
+
+-   Visualise the distribution of the numerical variables
+
+-   Answer the question: Does the order in which pre-processing steps are defined in the recipe matter?
 
 ```{r}
 ## Pre-processing
