@@ -5,7 +5,7 @@ In this tutorial, we will put into practice and apply many of the models seen ea
 
 ### Learning objectives
 - Understand the link between research objective, data type and machine learning methods.
-- Develop critical judgement, assess the relevance of a method for a particular modelling objective.
+- Develop critical judgment, assess the relevance of a method for a particular modelling objective.
 - Be able to cite examples of possible applications of various machine learning methods to problems in environmental systems science.
 - Build intuitions for future machine learning applications in own projects. 
 - Understand the difference between forward Neural Networks, CNN and embeddings. 
@@ -389,7 +389,7 @@ plot(history$ffnn)
 
 In image recognition, CNNs are widely used. They take advantage of the hierarchical patterns in data and assemble more complex patterns using smaller and simpler patterns. In our case, they can find the best way to combine the NDVI values around the point of interest, by relating one pixel value to the others. Furthermore, they can take into account local trends of small regions in comparison with the previous defined linear model which uses a global NVDI average of the whole region as the feature.
 
-Note again, that the scale of the relevant eddy covariance tower footpring (a few hundred metres) is much smaller than the scale of the NDVI "scene" we're using here. This is *a priori* knowledge about the system that we should absolutely and always use when building any type of empirical model. It saves us from deviating into a world of spurious results, that, when being surprising enough, make it into high-impact journals nonetheless. Let us, for just now, ignore this and carry on using the entire NDVI scene for predicting local fluxes with a CNN.
+Note again, that the scale of the relevant eddy covariance tower footprint (a few hundred metres) is much smaller than the scale of the NDVI "scene" we're using here. This is *a priori* knowledge about the system that we should absolutely and always use when building any type of empirical model. It saves us from deviating into a world of spurious results, that, when being surprising enough, make it into high-impact journals nonetheless. Let us, for just now, ignore this and carry on using the entire NDVI scene for predicting local fluxes with a CNN.
 
 CNNs use relatively little pre-processing compared to other image classification algorithms. This means that the network learns the filters that in traditional algorithms were hand-engineered. This independence from prior knowledge and human effort in feature design is a major advantage of these networks.
 
