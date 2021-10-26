@@ -24,7 +24,7 @@
 <meta name="author" content="Loïc Pellissier, Joshua Payne, Benjamin Stocker" />
 
 
-<meta name="date" content="2021-10-22" />
+<meta name="date" content="2021-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -296,20 +296,17 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="7.2.1" data-path="ch-06.html"><a href="ch-06.html#overfitting"><i class="fa fa-check"></i><b>7.2.1</b> Overfitting</a></li>
 <li class="chapter" data-level="7.2.2" data-path="ch-06.html"><a href="ch-06.html#motivation"><i class="fa fa-check"></i><b>7.2.2</b> Modelling challenge</a></li>
-<li class="chapter" data-level="7.2.3" data-path="ch-06.html"><a href="ch-06.html#a-selection-of-ml-models"><i class="fa fa-check"></i><b>7.2.3</b> A selection of ML models</a></li>
+<li class="chapter" data-level="7.2.3" data-path="ch-06.html"><a href="ch-06.html#a-selection-of-model-types"><i class="fa fa-check"></i><b>7.2.3</b> A selection of model types</a></li>
 <li class="chapter" data-level="7.2.4" data-path="ch-06.html"><a href="ch-06.html#data-splitting"><i class="fa fa-check"></i><b>7.2.4</b> Data splitting</a></li>
 <li class="chapter" data-level="7.2.5" data-path="ch-06.html"><a href="ch-06.html#preprocessing"><i class="fa fa-check"></i><b>7.2.5</b> Pre-processing</a></li>
+<li class="chapter" data-level="7.2.6" data-path="ch-06.html"><a href="ch-06.html#model-formulation"><i class="fa fa-check"></i><b>7.2.6</b> Model formulation</a></li>
 </ul></li>
-<li class="chapter" data-level="7.3" data-path="ch-06.html"><a href="ch-06.html#model-formulation"><i class="fa fa-check"></i><b>7.3</b> Model formulation</a>
+<li class="chapter" data-level="7.3" data-path="ch-06.html"><a href="ch-06.html#exercise-5"><i class="fa fa-check"></i><b>7.3</b> Exercise</a>
 <ul>
-<li class="chapter" data-level="7.3.1" data-path="ch-06.html"><a href="ch-06.html#formula-notation"><i class="fa fa-check"></i><b>7.3.1</b> Formula notation</a></li>
-</ul></li>
-<li class="chapter" data-level="7.4" data-path="ch-06.html"><a href="ch-06.html#exercise-5"><i class="fa fa-check"></i><b>7.4</b> Exercise</a>
-<ul>
-<li class="chapter" data-level="7.4.1" data-path="ch-06.html"><a href="ch-06.html#reading-and-cleaning"><i class="fa fa-check"></i><b>7.4.1</b> Reading and cleaning</a></li>
-<li class="chapter" data-level="7.4.2" data-path="ch-06.html"><a href="ch-06.html#data-splitting-1"><i class="fa fa-check"></i><b>7.4.2</b> Data splitting</a></li>
-<li class="chapter" data-level="7.4.3" data-path="ch-06.html"><a href="ch-06.html#linear-model"><i class="fa fa-check"></i><b>7.4.3</b> Linear model</a></li>
-<li class="chapter" data-level="7.4.4" data-path="ch-06.html"><a href="ch-06.html#pre-processing"><i class="fa fa-check"></i><b>7.4.4</b> Pre-processing</a></li>
+<li class="chapter" data-level="7.3.1" data-path="ch-06.html"><a href="ch-06.html#reading-and-cleaning"><i class="fa fa-check"></i><b>7.3.1</b> Reading and cleaning</a></li>
+<li class="chapter" data-level="7.3.2" data-path="ch-06.html"><a href="ch-06.html#data-splitting-1"><i class="fa fa-check"></i><b>7.3.2</b> Data splitting</a></li>
+<li class="chapter" data-level="7.3.3" data-path="ch-06.html"><a href="ch-06.html#linear-model"><i class="fa fa-check"></i><b>7.3.3</b> Linear model</a></li>
+<li class="chapter" data-level="7.3.4" data-path="ch-06.html"><a href="ch-06.html#pre-processing"><i class="fa fa-check"></i><b>7.3.4</b> Pre-processing</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="ch-07.html"><a href="ch-07.html"><i class="fa fa-check"></i><b>8</b> Supervised Machine Learning II</a>
@@ -474,28 +471,51 @@ div.csl-indent {
 <h3><span class="header-section-number">8.1.1</span> Learning objectives</h3>
 <p>After this learning unit, you will be able to …</p>
 <ul>
-<li>Explain the effect of hyper-parameter tuning in the context of the K-nearest neighbour algorithm.</li>
+<li>Explain the effect of hyper-parameter tuning.</li>
 <li>Assess the generalisability of a trained model.</li>
-<li>Explain the purpose and the method of cross-validation.</li>
+<li>Understand the purpose of resampling.</li>
 <li>Avoid data leakage during model training.</li>
 </ul>
 </div>
 <div id="key-points-from-the-lecture-4" class="section level3" number="8.1.2">
 <h3><span class="header-section-number">8.1.2</span> Key points from the lecture</h3>
-<p><strong>Training data</strong> is the data that is used to train our model, “to fit a curve to the data points.”</p>
-<p><strong>Testing data</strong> is set aside at the initial split and not “touched” during model training. It is key to test a model’s predictive power or whether it is overfitted.</p>
-<p><strong>Validation data</strong> is used for determining the loss during model training. The reason for distinguishing between testing and validation data is to assure we’re not misleading model training by some peculiarities of the training data and we get an assessment of generalisability based on data that was not seen during model training. This distinction might be somewhat confusing for now, have a look at this <a href="https://machinelearningmastery.com/difference-test-validation-datasets/">blog post</a> for additional explanations.</p>
-<p><strong>Model training</strong> minimises the loss. In other words, it optimises the agreement between predicted and observed values. The loss is most commonly measured by the root mean square error (RMSE).</p>
-<p>To tune a model, you can set <em>hyperparameters</em> that determine model structure or calibrate the coefficients. The <em>k</em> in KNN is such a hyperparameter.</p>
-<p><strong>Generalisability</strong> refers to the model’s performance on data not seen during the training - the testing data. To avoid overfitting, model generalisability is desired already during model training. One method to guide model training is <strong>cross validation</strong>.</p>
-<p><strong>Data leakage</strong> is when data from the testing dataset creeps into the training data. To avoid this the testing set must be left completely untouched!</p>
+<p><strong>Training data</strong> is the data that is used to train our model - “to fit
+a curve to the data points.”</p>
+<p><strong>Testing data</strong> is set aside at the initial split and not “touched”
+during model training. It is key to test a model’s predictive power and
+whether it is overfitted.</p>
+<p><strong>Validation data</strong> is used for determining the loss during model
+training. The reason for distinguishing between testing and validation
+data is to assure we’re not misleading model training by some
+peculiarities of the training data and we get an assessment of
+generalisability based on data that was not seen during model training.
+This distinction might be somewhat confusing for now, have a look at
+this <a href="https://machinelearningmastery.com/difference-test-validation-datasets/">blog
+post</a>
+for additional explanations.</p>
+<p><strong>Model training</strong> minimises the loss. In other words, it optimises the
+agreement between predicted and observed values. The loss is most
+commonly measured by the root mean square error (RMSE).</p>
+<p>To tune a model, you can set <em>hyperparameters</em> that determine model
+structure or calibrate the coefficients. The <em>k</em> in KNN is such a
+hyperparameter.</p>
+<p><strong>Generalisability</strong> refers to the model’s performance on data not seen
+during the training - the testing data. To avoid overfitting, model
+generalisability is desired already during model training. One method to
+guide model training is <strong>cross validation</strong>.</p>
+<p><strong>Data leakage</strong> is when information from the testing dataset “creeps”
+into the training data. To avoid this the testing set must be left
+completely untouched!</p>
 </div>
 </div>
 <div id="tutorial-5" class="section level2" number="8.2">
 <h2><span class="header-section-number">8.2</span> Tutorial</h2>
 <div id="model-formulation-using-train" class="section level3" number="8.2.1">
 <h3><span class="header-section-number">8.2.1</span> Model formulation using <code>train()</code></h3>
-<p>In the previous tutorial you learned how to wrangle, split and pre-process data (remember the recipes) and how to formulate a linear model in base R. To learn more about model creation, let us first repeat the data preparation from the previous tutorial:</p>
+<p>In the previous tutorial you learned how to wrangle, split and
+pre-process data (remember the recipes) and how to formulate a linear
+model in base R. To learn more about model creation, let us first repeat
+the data preparation from the previous tutorial:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="ch-07.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Load data and extrat relevant subset</span></span>
 <span id="cb1-2"><a href="ch-07.html#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-3"><a href="ch-07.html#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -529,14 +549,25 @@ div.csl-indent {
 ## Coefficients:
 ## (Intercept)      SW_IN_F        VPD_F         TA_F  
 ##     1.08298      0.01334     -0.34573      0.30404</code></pre>
-<p>The way we formulate a model is independent of the algorithm, or <em>engine</em> that takes care of fitting <span class="math inline">\(f(X)\)</span>. As mentioned in the previous tutorial, the R package <a href="https://topepo.github.io/caret/"><strong>caret</strong></a> provides a unified interface for using different ML algorithms implemented in separate packages.</p>
-<p>In other words, <strong>caret</strong> acts as a <em>wrapper</em> for multiple different model fitting, or ML algorithms. This has the advantage that it unifies the interface (the way arguments are provided). <strong>caret</strong> also provides implementations for a set of commonly used tools for data processing, model training, and evaluation. We’ll use <strong>caret</strong> for model training with the function <code>train()</code>. Using caret for specifying the same linear regression model as above, the base-R <code>lm()</code> function, can be done with caret in a generalized form as:</p>
+<p>Ideally, the way we formulate a model should be independent of the
+algorithm, or <em>engine</em> that takes care of fitting <span class="math inline">\(f(X)\)</span>. As mentioned
+in the previous tutorial, the R package
+<a href="https://topepo.github.io/caret/"><strong>caret</strong></a> provides a unified
+interface for using different ML algorithms implemented in separate
+packages. In other words, <strong>caret</strong> acts as a <em>wrapper</em> for multiple
+different model fitting, or ML algorithms. This has the advantage that
+it unifies the interface (the way arguments are provided). <strong>caret</strong>
+also provides implementations for a set of commonly used tools for data
+processing, model training, and evaluation. We’ll use <strong>caret</strong> for
+model training with the function <code>train()</code>. Using caret for specifying
+the same linear regression model as above, using the base-R <code>lm()</code>
+function, can be done with caret in a generalized form as:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="ch-07.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
 <span id="cb3-2"><a href="ch-07.html#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">train</span>(</span>
 <span id="cb3-3"><a href="ch-07.html#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">form =</span> GPP_NT_VUT_REF <span class="sc">~</span> SW_IN_F <span class="sc">+</span> VPD_F <span class="sc">+</span> TA_F, </span>
-<span id="cb3-4"><a href="ch-07.html#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> ddf <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>(), </span>
+<span id="cb3-4"><a href="ch-07.html#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> ddf, </span>
 <span id="cb3-5"><a href="ch-07.html#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;lm&quot;</span></span>
-<span id="cb3-6"><a href="ch-07.html#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb3-6"><a href="ch-07.html#cb3-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## Linear Regression 
 ## 
 ## 5893 samples
@@ -551,49 +582,100 @@ div.csl-indent {
 ##   1.58713  0.668969  1.228773
 ## 
 ## Tuning parameter &#39;intercept&#39; was held constant at a value of TRUE</code></pre>
-<p>Of course, this is an overkill compared to just writing <code>lm(...)</code>. But the advantage of the unified interface is that we can simply replace the <code>method</code> argument to use a different ML algorithm. For example, to use a random forest model implemented by the <strong>ranger</strong> package, we can write:</p>
+<p>Of course, this is an overkill compared to just writing <code>lm(...)</code>. But
+the advantage of the unified interface is that we can simply replace the
+<code>method</code> argument to use a different ML algorithm. For example, to use a
+random forest model implemented by the <strong>ranger</strong> package, we can write:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="ch-07.html#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">train</span>(</span>
 <span id="cb5-2"><a href="ch-07.html#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">form =</span> GPP_NT_VUT_REF <span class="sc">~</span> SW_F_IN <span class="sc">+</span> VPD_F <span class="sc">+</span> TA_F, </span>
 <span id="cb5-3"><a href="ch-07.html#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> ddf, </span>
 <span id="cb5-4"><a href="ch-07.html#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;ranger&quot;</span>,</span>
 <span id="cb5-5"><a href="ch-07.html#cb5-5" aria-hidden="true" tabindex="-1"></a>  ...</span>
 <span id="cb5-6"><a href="ch-07.html#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>The <code>...</code> hints at the fact that there are a few more arguments to be specified for training a random forest model with ranger. We learn more about these arguments below in Chapter <a href="ch-06.html#training">7.4.3.1</a>.</p>
-<p>Another great advantage of using <strong>caret</strong> to formulate our models is that it takes recipes from the <strong>recipes</strong> packages as input. This way, we can make sure that the exact same pre-processing steps are taken for the training data, testing data and as will be introduced later, the validation data.</p>
+<p>The <code>...</code> hints at the fact that there are a few more arguments to be
+specified for training a random forest model with ranger. We learn more
+about these arguments below in Chapter <a href="ch-06.html#training">7.3.3.1</a>.</p>
+<p>Another useful aspect of using <strong>caret</strong> to formulate models is that it
+takes recipes from the <strong>recipes</strong> packages as input. This way, we can
+make sure that the exact same pre-processing steps are taken for the
+training data, testing data and as will be introduced later, the
+validation data.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="ch-07.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(recipes)</span>
-<span id="cb6-2"><a href="ch-07.html#cb6-2" aria-hidden="true" tabindex="-1"></a>pp <span class="ot">&lt;-</span> <span class="fu">recipe</span>(GPP_NT_VUT_REF <span class="sc">~</span> SW_IN_F <span class="sc">+</span> VPD_F <span class="sc">+</span> TA_F, <span class="at">data =</span> ddf_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="ch-07.html#cb6-2" aria-hidden="true" tabindex="-1"></a>pp <span class="ot">&lt;-</span> <span class="fu">recipe</span>(GPP_NT_VUT_REF <span class="sc">~</span> SW_IN_F <span class="sc">+</span> VPD_F <span class="sc">+</span> TA_F, <span class="at">data =</span> ddf) <span class="sc">%&gt;%</span> </span>
 <span id="cb6-3"><a href="ch-07.html#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_center</span>(<span class="fu">all_numeric</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>()) <span class="sc">%&gt;%</span></span>
 <span id="cb6-4"><a href="ch-07.html#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_scale</span>(<span class="fu">all_numeric</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>())</span></code></pre></div>
 <p>The object <code>pp</code> can then be supplied to <code>train()</code> as its first argument:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="ch-07.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">train</span>(</span>
 <span id="cb7-2"><a href="ch-07.html#cb7-2" aria-hidden="true" tabindex="-1"></a>  pp, </span>
-<span id="cb7-3"><a href="ch-07.html#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> ddf_train, </span>
+<span id="cb7-3"><a href="ch-07.html#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> ddf, </span>
 <span id="cb7-4"><a href="ch-07.html#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;ranger&quot;</span>,</span>
 <span id="cb7-5"><a href="ch-07.html#cb7-5" aria-hidden="true" tabindex="-1"></a>  ...</span>
 <span id="cb7-6"><a href="ch-07.html#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="model-training" class="section level3" number="8.2.2">
 <h3><span class="header-section-number">8.2.2</span> Model training</h3>
-<p>Model training in supervised ML is guided by the match (or mismatch) between the predicted and observed target variable(s), that is, between <span class="math inline">\(\hat{Y}\)</span> and <span class="math inline">\(Y\)</span>. The <em>loss</em> function quantifies this mismatch (<span class="math inline">\(L(\hat{Y}, Y)\)</span>), and the algorithm takes care of progressively reducing the loss during model training.</p>
-<p>Let’s say the ML model contains two parameters and predictions can be considered a function of the two (<span class="math inline">\(\hat{Y}(w_1, w_2)\)</span>). <span class="math inline">\(Y\)</span> is actually constant. Thus, the loss function is effectively a function <span class="math inline">\(L(w_1, w_2)\)</span>. Therefore, we can consider the model training as a search of the parameter space of the machine learning model <span class="math inline">\((w_1, w_2)\)</span> to find the minimum of the loss. Common loss functions are the root mean square error (RMSE), or the mean square error (MSE), or the mean absolute error (MAE). Loss minimization is a general feature of ML model training.</p>
+<p>Model training in supervised ML is guided by the match (or mismatch)
+between the predicted and observed target variable(s), that is, between
+<span class="math inline">\(\hat{Y}\)</span> and <span class="math inline">\(Y\)</span>. The <em>loss</em> function quantifies this mismatch
+(<span class="math inline">\(L(\hat{Y}, Y)\)</span>), and the algorithm takes care of progressively
+reducing the loss during model training.</p>
+<p>Let’s say the ML model contains two parameters and predictions can be
+considered a function of the two (<span class="math inline">\(\hat{Y}(w_1, w_2)\)</span>). <span class="math inline">\(Y\)</span> doesn’t
+change as a function of $w_1$ and $w_2$. Thus, the loss function is
+effectively a function <span class="math inline">\(L(w_1, w_2)\)</span>. Therefore, we can consider the
+model training as a search of the parameter space of the machine
+learning model <span class="math inline">\((w_1, w_2)\)</span> to find the minimum of the loss. Common loss
+functions are the root mean square error (RMSE), or the mean square
+error (MSE), or the mean absolute error (MAE). Loss minimization is a
+general feature of ML model training.</p>
 <div class="figure"><span style="display:block;" id="fig:unnamed-chunk-6"></span>
 <img src="figures/loss_plane.png" alt="Visualization of a loss function as a plane spanned by the two parameters $w_1$ and $w_2$." width="414" />
 <p class="caption">
 Figure 8.1: Visualization of a loss function as a plane spanned by the two parameters <span class="math inline">\(w_1\)</span> and <span class="math inline">\(w_2\)</span>.
 </p>
 </div>
-<p>Model training is implemented in R for different algorithms in different packages. Some algorithms are even implemented by multiple packages (e.g., <code>nnet</code> and <code>neuralnet</code> for artificial neural networks). Again <strong>caret</strong> comes to the rescue as it offers a large selection of ML model implementations from different packages (see <a href="https://topepo.github.io/caret/available-models.html">here</a> for an overview of available models). The <code>train()</code> function takes an argument <code>metric</code>, which specifies the loss function and defaults to the RMSE for regression models and to accuracy for classification (see chapter on metrics below).</p>
+<p>Model training is implemented in R for different algorithms in different
+packages. Some algorithms are even implemented by multiple packages
+(e.g., <code>nnet</code> and <code>neuralnet</code> for artificial neural networks). Again,
+<strong>caret</strong> comes to the rescue as it offers a large selection of ML model
+implementations from different packages (see
+<a href="https://topepo.github.io/caret/available-models.html">here</a> for an
+overview of available models). The <code>train()</code> function takes an argument
+<code>metric</code>, which specifies the loss function and defaults to the RMSE for
+regression models and to accuracy for classification (see chapter on
+metrics below).</p>
 <div id="hyperparameter-tuning" class="section level4" number="8.2.2.1">
 <h4><span class="header-section-number">8.2.2.1</span> Hyperparameter tuning</h4>
-<p>Practically all ML algorithms have some “knobs” to turn in order to achieve efficient model training and predictive performance. Such “knobs” are called <em>hyperparameters</em> and depend on the ML algorithm.</p>
-<p>For k-nearest neighbour (KNN), it is <code>k</code> - the number of neighbours to consider for determining distances. There is always an optimum <span class="math inline">\(k\)</span>. Obviously, if <span class="math inline">\(k = n\)</span>, we consider all observations as neighbours and each prediction is simply the mean of all observed target values <span class="math inline">\(Y\)</span>, irrespective of the predictor values. This cannot be optimal and such a model is likely underfit. On the other extreme, with <span class="math inline">\(k = 1\)</span>, the model will be strongly affected by the noise in the single nearest neighbour and its generalisability will suffer. This should be reflected in a poor performance on the validation data.</p>
+<p>All ML algorithms have some “knobs” to turn in order to achieve
+efficient model training and predictive performance. Such “knobs” are
+called <em>hyperparameters</em> and their meaning and effect depend on the ML
+algorithm.</p>
+<p>For k-nearest neighbour (KNN), it is <code>k</code> - the number of neighbours to
+consider for determining distances. There is always an optimum <span class="math inline">\(k\)</span>.
+Obviously, if <span class="math inline">\(k = n\)</span>, we consider all observations as neighbours and
+each prediction is simply the mean of all observed target values <span class="math inline">\(Y\)</span>,
+irrespective of the predictor values. This cannot be optimal and such a
+model is likely underfit. On the other extreme, with <span class="math inline">\(k = 1\)</span>, the model
+will be strongly affected by the noise in the single nearest neighbour
+and its generalisability will suffer. This should be reflected in a poor
+performance on the validation data.</p>
 <p>For random forests from the <strong>ranger</strong> package, hyperparameters are:</p>
 <ul>
-<li><code>mtry</code>: the number of variables to consider to make decisions, often taken as <span class="math inline">\(p/3\)</span>, where <span class="math inline">\(p\)</span> is the number of predictors.</li>
-<li><code>min.node.size</code>: the number of data points at the “bottom” of each decision tree</li>
-<li><code>splitrule</code>: the function applied to data in each branch of a tree, used for determining the goodness of a decision</li>
+<li><code>mtry</code>: the number of variables to consider to make decisions, often
+taken as <span class="math inline">\(p/3\)</span>, where <span class="math inline">\(p\)</span> is the number of predictors.</li>
+<li><code>min.node.size</code>: the number of data points at the “bottom” of each
+decision tree</li>
+<li><code>splitrule</code>: the function applied to data in each branch of a tree,
+used for determining the goodness of a decision</li>
 </ul>
-<p>Hyperparameters usually have to be “tuned” and their optimal values depend on the data. Therefore they cannot be known <em>a priori</em> but must be found on-the-go. In <strong>caret</strong>, hyperparameter tuning is implemented as part of the <code>train()</code> function. Values of hyperparameters to consider are to be specified by the argument <code>tuneGrid</code>, which takes a data frame with column(s) named according to the name(s) of the hyperparameter(s) and rows for each combination of hyperparameters to consider. To specify the three hyperparameters of a random forest model would look like this:</p>
+<p>Hyperparameters usually have to be “tuned” and their optimal values
+depend on the data. Therefore they cannot be known <em>a priori</em> but must
+be found on-the-go. In <strong>caret</strong>, hyperparameter tuning is implemented
+as part of the <code>train()</code> function. Values of hyperparameters to consider
+are to be specified by the argument <code>tuneGrid</code>, which takes a data frame
+with column(s) named according to the name(s) of the hyperparameter(s)
+and rows for each combination of hyperparameters to consider. To specify
+the three hyperparameters of a random forest model would look like this:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="ch-07.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">train</span>(</span>
 <span id="cb8-2"><a href="ch-07.html#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">form =</span> GPP_NT_VUT_REF <span class="sc">~</span> SW_F_IN <span class="sc">+</span> VPD_F <span class="sc">+</span> TA_F, </span>
 <span id="cb8-3"><a href="ch-07.html#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> ddf, </span>
@@ -603,14 +685,45 @@ Figure 8.1: Visualization of a loss function as a plane spanned by the two param
 <span id="cb8-7"><a href="ch-07.html#cb8-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">.splitrule =</span> <span class="fu">c</span>(<span class="st">&quot;variance&quot;</span>, <span class="st">&quot;maxstat&quot;</span>)),</span>
 <span id="cb8-8"><a href="ch-07.html#cb8-8" aria-hidden="true" tabindex="-1"></a>  ...</span>
 <span id="cb8-9"><a href="ch-07.html#cb8-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>Here, <code>expand.grid()</code> is used to provide a data frame with all possible combinations of individual vectors (e.g. min node size) and their provided values (e.g. 3, 5, 9, 15, 30). For a KNN, it suffices to enter a dataframe with one vector of numbers as argument to <code>tuneGrid</code> (e.g., <code>data.frame(k = c(2, 5, 10, 15, 18, 20, 22, 24, 26, 30, 35, 40, 60, 100))</code>). The <code>train()</code> function will then create a KNN for each of these numbers to find the optimal k.</p>
+<p>Here, <code>expand.grid()</code> is used to generate a data frame with all possible
+combinations of individual vectors (e.g. min node size) and their
+provided values (e.g. 3, 5, 9, 15, 30). For a KNN, it suffices to enter
+a dataframe with one vector of numbers as argument to <code>tuneGrid</code> (e.g.,
+<code>data.frame(k = c(2, 5, 10, 15, 18, 20, 22, 24, 26, 30, 35, 40, 60, 100))</code>).
+The <code>train()</code> function will then create a KNN for each of these numbers
+to find the optimal k.</p>
 </div>
 <div id="resampling" class="section level4" number="8.2.2.2">
 <h4><span class="header-section-number">8.2.2.2</span> Resampling</h4>
-<p>The goal of model training is to achieve the best possible model generalisability. That is, the best possible model performance when predicting to data that was not used for training - the test data. Resampling mimicks the comparison of predictions to the test data. Instead of using all training data, the training data is <em>resampled</em> into a number further splits into pairs of training and <em>validation</em> data. Model training is then guided by minimising the average loss determined on each resample of the validation data. Having multiple resamples (multiple <em>folds</em> of training-validation splits) avoids the loss minimization from being misguided by random peculiarities in the training and/or validation data.</p>
-<p>A common resampling method is <em>k-fold cross validation</em>, where the training data is split into <em>k</em> equally sized subsets (<em>folds</em>). Then, there will be <em>k</em> iterations, where each fold is used for validation once (while the remaining folds are used for training). An extreme case is <em>leave-one-out cross validation</em>, where <em>k</em> corresponds to the number of data points.</p>
-<p><img src="figures/cv.png" width="716" /></p>
-<p>To do a k-fold cross validation during model training in R, we don’t have to implement the loops around folds ourselves. The resampling procedure can be specified in the <strong>caret</strong> function <code>train()</code> with the argument <code>trControl</code>. The object that this argument takes is the output of a function call to <code>trainControl()</code>. This can be implemented in two steps. For example, to do a 10-fold cross-validation, we can write:</p>
+<p>The goal of model training is to achieve the best possible model
+generalisability. That is, the best possible model performance when
+predicting to data that was not used for training - the test data.
+Resampling mimicks the comparison of predictions to the test data.
+Instead of using all training data, the training data is <em>resampled</em>
+into a number further splits - pairs of training and <em>validation</em> data.
+Model training is then guided by minimising the average loss determined
+on each resample of the validation data. Having multiple resamples
+(multiple <em>folds</em> of training-validation splits) avoids the loss
+minimization from being misguided by random peculiarities in the
+training and/or validation data.</p>
+<p>A common resampling method is <em>k-fold cross validation</em>, where the
+training data is split into <em>k</em> equally sized subsets (<em>folds</em>). Then,
+there will be <em>k</em> iterations, where each fold is used for validation
+once (while the remaining folds are used for training). An extreme case
+is <em>leave-one-out cross validation</em>, where <em>k</em> corresponds to the number
+of data points.</p>
+<div class="figure"><span style="display:block;" id="fig:cv"></span>
+<img src="figures/cv.png" alt="Cross-validation resampling (figure from [Boehmke &amp; Greenwell (2019)](https://bradleyboehmke.github.io/HOML/process.html))." width="716" />
+<p class="caption">
+Figure 8.2: Cross-validation resampling (figure from <a href="https://bradleyboehmke.github.io/HOML/process.html">Boehmke &amp; Greenwell (2019)</a>).
+</p>
+</div>
+<p>To do a k-fold cross validation during model training in R, we don’t
+have to implement the loops around folds ourselves. The resampling
+procedure can be specified in the <strong>caret</strong> function <code>train()</code> with the
+argument <code>trControl</code>. The object that this argument takes is the output
+of a function call to <code>trainControl()</code>. This can be implemented in two
+steps. For example, to do a 10-fold cross-validation, we can write:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="ch-07.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">train</span>(</span>
 <span id="cb9-2"><a href="ch-07.html#cb9-2" aria-hidden="true" tabindex="-1"></a>  pp, </span>
 <span id="cb9-3"><a href="ch-07.html#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> ddf_train, </span>
@@ -621,35 +734,62 @@ Figure 8.1: Visualization of a loss function as a plane spanned by the two param
 <span id="cb9-8"><a href="ch-07.html#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">10</span>),</span>
 <span id="cb9-9"><a href="ch-07.html#cb9-9" aria-hidden="true" tabindex="-1"></a>  ...</span>
 <span id="cb9-10"><a href="ch-07.html#cb9-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p>In certain cases, data points stem from different “groups,” and generalisability across groups is critical. In such cases, data from a given group must not be used both in the training and validation sets. Instead, splits should be made along group delineations. The <em>caret</em> function <code>groupKFold()</code> offers the solution for this case.</p>
+<p>In certain cases, data points stem from different “groups,” and
+generalisability across groups is critical. In such cases, data from a
+given group must not be used both in the training and validation sets.
+Instead, splits should be made along group delineations. The <em>caret</em>
+function <code>groupKFold()</code> offers the solution for this case.</p>
 </div>
 </div>
 <div id="model-evaluation" class="section level3" number="8.2.3">
 <h3><span class="header-section-number">8.2.3</span> Model evaluation</h3>
-<p>In previous chapters, you have already encountered different metrics that can be used to quantify the agreement between predicted (<span class="math inline">\(\hat{y}\)</span>) and observed (<span class="math inline">\(y\)</span>) values (e.g., the root mean square error). These metrics are essential to guide model training (where the metric defines the loss function) and inform the evaluation. Different metrics measure different aspects of the model-data agreement and different metrics are used for regression and classification models.</p>
+<p>In previous chapters, you have already encountered different metrics
+that can be used to quantify the agreement between predicted (<span class="math inline">\(\hat{y}\)</span>)
+and observed (<span class="math inline">\(y\)</span>) values (e.g., the root mean square error). These
+metrics are essential to guide model training and inform the evaluation.
+Different metrics measure different aspects of the model-data agreement
+and different metrics are used for regression and classification models.</p>
 <div id="metrics-for-regression-models" class="section level4" number="8.2.3.1">
 <h4><span class="header-section-number">8.2.3.1</span> Metrics for regression models</h4>
-<p>Different metrics measure, for example, the correlation between modeled and observed values or the magnitude of the errors. To get an intuitive understanding of their different abilities, compare the scatterplots in Figure <a href="ch-07.html#fig:metrics">8.2</a> and how different aspects of the model-data agreement are measured by different metrics. Their definitions will follow below.</p>
+<p>Different metrics measure, for example, the correlation between modeled
+and observed values or the magnitude of the errors. To get an intuitive
+understanding of their different abilities, compare the scatterplots in
+Figure <a href="ch-07.html#fig:metrics">8.3</a> and how different aspects of the model-data
+agreement are measured by different metrics. Their definitions will
+follow below.</p>
 <div class="figure"><span style="display:block;" id="fig:metrics"></span>
 <img src="figures/correlation_error.png" alt="Comparison of model metrics on different data sets." width="1350" />
 <p class="caption">
-Figure 8.2: Comparison of model metrics on different data sets.
+Figure 8.3: Comparison of model metrics on different data sets.
 </p>
 </div>
 <ul>
-<li><p><strong>MSE</strong>: The mean squared error is defined, as its name suggests, as:
-<span class="math display">\[
+<li><p><strong>MSE</strong>: The mean squared error is defined, as its name suggests,
+as: <span class="math display">\[
 \text{MSE} = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{y_i})^2
-\]</span>
-It measures accuracy, i.e., the magnitude of the errors, and is minimized during model training when used as a loss function. Note that since it scales with the square of the errors, the MSE is particularly sensitive to large errors in single points (including outliers). You may notice the difference to the error variance <span class="math inline">\(\widehat{\sigma}^2\)</span>. It was defined in Chapter <a href="ch-06.html#ch-06">7</a> similar to the definition of the MSE above, but with <span class="math inline">\(n-p\)</span> in the denominator instead of <span class="math inline">\(n\)</span>. The denominator <span class="math inline">\(n-p\)</span> corresponds to the <em>degrees of freedom</em> (size of our sample minus the number of parameters to estimate). Here we want to compute the mean of the errors, hence we divide by <span class="math inline">\(n\)</span>.</p></li>
-<li><p><strong>RMSE</strong>: The root mean squared error is, as its name suggests, the root of the MSE:
-<span class="math display">\[
+\]</span>It measures accuracy, i.e., the magnitude of the errors, and is
+minimized during model training when used as a loss function. Note
+that since it scales with the square of the errors, the MSE is
+particularly sensitive to large errors in single points (including
+outliers). You may notice the difference to the error variance
+<span class="math inline">\(\widehat{\sigma}^2\)</span>. It was defined in Chapter <a href="ch-06.html#ch-06">7</a> similar
+to the definition of the MSE above, but with <span class="math inline">\(n-p\)</span> in the
+denominator instead of <span class="math inline">\(n\)</span>. The denominator <span class="math inline">\(n-p\)</span> corresponds to the
+<em>degrees of freedom</em> (size of our sample minus the number of
+parameters to estimate). Here we want to compute the mean of the
+errors, hence we divide by <span class="math inline">\(n\)</span>.</p></li>
+<li><p><strong>RMSE</strong>: The root mean squared error is, as its name suggests, the
+root of the MSE: <span class="math display">\[
 \text{RMSE} = \sqrt{\text{MSE}} = \sqrt{\frac{1}{n} \sum_{i=1}^n (y_i - \hat{y_i})^2}
-\]</span>
-Like the MSE, the RMSE also measures accuracy (the magnitude of the errors) and is minimized during model training. By taking the square root of mean square errors, the RMSE is in the same units as the data <span class="math inline">\(y\)</span> and is less sensitive to outliers as the MSE.</p></li>
+\]</span>Like the MSE, the RMSE also measures accuracy (the magnitude of
+the errors) and is minimized during model training. By taking the
+square root of mean square errors, the RMSE is in the same units as
+the data <span class="math inline">\(y\)</span> and is less sensitive to outliers as the MSE.</p></li>
 </ul>
 <p><strong>Checkpoint</strong></p>
-<p>Implement the formula for RMSE using simple “low-level” functions like <code>sqrt()</code> and <code>mean()</code>. Confirm that the function <code>rmse()</code> from the yardstick package computes the RMSE the same way.</p>
+<p>Implement the formula for RMSE using simple “low-level” functions like
+<code>sqrt()</code> and <code>mean()</code>. Confirm that the function <code>rmse()</code> from the
+yardstick package computes the RMSE the same way.</p>
 <p><strong>Solution</strong></p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="ch-07.html#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## generate random data </span></span>
 <span id="cb10-2"><a href="ch-07.html#cb10-2" aria-hidden="true" tabindex="-1"></a>df_demo <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)) <span class="sc">%&gt;%</span> </span>
@@ -661,19 +801,40 @@ Like the MSE, the RMSE also measures accuracy (the magnitude of the errors) and 
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="ch-07.html#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">mean</span>((df_demo<span class="sc">$</span>y_pred <span class="sc">-</span> df_demo<span class="sc">$</span>y_obs)<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div>
 <pre><code>## [1] 1.01994</code></pre>
 <ul>
-<li><p><strong><span class="math inline">\(R^2\)</span></strong>, also called the <em>coefficient of determination</em>, describes the proportion of variation in <span class="math inline">\(y\)</span> that is captured by modelled values <span class="math inline">\(\hat{y}\)</span>. In this case, the goal is to maximize the metric, thus trying the explain as much variation as possible. In contrast to the MSE and RMSE, <span class="math inline">\(R^2\)</span> measures consistency, or correlation, or goodness of fit, and not accuracy. It is traditionally defined as:
+<li><p><span class="math inline">\(R^2\)</span>, also called the <em>coefficient of determination</em>, describes the
+proportion of variation in <span class="math inline">\(y\)</span> that is captured by modelled values
+<span class="math inline">\(\hat{y}\)</span>. In this case, the goal is to maximize the metric, thus
+trying the explain as much variation as possible. In contrast to the
+MSE and RMSE, <span class="math inline">\(R^2\)</span> measures consistency, or correlation, or
+goodness of fit, and not accuracy. It is traditionally defined as:
 <span class="math display">\[
 R^2 = 1 - \frac{\sum_i (\hat{y}_i - y_i)^2}{\sum_i (y_i - \bar{y})^2}
-\]</span>
-A perfect fit is quantified by <span class="math inline">\(R^2 = 1\)</span> and uninformative estimates have an <span class="math inline">\(R^2\)</span> approaching zero when compared to observations.</p></li>
-<li><p><strong>Pearson’s <span class="math inline">\(r^2\)</span></strong>: The linear association between to variables (here <span class="math inline">\(y\)</span> and <span class="math inline">\(\hat{y}\)</span>) is measured by the <em>Pearson’s correlation coefficient</em> <span class="math inline">\(r\)</span>. Its square is closely related to the coefficient of determination and in common cases of prediction-observation comparisons almost identical.
-<span class="math display">\[
+\]</span>A perfect fit is quantified by <span class="math inline">\(R^2 = 1\)</span> and uninformative
+estimates have an <span class="math inline">\(R^2\)</span> approaching zero when compared to
+observations.</p></li>
+<li><p><strong>Pearson’s</strong> <span class="math inline">\(r^2\)</span>: The linear association between to variables
+(here <span class="math inline">\(y\)</span> and <span class="math inline">\(\hat{y}\)</span>) is measured by the <em>Pearson’s correlation
+coefficient</em> <span class="math inline">\(r\)</span>. Its square is closely related to the coefficient
+of determination and in common cases of prediction-observation
+comparisons almost identical. <span class="math display">\[
 r = \frac{\sum_i (y_i - \bar{y}) (\hat{y_i} - \hat{\bar{y}}) }{\sqrt{ \sum_i(y_i-\bar{y})^2(\hat{y_i}-\hat{\bar{y}})^2 } }
 \]</span></p></li>
 </ul>
-<p>The distinction between uppercase and lowercase nomenclature is often not consistent in the literature. The uppercase <span class="math inline">\(R^2\)</span> is commonly used in the context of comparing observed and predicted values with the coefficient of determination. When the <em>correlation</em> between two different variables in a sample is quantified, the lowercase <span class="math inline">\(r^2\)</span> is commonly used. In a linear regression with an estimated intercept, the coefficient of determination and the square of the Pearson’s correlation coefficient are equal. However, when comparing estimated and observed values, the coefficient of determination can return negative values for uninformative estimates.</p>
-<p>Metrics for correlation should not be used as a loss function because they do not penalise biased models. This is illustrated also in the plots above.</p>
-<p>The yardstick library implements the definition of the coefficient of determination with its function <code>rsq_trad()</code>.</p>
+<p>The distinction between uppercase and lowercase nomenclature is often
+not consistent in the literature. The uppercase <span class="math inline">\(R^2\)</span> is commonly used
+in the context of comparing observed and predicted values with the
+coefficient of determination. When the <em>correlation</em> between two
+different variables in a sample is quantified, the lowercase <span class="math inline">\(r^2\)</span> is
+commonly used. In a linear regression with an estimated intercept, the
+coefficient of determination and the square of the Pearson’s correlation
+coefficient are equal. However, when comparing estimated and observed
+values, the coefficient of determination can return negative values for
+uninformative estimates.</p>
+<p>Metrics for correlation should not be used as a loss function because
+they do not penalise biased models. This is illustrated also in the
+plots above.</p>
+<p>The yardstick library implements the definition of the coefficient of
+determination with its function <code>rsq_trad()</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="ch-07.html#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## generate random data </span></span>
 <span id="cb14-2"><a href="ch-07.html#cb14-2" aria-hidden="true" tabindex="-1"></a>df_demo <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb14-3"><a href="ch-07.html#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">y_obs =</span> x <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">100</span>),</span>
@@ -684,7 +845,10 @@ r = \frac{\sum_i (y_i - \bar{y}) (\hat{y_i} - \hat{\bar{y}}) }{\sqrt{ \sum_i(y_i
 <pre><code>## [1] 0.4611166</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="ch-07.html#cb16-1" aria-hidden="true" tabindex="-1"></a>yardstick<span class="sc">::</span><span class="fu">rsq_trad</span>(df_demo, y_obs, y_pred) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(.estimate)</span></code></pre></div>
 <pre><code>## [1] 0.4611166</code></pre>
-<p>The square of the Pearson’s correlation coefficient, as defined above, is implemented by the yardstick function <code>rsq()</code>, and corresponds also to the value reported for <code>Multiple R-squared</code> by <code>summary()</code> on a linear model object, or simply to <code>cor(...)^2</code>.</p>
+<p>The square of the Pearson’s correlation coefficient, as defined above,
+is implemented by the yardstick function <code>rsq()</code>, and corresponds also
+to the value reported for <code>Multiple R-squared</code> by <code>summary()</code> on a
+linear model object, or simply to <code>cor(...)^2</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="ch-07.html#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## the equation given above for the squared Pearson&#39;s correlation coefficient corresponds to &#39;rsq()&#39;, &#39;cor()^2&#39;, and `summary()$r.squared</span></span>
 <span id="cb18-2"><a href="ch-07.html#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="ch-07.html#cb18-3" aria-hidden="true" tabindex="-1"></a>(<span class="fu">sum</span>((df_demo<span class="sc">$</span>y_pred <span class="sc">-</span> <span class="fu">mean</span>(df_demo<span class="sc">$</span>y_pred))<span class="sc">*</span>(df_demo<span class="sc">$</span>y_obs <span class="sc">-</span> <span class="fu">mean</span>(df_demo<span class="sc">$</span>y_obs))))<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span></span>
@@ -696,46 +860,91 @@ r = \frac{\sum_i (y_i - \bar{y}) (\hat{y_i} - \hat{\bar{y}}) }{\sqrt{ \sum_i(y_i
 <pre><code>## [1] 0.506538</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="ch-07.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(df_demo<span class="sc">$</span>y_obs, df_demo<span class="sc">$</span>y_pred)<span class="sc">^</span><span class="dv">2</span></span></code></pre></div>
 <pre><code>## [1] 0.506538</code></pre>
-<p>The <span class="math inline">\(R^2\)</span> generally increases when predictors are added to a model, even if predictors are not informative. This is particularly critical in the context of machine learning when we compare alternative models that differ by their number of predictors. In other words, the <span class="math inline">\(R^2\)</span> of a model with a large number of predictors tends to give an overconfident estimate of its predictive power. We have encountered cross-validation which yields good predictive power. This is the “gold-standard.” But when the number of data points is small, cross validation estimates may not be robust. Without resorting to cross validation, the effect of spuriously improving the evaluation metric by adding uninformative predictors can also be mitigated by penalising by the number of predictors <span class="math inline">\(p\)</span>. Different metrics are available.</p>
+<p>The <span class="math inline">\(R^2\)</span> generally increases when predictors are added to a model, even
+if predictors are not informative. This is particularly critical in the
+context of machine learning when we compare alternative models that
+differ by their number of predictors. In other words, the <span class="math inline">\(R^2\)</span> of a
+model with a large number of predictors tends to give an overconfident
+estimate of its predictive power.</p>
+<p>Above, we have seen how cross-validation can be used to assess
+generalisability (model performance on the validation set). This is the
+“gold-standard.” But when the number of data points is small, cross
+validation estimates may not be robust. Without resorting to cross
+validation, the effect of spuriously improving the evaluation metric by
+adding uninformative predictors can also be mitigated by penalising by
+the number of predictors <span class="math inline">\(p\)</span>. Different metrics are available.</p>
 <ul>
-<li><p><strong>Adjusted <span class="math inline">\(R^2\)</span></strong>: The adjusted <span class="math inline">\(R^2\)</span> discounts values by the number of predictors as
-<span class="math display">\[
+<li><p><strong>Adjusted</strong> <span class="math inline">\(R^2\)</span>: The adjusted <span class="math inline">\(R^2\)</span> discounts values by the
+number of predictors as <span class="math display">\[
 \bar{R}^2 = 1 - (1-R^2) \; \frac{n-1}{n-p-1} \;,
-\]</span>
-where <span class="math inline">\(n\)</span> (as before) is the number of observations and <span class="math inline">\(p\)</span> the number of predictors. As for <span class="math inline">\(R^2\)</span>, the goal is to maximize it. For a fitted model in R <code>modl</code>, it is returned by <code>summary(modl)$adj.r.squared</code>.</p></li>
-<li><p><strong>AIC</strong>: the Akaike’s Information Criterion is defined as
-<span class="math display">\[
+\]</span>where <span class="math inline">\(n\)</span> (as before) is the number of observations and <span class="math inline">\(p\)</span> the
+number of predictors. As for <span class="math inline">\(R^2\)</span>, the goal is to maximize it. For
+a fitted model in R <code>modl</code>, it is returned by
+<code>summary(modl)$adj.r.squared</code>.</p></li>
+<li><p><strong>AIC</strong>: the Akaike’s Information Criterion is defined as <span class="math display">\[
 \text{AIC} = n \log \Big(\frac{\text{SSE}}{n}\Big) + 2(p+2)
-\]</span>
-where <span class="math inline">\(N\)</span> is the number of observations used for estimation, <span class="math inline">\(p\)</span> is the number of predictors in the model and SSE is the sum of squared estimate of errors (SSE<span class="math inline">\(= \sum_i (y_i-\hat{y_i})^2\)</span>). Also in this case we have to minimize it and the model with the minimum value of the AIC is often the best model for forecasting. For large values of<br />
-<span class="math inline">\(n\)</span>, minimising the AIC is equivalent to minimising the cross-validated MSE.</p></li>
-<li><p><strong>AIC<span class="math inline">\(_c\)</span></strong>: For small values of <span class="math inline">\(n\)</span> the AIC tends to select too many predictors. A bias-corrected version of the AIC is defined as:
+\]</span>where <span class="math inline">\(N\)</span> is the number of observations used for estimation, <span class="math inline">\(p\)</span>
+is the number of predictors in the model and SSE is the sum of
+squared estimate of errors (SSE<span class="math inline">\(= \sum_i (y_i-\hat{y_i})^2\)</span>). Also
+in this case we have to minimize it and the model with the minimum
+value of the AIC is often the best model for forecasting. For large
+values of<br />
+<span class="math inline">\(n\)</span>, minimising the AIC is equivalent to minimising the
+cross-validated MSE.</p></li>
+<li><p><strong>AIC</strong><span class="math inline">\(_c\)</span>: For small values of <span class="math inline">\(n\)</span> the AIC tends to select too
+many predictors. A bias-corrected version of the AIC is defined as:
 <span class="math display">\[
 \text{AIC}_c = \text{AIC} + \frac{2(p + 2)(p + 3)}{n-p-3}
-\]</span>
-Also AIC<span class="math inline">\(_c\)</span> is minimised for an optimal predictive model.</p></li>
+\]</span>Also AIC<span class="math inline">\(_c\)</span> is minimised for an optimal predictive model.</p></li>
 <li><p><strong>BIC</strong>: the Schwarz’s Bayesian Information Criterion is defined as
 <span class="math display">\[
 \text{BIC} = n \log \Big(\frac{\text{SSE}}{n}\Big) + (p+2)  \log(n)
-\]</span>
-Also in this case our goal is to minimize the BIC. This metric has the feature that if there is a true underlying model, the BIC will select that model given enough data. The BIC tends to select the model with fewer predictors than AIC.</p></li>
+\]</span>Also in this case our goal is to minimize the BIC. This metric has
+the feature that if there is a true underlying model, the BIC will
+select that model given enough data. The BIC tends to select the
+model with fewer predictors than AIC.</p></li>
 </ul>
 </div>
 <div id="metrics-for-classification" class="section level4" number="8.2.3.2">
 <h4><span class="header-section-number">8.2.3.2</span> Metrics for classification</h4>
-<p>In the examples for this course, we have thus far focused on regression models. For classification, different metrics for measuring the agreement between predicted and observed values are used. They will be introduced in a later chapter. If you’re curious already now, good overviews are provided in the following links:</p>
+<p>In the examples for this course, we have thus far focused on regression
+models. For classification, different metrics for measuring the
+agreement between predicted and observed values are used. They will be
+introduced in a later chapter. If you’re curious already now, good
+overviews are provided in the following links:</p>
 <ul>
-<li><a href="https://bradleyboehmke.github.io/HOML/process.html#model-eval">Hands On Machine Learning in R, Bradley &amp; Boehmke</a> for brief definitions.</li>
-<li><a href="https://en.wikipedia.org/wiki/Confusion_matrix">Wikipedia on Confusion Matrix</a></li>
-<li><a href="https://medium.com/@MohammedS/performance-metrics-for-classification-problems-in-machine-learning-part-i-b085d432082b">Blogpost by M. Sunasra on Medium</a></li>
+<li><a href="https://bradleyboehmke.github.io/HOML/process.html#model-eval">Hands On Machine Learning in R, Bradley &amp;
+Boehmke</a>
+for brief definitions.</li>
+<li><a href="https://en.wikipedia.org/wiki/Confusion_matrix">Wikipedia on Confusion
+Matrix</a></li>
+<li><a href="https://medium.com/@MohammedS/performance-metrics-for-classification-problems-in-machine-learning-part-i-b085d432082b">Blogpost by M. Sunasra on
+Medium</a></li>
 </ul>
 </div>
 <div id="residual-analysis" class="section level4" number="8.2.3.3">
 <h4><span class="header-section-number">8.2.3.3</span> Residual analysis</h4>
-<p>Quantifying metrics is one part of model evaluation. The other part is to get an intuitive understanding of the model-observation agreement and where and why they fail. Getting there is an integral part of exploratory data analysis. One of the first steps after obtaining results from your initial model is to investigate its residuals (the difference between predicted and observed values) and their pattern. If you can detect a clear pattern or trend in your residuals, then your model has room for improvement.</p>
-<p>Our example data set contains time series of multiple variables. Above, we have not used time as a predictor but values in the data frame are ordered by time along rows. An obvious first step is to look at residuals and their relationship with time (or simply row number in our case).</p>
-<p>A handy function to add predictions and residuals from a fitted model to the data (must contain the variables used in the model), is <a href="https://broom.tidymodels.org/reference/data.frame_tidiers.html"><code>augment</code></a> from the tidyverse <a href="https://broom.tidymodels.org/index.html"><em>broom</em></a> package <span class="citation">(<a href="#ref-R-broom" role="doc-biblioref">Robinson, Hayes, and Couch 2021</a>)</span>. It adds information about observations to a data set.</p>
-<p>Let’s fit a linear regression model <code>GPP_NT_VUT_REF ~ SW_IN_F</code> and look at the residuals.</p>
+<p>Quantifying metrics is one part of model evaluation. The other part is
+to get an intuitive understanding of the model-observation agreement and
+where and why they fail. Getting there is an integral part of
+exploratory data analysis. One of the first steps after obtaining
+results from your initial model is to investigate its residuals (the
+difference between predicted and observed values) and their pattern. If
+you can detect a clear pattern or trend in your residuals, then your
+model has room for improvement.</p>
+<p>Our example data set contains time series of multiple variables. Above,
+we have not used time as a predictor but values in the data frame are
+ordered by time along rows. An obvious first step is to look at
+residuals and their relationship with time (or simply row number in our
+case).</p>
+<p>A handy function to add predictions and residuals from a fitted model to
+the data (must contain the variables used in the model), is
+<a href="https://broom.tidymodels.org/reference/data.frame_tidiers.html"><code>augment</code></a>
+from the tidyverse <a href="https://broom.tidymodels.org/index.html"><em>broom</em></a>
+package <span class="citation">(<a href="#ref-R-broom" role="doc-biblioref">Robinson, Hayes, and Couch 2021</a>)</span>. It adds information about observations to a data
+set.</p>
+<p>Let’s fit a linear regression model <code>GPP_NT_VUT_REF ~ SW_IN_F</code> and look
+at the residuals.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="ch-07.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
 <span id="cb26-2"><a href="ch-07.html#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-3"><a href="ch-07.html#cb26-3" aria-hidden="true" tabindex="-1"></a>linmod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(GPP_NT_VUT_REF <span class="sc">~</span> SW_IN_F, <span class="at">data =</span> ddf)</span>
@@ -749,28 +958,85 @@ Also in this case our goal is to minimize the BIC. This metric has the feature t
 <span id="cb26-11"><a href="ch-07.html#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Row number&quot;</span>) <span class="sc">+</span></span>
 <span id="cb26-12"><a href="ch-07.html#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Residuals&quot;</span>) <span class="sc">+</span></span>
 <span id="cb26-13"><a href="ch-07.html#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Univariate linear regression&quot;</span>, <span class="at">subtitle =</span> <span class="st">&quot;GPP_NT_VUT_REF ~ SW_IN_F&quot;</span>)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
-<p>Apparently, there is a clear pattern in the residuals with an apparent autocorrelation (the residual in one data point is correlated with the residual in its preceding data point). This suggests that there is temporal information that we did not account for in our model. This could either be from additional predictors, not included here, that have a temporal pattern (note that we only included one predictor in this model), or from the inherent dynamics of the system itself, which is not captured by the predictors (e.g., memory effects).</p>
-<p>We can also plot residuals versus additional, potentially influential but not included predictors to guide the revision of the model. However, it is often not possible to determine effects by eye, especially if interactions between variables are important. We learn about methods to sequentially add predictors to a linear regression model in the ‘Application’ session (see Chapter <a href="ch-08.html#ch-08">9</a>).</p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Apparently, there is a clear pattern in the residuals with an apparent
+autocorrelation (the residual in one data point is correlated with the
+residual in its preceding data point). This suggests that there is
+temporal information that we did not account for in our model. This
+could either be from additional predictors, not included here, that have
+a temporal pattern (note that we only included one predictor in this
+model), or from the inherent dynamics of the system itself, which is not
+captured by the predictors (e.g., memory effects).</p>
+<p>We can also plot residuals versus additional, potentially influential
+but not included predictors to guide the revision of the model. However,
+it is often not possible to determine effects by eye, especially if
+interactions between variables are important. We learn about methods to
+sequentially add predictors to a linear regression model in the
+‘Application’ session (see Chapter <a href="ch-08.html#ch-08">9</a>).</p>
 </div>
 </div>
 <div id="bonus-model-interpretation" class="section level3" number="8.2.4">
 <h3><span class="header-section-number">8.2.4</span> Bonus: Model interpretation</h3>
-<p>Until now, we have seen how to build and train models, tune the hyperparameters and evaluate models. ML models work so well because they can effectively make use of large amounts of data and are flexible enough to model non-linear relationships and interactions, and predict rare and faint phenomena. This is their great advantage over classical statistical methods. However, this flexibility is underpinned by a high model complexity and a large number of parameters. This complexity also contrasts with traditional statistical methods, e.g., linear regression where fitted coefficients (<span class="math inline">\(\beta_i\)</span> in Chapter <a href="ch-06.html#ch-06">7</a>) can directly be interpreted and yield information about the sensitivity of the target variable to the different predictors and even about the statistical significance of their effect (we haven’t looked at that part). In contrast, the complexity of ML models renders their interpretation difficult. The ML algorithms’ predictive power comes at the cost of reduced <em>model interpretability</em>. ML models often appear to be “black boxes” which may limit their usefulness in typical applications in research, where we’re often not only interested in <em>predicting</em>, but also in <em>understanding</em> how the model arrived at its predictions. We are often interested in identifying patterns in the data that would otherwise not be visible, but that the algorithm apparently identified and learned.</p>
-<p>In order to interpret a ML model and understand its inner workings, we have to “ask specific questions” that can be translated into an evaluation of the trained model that then yields the answer we want. There are basically two types of questions we can ask:</p>
+<p>Until now, we have seen how to build and train models, tune the
+hyperparameters and evaluate models. ML models work so well because they
+can effectively make use of large amounts of data and are flexible
+enough to model non-linear relationships and interactions, and predict
+rare and faint phenomena. This is their great advantage over classical
+statistical methods. However, this flexibility is underpinned by a high
+model complexity and a large number of parameters. This complexity also
+contrasts with traditional statistical methods, e.g., linear regression
+where fitted coefficients (<span class="math inline">\(\beta_i\)</span> in Chapter <a href="ch-06.html#ch-06">7</a>) can
+directly be interpreted and yield information about the sensitivity of
+the target variable to the different predictors and even about the
+statistical significance of their effect (we haven’t looked at that
+part). In contrast, the complexity of ML models renders their
+interpretation difficult. The ML algorithms’ predictive power comes at
+the cost of reduced <em>model interpretability</em>. ML models often appear to
+be “black boxes” which may limit their usefulness in typical
+applications in research, where we’re often not only interested in
+<em>predicting</em>, but also in <em>understanding</em> how the model arrived at its
+predictions. We are often interested in identifying patterns in the data
+that would otherwise not be visible, but that the algorithm apparently
+identified and learned.</p>
+<p>In order to interpret a ML model and understand its inner workings, we
+have to “ask specific questions” that can be translated into an
+evaluation of the trained model that then yields the answer we want.
+There are basically two types of questions we can ask:</p>
 <ul>
-<li>How “important” is each predictor variable in our model? This is answered by <em>variable importance analysis</em>.</li>
-<li>What’s the functional relationship between the target variable and each predictor? This is answered by <em>partial residual analysis</em>.</li>
+<li>How “important” is each predictor variable in our model? This is
+answered by <em>variable importance analysis</em>.</li>
+<li>What’s the functional relationship between the target variable and
+each predictor? This is answered by <em>partial residual analysis</em>.</li>
 </ul>
 <div id="variable-importance" class="section level4" number="8.2.4.1">
 <h4><span class="header-section-number">8.2.4.1</span> Variable importance</h4>
 <p><strong>Model specific approach (for linear regression)</strong></p>
-<p>Some of the approaches for evaluating feature importances are <em>model-specific</em>. For instance, the absolute value of <em>t</em>-statistic, in case of linear models, as a measure of feature importance. Such model-specific interpretation tools are limited to their respective model classes. There can be some advantages to using these model-specific approaches as they are more closely linked to the model and its performance, and can thus directly use parameters (coefficients) of the fitted model.</p>
-<p>For linear regression models, we can quantify the significance of its coefficients <span class="math inline">\(\beta\)</span>, by testing a null-hypothesis that the coefficient is, in reality, zero. As an example, let’s assume that our data are generated from the following linear model
-<span class="math display">\[
+<p>Some of the approaches for evaluating feature importances are
+<em>model-specific</em>. For instance, the absolute value of <em>t</em>-statistic, in
+case of linear models, as a measure of feature importance. Such
+model-specific interpretation tools are limited to their respective
+model classes. There can be some advantages to using these
+model-specific approaches as they are more closely linked to the model
+and its performance, and can thus directly use parameters (coefficients)
+of the fitted model.</p>
+<p>For linear regression models, we can quantify the significance of its
+coefficients <span class="math inline">\(\beta\)</span>, by testing a null-hypothesis that the coefficient
+is, in reality, zero. As an example, let’s assume that our data are
+generated from the following linear model <span class="math display">\[
 y = \beta_0 + \beta_1 x + \epsilon
-\]</span>
-where we assume that our errors <span class="math inline">\(\epsilon\)</span> are independent and come from a normal distribution. Given only one realization of our data, our aim is to estimate <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>. Let’s generate random data for a univariate linear relationship where the true coefficients are <span class="math inline">\(\beta_1 = 3\)</span> and <span class="math inline">\(\beta_0 =2\)</span>. Note that in practice we do not know the real coefficients and we don’t know what the true predictors are. Let’s consider an additional predictor that is available in our data but does not contribute to the actual data generation process (<code>x2</code>). We include it in the model and want to know whether the respective coefficient it yields is significant. How can we determine information about its <em>importance</em>? As we’ve seen before, the <code>summary()</code> function generates a human-readable output. What information does it provide about variable importance?</p>
+\]</span> where we assume that our errors <span class="math inline">\(\epsilon\)</span> are independent and come
+from a normal distribution. Given only one realization of our data, our
+aim is to estimate <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span>. Let’s generate random data
+for a univariate linear relationship where the true coefficients are
+<span class="math inline">\(\beta_1 = 3\)</span> and <span class="math inline">\(\beta_0 =2\)</span>. Note that in practice we do not know the
+real coefficients and we don’t know what the true predictors are. Let’s
+consider an additional predictor that is available in our data but does
+not contribute to the actual data generation process (<code>x2</code>). We include
+it in the model and want to know whether the respective coefficient it
+yields is significant. How can we determine information about its
+<em>importance</em>? As we’ve seen before, the <code>summary()</code> function generates a
+human-readable output. What information does it provide about variable
+importance?</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="ch-07.html#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="do">## generate random data</span></span>
 <span id="cb27-2"><a href="ch-07.html#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb27-3"><a href="ch-07.html#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -806,7 +1072,25 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 ## Residual standard error: 0.9513 on 97 degrees of freedom
 ## Multiple R-squared:  0.8853, Adjusted R-squared:  0.8829 
 ## F-statistic: 374.3 on 2 and 97 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>You see that the linear regression fit yields estimates of the coefficients <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> that are relatively close to the real ones (2.13507 for <span class="math inline">\(\beta_0\)</span> instead of 2, 2.86683 for <span class="math inline">\(\beta_1\)</span> instead of 3). We also see that the estimate (<code>Estimate</code>) for (the fake) coefficient <code>x2</code> is close to zero. The standard error of the coefficient estimate <code>Std. Error</code> is an estimate of the standard deviation of coefficient estimates we would get if the above random data generation process was repeated many times. It decreases with the sample size (<code>n</code> in the code above). The <em>t</em>-statistic (<code>t value</code>) is <span class="math inline">\(\frac{\mbox{Estimate}}{\mbox{Std.Error}}\)</span>. Assuming a t-distribution of coefficient estimates, the <em>p</em>-value (<code>Pr(&gt;|t|)</code>) quantifies the probability of our coefficient estimate (considering its <em>t</em>-statistic) if the true coefficient was zero - our null hypothesis. In our example, the <em>p</em>-value for the <code>x2</code> estimate is 0.81. This is not significant at any significance level (indicated by the <code>*</code> to the right of the reported p-value, key given by <code>Signif. codes</code>). In contrast, the estimates for coefficients <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are highly significant. Their very low <em>p</em>-values indicate that it is highly unlikely that their true value was zero.</p>
+<p>You see that the linear regression fit yields estimates of the
+coefficients <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> that are relatively close to the
+real ones (2.13507 for <span class="math inline">\(\beta_0\)</span> instead of 2, 2.86683 for <span class="math inline">\(\beta_1\)</span>
+instead of 3). We also see that the estimate (<code>Estimate</code>) for (the fake)
+coefficient <code>x2</code> is close to zero. The standard error of the coefficient
+estimate <code>Std. Error</code> is an estimate of the standard deviation of
+coefficient estimates we would get if the above random data generation
+process was repeated many times. It decreases with the sample size (<code>n</code>
+in the code above). The <em>t</em>-statistic (<code>t value</code>) is
+<span class="math inline">\(\frac{\mbox{Estimate}}{\mbox{Std.Error}}\)</span>. Assuming a t-distribution of
+coefficient estimates, the <em>p</em>-value (<code>Pr(&gt;|t|)</code>) quantifies the
+probability of our coefficient estimate (considering its <em>t</em>-statistic)
+if the true coefficient was zero - our null hypothesis. In our example,
+the <em>p</em>-value for the <code>x2</code> estimate is 0.81. This is not significant at
+any significance level (indicated by the <code>*</code> to the right of the
+reported p-value, key given by <code>Signif. codes</code>). In contrast, the
+estimates for coefficients <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are highly
+significant. Their very low <em>p</em>-values indicate that it is highly
+unlikely that their true value was zero.</p>
 <p>This is illustrated below.</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="ch-07.html#cb29-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
 <span id="cb29-2"><a href="ch-07.html#cb29-2" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">7</span>, <span class="dv">7</span>, <span class="at">length.out =</span> <span class="dv">1000</span>)</span>
@@ -822,7 +1106,7 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <span id="cb29-12"><a href="ch-07.html#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&#39;top&#39;</span>) <span class="sc">+</span></span>
 <span id="cb29-13"><a href="ch-07.html#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">1</span>),</span>
 <span id="cb29-14"><a href="ch-07.html#cb29-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">linetype =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">2</span>))</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="ch-07.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>()<span class="sc">+</span></span>
 <span id="cb30-2"><a href="ch-07.html#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> grid, <span class="at">y =</span> t_dist, <span class="at">color =</span> <span class="st">&#39;Null Distribution&#39;</span>), <span class="at">lwd=</span><span class="fl">1.5</span>) <span class="sc">+</span></span>
 <span id="cb30-3"><a href="ch-07.html#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept =</span> <span class="fl">0.241</span>, <span class="at">linetype =</span> <span class="st">&#39; t value </span><span class="sc">\n</span><span class="st"> for x2&#39;</span>), <span class="at">color=</span><span class="st">&#39;red&#39;</span>) <span class="sc">+</span></span>
@@ -833,8 +1117,11 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <span id="cb30-8"><a href="ch-07.html#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&#39;top&#39;</span>) <span class="sc">+</span></span>
 <span id="cb30-9"><a href="ch-07.html#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">1</span>),</span>
 <span id="cb30-10"><a href="ch-07.html#cb30-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">linetype =</span> <span class="fu">guide_legend</span>(<span class="at">order =</span> <span class="dv">2</span>))</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-15-2.png" width="672" /></p>
-<p>Variable importance in a fitted model can be assessed in R using the <strong>vip</strong> package <span class="citation">(<a href="#ref-R-vip" role="doc-biblioref">Greenwell and Boehmke 2020</a>)</span>. If we provide a linear regression model as argument, it automatically uses the absolute value of the <em>t</em>-statistic for quantifying the variable importance.</p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
+<p>Variable importance in a fitted model can be assessed in R using the
+<strong>vip</strong> package <span class="citation">(<a href="#ref-R-vip" role="doc-biblioref">Greenwell and Boehmke 2020</a>)</span>. If we provide a linear regression model as
+argument, it automatically uses the absolute value of the <em>t</em>-statistic
+for quantifying the variable importance.</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="ch-07.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vip)</span></code></pre></div>
 <pre><code>## 
 ## Attaching package: &#39;vip&#39;</code></pre>
@@ -843,9 +1130,10 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 ##     vi</code></pre>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="ch-07.html#cb34-1" aria-hidden="true" tabindex="-1"></a>linmod3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(GPP_NT_VUT_REF <span class="sc">~</span> ., <span class="at">data =</span> ddf <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>TIMESTAMP))</span>
 <span id="cb34-2"><a href="ch-07.html#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">vip</span>(linmod3)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <p><strong>Checkpoint</strong></p>
-<p>Verify that the bars plotted in the vip plot correspond to the t-statistic of the linear regression model.</p>
+<p>Verify that the bars plotted in the vip plot correspond to the
+t-statistic of the linear regression model.</p>
 <p><strong>Solution</strong></p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="ch-07.html#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(linmod3)  <span class="co"># compare with values under `t-value`</span></span></code></pre></div>
 <pre><code>## 
@@ -872,38 +1160,68 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 ## Residual standard error: 1.537 on 5885 degrees of freedom
 ## Multiple R-squared:  0.6906, Adjusted R-squared:  0.6902 
 ## F-statistic:  1877 on 7 and 5885 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>The results of the feature importance plot using <code>vip()</code>, agree with the statistics obtaind from the <code>summary()</code> function. The variables <code>LW_IN_F</code> and <code>VPD_F</code> have largest <span class="math inline">\(|t|\)</span> statistic values (thus, the values on the tail ends of the t-distribution have low measure), which results in a small p-value, thus indicating that these are the most important features. On the other end, the variable <code>P_F</code> has the smallest <span class="math inline">\(|t|\)</span> statistc, which results in a large p-value, thus indicating that this variable is not as important.</p>
-<p>To sum this up, variable importance can be measured for linear regression models using the <em>t</em>-statistic.</p>
-<p>While <em>t</em>-statistic values provide information for feature importance analysis that is straight-forward to quantify and interpret, corresponding information has to be extracted by other means for other ML algorithms (e.g., accuracy degradation in random forests). This makes it difficult to compare their results across different classes of ML models.</p>
+<p>The results of the feature importance plot using <code>vip()</code>, agree with the
+statistics obtaind from the <code>summary()</code> function. The variables
+<code>LW_IN_F</code> and <code>VPD_F</code> have largest <span class="math inline">\(|t|\)</span> statistic values (thus, the
+values on the tail ends of the t-distribution have low measure), which
+results in a small p-value, thus indicating that these are the most
+important features. On the other end, the variable <code>P_F</code> has the
+smallest <span class="math inline">\(|t|\)</span> statistc, which results in a large p-value, thus
+indicating that this variable is not as important.</p>
+<p>To sum this up, variable importance can be measured for linear
+regression models using the <em>t</em>-statistic.</p>
+<p>While <em>t</em>-statistic values provide information for feature importance
+analysis that is straight-forward to quantify and interpret,
+corresponding information has to be extracted by other means for other
+ML algorithms (e.g., accuracy degradation in random forests). This makes
+it difficult to compare their results across different classes of ML
+models.</p>
 <p><strong>Model-Agnostic approaches</strong></p>
-<p>Model-Agnostic approaches offer a solution to the intercomparability problem for feature importance analysis. These treat the ML algorithm as a “black-box,” and the separation of the specific model types from their interpretability measure enables us to compare the feature importance across different models and ML algorithms. <em>Permutation-based feature importance</em> is such an algorithm. Its idea is that if we <em>permute</em> (re-shuffle) the values of a feature in the training data, we effectively destroy the relationship between that particular feature and the target variable. Thus, if the feature is important, the model performance should degrade substantially. In contrast, for unimportant features, permuting their values should not degrade the model performance much.</p>
+<p>Model-Agnostic approaches offer a solution to the intercomparability
+problem for feature importance analysis. These treat the ML algorithm as
+a “black-box,” and the separation of the specific model types from their
+interpretability measure enables us to compare the feature importance
+across different models and ML algorithms. <em>Permutation-based feature
+importance</em> is such an algorithm. Its idea is that if we <em>permute</em>
+(re-shuffle) the values of a feature in the training data, we
+effectively destroy the relationship between that particular feature and
+the target variable. Thus, if the feature is important, the model
+performance should degrade substantially. In contrast, for unimportant
+features, permuting their values should not degrade the model
+performance much.</p>
 <p>Algorithmically speaking, this works as follows:</p>
 <ul>
-<li>We first compute the loss for the original model to establish a reference loss.</li>
-<li>For predictor <span class="math inline">\(i\)</span> in <span class="math inline">\(\{1,2, …, p\}\)</span>
+<li><p>We first compute the loss for the original model to establish a
+reference loss.</p></li>
+<li><p>For predictor <span class="math inline">\(i\)</span> in <span class="math inline">\(\{1,2, …, p\}\)</span></p>
 <ul>
 <li>Randomly permute values of predictor <span class="math inline">\(i\)</span> in the dataset.</li>
 <li>Train the model.</li>
 <li>Compute the loss.</li>
-<li>Compute the feature importance, e.g., as the ratio or difference of the loss with the permuted data and the reference loss.</li>
+<li>Compute the feature importance, e.g., as the ratio or difference
+of the loss with the permuted data and the reference loss.</li>
 <li>Store this as the feature importance for feature <span class="math inline">\(i\)</span></li>
 </ul></li>
-<li>Sort the variable by their feature importance</li>
+<li><p>Sort the variable by their feature importance</p></li>
 </ul>
-<p>This can be easily implemented using the <code>vip</code> package along with a few extra parameters</p>
-<p>Arguments to the function vip(), for permutation based feature importance
-- <code>linmod3</code>: A fitted model object
-- <code>train</code> : the training data to be used to compute the feature importances
-- <code>method</code> : <code>"permute"</code> for permutation based method
-- <code>target</code> : specifying the target variable for the train datset
-- <code>metric</code> : <code>"RMSE"</code> root mean squared error for the regression based task
-- <code>n_sim</code> : number of times the simulation is to be repeated, the result is averaged over all the simulations ; choose greater values to increase the stability of estimates
-- <code>sample_frac</code> : specifies the proportion of the training data to be used in each simulation. Default value is NULL i.e. all of training data is used<br />
-- <code>pred_wrapper</code> : Prediction function that requires two arguments, <code>object</code> and <code>newdata</code>. The output of this function should be determined by the metric being used
-- A numeric vector of predicted outcomes for a regression task
-- A vector of predicted class labels, or a matrix of predicted class probabilitites for a classification task
-- <code>type</code> : Character string specifying how to compare the baseline and permuted performance metrics; default value is <code>'difference'</code>, and the other option is <code>'ratio'</code></p>
-<p><em>Note: In case of large datasets, <code>n_sim</code> and <code>sample_frac</code> can be used to reduce the execution time of the algorithm, as permutation based approaches can become slow as the number of predictors grows.</em></p>
+<p>This can be easily implemented using the <code>vip</code> package along with a few
+extra parameters</p>
+<p>Arguments to the function <code>vip()</code>, for permutation based feature
+importance</p>
+<ul>
+<li><code>linmod3</code>: A fitted model object</li>
+<li><code>train</code> : the training data to be used to compute the feature importances</li>
+<li><code>method</code> : <code>"permute"</code> for permutation based method</li>
+<li><code>target</code> : specifying the target variable for the train datset</li>
+<li><code>metric</code> : <code>"RMSE"</code> root mean squared error for the regression based task</li>
+<li><code>n_sim</code> : number of times the simulation is to be repeated, the result is averaged over all the simulations ; choose greater values to increase the stability of estimates</li>
+<li><code>sample_frac</code> : specifies the proportion of the training data to be used in each simulation. Default value is NULL i.e. all of training data is used</li>
+<li><code>pred_wrapper</code> : Prediction function that requires two arguments, <code>object</code> and <code>newdata</code>. The output of this function should be determined by the metric being used - A numeric vector of predicted outcomes for a regression task - A vector of predicted class labels, or a matrix of predicted class probabilitites for a classification task</li>
+<li><code>type</code> : Character string specifying how to compare the baseline and permuted performance metrics; default value is <code>'difference'</code>, and the other option is <code>'ratio'</code></li>
+</ul>
+<p><em>Note: In case of large datasets, <code>n_sim</code> and <code>sample_frac</code> can be used
+to reduce the execution time of the algorithm, as permutation based
+approaches can become slow as the number of predictors grows.</em></p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="ch-07.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inline function defined to output the predictions for newdata given a particular model object </span></span>
 <span id="cb37-2"><a href="ch-07.html#cb37-2" aria-hidden="true" tabindex="-1"></a>pfun <span class="ot">&lt;-</span> <span class="cf">function</span>(object, newdata) <span class="fu">predict</span>(object, <span class="at">newdata =</span> newdata) </span>
 <span id="cb37-3"><a href="ch-07.html#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -919,7 +1237,7 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <span id="cb37-13"><a href="ch-07.html#cb37-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">pred_wrapper =</span> pfun,</span>
 <span id="cb37-14"><a href="ch-07.html#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&#39;ratio&#39;</span></span>
 <span id="cb37-15"><a href="ch-07.html#cb37-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 <div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="ch-07.html#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="do">## variable importance plot using the permute method, with type == &#39;difference&#39; </span></span>
 <span id="cb38-2"><a href="ch-07.html#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">vip</span>(</span>
 <span id="cb38-3"><a href="ch-07.html#cb38-3" aria-hidden="true" tabindex="-1"></a>  linmod3,</span>
@@ -932,10 +1250,19 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <span id="cb38-10"><a href="ch-07.html#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">pred_wrapper =</span> pfun, </span>
 <span id="cb38-11"><a href="ch-07.html#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&#39;difference&#39;</span> </span>
 <span id="cb38-12"><a href="ch-07.html#cb38-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
-<p>Now we can compare the importance plots obtained from the model-specific t-statistic approach and the model agnostic permuation based method. The feature importances obtained from both approaches differ a little, because of the underlying differences in the feature importance evaluation. Despite of the differences, both methods robustly return the key important features, particularly their ranks.</p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-17-2.png" width="672" /></p>
+<p>Now we can compare the importance plots obtained from the model-specific
+t-statistic approach and the model agnostic permuation based method. The
+feature importances obtained from both approaches differ a little,
+because of the underlying differences in the feature importance
+evaluation. Despite of the differences, both methods robustly return the
+key important features, particularly their ranks.</p>
 <p><strong>Checkpoint</strong></p>
-<p>Compute the variable importance for the best fit knn model, which we obtained earlier in the tutorial, using the <code>vip()</code> function in default mode. Repeat the same with permuatation based method, with type as ‘difference’ and ‘ratio.’ Do the two return the same top-4 features ? Verify.</p>
+<p>Compute the variable importance for the best fit knn model, which we
+obtained earlier in the tutorial, using the <code>vip()</code> function in default
+mode. Repeat the same with permuatation based method, with type as
+‘difference’ and ‘ratio.’ Do the two return the same top-4 features ?
+Verify.</p>
 <p><strong>Solution</strong></p>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="ch-07.html#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Data wrangling done above</span></span>
 <span id="cb39-2"><a href="ch-07.html#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -974,7 +1301,7 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <span id="cb43-23"><a href="ch-07.html#cb43-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb43-24"><a href="ch-07.html#cb43-24" aria-hidden="true" tabindex="-1"></a><span class="do">## variable importance plot without the permute method</span></span>
 <span id="cb43-25"><a href="ch-07.html#cb43-25" aria-hidden="true" tabindex="-1"></a><span class="fu">vip</span>(knn_fit)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 <div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="ch-07.html#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="do">## variable importance plot using the permute method, with type == &#39;ratio&#39; </span></span>
 <span id="cb44-2"><a href="ch-07.html#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">vip</span>(</span>
 <span id="cb44-3"><a href="ch-07.html#cb44-3" aria-hidden="true" tabindex="-1"></a>  knn_fit,</span>
@@ -987,7 +1314,7 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <span id="cb44-10"><a href="ch-07.html#cb44-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">pred_wrapper =</span> pfun, </span>
 <span id="cb44-11"><a href="ch-07.html#cb44-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&#39;difference&#39;</span> </span>
 <span id="cb44-12"><a href="ch-07.html#cb44-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-19-2.png" width="672" /></p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="ch-07.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="do">## variable importance plot using the permute method, with type == &#39;difference&#39; </span></span>
 <span id="cb45-2"><a href="ch-07.html#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">vip</span>(</span>
 <span id="cb45-3"><a href="ch-07.html#cb45-3" aria-hidden="true" tabindex="-1"></a>  knn_fit,</span>
@@ -1000,11 +1327,20 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <span id="cb45-10"><a href="ch-07.html#cb45-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">pred_wrapper =</span> pfun, </span>
 <span id="cb45-11"><a href="ch-07.html#cb45-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&#39;ratio&#39;</span> </span>
 <span id="cb45-12"><a href="ch-07.html#cb45-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-19-3.png" width="672" /></p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-18-3.png" width="672" /></p>
 </div>
 <div id="partial-dependence-plots" class="section level4" number="8.2.4.2">
 <h4><span class="header-section-number">8.2.4.2</span> Partial dependence plots</h4>
-<p>While variable importance analysis is helpful for understanding which predictors are helping us predict, <em>partial dependence plots</em> (PDPs) yield information on what the relationship between one individual predictor and the target variable looks like. It quantifies how the response of the target variable changes when we vary one particular predictor and hold all the remaining predictors at a constant value. If this is still a little muddy, the pseudo-code of this algorithm should make things clear (see <a href="https://bradleyboehmke.github.io/HOML/iml.html#partial-dependence">this</a> by <span class="citation"><a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">Brad Boehmke and Greenwell</a> (<a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">2019</a>)</span>).</p>
+<p>While variable importance analysis is helpful for understanding which
+predictors are helping us predict, <em>partial dependence plots</em> (PDPs)
+yield information on what the relationship between one individual
+predictor and the target variable looks like. It quantifies how the
+response of the target variable changes when we vary one particular
+predictor and hold all the remaining predictors at a constant value. If
+this is still a little muddy, the pseudo-code of this algorithm should
+make things clear (see
+<a href="https://bradleyboehmke.github.io/HOML/iml.html#partial-dependence">this</a>
+by <span class="citation"><a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">Brad Boehmke and Greenwell</a> (<a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">2019</a>)</span>).</p>
 <div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="ch-07.html#cb46-1" aria-hidden="true" tabindex="-1"></a>For a selected <span class="fu">predictor</span> (x)</span>
 <span id="cb46-2"><a href="ch-07.html#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> Construct a grid of j evenly spaced values across the range of x<span class="sc">:</span> {x1, x2, ..., xj}</span>
 <span id="cb46-3"><a href="ch-07.html#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> For i <span class="cf">in</span> {<span class="dv">1</span>,...,j} do</span>
@@ -1013,15 +1349,42 @@ where we assume that our errors <span class="math inline">\(\epsilon\)</span> ar
 <span id="cb46-6"><a href="ch-07.html#cb46-6" aria-hidden="true" tabindex="-1"></a>     <span class="sc">|</span> Average predictions across all data points.</span>
 <span id="cb46-7"><a href="ch-07.html#cb46-7" aria-hidden="true" tabindex="-1"></a>   End</span>
 <span id="cb46-8"><a href="ch-07.html#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> Plot the averaged predictions against x1, x2, ..., xj</span></code></pre></div>
-<p>As the steps explain, PDPs plot the change in the average predicted value (<span class="math inline">\(\hat{y}\)</span>) as a function of a specified feature. As you will see in later chapters, PDPs become more useful when non-linear relationships are present. However, PDPs of linear models help illustrate how a fixed change in <span class="math inline">\(x_i\)</span> relates to a fixed linear change in <span class="math inline">\(\hat{y_i}\)</span> while taking into account the average effect of all the other features in the model. For linear regression models, the slope of the PDP is equal to the corresponding coefficient of the model.</p>
-Considering Figure <a href="ch-07.html#fig:pdp">8.3</a>, to compute the PDP of target variable with respect to Gr_Liv_Area, we modify the values of this variable for all the rows in the data set, for each [j1, j2, …, j20] in the grid. Feed this modified dataset to the pre-trained model and compute the mean of our target variable (mean taken over all rows). Finally at the end of the algorithm we have 20 mean responses of the target variable for 20 different values of Gr_Liv_Area. Finally we plot the mean response of the target variable with respect to the changing variable Gr_Liv_Area to get the parital dependence plot.
+<p>As the steps explain, PDPs plot the change in the average predicted
+value (<span class="math inline">\(\hat{y}\)</span>) as a function of a specified feature. As you will see
+in later chapters, PDPs become more useful when non-linear relationships
+are present. However, PDPs of linear models help illustrate how a fixed
+change in <span class="math inline">\(x_i\)</span> relates to a fixed linear change in <span class="math inline">\(\hat{y_i}\)</span> while
+taking into account the average effect of all the other features in the
+model. For linear regression models, the slope of the PDP is equal to
+the corresponding coefficient of the model.</p>
+<p>Considering Figure <a href="ch-07.html#fig:pdp">8.4</a>, to compute the PDP of target variable
+with respect to Gr_Liv_Area, we modify the values of this variable for
+all the rows in the data set, for each [j1, j2, …, j20] in the grid.
+Feed this modified dataset to the pre-trained model and compute the mean
+of our target variable (mean taken over all rows). Finally at the end of
+the algorithm we have 20 mean responses of the target variable for 20
+different values of Gr_Liv_Area. Finally we plot the mean response of
+the target variable with respect to the changing variable Gr_Liv_Area to
+get the parital dependence plot.</p>
 <div class="figure"><span style="display:block;" id="fig:pdp"></span>
-<img src="figures/pdp-illustration.png" alt="Visualiation of a partial dependence plot (from [Bradley &amp; Boehmke](https://bradleyboehmke.github.io/HOML/images/pdp-illustration.png))." width="948" />
+<img src="figures/pdp-illustration.png" alt="Visualiation of a partial dependence plot (from [Boehmke &amp; Greenwell (2019)](https://bradleyboehmke.github.io/HOML/images/pdp-illustration.png))." width="948" />
 <p class="caption">
-Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bradleyboehmke.github.io/HOML/images/pdp-illustration.png">Bradley &amp; Boehmke</a>).
+Figure 8.4: Visualiation of a partial dependence plot (from <a href="https://bradleyboehmke.github.io/HOML/images/pdp-illustration.png">Boehmke &amp; Greenwell (2019)</a>).
 </p>
 </div>
-<p>Lucky for us, this code has already been implemented in the <strong>pdp</strong> package in R <span class="citation">(<a href="#ref-R-pdp" role="doc-biblioref">Greenwell 2017</a>)</span>. We use the <code>partial()</code> function to plot the partial dependence plot for a single predictor variable, <code>SW_IN_F</code> or <code>VPD_F</code>, or for a subset of both these variables. Since our models are linear, we expect the PDP curves to be linear as well. The first curve shows a positive linear relationship between <code>SW_IN_F</code> and the target y_hat (<code>GPP_NT_VUT_REF</code>), i.e. as the <code>SW_IN_F</code> increases, the target increases. Whereas the second curve shows us that there is a negative linear dependence between <code>VPD_F</code> and <code>GPP_NT_VUT_REF</code>. The final plot shows a 2D partial dependence plot with <code>SW_IN_F</code> and <code>VPD_F</code>, and this follows a linear relationship too. As expected, we get the highest value for our target variable in the lower right corner and the smallest value in the upper left corner.</p>
+<p>Lucky for us, this code has already been implemented in the <strong>pdp</strong>
+package in R <span class="citation">(<a href="#ref-R-pdp" role="doc-biblioref">Greenwell 2017</a>)</span>. We use the <code>partial()</code> function to plot the
+partial dependence plot for a single predictor variable, <code>SW_IN_F</code> or
+<code>VPD_F</code>, or for a subset of both these variables. Since our models are
+linear, we expect the PDP curves to be linear as well. The first curve
+shows a positive linear relationship between <code>SW_IN_F</code> and the target
+y_hat (<code>GPP_NT_VUT_REF</code>), i.e. as the <code>SW_IN_F</code> increases, the target
+increases. Whereas the second curve shows us that there is a negative
+linear dependence between <code>VPD_F</code> and <code>GPP_NT_VUT_REF</code>. The final plot
+shows a 2D partial dependence plot with <code>SW_IN_F</code> and <code>VPD_F</code>, and this
+follows a linear relationship too. As expected, we get the highest value
+for our target variable in the lower right corner and the smallest value
+in the upper left corner.</p>
 <div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="ch-07.html#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pdp)</span></code></pre></div>
 <pre><code>## 
 ## Attaching package: &#39;pdp&#39;</code></pre>
@@ -1029,14 +1392,27 @@ Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bra
 ## 
 ##     partial</code></pre>
 <div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="ch-07.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">partial</span>(linmod3, <span class="st">&quot;SW_IN_F&quot;</span>, <span class="at">plot =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="ch-07.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">partial</span>(linmod3, <span class="st">&quot;VPD_F&quot;</span>, <span class="at">plot =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-21-2.png" width="672" /></p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-20-2.png" width="672" /></p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="ch-07.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">partial</span>(linmod3, <span class="fu">c</span>(<span class="st">&quot;SW_IN_F&quot;</span>, <span class="st">&quot;VPD_F&quot;</span>), <span class="at">plot =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="esds_book_files/figure-html/unnamed-chunk-21-3.png" width="672" /></p>
-<p>The <code>pdp</code> package works with various model classes. For classes that are not available, a prediction wrapper function has to be specified as described for example <a href="https://bradleyboehmke.github.io/HOML/iml.html#implementation-6">here</a> <span class="citation">(<a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">Brad Boehmke and Greenwell 2019</a>)</span>. If you want to learn more about PDP, have a look the <a href="https://christophm.github.io/interpretable-ml-book/">online book</a> by <span class="citation"><a href="#ref-molnar_interpretable_2019" role="doc-biblioref">Molnar</a> (<a href="#ref-molnar_interpretable_2019" role="doc-biblioref">2019</a>)</span>.</p>
-<p>Note: The computational demand of partial dependence analysis rapidly increases as the number of search grid points (<code>j</code> in the algorithm description above) rises.</p>
-<p><em>For the interested: If you do not want to average the y_hat, predictions over all the rows for each value of <span class="math inline">\(X_i\)</span>, look into Individual conditional expectation (ICE) curves, which rather than averaging the predicted values across all observations, observe and plot the individual observation-level predictions.</em></p>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-20-3.png" width="672" /></p>
+<p>The <code>pdp</code> package works with various model classes. For classes that are
+not available, a prediction wrapper function has to be specified as
+described for example
+<a href="https://bradleyboehmke.github.io/HOML/iml.html#implementation-6">here</a>
+<span class="citation">(<a href="#ref-boehmke_hands-machine_2019" role="doc-biblioref">Brad Boehmke and Greenwell 2019</a>)</span>. If you want to learn more about PDP, have
+a look the <a href="https://christophm.github.io/interpretable-ml-book/">online
+book</a> by
+<span class="citation"><a href="#ref-molnar_interpretable_2019" role="doc-biblioref">Molnar</a> (<a href="#ref-molnar_interpretable_2019" role="doc-biblioref">2019</a>)</span>.</p>
+<p>Note: The computational demand of partial dependence analysis rapidly
+increases as the number of search grid points (<code>j</code> in the algorithm
+description above) rises.</p>
+<p><em>For the interested: If you do not want to average the y_hat,
+predictions over all the rows for each value of</em> <span class="math inline">\(X_i\)</span>, look into
+Individual conditional expectation (ICE) curves, which rather than
+averaging the predicted values across all observations, observe and plot
+the individual observation-level predictions.</p>
 </div>
 </div>
 </div>
@@ -1044,7 +1420,8 @@ Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bra
 <h2><span class="header-section-number">8.3</span> Exercise</h2>
 <div id="setup" class="section level3" number="8.3.1">
 <h3><span class="header-section-number">8.3.1</span> Setup</h3>
-<p>The following exercise builds on the exercise of the previous tutorial. So let’s load the work done there first:</p>
+<p>The following exercise builds on the exercise of the previous tutorial.
+So let’s load the work done there first:</p>
 <div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="ch-07.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Load data and extrat relevant subset</span></span>
 <span id="cb53-2"><a href="ch-07.html#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb53-3"><a href="ch-07.html#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1077,36 +1454,81 @@ Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bra
 </div>
 <div id="linear-model-1" class="section level3" number="8.3.2">
 <h3><span class="header-section-number">8.3.2</span> Linear Model</h3>
-<p>In the previous exercise, you fitted a linear regression model using the base-R function <code>lm()</code> and the training set. The target variable was <code>"GPP_NT_VUT_REF"</code>, and predictor variables were all available meterological variables in the dataset.</p>
-<p>First, repeat these same steps but use <strong>caret</strong> and the function <code>train()</code> for fitting the same linear regression model (with all predictors) on the same data. Does it yield identical results as using <code>lm()</code> directly? You will have to set the argument <code>trControl</code> accordingly to avoid resampling, and instead fit the model on the all data in <code>ddf_train</code>. You can use <code>summary()</code> also on the object returned by the function <code>train()</code>.</p>
-<p>Second, repeat the visualisation and display of model metrics. Feel free to copy-paste from the previous exercise /solutions. You are repeating this step mainly to refresh the previous results and to compare them to your work on the next tasks.</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="ch-07.html#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<p>In the previous exercise, you fitted a linear regression model using the
+base-R function <code>lm()</code> and the training set. The target variable was
+<code>"GPP_NT_VUT_REF"</code>, and predictor variables were all available
+meterological variables in the dataset.</p>
+<p><strong>First</strong>, repeat these same steps but use <strong>caret</strong> and the function
+<code>train()</code> for fitting the same linear regression model (with all
+predictors) on the same data. You will have to set the argument
+<code>trControl</code> accordingly to avoid resampling, and instead fit the model
+on all data in <code>ddf_train</code>. Does it yield identical results as using
+<code>lm()</code> directly?</p>
+<p><strong>Second</strong>, repeat the visualisation and display of model metrics. Feel
+free to copy-paste from the previous exercise /solutions. You are
+repeating this step mainly to refresh the previous results and to
+compare them to your work on the next tasks.</p>
+<p><strong>Third</strong>, in the previous exercise we found that <code>PA_F</code> was not
+significant. Build another linear model with <code>train()</code> but this time
+without using <code>PA_F</code> as predictor. Can you find a model metric that
+supports dropping <code>PA_F</code>from further analysis?</p>
+<p>Hints:</p>
+<ul>
+<li>To specify the argument <code>trControl</code> you will have to use the
+function <code>trainControl</code>. See the tutorial for the correct ssyntax
+and enter <code>?trainControl</code> into the console to find out how to
+specify the right method.</li>
+<li>You can use <code>summary()</code> also on the object returned by the function
+<code>train()</code> (similar to the object returned by <code>lm()</code>).</li>
+<li>To support dropping <code>PA_F</code>, you might want to consider one of the
+introduced information criteria.</li>
+</ul>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="ch-07.html#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span>
+<span id="cb58-2"><a href="ch-07.html#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="do">## 1. Setting up a linear model with train()</span></span>
+<span id="cb58-3"><a href="ch-07.html#cb58-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-4"><a href="ch-07.html#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 2. Repeat visualisation and display of model metrics from Exercise 06</span></span>
+<span id="cb58-5"><a href="ch-07.html#cb58-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-6"><a href="ch-07.html#cb58-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 3. Compare model performance with and without `PA_F` as predictor</span></span></code></pre></div>
 </div>
 </div>
 <div id="knn" class="section level2" number="8.4">
 <h2><span class="header-section-number">8.4</span> KNN</h2>
 <div id="check-data" class="section level3" number="8.4.1">
 <h3><span class="header-section-number">8.4.1</span> Check data</h3>
-<p>The variable <code>PA_F</code> was not significant in the linear model. Find a way to show that the variable has a weird distribution and exclude it from further analysis.</p>
+<p>The variable <code>PA_F</code> was not significant in the linear model. Exclude it from
+further analysis by specifying a “recipe” where <code>GPP_NT_VUT_REF</code> is the target variable, and all available variables except <code>PA_F</code> and <code>TIMESTAMP</code> are used as predictors.</p>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="ch-07.html#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 <div id="training-1" class="section level3" number="8.4.2">
 <h3><span class="header-section-number">8.4.2</span> Training</h3>
-<p>Fit two KNN models on <code>ddf_train</code> (excluding <code>"PA_F"</code>), one with <span class="math inline">\(k = 2\)</span> and one with <span class="math inline">\(k = 30\)</span>, both without resampling. Use the RMSE as the loss function. Center and scale data as part of the pre-processing and model formulation specification using the function <code>recipe()</code>.</p>
+<p>Fit two KNN models on <code>ddf_train</code> (excluding <code>"PA_F"</code>), one with <span class="math inline">\(k = 2\)</span>
+and one with <span class="math inline">\(k = 30\)</span>, both without resampling. Use the RMSE as the loss
+function. Center and scale data as part of the pre-processing and model
+formulation specification using the function <code>recipe()</code>.</p>
 <div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="ch-07.html#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 <div id="prediction-1" class="section level3" number="8.4.3">
 <h3><span class="header-section-number">8.4.3</span> Prediction</h3>
-<p>With the two models fitted above, predict <code>"GPP_NT_VUT_REF"</code> for both and training and the testing sets, and evaluate them as above (metrics and visualisation).</p>
-<p>Which model do you expect to perform better on the training set and which to perform better on the testing set? Why? Do you find evidence for overfitting in any of the models?</p>
+<p>With the two models fitted above, predict <code>"GPP_NT_VUT_REF"</code> for both
+and training and the testing sets, and evaluate them as above (metrics
+and visualisation).</p>
+<p>Which model do you expect to perform better on the training set and
+which to perform better on the testing set? Why? Do you find evidence
+for overfitting in any of the models?</p>
+<p>Hint: Make use of the visualization code that you used above and in
+Exercise 06.</p>
 <div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="ch-07.html#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 <div id="sample-hyperparameters" class="section level3" number="8.4.4">
 <h3><span class="header-section-number">8.4.4</span> Sample hyperparameters</h3>
-<p>Train a KNN model with hyperparameter (<span class="math inline">\(k\)</span>) tuned, and with five-fold cross validation, using the training set. As the loss function, use RMSE. Sample the following values for <span class="math inline">\(k\)</span>: 2, 5, 10, 15, 18, 20, 22, 24, 26, 30, 35, 40, 60, 100. Visualise the RMSE as a function of <span class="math inline">\(k\)</span>.</p>
+<p>Train a KNN model with hyperparameter (<span class="math inline">\(k\)</span>) tuned, and with five-fold
+cross validation, using the training set. As the loss function, use
+RMSE. Sample the following values for <span class="math inline">\(k\)</span>: 2, 5, 10, 15, 18, 20, 22, 24,
+26, 30, 35, 40, 60, 100. Visualise the RMSE as a function of <span class="math inline">\(k\)</span>.</p>
 <p>Hint:</p>
 <ul>
-<li>The visualisation of cross-validation results can be visualised with the <code>plot(model_object)</code> of <code>ggplot(model_object)</code>.</li>
+<li>The visualisation of cross-validation results can be visualised with
+the <code>plot(model_object)</code> of <code>ggplot(model_object)</code>.</li>
 </ul>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="ch-07.html#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
@@ -1115,23 +1537,36 @@ Figure 8.3: Visualiation of a partial dependence plot (from <a href="https://bra
 <h2><span class="header-section-number">8.5</span> Random forest</h2>
 <div id="training-2" class="section level3" number="8.5.1">
 <h3><span class="header-section-number">8.5.1</span> Training</h3>
-<p>Fit a random forest model with <code>ddf_train</code> and all predictors excluding <code>"PA_F"</code> and five-fold cross validation. Use RMSE as the loss function.</p>
+<p>Fit a random forest model with <code>ddf_train</code> and all predictors excluding
+<code>"PA_F"</code> and five-fold cross validation. Use RMSE as the loss function.</p>
 <p>Hints:</p>
 <ul>
-<li>Use the package <em>ranger</em> which implements the random forest algorithm.</li>
-<li>See <a href="https://topepo.github.io/caret/available-models.html">here</a> for information about hyperparameters available for tuning with caret.</li>
-<li>Set the argument <code>savePredictions = "final"</code> of function <code>trainControl()</code>.</li>
+<li>Use the package <em>ranger</em> which implements the random forest
+algorithm.</li>
+<li>See <a href="https://topepo.github.io/caret/available-models.html">here</a> for
+information about hyperparameters available for tuning with caret.</li>
+<li>Set the argument <code>savePredictions = "final"</code> of function
+<code>trainControl()</code>.</li>
 </ul>
 <div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="ch-07.html#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
 </div>
 <div id="prediction-2" class="section level3" number="8.5.2">
 <h3><span class="header-section-number">8.5.2</span> Prediction</h3>
-<p>Evaluate the trained model on the training and on the test set, giving metrics and a visualisation as above.</p>
-<p>How are differences in performance to be interpreted? Compare the performances of linear regression, KNN, and random forest, considering the evaluation on the test set.</p>
+<p>Evaluate the trained model on the training and on the test set, giving
+metrics and a visualisation as above.</p>
+<p>How are differences in performance to be interpreted? Compare the
+performances of linear regression, KNN, and random forest, considering
+the evaluation on the test set.</p>
+<p>Hint: Make use of the visualization code that you used above and in
+Exercise 06.</p>
 <div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="ch-07.html#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
-<p>Show the model performance (metrics and visualisation) on the validation sets all cross validation folds combined.</p>
-<p>Do you expect it to be more similar to the model performance on the training set or the testing set in the evaluation above? Why?</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="ch-07.html#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="do">## write your code here</span></span></code></pre></div>
+<!-- Show the model performance (metrics and visualisation) on the validation -->
+<!-- sets all cross validation folds combined. -->
+<!-- Do you expect it to be more similar to the model performance on the -->
+<!-- training set or the testing set in the evaluation above? Why? -->
+<!-- ```{r} -->
+<!-- ## write your code here -->
+<!-- ``` -->
 
 </div>
 </div>

@@ -236,13 +236,11 @@ $$Note that here, $X$, $Y$, and $\epsilon$ are vectors of length corresponding t
 
 As the name suggests, K-nearest neighbour (KNN) uses the $k$ observations that are "nearest" to the new record for which we want to make a prediction. It then calculates their average (in regression) or most frequent value (in classification) as the prediction. "Nearest" is determined by some distance metric evaluated based on the values of the predictors. In our example (`GPP_NT_VUT_REF ~ .`), KNN would determine the $k$ days where conditions, given by our set of predictors, were most similar (nearest) to the day for which we seek a prediction. Then, it calculates the prediction as the average (mean) GPP value of these days. Determining "nearest" neighbors is commonly based on either the Euclidean or Manhattan distances between two data points $x_a$ and $x_b$, considering all $p$ predictors $j$.
 
-Euclidean distance:
-$$
+Euclidean distance: $$
 \sqrt{ \sum_{j=1}^p (x_{a,j} - x_{b,j})^2  } \\
 $$
 
-Manhattan distance:
-$$
+Manhattan distance: $$
 \sum_{j=1}^p | x_{a,j} - x_{b,j} |
 $$
 
@@ -350,7 +348,7 @@ ddf_train %>%
 
 #### The use of recipes
 
-Skewed data, outliers, and values covering multiple orders of magnitude can create difficulties for certain ML algorithms, e.g.,  K-nearest neighbours or neural networks. Other algorithms, like tree-based methods (e.g., Random Forest), are more robust against such issues.
+Skewed data, outliers, and values covering multiple orders of magnitude can create difficulties for certain ML algorithms, e.g., K-nearest neighbours or neural networks. Other algorithms, like tree-based methods (e.g., Random Forest), are more robust against such issues.
 
 When defining any pre-processing step, it should be specified as a "recipe" or "blueprint", and not actually executed on the data itself before we start with the model training. Such a "recipe" can then be applied to any new data, while the parameters of the data pre-processing transformations are different each time. We will introduce an example below where we divide all values in the testing and training dataset by the standard deviation of the respective dataset. Note that, because the two datasets hold different values, they also have different standard deviations. The same "recipe" (i.e., division by standard deviation) will be applied to both datasets but the transformation is done with a different parameter (i.e., the different standard deviations in either dataset).
 
