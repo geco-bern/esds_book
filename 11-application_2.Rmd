@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Application 2: Neural Networks and Hyperparameter Tuning {#ch-11}
 
 The goal of this application is to put the concepts that we have learnt over all these weeks into practice. The task at hand is to predict the productivity of vegetation (`GPP_NT_VUT_REF`), using an artificial neural network. For this task we will be using the `FLX_CH-Lae_FLUXNET2015_FULLSET_HH_2004-2014_1-3_CLEAN` data, that we obtained after the data wrangling tutorial 
@@ -11,7 +16,7 @@ After this exercise session you shall be able to
 - Use KFold cross-validation for hyper-parameter tuning 
 - Build and train a simple, 1 hidden layer NN for regression tasks 
 - Optimise the number of hidden layer units.
-- Evaluate feature importance and its effects on the model performance (maybe as bonus?)
+- Evaluate feature importance and its effects on the model performance (maybe as bonus?) Definitely a bonus 
 
 
 ### Key Points from Previous Lectures  
@@ -20,10 +25,10 @@ After this exercise session you shall be able to
 - Testing data is set aside at the initial split and not "touched" during model training. It is key to test a model’s predictive power or whether it is overfitted. 
 - Validation data is used for determining the loss during model training. The reason for distinguishing between testing and validation data is to assure we're not misleading model training by some peculiarities of the validation data and we get an assessment of generalisability based on data that was not seen during model training.
 - Loss is a measure of how well our trained model predicts training labels. Loss is high when predictions are poor. Loss is low when predictions are good.
-- Model training minimises the loss. In other words, it optimises the agreement between predicted and observed values.
+- Model training minimises the loss. In other words, it optimises (maximises) the agreement between predicted and observed values.
 - There are several ways to measure loss. RMSE (Root Mean Squared Error) is one such measure. It is used in regression problems.  
 - Gradient descent is a method that searches for model parameters that minimize loss.
-- Machine learning algorithms have hyper-parameters. These are parameters that are set by the user rather than learned during training. An example is the learning rate in gradient descent. In the case of Artificial Neural Networks, this can be the number of nodes per hidden layer, or the number of hidden layers. 
+- Machine learning algorithms have hyperparameters. These are parameters that are set by the user rather than learned during training. An example is the learning rate in gradient descent. In the case of Artificial Neural Networks, this can be the number of nodes per hidden layer, or the number of hidden layers. 
 
 - To tune a model, you can set hyperparameters that determine model structure or calibrate the coefficients. 
 - Generalisability refers to the model’s performance on data not seen during the training - the testing data.
@@ -73,19 +78,16 @@ df$TIMESTAMP_END <- as.POSIXct(df$TIMESTAMP_END, format = "%Y-%m-%dT%TZ")
 str(df)
 ```
 
-Recall the tutorial on *data wrangling*. We alreadt performed some data-preprocessing there. We had replaced the missing value flag -9999 by NAs for the target variable **GPP_NT_VUT_REF**. 
+Recall the tutorial on *data wrangling*. We already performed some data-preprocessing there. We had replaced the missing value flag -9999 by NAs for the target variable **GPP_NT_VUT_REF**. 
 We had used the categorical variable **NEE_VUT_REF_QC**, representing the quality control, to further edit some of the values of the target variable **GPP_NT_VUT_REF**. For all those rows where $NEE\_VUT\_REF\_QC \in \{3,4\}$, i.e. poor quality of measurements, we have already replaced the target variable **GPP_NT_VUT_REF** with NAs.
 
-Thus we remove all the rows where the target variable is NA. As the target GPP_NT_VUT_REF is missing, we cannot learn or test against this data, so we remove all the rows where the target variable is missing. After we do this, the information that we previously encoded in NEE_VUT_REF_QC has already been used to filter out the rows with poor quality control measures. The variable NEE_VUT_REF_QC does not carry any additional information that would be helpful in predicting the target variable. Consequently, we can discard this variable. 
-
-Side Note: NEE_VUT_REF_QC was the only categorical feature in our dataset, and by discarding it we got lucky. Neural networks in keras require input data in the form of matrices, and if we had any other categorical variables present in our data, we would have to encode these e.g. One-Hot Encoding vectors
-
+Thus we remove all the rows where the target variable is NA. As the target GPP_NT_VUT_REF is missing, we cannot learn or test against this data, so we remove all the rows where the target variable is missing. After we do this, the information that we previously encoded in NEE_VUT_REF_QC has already been used to filter out the rows with poor quality control measures. The variable NEE_VUT_REF_QC does not carry any additional information that would be helpful in predicting the target variable. Consequently, we can discard this variable. Note that NEE_VUT_REF_QC was a categorical feature in our dataset, and by discarding it we got lucky. Neural networks in keras require input data in the form of matrices, and if we had any other categorical variables present in our data, we would have to encode these e.g. One-Hot Encoding vectors. But indeed we have one remaining: NIGHT (Check unique(df$NIGHT)). In order to avoid further complications we remove Night from our dataset as well.
 
 ```{r}
-## Drop rows with NAs for GPP_NT_VUT_REF, and discard the column NEE_VUT_REF_QC
+## Drop rows with NAs for GPP_NT_VUT_REF, and discard the columns NEE_VUT_REF_QC and NIGHT
 df <- df %>% 
             drop_na(any_of("GPP_NT_VUT_REF")) %>%
-            select(-"NEE_VUT_REF_QC")
+            select(-c("NEE_VUT_REF_QC","NIGHT"))
 
 ## Print the dimensionality of the data frame now to check how many rows have been deleted, and the num of columns remaining 
 dim(df)
@@ -105,7 +107,7 @@ We see that there are still a few variables with NAs. Let's see how many NAs eac
 # .
 # . 
 # . 
-# NIGHT                           xyz
+# RH                           xyz
 
 colSums(is.na(df))
 
@@ -123,13 +125,13 @@ The number of rows with NAs are not that large compared to the current size of t
 df <-  df %>% drop_na()
 str(df)
 
-## Here we create a few variabels to reference different columns that might make preprocessing a little easier for us
-## Feel free to use or not use them in the subsequent steps; If you wish to use them, uncomment the lines below 
+## Here we create a few variables to reference different columns that might make preprocessing a little easier for us
+## Feel free to use or not use them in the subsequent steps; If you wish not to use them, just put a "#" before the lines below 
 
 time_cols <- c("TIMESTAMP_START","TIMESTAMP_END")
 target_variable <- c("GPP_NT_VUT_REF")
 column_names <- colnames(df)
-predictors <- column_names[! column_names %in% c(target_variable, time_cols)] ## time stamp columns and the target variables are not used as predictors
+predictors <- column_names[!column_names %in% c(target_variable, time_cols)] ## time stamp columns and the target variables are not used as predictors
 ```
 
 
@@ -140,7 +142,7 @@ The 80% of our data will be used to train the models and the rest 20% will be ou
 
 ```{r}
 ## set seed for reproducibility 
-set.seed(2020)
+set.seed(2021)
 ## First shuffle the dataset (Hint: sample() )
 df <- df[sample(nrow(df)),]
 
@@ -165,6 +167,7 @@ train_target <-  train_split %>% select(target_variable)
 test_target <- test_split %>% select(target_variable)
 train_data <- train_split %>% select(-one_of(c(target_variable, time_cols)))
 test_data <- test_split %>% select(-one_of(c(target_variable, time_cols)))
+head(test_data)
 ```
 
 ### Center and scale
@@ -173,9 +176,9 @@ Take care to extract the centering and scaling parameters from the training set 
 
 If you use the entire data set to get the centering and scaling parameters, we actually use information from the test-data, which is something we don't have access to in real life. Thus doing so results in *information leak* from the test data, and we may get results more optimistic than our model's true predictions. Follow the steps below to carry out centering and scaling in a proper way: 
 
-- Extract normalisation parameters from train data for numeric predictors
+- Extract normalisation parameters from *train* data for numeric predictors
 - Normalize train data using these parameters
-- Normalize test data using the parameters extracted from train data
+- Normalize test data using the parameters extracted from *train* data
 - Generally we only normalize the numeric variables and not the factors
 
 
@@ -198,6 +201,22 @@ test_data[, predictors] <- predict(train_data_stat, test_data)    # transform th
 summary(train_data)
 summary(test_data)
 ```
+```{r}
+train_data_stat <- preProcess(train_data, method = c("center", "scale"))
+
+#initialize of same dimension
+train_data_cs <- train_data
+test_data_cs <- test_data
+
+for (i in 1:ncol(train_data)){
+  #center and scale training data set
+  train_data_cs[,i] <- (train_data[,i] - train_data_stat$mean[i])/train_data_stat$std[i]
+  #center and scale testing data set
+  test_data_cs[,i] <- (test_data[,i] - train_data_stat$mean[i])/train_data_stat$std[i]
+}
+summary(train_data_cs)
+summary(test_data_cs)
+```
 
 Are all of the columns in the training set are centered perfectly with a mean = 0.0000? Yes!
 Are all of the columns in the testing set are centered perfectly with a mean = 0.0000? No!
@@ -206,7 +225,7 @@ Explanation: This is because the mean of the training set is used to center it, 
 
 ### Building a simple model with keras ( SubTask 1)
 
-To train keras models, the input data needs to be as a R matrix or arrays. Since all our featues are numeric, we can safely convert the train and test datasets to matrices. 
+To train keras models, the input data needs to be as a R matrix or arrays. Since all our features are numeric, we can safely convert the train and test datasets to matrices. 
 
 ```{r}
 ## Convert the "train_data", "train_targets", "test_data" and "test_targets", to matrix using as.matrix()  
@@ -217,7 +236,7 @@ test_target <- as.matrix(test_target)
 ```
 
 Now we can build a sequential model with keras. Define a model with 1 hidden layer with 20 units, and 1 output unit, for the target variable. Remember to specify a non-linear activation such as Sigmoid or ReLU for the hidden layer, and a linear activation function for the output unit (as it is a regression task). If we don't specify a non-linear activation we will just be training a linear mapping! 
-When compliling the model take care to use appropriate optimiser, loss and evaluation metric. Use mean squared error as the loss, and mean absolute error as the evaluation metric 
+When compiling the model take care to use appropriate optimiser, loss and evaluation metric. Use mean squared error as the loss, and mean absolute error as the evaluation metric 
 
 *Side Note*: Since our model is not very deep in this application (only 1 hidden layer), we can use any of the non-linear activations (tanh, sigmoid, or ReLu), but in practice when we train deep neural networks (with a large number of hidden layers) we prefer to use ReLU as the activation function, as it does not suffer from the problem of Vanishing or Exploding gradients (which happens if we use sigmoid or tanh). In a nutshell : In a network of n hidden layers, n derivatives will be multiplied together. If the derivatives are large then the gradient will increase exponentially as we propagate down the model until they eventually explode, and this is what we call the problem of exploding gradient. Alternatively, if the derivatives are small then the gradient will decrease exponentially as we propagate through the model until it eventually vanishes, and this is the vanishing gradient problem. [Source for the interested] (https://towardsdatascience.com/the-vanishing-exploding-gradient-problem-in-deep-neural-networks-191358470c11).
 
@@ -229,7 +248,7 @@ model %>%
   layer_dense(units = 1) %>%
   compile( optimizer = optimizer_adam(lr=0.001),
            loss = 'mse',
-           metrics = list('mae'))
+           metrics = list('mean_absolute_error'))
 
 ## Print the summary of the model using summary()
 summary(model)
@@ -260,7 +279,7 @@ The network needs 341 parameters. These are split as Layer 1: 320 parameters –
 ## More info on training callbacks: https://keras.rstudio.com/articles/training_callbacks.html
 ## More info on the fit function https://keras.rstudio.com/reference/fit.html
 
-## You can choose the number of epochs to train, manually by monitoring the validation loss while training and selecting the number of epochs where the validation loss starts to increase. Alternatively you can use early stopping to pause the model training at an optimal point for you. Choose whatever method you feel is best! 
+## You can choose the number of epochs to train, manually by monitoring the validation loss while training and selecting the number of epochs where the validation loss starts to increase. Alternatively you can use early stopping to pause the model training at an optimal point for you. Choose whatever me(thod you feel is best! 
 
 history <- fit(
   object           = model, 
@@ -275,9 +294,7 @@ history <- fit(
 ## 	Patience : number of epochs with no improvement after which training will be stopped.
 ```
 
-```{r echo = F, eval = F}
-history <- readRDS("./data/history.rds")
-```
+
 
 Now that the model training is complete we can look at the history, plot the training history, and look at our trained weights. Pay attention to the trained weight matrices and try to recognise the transformation weights and the bias units.  
 
@@ -286,7 +303,7 @@ Now that the model training is complete we can look at the history, plot the tra
 # plot history 
 # plot(history, metrics = c("loss"), smooth = getOption("keras.plot.history.smooth", TRUE))
 
-plot(history, smooth = getOption("keras.plot.history.smooth", TRUE))
+plot(history)
 
 # Get weights of model
 get_weights(model)
@@ -417,18 +434,24 @@ Next we can plot the model predictions with along with the ground truth for the 
 
 ```{r eval = F}
 ## plot the test data observations along with the test data predictions. Use color red for predictions, and blue for the observed data.
-plt_1 <- ggplot() + geom_line(data = test_split, aes(x = test_data_time, y = test_data_predictions), col = alpha("red", 0.8)) + geom_line(data = test_split, aes(x = test_data_time, y = test_target),col=alpha("blue",0.3))
+plt_1 <- ggplot() + geom_line(data = test_split, aes(x = test_data_time, y = test_data_predictions), col = alpha("red", 0.5)) + geom_line(data = test_split, aes(x = test_data_time, y = test_target),col=alpha("blue",0.3))+
+xlab("Time of observation")+
+ylab("Prediction and observation")+
+labs(title="Test data")
 plt_1
 
 ## plot the train data observations along with the train data predictions. Use color red for predictions, and blue for the observed data.
 train_data_predictions <- predict(model, train_data)
-plt_2 <- ggplot() + geom_line(data = train_split, aes(x = train_data_time, y = train_data_predictions), col = alpha("red", 0.8)) + geom_line(data = train_split, aes(x = train_data_time, y = train_target),col=alpha("blue",0.15))
+plt_2 <- ggplot() + geom_line(data = train_split, aes(x = train_data_time, y = train_data_predictions), col = alpha("red", 0.5)) + geom_line(data = train_split, aes(x = train_data_time, y = train_target),col=alpha("blue",0.15))+
+xlab("Time of observation")+
+ylab("Prediction and observation")+
+labs(title="Train data")
 plt_2
 
 ## Hint: For both the plots above, edit the alpha value such that the test data observations and the test data predictions both can be seen even with overlap 
 ```
 
-![ ](./figures/11_output-train.png)
+
 
 Nice! From our domain knowledge we know that the target varible GPP_NT_VUT_REF cannot be negative, but our dataset contains some negative observations because of noisy measurements. From the plot we see that the model learns the trends in the data, without learning the noise.
 
@@ -456,11 +479,12 @@ r2(test_target, test_data_predictions)
 ## GPP_NT_VUT_REF 0.6658682
 ```
 
-Having done this we have an idea of how well our model generalises against unseen data. But, to optimise the hyperparameters of the network we should not use the performance on the test set to select these hyperparameters. If we tune our model hyper-parameters using results from the test set, then the performance of our best model on the test set underestimates the true risk of our model. In the following steps we do the same things as we have discusses until now, but with 5-fold cross validation. We will do cross validation "by-hand", as we try to avoid using caret here, and doing so by hand gives us a more fine grain control. 
+Having done this we have an idea of how well our model generalises against unseen data. But, to optimise the hyperparameters of the network we should not use the performance on the test set to select these hyperparameters. If we tune our model hyperparameters using results from the test set, then the performance of our best model on the test set underestimates the true risk of our model. In the following steps we do the same things as we have discusses until now, but with 5-fold cross validation. We will do cross validation "by-hand", as we try to avoid using caret here, and doing so by hand gives us a more fine grain control. 
 
 Let's put the model creating and training in a function which takes the different hyper-parameters as inputs. This will make it easier to build a model from inside a cross validation loop. 
 
 Write a function, that does all the above steps, and returns a trained model. This will come in handy when we perform cross-validation. 
+Use mean squared error as your loss and evaluation metric. Don't forget to use *early stopping* (callback_early_stopping()).
 
 ```{r eval = F}
 # Function name: build_model()  
@@ -663,7 +687,7 @@ After running this loop we would have trained 5 different models, on our cross v
 ```{r eval = F}
 ## Plot the training history for all the 5 folds 
 for (i in 1:5){
-  plt<-plot(history_list[[i]], metrics = c("loss"),  smooth = getOption("keras.plot.history.smooth", TRUE))
+  plt<-plot(history_list[[i]])
   print(plt)
 }
 
@@ -685,7 +709,7 @@ avg_cv_loss
 What is the average cross validation error obtained for this configuration of the network ? 
 
 ### Parameter Tuning
-Here we will write a function that does the cross-validation for paramater tuning. The content of the cross-validation code remains the same as we have seen before. This is the same code written as a function that also takes the hyper-parameter to be tuned as an argument.
+Here we will write a function that does the cross-validation for parameter tuning. The content of the cross-validation code remains the same as we have seen before. This is the same code written as a function that also takes the hyperparameter to be tuned as an argument.
 Your task is to optimise the number of hidden units. 
 First we will organise all the steps done until now to write the function. 
 
@@ -760,6 +784,7 @@ cross_validate_model <- function(train_split, num_units, num_epochs){
         cat("Evaluation error on the held out fold: " , eval_result$mean_squared_error,"\n")
   
     }
+  return(cv_performance_list)
 }
 ```
 
@@ -769,16 +794,6 @@ cross_validate_model <- function(train_split, num_units, num_epochs){
 ![ ](./figures/11_output-loss2.png)
 ![ ](./figures/11_output-loss3.png)
 ![ ](./figures/11_output-loss4.png)
-
-```{r eval = F}
-loss_list <- rep(NA, 5)
-  for (i in 1:5){
-    loss_list[i] <- cv_performance_list[[i]]$mean_squared_error
-  }
-  avg_cv_loss <- mean(loss_list)
-  return(avg_cv_loss)
-}
-```
 
 ![ ](./figures/11_output-mse.png)
 
@@ -796,9 +811,14 @@ tune_num_units <- function(train_split,  num_units){
   ## write a loop to iterate over num_units and store the average cross validation loss 
   p <- 1
   for (k in num_units){
-    loss <- cross_validate_model(train_split = train_split, num_units = k, num_epochs = 30)
-    avg_loss_list[p] <- loss
-    p <- p+1 
+    performance<- cross_validate_model(train_split = train_split, num_units = k, num_epochs = 30)
+    loss <- rep(NA,5)
+    for (i in 1:5) {
+    loss[i] <- performance[[i]]$mean_squared_error
+    }
+  avg_loss_list[p] <- mean(loss)
+  p <- p+1 
+    
   }
   print(avg_loss_list)
   
@@ -807,9 +827,6 @@ tune_num_units <- function(train_split,  num_units){
 }
 ```
 
-```{r}
-## [1] 24.52219
-```
 
 Now let's consider the given vector "num_units" for tuning the number of hidden units 
 
