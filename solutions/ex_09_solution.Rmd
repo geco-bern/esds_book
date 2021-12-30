@@ -25,7 +25,7 @@ You have to solve tasks 3-7 with 2 different configurations.
  b. Using both Petal Length and Petal Width as predictors
 
 
-```{r, eval = F}
+```{r}
 ## Import libraries
 library(tidyverse)
 library(reticulate)
@@ -64,7 +64,7 @@ y_test = df_test$y
 
 ***
 **Configuration A for tasks 3-5**
-```{r, eval = F}
+```{r}
 ## A3. Plot training data
 df_train %>%
   ggplot(aes(x=Petal_Width,y=y,color = Type))+
@@ -73,7 +73,7 @@ df_train %>%
 
 
 ## A4. Create model
-use_session_with_seed(42) 
+set_random_seed(42) 
 model_a = keras_model_sequential()
 model_a %>% layer_dense(units = 1,activation = 'sigmoid') 
 opt = optimizer_adam(lr=0.1)
@@ -128,7 +128,7 @@ ylab('P(positive')
 ***
 **Configuration B for tasks 3-5**
 
-```{r, eval = F}
+```{r}
 ## B3. Plot training data
 df_train %>%
   ggplot(aes(x=Petal_Length,y=Petal_Width,color = Type))+
@@ -136,7 +136,7 @@ df_train %>%
   scale_color_manual(breaks = c("virginica","not_virginica"),values=c("blue","red"))
 
 ## B4. Create model
-use_session_with_seed(42) 
+set_random_seed(42) 
 model_b = keras_model_sequential()
 model_b %>% layer_dense(units = 1,activation = 'sigmoid') 
 opt = optimizer_adam(lr=0.1)
