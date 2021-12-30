@@ -97,7 +97,7 @@ library(lubridate)
 library(stringr)
 library(imputeTS) # Library for Imputation
 library(reticulate)
-use_condaenv('r-reticulate')
+# use_condaenv('r-reticulate')
 library(keras) # Python library for deep learning
 library(tensorflow) # Google API for Machine Learning
 ```
@@ -136,7 +136,7 @@ We start now the modeling part
 ### Naive models (Old World): Linear Models
 
 We first build a linear model, which assumes a linear relationship between label (output) and feature (input) 
-$$y=f(x)+ϵ$$ .That is, f is of the form $$f(x)=β_1x+β_0$$ with $β_0,β_1 \in R$. For this first model we will use only the NDVI value as our predictor. However, it seems reasonable to simply average the NDVI values per image, and use it as a predictor for the GPP. Later on we will extract more statistics.
+$$y=f(x)+ϵ$$. That is, f is of the form $$f(x)=β_1x+β_0$$ with $β_0,β_1 \in R$. For this first model we will use only the NDVI value as our predictor. However, it seems reasonable to simply average the NDVI values per image, and use it as a predictor for the GPP. Later on we will extract more statistics.
 
 ```{r}
 avg_values_ndvi = c()
@@ -144,7 +144,7 @@ avg_values_ndvi = c()
 for(j in 1:length(ndvi_files)){
   
   # read ndvi file
-  ndvi = readRDS(ndvi_files[j])
+    ndvi = readRDS(ndvi_files[j])
   
   # keep only healthy pixels
   ndvi = ndvi[ndvi <= 10000]
@@ -154,7 +154,7 @@ for(j in 1:length(ndvi_files)){
 }
 ```
 
-A specific built in function *lm* can be used to estimate $f$.
+The built-in function *lm* can be used to estimate $f$.
 
 ```{r}
 # create dataframe 
@@ -333,7 +333,7 @@ Then we define the model (our function f), as follows with:
 - a hidden layer, with relu activation, with a size of 5
 - an ouput layer, of size 1 with linear activation
 
-```{r}
+```{r, eval = F}
 #FFNN
 model = keras_model_sequential()
 model %>% 
@@ -344,13 +344,29 @@ model %>%
 
 We can also have a look at the number of trainable parameters of the model.
 
-```{r}
+```{r, eval = F}
 summary(model)
 ```
+```{r, eval = F}
+## Model: "sequential"
+## __________________________________________________________________________
+## Layer (type)                     Output Shape                 Param #     
+## ==========================================================================
+## dense_2 (Dense)                  (None, 10)                   140         
+## __________________________________________________________________________
+## dense_1 (Dense)                  (None, 5)                    55          
+## __________________________________________________________________________
+## dense (Dense)                    (None, 1)                    6           
+## ==========================================================================
+## Total params: 201
+## Trainable params: 201
+## Non-trainable params: 0
+## __________________________________________________________________________
+```
 
-In this setting we make a cv approach while keeping 10 tower sites for the test fold (in order to save time). 
+In this setting we make a CV approach while keeping 10 tower sites for the test fold (in order to save time). 
 
-```{r}
+```{r, eval=F}
 n_tower_test = 10
 unique_towers = unique(df_data_all_nn$sitename)
 
@@ -394,6 +410,9 @@ for(i in 1:n_breaks){
 }
 
 cat(paste("\n", "CV MSE:", mean(mse_per_fold_nn))) 
+```
+```{r eval=F}
+##  CV MSE: 3.78162750720368
 ```
 
 As you can see, the FFNN improves the out of training mean square error (sometimes this is not the case due to randomization during training).
@@ -539,14 +558,43 @@ create_cnn = function(){
 }
 ```
 
-```{r}
+```{r eval = F}
 cnn_model = create_cnn()
 summary(cnn_model)
+```
+```{r eval = F}
+## Model: "model"
+## ________________________________________________________________________________
+## Layer (type)              Output Shape      Param #  Connected to               
+## ================================================================================
+## input_1 (InputLayer)      [(None, 50, 50, 1 0                                   
+## ________________________________________________________________________________
+## conv2d (Conv2D)           (None, 50, 50, 4) 104      input_1[0][0]              
+## ________________________________________________________________________________
+## average_pooling2d (Averag (None, 5, 5, 4)   0        conv2d[0][0]               
+## ________________________________________________________________________________
+## flatten (Flatten)         (None, 100)       0        average_pooling2d[0][0]    
+## ________________________________________________________________________________
+## dense_21 (Dense)          (None, 32)        3232     flatten[0][0]              
+## ________________________________________________________________________________
+## input_2 (InputLayer)      [(None, 9)]       0                                   
+## ________________________________________________________________________________
+## tf.concat (TFOpLambda)    (None, 41)        0        dense_21[0][0]             
+##                                                      input_2[0][0]              
+## ________________________________________________________________________________
+## dense_22 (Dense)          (None, 16)        672      tf.concat[0][0]            
+## ________________________________________________________________________________
+## dense_23 (Dense)          (None, 1)         17       dense_22[0][0]             
+## ================================================================================
+## Total params: 4,025
+## Trainable params: 4,025
+## Non-trainable params: 0
+## ________________________________________________________________________________
 ```
 
 To evaluate the performance of the model we follow a cv approach by leaving out 10 tower sites.
 
-```{r}
+```{r eval = F}
 n_tower_test = 10
 unique_towers = unique(data_cnn_complete$sitename)
 
@@ -593,6 +641,9 @@ for(i in 1:n_breaks){
 }
 
 cat(paste("\n","CV MSE:",mean(mse_per_fold_cnn)))
+```
+```{r eval = F}
+## CV MSE: 3.64838966197611
 ```
 
 The CNN yields better performances than the linear model and the FFNN. However, since we used different inputs, we should be careful with comparisons.
