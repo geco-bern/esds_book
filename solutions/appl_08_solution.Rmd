@@ -427,7 +427,7 @@ ggplot() +
   coord_flip()
 ```
 
-### Bonus: Best Subset Selection
+### Bonus: Best Subset Selection - Not included in application for students (too long...)
 
 First we generate our data.
 
