@@ -31,7 +31,7 @@ We first need to import some libraries. You have seen all of these in previous t
 library(tidyverse)
 library(rsample)
 library(reticulate)
-use_condaenv()
+# use_condaenv()
 library(keras)
 library(pROC)
 # plot size 
@@ -1213,7 +1213,7 @@ The required libraries and some useful functions are already imported in the fol
 library(tidyverse)
 library(reticulate)
 library(pROC)
-use_condaenv()
+# use_condaenv()
 library(keras)
 library(rsample)
 ```

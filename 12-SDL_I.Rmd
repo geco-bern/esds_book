@@ -50,7 +50,7 @@ Let's dive into our example for a practical application of this.
 ```{r}
 # import libraries
 library(reticulate)
-use_condaenv()
+# use_condaenv()
 library(keras)
 library(tensorflow)
 library(tidyverse)
@@ -918,7 +918,7 @@ Your task is to create a CNN architecture that outperforms the baseline model. T
 ### Import libraries and data
 ```{r eval = F}
 library(reticulate)
-use_condaenv()
+# use_condaenv()
 library(keras)
 library(tensorflow)
 library(tidyverse)
