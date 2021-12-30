@@ -38,7 +38,7 @@ library(rjson)
 library(tidyverse)
 library(patchwork)
 library(reticulate)
-use_condaenv()
+# use_condaenv()
 library(keras)
 library(tensorflow)
 library(IRdisplay)
@@ -495,32 +495,50 @@ for (file_index in 1:length(fnames)){
 }
 
 #plot w
-df_w = data.frame(loss = c(w),group = as.factor(rep(1:4,each=num_epochs)),epoch = rep(1:20,times=4))
+df_w <- data.frame(loss = c(w),group = as.factor(rep(1:4,each=num_epochs)),epoch = rep(1:20,times=4))
 
-gg1 =df_w %>%
-    ggplot(aes(x = epoch,y = loss,color = group ))+
-    geom_line()+
-    geom_point(shape=4,color = 'black')+
-    geom_hline(aes(yintercept = 0.01378,linetype='lt'))+
-    scale_color_manual(name = 'Learning Rate',values = colors,labels = labels)+
-    scale_linetype_manual(labels ='',name='exact w',values = 3)+
-    theme_gray(base_size = 15)+
-    theme(legend.position="top",legend.direction = 'vertical')
+gg1 <- df_w %>%
+  ggplot(aes(x = epoch,y = loss,color = group ))+
+  geom_line()+
+  geom_point(shape=4,color = 'black')+
+  geom_hline(aes(yintercept = 0.01378, linetype='lt'))+
+  scale_color_manual(name = 'Learning Rate',values = colors,labels = labels)+
+  scale_linetype_manual(labels ='',name='exact value',values = 3)+
+  theme_gray(base_size = 15)+
+  theme(legend.position="top",legend.direction = 'horizontal') +
+  ylab("Estimated w")
+
+gg1.1 <- df_w %>%
+  ggplot(aes(x = epoch,y = loss,color = group ))+
+  geom_line()+
+  geom_point(shape=4,color = 'black')+
+  geom_hline(aes(yintercept = 0.01378, linetype='lt'))+
+  scale_color_manual(name = 'Learning Rate',values = colors,labels = labels)+
+  scale_linetype_manual(labels ='',name='exact value',values = 3)+
+  theme_gray(base_size = 15)+
+  theme(legend.position="top",legend.direction = 'horizontal') +
+  ylab("Estimated w (zoomed)") +
+  ylim(0, 0.04)
+
+
 
 #plot b
-df_b = data.frame(loss = c(b),group = as.factor(rep(1:4,each=num_epochs)),epoch = rep(1:20,times=4))
+df_b <- data.frame(loss = c(b),group = as.factor(rep(1:4,each=num_epochs)), epoch = rep(1:20,times=4))
 
-gg2 = df_b %>%
-    ggplot(aes(x = epoch,y = loss,color = group ))+
-    geom_line()+
-    geom_point(shape=4,color = 'black')+
-    geom_hline(aes(yintercept = 0.93987,linetype='lt'))+
-    scale_color_manual(name = 'Learning Rate',values = colors,labels = labels)+
-    scale_linetype_manual(labels ='',name='exact b',values = 3)+
-    theme_gray(base_size = 15)+
-    theme(legend.position="top",legend.direction = 'vertical')
+gg2 <- df_b %>%
+  ggplot()+
+  aes(x = epoch,y = loss, color = group) +
+  geom_line() +
+  geom_point(shape=4,color = 'black') +
+  geom_hline(aes(yintercept = 0.93987, linetype='lt')) +
+  scale_color_manual(name = 'Learning Rate',values = colors,labels = labels) +
+  scale_linetype_manual(labels ='',name='exact value',values = 3) +
+  theme_gray(base_size = 15) +
+  theme(legend.position="top",legend.direction = 'horizontal') +
+  ylab("Estimated b")
+  
 
-gg1+gg2
+gg1 + gg1.1 + gg2 + plot_spacer() + plot_layout(guides = "collect") & theme(legend.position = "bottom")
 ```
 
 
@@ -1002,7 +1020,7 @@ cat("Test Accuracy: ", round(accuracy, 3), '/n')
 **Configuration B for tasks 3-5**
 ```{r eval = F}
 ## B3. Plot training data
-# <ADD CODE HERE: use only the Petal Width as input>
+# <ADD CODE HERE: For configuration B use both, Petal Length and Petal Width, as predictors
 
 ## B4. Create model
 # <FILL IN MISSING PARTS BELOW>
