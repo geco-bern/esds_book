@@ -1,0 +1,659 @@
+# Supervised Deep Learning II - *A Scenario of Environmental Systems* {#ch-13}
+
+## Introduction
+
+In this tutorial, we will put into practice and apply some of the models seen earlier in the course, in order to achieve a simple goal: efficiently extrapolate an environmental data set. For this, we will use satellite, meteorological, environmental data (that is measured scarcely by expensive physical devices (towers)) as an accurate and cheap predictors of a specific environmental variable (GPP - Gross primary production). Sit down and relax. This tutorial invites you to take a step back, and reflect on all the knowledge you have acquired on modeling. 
+
+### Learning objectives
+
+- Understand the link between research objective, data type and machine learning methods.
+- Develop critical judgment, assess the relevance of a method for a particular modeling objective.
+- Be able to cite examples of possible applications of various machine learning methods to problems in environmental systems science.
+- Build intuitions for future machine learning applications in own projects. 
+- Understand the difference between forward Neural Networks, CNN.
+- Appreciate similarities and differences between simpler statistical models and NN.
+
+**Important points from the lecture**
+
+<div style="border: 2px black solid; border-radius: 7px; padding:10px">
+    
+- Several types of models are commonly used in the Environmental Sciences. Those include linear models, general linear models, random forests, and neural networks.
+- Linear models are suited for obtaining *simple* relationships between predictors and variables (for those with a normally distributed response variable)
+
+\begin{equation}
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_k x_k + \epsilon, \quad \epsilon \sim \mathcal{N} (0,\sigma^2)
+\end{equation}
+
+- Generalized linear models are similar to linear models. However, they allow for less restrictive assumptions on the distribution of the predicted variable (e.g., can be binomial for predicting presence/absence).
+
+- Randoms forests can be used for classification or label predictions.
+
+- Neural Networks can be used for capturing more *complex* relationships between predictors and variable. This comes at the cost of interpretability. Convolutional Neural Networks are a special type of neural network which is suited to for example capturing the effect of the spatial structure of the predictors. 
+
+- Neural Networks can be combined with mechanistic models to reduce the dimensionality of a problem.
+</div>
+
+### Content & Operations
+- Description of the modeling task
+- Preprocessing
+- Old World: Linear models
+- New World: Neural networks
+    - Feed Forward Neural Network
+    - Convolutional Neural Network
+- Comparisons
+
+## Tutorial 
+
+### Description of the modelling task
+
+Ecosystem-atmosphere exchange fluxes of water vapour and CO2 are continuously measured at several hundred of sites, distributed across the globe. The oldest running sites have been recording data since over twenty years. Thanks to the international FLUXNET initiative, these time series data are made openly accessible from over hundred sites and provided in a standardized format and complemented with measurements of several meteorological variables, plus soil temperature and moisture, measured in parallel. These data provide an opportunity for understanding ecosystem fluxes and how they are affected by environmental covariates. The challenge is to build models that are sufficiently generalisable in space. That is, temporally resolved relationships learned from one subset of sites should be used effectively to predict time series, given environmental covariates, at new sites (spatial upscaling). This is a challenge as previous research has shown that relatively powerful site-specific models can be trained, but predictions to new sites have been found wanting. This may be due to site-specific characteristics (e.g. vegetation type) that have thus far not been satisfactorily encoded in models. In other words, factors that would typically be regarded as random factors in mixed effects modeling, continue to undermine effective learning in machine learning models.
+
+### Goal of the tutorial
+
+Our aim is to build a model that can estimate the GPP - gross primary production of a given place, extending the range of measurements from around the towers to the entire Earth system.
+We will compare different approaches to find the function $f$ that best captures the relationship between the explanatory variables and the GPP - gross primary production ($y_{GPP}$).
+
+\begin{equation}
+y_{GPP} = f(x_{features},...)
+\end{equation}
+
+### Dataset
+
+As a first step of any modeling problem, we need to get and process the data to be used. Those steps have been detailed in Tutorial 4: **Data scraping**.
+
+#### FLUXNET dataset
+
+We will once again be using the FLUXNET data set, that you have gotten familiar with in the previous tutorials. We want to try to predict the variable  y =  [`GPP_NT_VUT_REF`](https://fluxnet.org/data/fluxnet2015-dataset/fullset-data-product/), which expresses the **monthly** gross primary production of the corresponding region.
+
+Here is the map showing the location of the 71 towers available in our dataset:
+
+<center><img src="./figures/location_of_towers.png" style="width:70%;" class="center"><center>
+
+#### Explanatory variables
+
+- fpar_loess: fraction of absorbed photosynthetically active radiation, interpolated to monthly values using LOESS
+- TA_F: Air temperature
+- SW_IN_F: Shortwave incoming radiation
+- LW_IN_F: Longwave incoming radiation
+- VPD_F: Vapour pressure deficit (relates to the humidity of the air)
+- PA_F: Atmospheric pressure
+- P_F: Precipitation
+- WS_F: Wind speed
+- CO2_F_MDS: CO2 concentration
+- NDVI (Landsat 7 product): The [Normalised Difference Vegetation Index](https://en.wikipedia.org/wiki/Normalized_difference_vegetation_index) (NDVI)  is a measure for live green foliage and is strongly related to the fraction of absorbed photosynthetically active radiation. In other words, it should scale (more or less linearly) with GPP. NDVI is easy to obtain at a fine spatial resolution, through satellite imagery.  The spatial resolution of a pixel is 30m and the temporal resolution between 2 consecutive dates is 16 days.In this tutorial, we keep the maximum available date per month. More details about the product can be found [here](https://www.usgs.gov/core-science-systems/nli/landsat/landsat-normalized-difference-vegetation-index?qt-science_support_page_related_con=0#qt-science_support_page_related_con). For each area of interest (i.e tower location) and date, a square with side 6km is considered. The center of this square is the tower location. The extracted NDVI pixels are the area of the square. Therefore, in total for a specific (tower location, date) pair we have a square with a side of  [6km / 30m(per pixel)] = 200 pixels and thus 200 x 200 = 40000 pixels per pair.
+
+Each Landsat product gives a tile with the desired information. From this tile a region around each tower is extracted. The following picture shows you an example of such a tile and the area around the CH Oerlikon tower.
+
+<center><h4>Extracted Region (black square) around the Tower of CH Oerlikon (red cross) for the given Landsat tile</h4></center>
+<center><img src="./figures/extracted_region_CH_Oe2.jpg" style="width:45%;" class="center"></center>
+
+### Let's dive into the code
+
+First we need to load the libraries required for our modeling task. We'll be using the Keras library for the neural networks.
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(imputeTS) # Library for Imputation
+library(reticulate)
+# use_condaenv('r-reticulate')
+library(keras) # Python library for deep learning
+library(tensorflow) # Google API for Machine Learning
+```
+
+### Read in the Data
+
+We have two data sources. The **FLUXNET** data set averaged on monthly valued which contains the target variable gpp as well as the following explanatory variables: fpar_loess, TA_F, SW_IN_F, LW_IN_F, VPD_F, PA_F, P_F, WS_F, CO2_F_MDS. Next, we have the Landsat 7 **NDVI** product on monthly NDVI values.
+
+```{r}
+path = "./data/"
+
+# read fluxnet data
+flux_data = read.csv(file.path(path, "flux_dataset.csv"))
+
+# have a look
+head(flux_data)
+
+# read ndvi file path
+ndvi_files = list.files(file.path(path, "ndvi/"), full.names = T)
+
+# look one file
+cat(ndvi_files[1])
+```
+
+Let's now look at some statistics of the data.
+
+```{r}
+# Number of samples
+cat(paste("The dataset contain", nrow(flux_data), "samples", "\n \n"))
+
+# Number of distinct towers
+cat(paste("The dataset contain", length(unique(flux_data$sitename)), "different tower sites","\n"))
+```
+We start now the modeling part
+
+### Naive models (Old World): Linear Models
+
+We first build a linear model, which assumes a linear relationship between label (output) and feature (input) 
+$$y=f(x)+ϵ$$. That is, f is of the form $$f(x)=β_1x+β_0$$ with $β_0,β_1 \in R$. For this first model we will use only the NDVI value as our predictor. However, it seems reasonable to simply average the NDVI values per image, and use it as a predictor for the GPP. Later on we will extract more statistics.
+
+```{r}
+avg_values_ndvi = c()
+
+for(j in 1:length(ndvi_files)){
+  
+  # read ndvi file
+    ndvi = readRDS(ndvi_files[j])
+  
+  # keep only healthy pixels
+  ndvi = ndvi[ndvi <= 10000]
+  
+  # take average ndvi
+  avg_values_ndvi = c(avg_values_ndvi, mean(ndvi, na.rm = T))
+}
+```
+
+The built-in function *lm* can be used to estimate $f$.
+
+```{r}
+# create dataframe 
+
+df_data = data.frame(y = flux_data$y, avg_ndvi = avg_values_ndvi)
+
+# drop null values
+df_data = na.omit(df_data)
+
+head(df_data)
+
+# fit the model
+
+model_ndvi = lm(y ~ avg_ndvi, data = df_data)
+
+summary(model_ndvi)
+```
+
+Although the $R^2 = 0.31$ is low, the NDVI predictor can be considered significant ($p_{value} < 0.05$) for the prediction of GPP.
+
+Let's also create a plot of the linear model
+
+```{r}
+df_data %>%
+  ggplot(aes(x = avg_ndvi, y = y)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "red", lwd = 2, se = F) +
+  theme_gray(base_size = 20) + 
+  labs(x = 'Average NDVI', y = "gpp" )
+```
+
+Next, we fit again a linear model but at this time we incorporate all the available predictors of fluxnet data set along with the extracted average NDVI values.
+```{r}
+colnames(flux_data)
+```
+
+```{r}
+# create dataframe 
+
+df_data_all = data.frame(flux_data[,-c(1,3:4)], avg_ndvi = avg_values_ndvi)
+head(df_data_all)
+
+# drop null values
+
+df_data_all = na.omit(df_data_all)
+
+# fit the model
+
+model_all = lm(y ~ 
+                 fpar_loess_per_month + 
+                 TA_F_per_month  + 
+                 SW_IN_F_per_month + 
+                 LW_IN_F_per_month + 
+                 VPD_F_per_month +     
+                 PA_F_per_month  + 
+                 P_F_per_month +   
+                 WS_F_per_month  +     
+                 CO2_F_MDS_per_month +
+                 avg_ndvi, 
+                 data = df_data_all)
+summary(model_all)
+```
+
+As you can see now, by using all the available predictors we have a magnificent improvement of the $R^2 = 0.73$
+
+We may also perform a cross validation approach for the mse of our model. Our goal is to generalize to unseen tower sites. Therefore the test fold of the cv should be unseen tower sites. Here, we choose to leave one tower site out (similar to LooCV apporach) for the test fold
+
+```{r}
+n_tower_test = 1
+unique_towers = unique(df_data_all$sitename)
+
+n_breaks = as.integer(length(unique_towers)/n_tower_test)
+folds = cut(1:length(unique_towers), breaks = n_breaks,labels = F)
+  
+mse_per_fold = c()
+  
+for(i in 1:n_breaks){
+  
+  train_towers = unique(df_data_all$sitename)[folds!=i]
+  test_towers = unique(df_data_all$sitename)[folds==i]
+  
+  
+  train_ind = df_data_all$sitename %in% train_towers
+  test_ind = !train_ind
+  
+  
+  x_train = df_data_all[train_ind,-c(1:2)]
+
+  
+  x_test  = df_data_all[test_ind,-c(1:2)]
+  
+  y_train = df_data_all$y[train_ind]
+  y_test = df_data_all$y[test_ind]
+  
+  df = data.frame(y_train = y_train,x_train)
+  
+  head(df)
+  
+  fit = lm(y_train ~ . ,data = df)
+  
+  pred = predict(fit, x_test)
+  
+  mse = mean((pred-y_test)^2,na.rm=T)
+  
+  mse_per_fold = c(mse_per_fold,mse)
+  
+  cat(paste(test_towers, 'mse:', mse,"\n"))
+  
+}
+
+cat(paste("\n", "CV MSE:", mean(mse_per_fold)))    
+```
+
+### Neural Networks (New World)
+
+#### Feed Forward Neural Network
+
+Instead of a Linear  model, let's see what happens when we approximate $f$ using a Feed Forward Neural Network with two hidden layers. We use again all the available predictors as well as the ndvi features (we also extract more statistics such maximum, minimum and standard deviation).
+
+```{r warning=F}
+avg_values_ndvi = c()
+max_values_ndvi = c()
+min_values_ndvi = c()
+std_values_ndvi = c()
+
+for(j in 1:length(ndvi_files)){
+  
+  # read ndvi file
+  ndvi = readRDS(ndvi_files[j])
+  
+  # keep only healthy pixels
+  ndvi = ndvi[ndvi <= 10000]
+  
+  # take average ndvi
+  avg_values_ndvi = c(avg_values_ndvi, mean(ndvi,na.rm = T))
+  # take max ndvi
+  max_values_ndvi = c(max_values_ndvi, max(ndvi,na.rm = T))
+  # take min ndvi
+  min_values_ndvi = c(min_values_ndvi, min(ndvi,na.rm = T))
+  # take std ndvi
+  std_values_ndvi = c(std_values_ndvi, sd(ndvi,na.rm = T))
+}
+```
+
+```{r}
+# create dataframe 
+
+df_data_all_nn = data.frame(flux_data[,-c(1,3:4)],
+                            avg_ndvi = avg_values_ndvi,
+                            max_ndvi = max_values_ndvi,
+                            min_ndvi = min_values_ndvi,
+                            std_ndvi = std_values_ndvi)
+head(df_data_all_nn)
+
+# drop null values
+
+df_data_all_nn = na.omit(df_data_all_nn)
+
+y = df_data_all_nn$y
+x = df_data_all_nn[,-c(1,2)]
+```
+
+The first step and key step as always is preprocessing!
+
+```{r}
+# normalize
+
+x_scaled = scale(x)
+head(x_scaled)
+```
+
+Then we define the model (our function f), as follows with:
+
+- an input layer, with dimensions the number of features x 
+- a hidden layer, with relu activation, with a size of 10 
+- a hidden layer, with relu activation, with a size of 5
+- an ouput layer, of size 1 with linear activation
+
+```{r, eval = F}
+#FFNN
+model = keras_model_sequential()
+model %>% 
+  layer_dense(units = 10, activation = 'relu', input_shape = ncol(x)) %>%
+  layer_dense(units = 5, activation = 'relu') %>%
+  layer_dense(units=1)
+```
+
+We can also have a look at the number of trainable parameters of the model.
+
+```{r, eval = F}
+summary(model)
+```
+```{r, eval = F}
+## Model: "sequential"
+## __________________________________________________________________________
+## Layer (type)                     Output Shape                 Param #     
+## ==========================================================================
+## dense_2 (Dense)                  (None, 10)                   140         
+## __________________________________________________________________________
+## dense_1 (Dense)                  (None, 5)                    55          
+## __________________________________________________________________________
+## dense (Dense)                    (None, 1)                    6           
+## ==========================================================================
+## Total params: 201
+## Trainable params: 201
+## Non-trainable params: 0
+## __________________________________________________________________________
+```
+
+In this setting we make a CV approach while keeping 10 tower sites for the test fold (in order to save time). 
+
+```{r, eval=F}
+n_tower_test = 10
+unique_towers = unique(df_data_all_nn$sitename)
+
+n_breaks = as.integer(length(unique_towers)/n_tower_test)
+folds = cut(1:length(unique_towers), breaks = n_breaks,labels = F)
+  
+mse_per_fold_nn = c()
+  
+for(i in 1:n_breaks){
+  
+  train_towers = unique(df_data_all_nn$sitename)[folds!=i]
+  test_towers = unique(df_data_all_nn$sitename)[folds==i]
+  
+  
+  train_ind = df_data_all_nn$sitename %in% train_towers
+  test_ind = !train_ind
+  
+  
+  model = keras_model_sequential()
+  model %>% 
+    layer_dense(units = 10, activation = 'relu', input_shape = ncol(x)) %>%
+    layer_dense(units = 5, activation = 'relu') %>%
+    layer_dense(units=1)
+  
+  #optimizer
+  opt=optimizer_adam(lr=0.01) 
+  
+  #compile
+  compile(model, loss = 'mse', optimizer = opt, metrics=list('mse'))
+  
+  history_ffnn = fit(model, x = data.matrix(x_scaled[train_ind,]), y = y[train_ind], batch_size =                      512, epochs = 50, shuffle = T)
+  
+  pred = predict(model, data.matrix(x_scaled[test_ind,]))
+  
+  mse = mean((pred-y[test_ind])^2, na.rm=T)
+  
+  mse_per_fold_nn = c(mse_per_fold_nn,mse)
+  
+  cat(paste(test_towers, 'mse:', mse,"\n"))
+  
+}
+
+cat(paste("\n", "CV MSE:", mean(mse_per_fold_nn))) 
+```
+```{r eval=F}
+##  CV MSE: 3.78162750720368
+```
+
+As you can see, the FFNN improves the out of training mean square error (sometimes this is not the case due to randomization during training).
+
+### Convolutional Neural Network
+
+In the previous section we extracted statistics of NDVI images and then we used those features together with the FLUXNET features as input to the feed forward neural network. Now, we will use the image of the NDVI and we allow a CNN model to extract relevant features. Then we will feed those features together with the FLUXNET features to a feed forward neural network. As it mentioned in the beginning the size of each NDVI image is 200 x 200 pixel. To avoid memory issues and facilitate fast training we crop the images to 50 x 50 pixel keeping the same center.
+
+Before we proceed, we remind here the basic building blocks of the CNN model.
+
+**Building Blocks of a CNN**
+
+- **Convolutional Layers**: Layers implementing the actual convolution. Their outputs are feature maps which are then passed through an activation function in order to introduce non-linearities into the system. Convolutional layers can be seen as extracting features that are passed on deeper into the model thus enabling the model to learn higher-level features that make the classification task easier.
+
+- **Pooling Layers**: Downsampling or pooling layers concentrate the information so that deeper layers focus more on abstract/high-level patterns. A common choice is max-pooling, where only the maximum value occurring in a certain region is propagated to the output.
+
+- **Dense Layers**: A dense or fully-connected layer connects every node in the input to every node in the output. This is the type of layer you already used in the previous tutorial. If the input dimension is large, the amount of learnable parameters introduced by using a dense layer can quickly explode. Hence, dense layers are usually added on deeper levels of the model, where the pooling operations have already reduced the dimensionality of the data. Typically, the dense layers are added last in a predictive model, performing the actual prediction on the features extracted by the convolutional layers.
+
+```{r}
+data_cnn = data.frame(flux_data, ndvi_file = ndvi_files)
+
+head(data_cnn)
+```
+
+Here we remove the images with more than 40% missing NDVI values.
+
+```{r}
+# remove rows with NAs
+data_cnn = na.omit(data_cnn)
+
+# remove rows with more than 40% missing NDVI values
+dim = 200
+to_remove = c()
+
+for(j in 1:length(data_cnn$ndvi_file)){
+  
+  # read ndvi file, extract window of 50x50
+  ndvi = matrix(readRDS(data_cnn$ndvi_file[j]), nrow=dim, byrow = T)[75:124,75:124]
+  
+  # check percentage of missing values
+  
+  percentage_missing = mean(is.na(ndvi) | ndvi>10000)
+  
+  
+  if (percentage_missing > 0.4 | length(ndvi)==0){
+    to_remove = c(to_remove, j) 
+  }
+  
+  
+}
+
+data_cnn_complete = data_cnn[-to_remove,]
+```
+
+Now it is time to scale the inputs.
+
+```{r}
+
+dim = 50
+ndvi = array(NA,dim =c(length(data_cnn_complete$ndvi_file), dim, dim))
+
+for(j in 1:length(data_cnn_complete$ndvi_file)){
+    ndvi_values = readRDS(data_cnn_complete$ndvi_file[j])
+    
+    #reshape
+    ndvi[j,,] = matrix(ndvi_values, nrow=200, byrow = T)[75:124,75:124]
+}
+
+#specify image size
+IMAGE_WIDTH = dim
+IMAGE_HEIGHT = dim
+IMAGE_CHANNELS = 1
+IMAGE_SIZE = c(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)
+
+
+#fill missing values , rescale images to [0,1] , reshape to be a valid input for NN
+
+preprocess_images = function(ndvi){
+  
+  min_ndvi = -10000
+  max_ndvi = 10000
+  
+  #fill missing values
+  nd = apply(ndvi, c(2,3), function(i) na_interpolation(i))
+  
+  #rescale to [0,1]
+  nd = (nd-min_ndvi)/(max_ndvi-min_ndvi)
+  
+  #reshape adding an extra dimension
+  nd = array_reshape(nd, dim = c(-1,IMAGE_SIZE))
+  
+  return (nd)
+}
+
+```
+
+```{r}
+ndvi_pr = preprocess_images(ndvi)
+x_flux = data_cnn_complete[,-c(1:5,15)]
+x_flux_scaled = scale(x_flux)
+
+y = data_cnn_complete$y
+```
+
+Here we create the CNN model. We use only one CNN layer with 4 filters and kernel size of 5. We also use a pooling layer.
+
+```{r}
+create_cnn = function(){
+  
+  #input --> ndvi images
+  input_1 = layer_input(shape=IMAGE_SIZE)
+  
+  # cnn layer
+  cnn_layer = layer_conv_2d(input_1, filters = 4, kernel_size = c(5,5), activation = 'relu', padding = 'same')
+  
+  # pool layer
+  pool =  layer_average_pooling_2d(cnn_layer, pool_size = c(10, 10)) 
+  
+  
+  # flatten the features
+  flat = layer_flatten(pool)
+  
+  # mlp of the features --> project to dim 32
+  flat_proj = layer_dense(flat, units = 32, activation = 'relu')
+  
+  #input --> fluxnet features
+  input_2 = layer_input(shape=ncol(x_flux))
+  
+  # concatenate features
+  features = k_concatenate(c(flat_proj, input_2),axis=2)
+  
+  # hidden layer
+  
+  hidden_dense = layer_dense(features, units = 16, activation = 'relu')
+  
+  #output
+  output =  layer_dense(hidden_dense, units = 1, activation = 'linear')
+  
+  #create model
+  model = keras_model(c(input_1, input_2), output)
+  
+  return(model)
+}
+```
+
+```{r eval = F}
+cnn_model = create_cnn()
+summary(cnn_model)
+```
+```{r eval = F}
+## Model: "model"
+## ________________________________________________________________________________
+## Layer (type)              Output Shape      Param #  Connected to               
+## ================================================================================
+## input_1 (InputLayer)      [(None, 50, 50, 1 0                                   
+## ________________________________________________________________________________
+## conv2d (Conv2D)           (None, 50, 50, 4) 104      input_1[0][0]              
+## ________________________________________________________________________________
+## average_pooling2d (Averag (None, 5, 5, 4)   0        conv2d[0][0]               
+## ________________________________________________________________________________
+## flatten (Flatten)         (None, 100)       0        average_pooling2d[0][0]    
+## ________________________________________________________________________________
+## dense_21 (Dense)          (None, 32)        3232     flatten[0][0]              
+## ________________________________________________________________________________
+## input_2 (InputLayer)      [(None, 9)]       0                                   
+## ________________________________________________________________________________
+## tf.concat (TFOpLambda)    (None, 41)        0        dense_21[0][0]             
+##                                                      input_2[0][0]              
+## ________________________________________________________________________________
+## dense_22 (Dense)          (None, 16)        672      tf.concat[0][0]            
+## ________________________________________________________________________________
+## dense_23 (Dense)          (None, 1)         17       dense_22[0][0]             
+## ================================================================================
+## Total params: 4,025
+## Trainable params: 4,025
+## Non-trainable params: 0
+## ________________________________________________________________________________
+```
+
+To evaluate the performance of the model we follow a cv approach by leaving out 10 tower sites.
+
+```{r eval = F}
+n_tower_test = 10
+unique_towers = unique(data_cnn_complete$sitename)
+
+n_breaks = as.integer(length(unique_towers)/n_tower_test)
+folds = cut(1:length(unique_towers),breaks = n_breaks,labels = F)
+  
+mse_per_fold_cnn = c()
+  
+for(i in 1:n_breaks){
+  
+  train_towers = unique(data_cnn_complete$sitename)[folds!=i]
+  test_towers = unique(data_cnn_complete$sitename)[folds==i]
+  
+  
+  train_ind = data_cnn_complete$sitename %in% train_towers
+  test_ind = !train_ind
+  
+  
+  model_cnn = create_cnn()
+  
+  #optimizer
+  opt=optimizer_adam(lr=0.01) 
+  
+  #compile
+  compile(model_cnn, loss = 'mse', optimizer = opt, metrics=list('mse'))
+  
+  history_ffnn = fit(model_cnn,
+                     x = list(array_reshape(ndvi_pr[train_ind,,,], dim=c(-1,IMAGE_SIZE)),
+                     data.matrix(x_flux_scaled[train_ind,])),
+                     y = y[train_ind],
+                     batch_size = 512,
+                     epochs = 20,
+                     shuffle = T)
+  
+  pred = predict(model_cnn,list(array_reshape(ndvi_pr[test_ind,,,], 
+                dim=c(-1,IMAGE_SIZE)), data.matrix(x_flux_scaled[test_ind,])))
+  
+  mse = mean((pred-y[test_ind])^2,na.rm=T)
+  
+  mse_per_fold_cnn = c(mse_per_fold_cnn, mse)
+  
+  cat(paste(test_towers, 'mse:', mse,"\n"))
+  
+}
+
+cat(paste("\n","CV MSE:",mean(mse_per_fold_cnn)))
+```
+```{r eval = F}
+## CV MSE: 3.64838966197611
+```
+
+The CNN yields better performances than the linear model and the FFNN. However, since we used different inputs, we should be careful with comparisons.
+
+## Exercise
+
+In class, we used the monthly FLUXNET data set and the NDVI images of 71 distinct tower sites. We first had to fit a linear model using only the average NDVI in order to predict the **GPP - gross primary production **. The **first task** for this exercise is to create a polynomial model of degree 2 using the average NDVI value. Is there an improvement on $R^2$? Can you also plot the corresponding fitting polynomial figure? In addition, we made a feed forward neural network using all the available features and evaluating the model on cv leaving out 10 sites. Your **second task** is to fit again a feed forward neural network but using more layers and/or neurons this time. You may want to add regularization methods (i.e dropout etc.) in order to avoid overfitting. Check the performance on cv leaving out 10 sites.
+
+**Tasks:**
+
+1. Fit a polynomial model of degree 2 using the average NDVI value as predictor in order to predict the GPP value. Compare the $R^2$ with the linear model.
+2. Plot the polynomial model.
+3. Create a feed forward neural network with more layers and/or neurons than the one made in class. Take care to avoid overfitting. Evaluate your results on cv leaving out 10 tower sites.

@@ -1,0 +1,688 @@
+# Catch-up {#ch-05}
+This chapter is a review of various applications and functions of the code we have covered so far.
+
+We'll start as always by loading all the necessary packages:
+```{r message=FALSE, warning=FALSE}
+list_pkgs <- c("tidyverse", "datasets", "stringr", "XML", "RCurl", "ggplot2", "rfishbase", "ggridges")
+new_pkgs <- list_pkgs[!(list_pkgs %in% installed.packages()[, "Package"])]
+if (length(new_pkgs) > 0) install.packages(new_pkgs)
+
+library("tidyverse")
+library("datasets")
+library("stringr")
+library("XML")
+library("RCurl")
+library("ggplot2")
+library("rfishbase")
+library("ggridges")
+```
+
+## Loops in R
+### Some simple examples
+```{r}
+# simple example with a for loop 
+## convert all the names to uppercase letters 
+names = c('Maria','Thomas','Andreas')
+#initialize uppercase names
+upper_names = rep(NA,length(names))
+
+for (i in 1:length(names)){
+    #convert to uppercase 
+    upper_name = toupper(names[i])
+    #add it to upper_names 
+    upper_names[i] = upper_name
+}
+
+upper_names
+
+```
+
+```{r}
+# equivalent operation with the lapply
+lapply(names,toupper)
+```
+
+```{r}
+# simple example with a while loop
+## calculate the sum of the values 
+values = c(2,4,6)
+
+#initialize index
+i <- 1
+
+#initialize sum
+sum <- 0
+ 
+while (i <= 3){# for as long as i is smaller or equal to 3, execute the code below
+   
+   # add the next value to the sum 
+   sum = sum + values[i]
+   
+   #update the index
+   i <- i+1 
+}
+#print the sum
+cat("Sum = ", sum)
+```
+
+**For loops with breaks:**
+```{r}
+## Print all the numbers until the number 10 appers. Then stop the loop
+values = c(3,1,5,18,10,12,13)
+
+for (i in 1:length(values)){
+    
+    #print value
+    cat(values[i],'\n')
+    
+    #check the printed number
+    if (values[i] == 10){
+        break # if the number is 10 stop the loop
+    }
+}
+```
+
+```{r}
+# while true loop
+## Print all the numbers until the number 10 appers. Then stop the loop
+values = c(3,1,5,18,10,12,13)
+
+#initialize index
+i <- 1
+
+while (TRUE){# It always gets inside and executes the code. The loop only stops when the break starement is encountered
+    
+    #print value
+    cat(values[i],'\n')
+    
+    #check the printed number
+    if (values[i] == 10){
+        break # if the number is 10 stop the loop
+    }
+    
+    #otherwise update the index and continue
+    i <- i + 1
+}
+
+```
+
+### Nested loops
+
+```{r}
+values <- matrix(c(1,2,3,4,5,6), nrow = 2 ,ncol = 3)
+values
+```
+
+```{r}
+# nested loops
+## find the sum of the values per column
+
+#initialize the sums of the columns to zero
+col_sum <- rep(0,ncol(values))
+
+#iterate over the columns
+for (j in 1:ncol(values)){ 
+    #iterate over the rows for each column
+    for (i in 1:nrow(values)){
+        #calculate the sum of the jth column by adding the values of each row (of the jth column)
+        col_sum[j] <- col_sum[j] + values[i,j]
+    }
+}
+col_sum
+```
+
+### Exercise
+Create a for loop program that estimates the sum of each row. However it has to take into account only the numbers that are greater than 2. If you get it right, you should come up with 3 for the first row and 15 for the second row.
+
+```{r}
+values <- matrix(c(3,4,1,5,2,6),nrow=2,ncol=3)
+values
+```
+
+## Functional programming using purr
+
+`purrr` [@R-purrr] is tidyverse's version of the base R's apply (lapply(), sapply(),..etc) functions for iterating over objects and lists. But `purrr` is a lot more powerful than that! While the main data-type used in dplyr is the data frame, for `purrr` it is lists. Let us look at a few map functions and how they can be used to replace apply functions / loops in R. For this we'll use the iris data set from the R package *datasets* [@R-datasets]. Then we look at nested data handling and a fairly realistic workflow. Splitting the data based on some column, fitting multiple models to each split, and extracting the R^2 for these models. Let us first load in the required libraries.
+
+```{r message=FALSE, warning=FALSE}
+library('tidyverse')
+library('datasets')
+data(iris)
+```
+
+```{r}
+# Let's define a vector with values from 1 to 10
+vector_1 <- c(1:10) 
+
+# Next we define a function to compute the square of a number
+square <- function(.x){
+  return (.x^2)
+}
+
+# What happens if we apply our function to vector_1? Of course, it squares every element!
+vector_1
+square(vector_1)
+```
+
+The same can be done using `map()` functions, as there is nothing wrong with them, but the output format we get, can become a little ambiguous (recall `sapply()`), and the function syntax can become a little inconsistent. The input to a map() function is either: list, vector, or a dataframe. For lists and vectors the iteration is carried over the elements of the list/vector. For dataframes, the iteration is carried over the columns of the dataframe. Here's a quick overview over the different functions with their outputs and object classes below as code. Note that `.x` stands for the input object and `.f` for the function that you want to apply:
+
+- `map(.x, .f)` is the main mapping function and returns a list
+- `map_df(.x, .f)` takes data frame as input and returns one
+- `map_dbl(.x, .f)` returns a numeric (double) vector
+- `map_chr(.x, .f)` returns a character vector
+- `map_lgl(.x, .f)` returns a logical vector
+
+```{r paged.print=TRUE}
+map(vector_1, square)
+map_df(as.data.frame(vector_1), square)
+map_dbl(vector_1, square)
+map_chr(vector_1, square)
+# map_lgl(vector_1, square) - useless because numbers except 1 and 0 cannot be turned into logic operators
+```
+
+### Shortcuts in a `purrr` function
+We can also define inline functions using the `~` syntax. This means that you can directly define a function that has to be applied to your input object(s) without having to define it separately. Note that this allows you to combine multiple input variables as you whish. For example, if you want to multiply `x` and `y`, you would define the function as `~(.x * .y)`. In the list below, the multiplication can be swapped arbitrarily and is thus any operation is generally referred to by using `operation`. Also note that for multiple inputs, you need to adjust the `map()` function to `map2()` or `pmap()` Play around with the codes below to get a feeling for this formulation! Here are some examples explained:
+
+- `~ operation .` becomes `function(x) x.`: map(input, ~ (2 + . )) adds 2 to every element in your input
+- `~ .x operation .y` becomes `function(x, y) .x .y.`: map2(input1, input2, ~ (.x + .y )) means every input1 element is added to the respective input2 element.
+- `~ ..1 operation ..2 operation ..etc` becomes `function(1, 2, etc)`:  pmap(list(input1, input2, input3), ~ (..3 + ..1 - ..2)) for example adds the first element in input1 to and subtracts the first element in input2 from the first element in input 3. The same is done for the second element of each input and so on. In other words the elements of the list or vector you give as input are paired up depending on their position. Note that `pmap()` requires a list for multiple inputs.
+
+```{r}
+vector_2 <- rep(5,10)       # Vector holding 10 elements which are a 5
+vector_3 <- seq(1, 10, 1)   # Vector holding elements from 1 to 10 with 1 as interval (same as vector_1)
+
+map_dbl(vector_1, ~ (.x^2)) # Does the same as above using our pre-defined square() function
+map_dbl(vector_1, ~ (.x + 1))
+map2_dbl(vector_1, vector_2, ~(.x * .y))
+pmap_dbl(list(vector_1, vector_2, vector_3), ~(..1*..2 + ..3))
+
+pmap_dbl(list(vector_1, vector_2, 1), ~(..1*..2 + ..3)) # What if vector_3 is a 1? It simply takes 1 for every operation!
+```
+
+### Workflow: nested data, map and mutate
+
+Now let us consider workflow with the iris dataset from R. We want to fit a linear model to predict the the `Sepal.length` as a function of all the other features in the dataset. But we want a different linear model for each type of species. This is pretty realistic as one would have different species to have different "models" for their sepal length. After loading the data, let us first group all the rows in our dataframe by the Species. Then we can use the `nest()` function, which gives us a nested dataframe for each unique entry in the grouping column. The code below walks you through every step to access the R^2^ values of different models and then in the end combines everything in one simple pipe. To have a in-depth look at these functionalities, look up the [purrr documentation](https://purrr.tidyverse.org/).
+
+```{r}
+df <- iris
+head(df)
+
+nested_iris <- iris %>% group_by(Species) %>% nest()
+nested_iris      # See that for every species there is a tibble defined 
+str(nested_iris) # Each of these tibbles holds information on the other 4 variables for this species
+
+map(nested_iris$data, dim) # Display the dimension of every data frame saved in nested_iris (50 entries for 4 features)
+
+# Let's use the nested data frame to create a data frame holding only the linear models:
+list_linear_models <- map(nested_iris$data,      # Give the list of data frames as input to map
+                          ~lm(Sepal.Length ~ .,  # For every data frame, create a linear model with lm() where 
+                                                 # Sepal.Length is the response and all other variables predictors
+                          data = .x))            # The data for each linear model is simply the input .x, i.e. the df
+
+list_linear_models %>% 
+  map(summary) %>%                               # Apply summary() on all linear models
+  map("r.squared")                               # Extract the r.squared value of each linear model
+
+# Now we know how to create these models, so let's add them as a variable to our nested data frame
+model_iris <- nested_iris %>% mutate(linear_model = map(data, ~lm(Sepal.Length~., data = .x))) # To add models
+model_iris <- model_iris %>% mutate(summary = map(linear_model, ~summary(.))) # To add summary of each model
+model_iris
+
+# Putting it all together and extracting the R^2 value for each linear model
+
+iris %>%                                                               # Use iris data frame
+  group_by(Species) %>%                                                # Select variable to group by 
+  nest() %>%                                                           # Create nested df by groups 
+  mutate(linear_model = map(data, ~lm(Sepal.Length~., data = .x))) %>% # Create lm for each group
+  mutate(summary = map(linear_model, ~summary(.))) %>%                 # Create summary for each group
+  mutate(rsq = map_dbl(summary, "r.squared")) %>%                      # Save r.squared from each lm as rsq
+  select(c(Species,rsq))                                               # Only pick Species and rsq to display
+
+```
+
+## String Manipulations
+### Introduction to strings
+
+The `stringr` package [@R-stringr] offers a set of very handy tools to work with strings. In this document, we will show you how to do some basic string manipulations with `stringr. Further useful sources are the [stringr cheathseet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf) and the Chapter 14 in the book [R for Data Science](https://r4ds.had.co.nz/strings.html).
+
+```{r}
+# Let's load the package and save two srings
+library(stringr)
+s1 <- "A1 BC23 DEF456"
+s2 <- c("A1","BC23","DEF456")
+
+# String lengths
+str_length(s1) # spacing counts 
+str_length(s2) # returns length of each string vector
+
+# Combining strings
+str_c("x", "y") 
+str_c('p',s2,'q') # works on each element of the string vector
+
+# Changing lower/upper case
+str_to_lower(s1)
+str_to_upper("paradox? is this now lower or upper case?")
+```
+
+`str_sub()` is inclusive - they include the characters at both start and end positions. For example, `str_sub(string, 1, -1)` will return the complete substring, from the first character to the last.
+```{r}
+str_sub(s1, 1, 6) # get a substing from 1st to 6th elements
+str_sub(s2, 1, 2) # get substings from 1st to 2nd elements
+
+str_sub(s1, 8)  # get a substring from 8th element onwards
+str_sub(s2, 2)  # get substrings from 2nd element onwards
+```
+
+`str_split(string, pattern,...)` allows to vectorise strings over pattern.
+
+```{r}
+str_split(s2, pattern = " ")
+
+fruits <- c(
+  "apples and oranges and pears and bananas",
+  "pineapples and mangos and guavas")
+
+str_split(fruits, pattern = " and ")
+```
+
+
+### Matching and extracting patterns
+`str_match(string, pattern,...)` returns the first pattern match found in each string, as a matrix with a column for each ( ) group in pattern.  `str_match_all()` returns all matched patterns. The pattern can be a substring from the strinh vectors, or can be a generalized pattern to detect for example certain sequences of alphabetic and numeric characters. Please refer to this [info page](https://stringr.tidyverse.org/articles/regular-expressions.html) for an introduction to pattern usages.
+
+```{r}
+# Detect certain patterns in a vector of characters
+str_detect(s1, 'A') # s1 is just one string!
+str_detect(s2, 'A') # s2 splitted s1 into three strings
+
+# Detect substring (pattern)
+pattern1 = "BC" # substring as a pattern
+str_match(s1, pattern1)
+
+pattern2 = "([[:alpha:]]+)([[:digit:]]+)" # pattern2 = alphabetic characters + digits
+str_match(s1, pattern2)
+str_match_all(s1, pattern2)
+```
+
+`str_extract(string, pattern,...)` returns the first pattern match found in each string, as a vector, `str_extract_all()` again returns all matched patterns.
+
+```{r}
+str_extract(s1, pattern2)
+str_extract_all(s1, pattern2)
+
+# an equivalent way using basic R:
+regmatches(s1, gregexpr(pattern2, s1)) 
+```
+
+`str_replace(string, pattern, replacement,...)` replaces matched patterns in a string. Alternatively, you can replace substrings by identifying the substrings with `str_sub()` and assigning into the results.
+
+```{r}
+str_replace_all(s1, " ", "-")
+str_sub(s1, 1, 2) <- "XX" # Replace the first two positions in s1
+s1
+```
+
+### Advanced example
+
+Now we look at a slightly more complicated example. First we give an introduction to some of the general patterns: 
+- `[a-z]`: matches every character between a and z (in Unicode code point order)
+- `[abc]`: matches a, b, or c.
+- `{n}`: exactly n matches
+
+If we look at the pattern defined by phone in the code below:
+1. `([2-9][0-9]{2})` means the 1st digit is between 2 and 9, and the 2nd and 3rd digits are both between 0 and 9.
+2. `[- .]` denotes the linkages are symbols, which is one of the 3: "-", " "(spacing) or ".".
+3. `([0-9]{3})` means the 4th to 6th digits are all between 0 and 9.
+4. `([0-9]{4})` means the last 4 digits are all between 0 and 9. 
+
+```{r}
+strings <- c(" 219 733 8965", "329-293-8753 ",
+             "239 923 8115 and 842 566 4692",
+             "Work: 579-499-7527",
+             "$1000",
+             "Home: 543.355.3679")
+
+phone <- "([2-9][0-9]{2})[- .]([0-9]{3})[- .]([0-9]{4})"
+
+str_extract_all(strings, phone)
+```
+
+## Web-scraping in a nut-shell
+In this session we review some important concepts from web scraping. We will extract the price category of the Coregonus lavaretus. We will do that first using the techniques from week 4 and then using the API `rfishbase.` The webpage FishBase for the Coregonus lavaretus contains information on its price category which we want to extract.
+
+Let us first load the packages. So the package xml is a tool that is used for Parsing and Generating XML Within R. This package contain many functions e.g. getHTMLLinks, getNodeSet, readHTMLTable etc. Whereas package RCurl is used to get General Network (HTTP/FTP/...) Client Interface for R. It is a wrapper for [libcurl](http://curl.haxx.se/libcurl/) and provides functions to compose general HTTP requests and provides convenient functions to fetch URIs, get & post forms, etc. and process the results returned by the Web server.
+
+```{r}
+library(XML)
+library(RCurl)
+```
+
+First, we save our fish species in the object x. Next, we use the function paste() to convert its arguments to character strings and concatenate them to get the link of the webpage from which we are going to extract the data. We concatenate the URL in order to get the webpage with the summary of the species Coregonus-lavaretus. We do not put any separation between the arguments, so we use sep = "".
+
+```{r}
+x <- "Coregonus-lavaretus"
+url <- paste("http://www.fishbase.de/summary/",x,".html",sep="")
+```
+
+We will now use the function getURLContent() to retrieve the source of a webpage, which is especially useful for retrieving pages for data processing. We will apply the function htmlParse() to obtain an R object and extract the div blocks. Now we are ready to get the price category of the Coregonus lavaretus. We will use the function xmlValue() to get the value at the node.
+
+```{r}
+c <- htmlParse(getURLContent(url, followlocation=TRUE))
+c_div <- getNodeSet(c, "//div ")
+values_nodes <- lapply(c_div,xmlValue)
+values_nodes
+```
+
+Next we look for the pattern "Price category" in the variable values_nodes. Then we look at which position we can find our information.
+
+```{r}
+values_pattern <- sapply(values_nodes, function(x){regexec(pattern="Price category", x)[[1]][1]})
+values_pattern
+
+w_Price <- which(values_pattern > 0)
+w_Price
+```
+
+Now we can look at the informations contained at the found positions. If w_Price is empty, then we set the price category as NA. Otherwise we get the value at the foud positions using the function xmlValue(). 
+
+```{r}
+if(length(w_Price)==0){
+  Price=NA
+} else {
+  d1_Price <- xmlValue(c_div[[w_Price[length(w_Price)]]])
+} 
+
+d1_Price
+
+```
+
+Next we can extract the relevant information from d1_price. We can use the function strsplit() to obtain the part of the string after ":". We need to take the second element in the first position in the list. We now use the function regmatches to extract matched substrings from match data obtained by gregexpr. We get a list with one element, so we can extract this element from the list. Now we use the function gregexpr() to search for alphabetic characters. We then use the function regmatches to extract matched substrings from match data obtained by gregexpr which gives a list with one element, so we can extract this element from the list.
+
+```{r}
+(int <- strsplit(d1_Price,":"))
+(int <- int[[1]][2])
+
+alph_char <- gregexpr(pattern= "[[:alpha:]]+",int) # find starting position and length of all matches
+
+(Price <- regmatches(int, alph_char))
+(Price <- Price[[1]])
+```
+
+Or alternatively to this entire web scraping part, we can directly use the `rfishbase` package [@R-rfishbase]:
+
+```{r message=FALSE, warning=FALSE}
+library(rfishbase)
+species("Coregonus lavaretus", "PriceCateg")
+```
+
+Using both the methods we can get the price category of the Coregonus lavaretus and it gives the same results. Using an API to fetch data from the web is very handy as we can see in the example above whereas web scraping is bit tideous.
+
+## Tidyverse's filter and select
+### Introduction
+
+Writing code is learning a language!
+- Learn the grammar of a function (i.e. sentence)
+- Learn how to connect functions
+- Learn how to express your thoughts
+- Learn how to get translations from the web (Google is your best friend!)
+
+Let's load `tidyverse` and have a look at the star wars data:
+
+```{r}
+library(tidyverse)
+
+dat <- starwars
+
+ncol(dat)         # Number of Columns
+nrow(dat)         # Number of Rows
+dim(dat)          # Dimension (Rows x Columns)
+
+colnames(dat)     # Look at variables in dat       in tidyverse: dat %>% names(.)
+head(dat)         # Look at top 6 entries of dat   in tidyverse: dat %>% head()
+tail(dat, 10)     # Look at last 10 entries of dat in tidyverse: dat %>% tail()
+tail(names(dat))  # Look at last 6 columns of dat  in tidyverse: dat %>% tail(names(.))
+ 
+dat$films[1]      # Accessing the entire list of the first entry
+dat$films[[1]]    # Accessing the entire list of the first entry
+dat$films[[1]][3] # Accessing the third object in the list of the first entry
+
+```
+
+### Select()
+
+`select()` is a straightforward to pick your varialbes (features) of interes. It can be used in various ways, even by adding functions and operators to its arguments.
+
+```{r}
+# When doing selections and filters: Always save your data frame using "<-"
+new_df <- dat %>% select(1:5)
+
+## Specific
+dat %>% select(1,2)                     # select by column number
+dat %>% select(2,1)                     # rearrange columns
+dat %>% select(name, height, starships) # select by names
+dat %>% select(H = height, N = name)    # renaming Variables
+
+# Backwards
+dat %>% select(tail(names(dat), 2))     # select the last two variables
+
+## Deletion
+dat %>% select(-name)                   # using a minus sign for deleting column name
+dat %>% select(-(1:4))                  # same as select((5:length(dat)))
+
+## Range
+dat %>% select(1:4)                     # 1:4 is a vector from 1 to 4
+dat %>% select(seq(1, length(dat), 2))  # seq() creates a sequence; selects every 2nd column
+
+```
+
+**Advanced:** Using selection helpers (additional functions). More examples can be found [here]( https://dplyr.tidyverse.org/reference/select.html).
+```{r}
+dat %>% select(where(is.numeric))
+
+dat %>% select(last_col(0:2))           # Last 3 columns
+dat %>% select(last_col(2:0))           # Careful last_col() inedexes last column as 0
+
+dat %>% select(starts_with("h"))        # Selects all variables that start with an "h"
+dat %>% select(ends_with("color"))      # Selects all variables that end with "color"
+dat %>% select(contains("_"))
+dat %>% select(matches("height"))       # Same as select(height)
+
+dat %>% select(-any_of(ends_with("color"))) # Delete any variables that end with "color". Note that any_of can only be used within select()!
+
+#  (Using conditions is rarely meaningful...)
+dat %>% select(1:4 | length(dat))           # Select columns one to for "or" the last one
+dat %>% select(1:4 & (starts_with("h")))    # Select cols 1:4 and all which start with "h"
+
+```
+
+**Sidenote on using slice():** slice() is similar to select() but less intuitive, thus better use filter()
+```{r}
+dat %>% slice(1)                # Select first entry
+dat %>% slice(1:10)             # Select top 10 entries
+dat %>% slice(nrow(dat))        # Select last entry
+dat %>% slice(-(1:nrow(dat)-1)) # Delete everything from 1 to second last entry
+```
+
+
+### Filter()
+`filter()` provides a quick tool to pick certain entries using functions and conditions.
+Here's a quick overview on math and logic operators:
+
+Math Operators     |   | Logic Operators |
+-------------------|---|-----------------|--------------------
+Equal              |== | a AND b         |a, b *(or a & b)*
+Not Equal          |!= | a OR b          |a \| b
+Bigger             |>  | EITHER a or b   |xor(a, b)
+Equal or Smaller   |>= | NOT a           |!a
+
+```{r paged.print=TRUE}
+
+# Reducing data for comprehensive output
+dat1 <- dat %>% select(1:8)
+
+# Numeric Criteria
+dat1 %>% filter(height > 100)                # Entries with height above 100
+dat1 %>% filter(height > 100 , mass > 125)   # Entries with height above 100 and mass above 125
+dat1 %>% filter(height > 100 & mass > 125)   # "
+
+dat1 %>% filter(mass >= 50 & mass <= 55)     # Entries with more than 50 and below 55 mass
+dat1 %>% filter(between(mass, 50, 55))       # "
+
+dat1 %>% filter(between(height, 85, 115))    # Entries with height between 85 and 115
+dat1 %>% filter(near(height, 100, 15))       # Entries with height 100 +/- 15 (same as line 106)
+
+# Character Criteria
+dat1 %>% filter(eye_color == "red")          # Entries with red eyes
+dat1 %>% filter(eye_color != "red")          # Entries without red eyes
+dat1 %>% filter(!(eye_color == "red"))       # Entries without red eyes
+
+# NA's
+dat1 %>% drop_na                             # Removes all entries with at least 1 NA
+
+# Pick values from a vector using %in%
+eyes <- c("red", "black", "none")                          # Defining vector with wanted eye colors
+dat1 %>% filter(eye_color %in% eyes)                       # Entries with wanted eye colors
+dat1 %>% filter(eye_color %in% eyes &  is.na(birth_year))  # Entries with wanted eye colors and missing birthdate
+
+# Negations
+dat1 %>% filter(!(eye_color %in% eyes))                    # No (!) entries with wanted eye colors
+dat1 %>% filter(eye_color %in% eyes & !is.na(birth_year))  # Entries with wanted eye colors but no missing birthdate
+
+dat1 %>% filter(is.na(sex))                             # Entries where sex is NA
+dat1 %>% filter(is.na(sex)) %>% nrow                    # Number of entries where sex is NA
+dat1 %>% filter(!is.na(sex) | !is.na(hair_color))       # Remove entries where sex or hair color is missing
+
+# Filter functions
+dat1 %>% top_n(3)  # Selects highest values of given number of numeric columns
+dat1 %>% top_n(-3) # Selects lowest values of given number of numeric columns
+
+dat1 %>% group_by(sex) %>% top_n(-1, birth_year)        # Give the youngest of each sex
+```
+
+Other useful filter functions: filter_if(), filter_at(). Examples can be found [here](https://suzan.rbind.io/2018/02/dplyr-tutorial-3/).
+
+### Exercises
+a. How many pale characters are there from planet Ryloth or Naboo?
+b. Who is the oldest of the tallest 5 characters?
+c. Who has the most starships?
+   
+   Hints: Try to Google: Unlist into new columns or check this stackoverflow [post](https://stackoverflow.com/questions/26194298/unlist-data-frame-column-preserving-information-from-other-column)
+d. Find name and starship of the smallest character in "Return of the Jedi"
+   
+   Hints: filter_at or this stackoverflow [post](https://stackoverflow.com/questions/26194298/unlist-data-frame-column-preserving-information-from-other-column)
+   
+   
+### Solutions
+```{r message=FALSE, warning=FALSE}
+# a.
+dat %>% filter(skin_color == "pale", homeworld == "Naboo" | homeworld == "Ryloth") %>% nrow      
+
+# b.
+dat1 %>% top_n(5, height) %>% top_n(1, birth_year)    
+
+# c.
+dat %>% unnest_wider(starships) %>% filter_at(vars(contains("...")), all_vars(!is.na(.)))  
+
+# d.
+dat %>% unnest(starships) %>% filter(films == "Return of the Jedi") %>% top_n(-1, height) %>% select(name, starships) 
+```
+
+
+## Preparing data for ggplot() 
+Here we will also use a new package `ggridges`[@R-ggridges], which allows you to make ridgeline plots with `ggplot2`.
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(ggridges)
+?pivot_longer
+```
+
+**Example 1:**
+```{r}
+
+head(iris)
+iris.long <- iris[,1:4] %>% 
+  pivot_longer(cols=1:4, 
+               names_to = "variable", 
+               values_to = "value")
+head(iris.long)
+iris.long %>% 
+  ggplot(aes(x = value, y = variable)) +
+  geom_density_ridges()
+```
+
+**Example 2:**
+```{r}
+head(relig_income)
+relig_income
+relig_income_long <- relig_income %>%
+  pivot_longer(-religion, names_to = "income", values_to = "count")
+relig_income_long %>% ggplot(aes(x = income, y = count)) +
+  geom_bar(stat="identity")+ 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+**Example 3:**
+```{r}
+df <- tibble(country=c('Afghanistan',
+                       'Brazil','China'),
+             '1999'=c(745,37737,212258),
+             '2000'=c(2666,80488,213768))
+df
+df_long <- df %>%
+  pivot_longer(-country, names_to="year", values_to = "cases")
+
+# equivalently:
+df_long <- df %>%
+  pivot_longer(c('1999','2000'), names_to="year", values_to = "cases")
+df_long
+df_long %>%  ggplot(aes(x = year, y = cases, shape= country, color=country)) +
+  geom_point(size=4)
+```
+
+## Base R functions
+
+```{r}
+## lapply 
+# returns a list of the same length as X, 
+?lapply
+head(iris)
+lapply(iris[,-5],mean) # exclude the Species column
+
+## sapply 
+# a user-friendly version and wrapper of lapply 
+# by default returning a vector, matrix 
+sapply(iris[,-5],mean)
+
+## substr()
+substr('APPLE',2,4)
+substr('AP PLE',2,4) # spacing counts
+
+## gregexpr()
+?gregexpr
+sequences<-c("ACATGTCATGTCC","CTTGTATGCTG")
+gregexpr("ATG",sequences)
+
+## regexec() and gregexpr()
+?regexec()
+pattern <- "([[:alpha:]]+)([[:digit:]]+)" 
+# alphabetic characters + digits
+
+######123456789
+s <- "Test: A1 BC23 DEF456"
+
+regexec(pattern,s)
+# only record the location of first match
+regmatches(s, regexec(pattern,s)) 
+# returns only the first match
+
+
+gregexpr(pattern, s) 
+# get the location of all matched substrings
+regmatches(s, gregexpr(pattern, s)) 
+# extract all matched substrings
+
+lapply(
+  regmatches(s, gregexpr(pattern, s)), # all matched strings
+       # get the matching substings and elements
+       function(e) regmatches(e, regexec(pattern, e))) 
+```
+

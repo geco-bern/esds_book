@@ -1,0 +1,76 @@
+--- 
+title: "Environmental Systems Data Science"
+author: "Loïc Pellissier, Joshua Payne, Benjamin Stocker"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+output:
+  bookdown::gitbook: default
+#  pdf_document:
+#    latex_engine: xelatex
+bibliography: [book.bib] # packages.bib
+biblio-style: apalike
+link-citations: true
+nocite: '@*'
+description: "Tutorial and exercises for Environmental System Data Science, ETH Zürich."
+---
+
+# Prerequisites {-}
+
+## Course Description {-}
+
+In a series of tutorials with code examples (R) from environmental systems and exercises, students are introduced to methods for implementing each step of a typical data science workflow - including data management, data processing, modelling, visualization and communication. The course enables students to plan their own data science project in their specialization and to acquire more domain-specific methods independently or in further courses.
+
+## Course Objectives {-}
+
+The students are able to
+
+- frame a data science problem and build a hypothesis
+- describe the steps of a typical data science project workflow
+- conduct selected steps of a workflow on specifically prepared datasets, with a focus on choosing, fitting and evaluating appropriate algorithms and models
+- critically think about the limits and implications of a method
+- visualise data and results throughout the workflow
+- access online resources to keep up with the latest data science methodology and deepen their understanding
+
+## Content {-}
+
+- The data science workflow
+- Access and handle (large) datasets
+- Prepare and clean data
+- Analysis: data exploratory steps
+- Analysis: machine learning and computational methods
+- Evaluate results and analyse uncertainty
+- Visualisation and communication
+
+## Useful Prerequisites {-}
+
+- 252-0840-02L Anwendungsnahes Programmieren mit Python
+- 401-0624-00L Mathematik IV: Statistik
+- 401-6215-00L Using R for Data Analysis and Graphics (Part I)
+- 401-6217-00L Using R for Data Analysis and Graphics (Part II)
+- 701-0105-00L Mathematik VI: Angewandte Statistik für Umweltnaturwissenschaften
+
+
+```{r include=FALSE}
+## Set-Up for bookdown build
+all_pkg <- c('base', 'bookdown', 'broom', 'caret', 'conflicted', 'datasets', 'dplyr', 'forcats', 'ggfortify', 'ggplot2', 'ggridges', 'graphics', 'grDevices', 'imputeTS', 'IRdisplay', 'keras', 'lattice', 'latticeExtra', 'leaps', 'lubridate', 'knitr', 'maptools', 'methods', 'Metrics', 'modelr', 'MODISTools', 'patchwork', 'pdp', 'pROC', 'purrr', 'raster', 'rasterVis', 'RColorBrewer', 'RCurl', 'readr', 'recipes', 'reticulate', 'rfishbase', 'rgbif', 'rgdal', 'rgeos', 'rjson', 'rmarkdown', 'rsample', 'sf', 'sp', 'spData', 'stats', 'stringr', 'tensorflow', 'terra', 'tibble', 'tidyr', 'tidyverse', 'utils', 'vip', 'visdat', 'XML', 'yardstick')
+
+# # Preferences for conflicting packages
+# conflict_prefer("select", "dplyr")
+# conflict_prefer("filter", "dplyr")
+# conflict_prefer("levelplot", "rasterVis")
+# conflict_prefer("origin", "raster")
+# conflict_prefer("extract", "raster")
+# conflict_prefer("partial", "pdp")
+# conflict_prefer("mse", "Metrics")
+# conflict_prefer("near", "dplyr")
+# conflict_prefer("resample", "raster")
+# conflict_prefer("train", "caret")
+
+# Write packages bibliography
+knitr::write_bib(all_pkg, "packages.bib")
+
+# Set global chunk options
+knitr::opts_chunk$set(out.width = "50%", fig.align = "center", warning = FALSE, message = FALSE)
+```
+

@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 8 Application 1: Variable selection | Environmental Systems Data Science</title>
+  <meta name="description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 8 Application 1: Variable selection | Environmental Systems Data Science" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 8 Application 1: Variable selection | Environmental Systems Data Science" />
+  
+  <meta name="twitter:description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  
+
+<meta name="author" content="Loïc Pellissier, Joshua Payne, Benjamin Stocker" />
+
+
+<meta name="date" content="2021-12-30" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="ch-07.html"/>
+<link rel="next" href="ch-09.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-description"><i class="fa fa-check"></i>Course Description</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-objectives"><i class="fa fa-check"></i>Course Objectives</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#content"><i class="fa fa-check"></i>Content</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#useful-prerequisites"><i class="fa fa-check"></i>Useful Prerequisites</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="ch-01.html"><a href="ch-01.html"><i class="fa fa-check"></i><b>1</b> Primers</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="ch-01.html"><a href="ch-01.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="ch-01.html"><a href="ch-01.html#key-points-from-the-lecture"><i class="fa fa-check"></i><b>1.1.1</b> Key Points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="ch-01.html"><a href="ch-01.html#tutorial"><i class="fa fa-check"></i><b>1.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="ch-01.html"><a href="ch-01.html#working-with-rstudio-on-renku"><i class="fa fa-check"></i><b>1.2.1</b> Working with RStudio on Renku</a></li>
+<li class="chapter" data-level="1.2.2" data-path="ch-01.html"><a href="ch-01.html#git"><i class="fa fa-check"></i><b>1.2.2</b> Git</a></li>
+<li class="chapter" data-level="1.2.3" data-path="ch-01.html"><a href="ch-01.html#libraries"><i class="fa fa-check"></i><b>1.2.3</b> Libraries</a></li>
+<li class="chapter" data-level="1.2.4" data-path="ch-01.html"><a href="ch-01.html#r-scripts"><i class="fa fa-check"></i><b>1.2.4</b> R scripts</a></li>
+<li class="chapter" data-level="1.2.5" data-path="ch-01.html"><a href="ch-01.html#rmarkdown"><i class="fa fa-check"></i><b>1.2.5</b> RMarkdown</a></li>
+<li class="chapter" data-level="1.2.6" data-path="ch-01.html"><a href="ch-01.html#functions"><i class="fa fa-check"></i><b>1.2.6</b> Functions</a></li>
+<li class="chapter" data-level="1.2.7" data-path="ch-01.html"><a href="ch-01.html#tidy-data"><i class="fa fa-check"></i><b>1.2.7</b> Tidy data</a></li>
+<li class="chapter" data-level="1.2.8" data-path="ch-01.html"><a href="ch-01.html#r-projects"><i class="fa fa-check"></i><b>1.2.8</b> R projects</a></li>
+<li class="chapter" data-level="1.2.9" data-path="ch-01.html"><a href="ch-01.html#working-with-data-frames"><i class="fa fa-check"></i><b>1.2.9</b> Working with data frames</a></li>
+<li class="chapter" data-level="1.2.10" data-path="ch-01.html"><a href="ch-01.html#r-objects"><i class="fa fa-check"></i><b>1.2.10</b> R objects</a></li>
+<li class="chapter" data-level="1.2.11" data-path="ch-01.html"><a href="ch-01.html#data-visualisation"><i class="fa fa-check"></i><b>1.2.11</b> Data visualisation</a></li>
+<li class="chapter" data-level="1.2.12" data-path="ch-01.html"><a href="ch-01.html#conditionals"><i class="fa fa-check"></i><b>1.2.12</b> Conditionals</a></li>
+<li class="chapter" data-level="1.2.13" data-path="ch-01.html"><a href="ch-01.html#loops"><i class="fa fa-check"></i><b>1.2.13</b> Loops</a></li>
+<li class="chapter" data-level="1.2.14" data-path="ch-01.html"><a href="ch-01.html#where-to-find-help"><i class="fa fa-check"></i><b>1.2.14</b> Where to find help</a></li>
+<li class="chapter" data-level="1.2.15" data-path="ch-01.html"><a href="ch-01.html#key-points-from-the-tutorial"><i class="fa fa-check"></i><b>1.2.15</b> Key points from the tutorial</a></li>
+<li class="chapter" data-level="1.2.16" data-path="ch-01.html"><a href="ch-01.html#further-reading"><i class="fa fa-check"></i><b>1.2.16</b> Further reading</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="ch-01.html"><a href="ch-01.html#exercise"><i class="fa fa-check"></i><b>1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="ch-02.html"><a href="ch-02.html"><i class="fa fa-check"></i><b>2</b> Data wrangling</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="ch-02.html"><a href="ch-02.html#introduction-1"><i class="fa fa-check"></i><b>2.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="ch-02.html"><a href="ch-02.html#learning-objectives"><i class="fa fa-check"></i><b>2.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="2.1.2" data-path="ch-02.html"><a href="ch-02.html#key-points-from-the-lecture-1"><i class="fa fa-check"></i><b>2.1.2</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="ch-02.html"><a href="ch-02.html#tutorial-1"><i class="fa fa-check"></i><b>2.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="ch-02.html"><a href="ch-02.html#libraries-1"><i class="fa fa-check"></i><b>2.2.1</b> Libraries</a></li>
+<li class="chapter" data-level="2.2.2" data-path="ch-02.html"><a href="ch-02.html#variables-in-a-data-frame"><i class="fa fa-check"></i><b>2.2.2</b> Variables in a data frame</a></li>
+<li class="chapter" data-level="2.2.3" data-path="ch-02.html"><a href="ch-02.html#time-objects"><i class="fa fa-check"></i><b>2.2.3</b> Time objects</a></li>
+<li class="chapter" data-level="2.2.4" data-path="ch-02.html"><a href="ch-02.html#variable-re--definition"><i class="fa fa-check"></i><b>2.2.4</b> Variable (re-) definition</a></li>
+<li class="chapter" data-level="2.2.5" data-path="ch-02.html"><a href="ch-02.html#selecting-cleaning-and-gap-filling"><i class="fa fa-check"></i><b>2.2.5</b> Selecting, cleaning and gap-filling</a></li>
+<li class="chapter" data-level="2.2.6" data-path="ch-02.html"><a href="ch-02.html#functions-1"><i class="fa fa-check"></i><b>2.2.6</b> Functions</a></li>
+<li class="chapter" data-level="2.2.7" data-path="ch-02.html"><a href="ch-02.html#data-overview"><i class="fa fa-check"></i><b>2.2.7</b> Data overview</a></li>
+<li class="chapter" data-level="2.2.8" data-path="ch-02.html"><a href="ch-02.html#data-visualisation-i"><i class="fa fa-check"></i><b>2.2.8</b> Data visualisation I</a></li>
+<li class="chapter" data-level="2.2.9" data-path="ch-02.html"><a href="ch-02.html#aggregating"><i class="fa fa-check"></i><b>2.2.9</b> Aggregating</a></li>
+<li class="chapter" data-level="2.2.10" data-path="ch-02.html"><a href="ch-02.html#data-visualisation-ii"><i class="fa fa-check"></i><b>2.2.10</b> Data visualisation II</a></li>
+<li class="chapter" data-level="2.2.11" data-path="ch-02.html"><a href="ch-02.html#functional-programming-i"><i class="fa fa-check"></i><b>2.2.11</b> Functional programming I</a></li>
+<li class="chapter" data-level="2.2.12" data-path="ch-02.html"><a href="ch-02.html#strings"><i class="fa fa-check"></i><b>2.2.12</b> Strings</a></li>
+<li class="chapter" data-level="2.2.13" data-path="ch-02.html"><a href="ch-02.html#combining-relational-data"><i class="fa fa-check"></i><b>2.2.13</b> Combining relational data</a></li>
+<li class="chapter" data-level="2.2.14" data-path="ch-02.html"><a href="ch-02.html#key-points-from-the-tutorial-1"><i class="fa fa-check"></i><b>2.2.14</b> Key points from the tutorial</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="ch-02.html"><a href="ch-02.html#exercise-1"><i class="fa fa-check"></i><b>2.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="ch-03.html"><a href="ch-03.html"><i class="fa fa-check"></i><b>3</b> Data variety</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="ch-03.html"><a href="ch-03.html#introduction-2"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="ch-03.html"><a href="ch-03.html#overview"><i class="fa fa-check"></i><b>3.1.1</b> Overview</a></li>
+<li class="chapter" data-level="3.1.2" data-path="ch-03.html"><a href="ch-03.html#learning-objectives-1"><i class="fa fa-check"></i><b>3.1.2</b> Learning objectives</a></li>
+<li class="chapter" data-level="3.1.3" data-path="ch-03.html"><a href="ch-03.html#key-points-from-the-lecture-2"><i class="fa fa-check"></i><b>3.1.3</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="ch-03.html"><a href="ch-03.html#tutorial-2"><i class="fa fa-check"></i><b>3.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="ch-03.html"><a href="ch-03.html#overview-1"><i class="fa fa-check"></i><b>3.2.1</b> Overview</a></li>
+<li class="chapter" data-level="3.2.2" data-path="ch-03.html"><a href="ch-03.html#modis-remote-download"><i class="fa fa-check"></i><b>3.2.2</b> MODIS remote download</a></li>
+<li class="chapter" data-level="3.2.3" data-path="ch-03.html"><a href="ch-03.html#points-on-the-globe"><i class="fa fa-check"></i><b>3.2.3</b> Points on the globe</a></li>
+<li class="chapter" data-level="3.2.4" data-path="ch-03.html"><a href="ch-03.html#shapefiles"><i class="fa fa-check"></i><b>3.2.4</b> Shapefiles</a></li>
+<li class="chapter" data-level="3.2.5" data-path="ch-03.html"><a href="ch-03.html#rasters"><i class="fa fa-check"></i><b>3.2.5</b> Rasters</a></li>
+<li class="chapter" data-level="3.2.6" data-path="ch-03.html"><a href="ch-03.html#key-points-from-the-tutorial-2"><i class="fa fa-check"></i><b>3.2.6</b> Key points from the tutorial</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="ch-03.html"><a href="ch-03.html#exercise-2"><i class="fa fa-check"></i><b>3.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="ch-04.html"><a href="ch-04.html"><i class="fa fa-check"></i><b>4</b> Data Scraping</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="ch-04.html"><a href="ch-04.html#introduction-3"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="ch-04.html"><a href="ch-04.html#key-points-from-the-lecture-3"><i class="fa fa-check"></i><b>4.1.1</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="ch-04.html"><a href="ch-04.html#tutorial-3"><i class="fa fa-check"></i><b>4.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="ch-04.html"><a href="ch-04.html#r-packages-and-functions"><i class="fa fa-check"></i><b>4.2.1</b> R-Packages and Functions</a></li>
+<li class="chapter" data-level="4.2.2" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-website"><i class="fa fa-check"></i><b>4.2.2</b> The FishBase website</a></li>
+<li class="chapter" data-level="4.2.3" data-path="ch-04.html"><a href="ch-04.html#accessing-fishbase"><i class="fa fa-check"></i><b>4.2.3</b> Accessing FishBase</a></li>
+<li class="chapter" data-level="4.2.4" data-path="ch-04.html"><a href="ch-04.html#scraping-numbers"><i class="fa fa-check"></i><b>4.2.4</b> Scraping Numbers</a></li>
+<li class="chapter" data-level="4.2.5" data-path="ch-04.html"><a href="ch-04.html#scraping-text-snippetrs"><i class="fa fa-check"></i><b>4.2.5</b> Scraping Text Snippetrs</a></li>
+<li class="chapter" data-level="4.2.6" data-path="ch-04.html"><a href="ch-04.html#scraping-tables"><i class="fa fa-check"></i><b>4.2.6</b> Scraping Tables</a></li>
+<li class="chapter" data-level="4.2.7" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-package"><i class="fa fa-check"></i><b>4.2.7</b> The Fishbase Package</a></li>
+<li class="chapter" data-level="4.2.8" data-path="ch-04.html"><a href="ch-04.html#summary"><i class="fa fa-check"></i><b>4.2.8</b> Summary</a></li>
+<li class="chapter" data-level="4.2.9" data-path="ch-04.html"><a href="ch-04.html#case-study"><i class="fa fa-check"></i><b>4.2.9</b> Case Study</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="ch-04.html"><a href="ch-04.html#exercise-3"><i class="fa fa-check"></i><b>4.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="ch-05.html"><a href="ch-05.html"><i class="fa fa-check"></i><b>5</b> Catch-up</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="ch-05.html"><a href="ch-05.html#loops-in-r"><i class="fa fa-check"></i><b>5.1</b> Loops in R</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="ch-05.html"><a href="ch-05.html#some-simple-examples"><i class="fa fa-check"></i><b>5.1.1</b> Some simple examples</a></li>
+<li class="chapter" data-level="5.1.2" data-path="ch-05.html"><a href="ch-05.html#nested-loops"><i class="fa fa-check"></i><b>5.1.2</b> Nested loops</a></li>
+<li class="chapter" data-level="5.1.3" data-path="ch-05.html"><a href="ch-05.html#exercise-4"><i class="fa fa-check"></i><b>5.1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="ch-05.html"><a href="ch-05.html#functional-programming-using-purr"><i class="fa fa-check"></i><b>5.2</b> Functional programming using purr</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="ch-05.html"><a href="ch-05.html#shortcuts-in-a-purrr-function"><i class="fa fa-check"></i><b>5.2.1</b> Shortcuts in a <code>purrr</code> function</a></li>
+<li class="chapter" data-level="5.2.2" data-path="ch-05.html"><a href="ch-05.html#workflow-nested-data-map-and-mutate"><i class="fa fa-check"></i><b>5.2.2</b> Workflow: nested data, map and mutate</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="ch-05.html"><a href="ch-05.html#string-manipulations"><i class="fa fa-check"></i><b>5.3</b> String Manipulations</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="ch-05.html"><a href="ch-05.html#introduction-to-strings"><i class="fa fa-check"></i><b>5.3.1</b> Introduction to strings</a></li>
+<li class="chapter" data-level="5.3.2" data-path="ch-05.html"><a href="ch-05.html#matching-and-extracting-patterns"><i class="fa fa-check"></i><b>5.3.2</b> Matching and extracting patterns</a></li>
+<li class="chapter" data-level="5.3.3" data-path="ch-05.html"><a href="ch-05.html#advanced-example"><i class="fa fa-check"></i><b>5.3.3</b> Advanced example</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="ch-05.html"><a href="ch-05.html#web-scraping-in-a-nut-shell"><i class="fa fa-check"></i><b>5.4</b> Web-scraping in a nut-shell</a></li>
+<li class="chapter" data-level="5.5" data-path="ch-05.html"><a href="ch-05.html#tidyverses-filter-and-select"><i class="fa fa-check"></i><b>5.5</b> Tidyverse’s filter and select</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="ch-05.html"><a href="ch-05.html#introduction-4"><i class="fa fa-check"></i><b>5.5.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.5.2" data-path="ch-05.html"><a href="ch-05.html#select"><i class="fa fa-check"></i><b>5.5.2</b> Select()</a></li>
+<li class="chapter" data-level="5.5.3" data-path="ch-05.html"><a href="ch-05.html#filter"><i class="fa fa-check"></i><b>5.5.3</b> Filter()</a></li>
+<li class="chapter" data-level="5.5.4" data-path="ch-05.html"><a href="ch-05.html#exercises"><i class="fa fa-check"></i><b>5.5.4</b> Exercises</a></li>
+<li class="chapter" data-level="5.5.5" data-path="ch-05.html"><a href="ch-05.html#solutions"><i class="fa fa-check"></i><b>5.5.5</b> Solutions</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="ch-05.html"><a href="ch-05.html#preparing-data-for-ggplot"><i class="fa fa-check"></i><b>5.6</b> Preparing data for ggplot()</a></li>
+<li class="chapter" data-level="5.7" data-path="ch-05.html"><a href="ch-05.html#base-r-functions"><i class="fa fa-check"></i><b>5.7</b> Base R functions</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="ch-06.html"><a href="ch-06.html"><i class="fa fa-check"></i><b>6</b> Supervised Machine Learning I</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="ch-06.html"><a href="ch-06.html#introduction-5"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="ch-06.html"><a href="ch-06.html#learning-objectives-2"><i class="fa fa-check"></i><b>6.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="6.1.2" data-path="ch-06.html"><a href="ch-06.html#important-points-from-the-lecture"><i class="fa fa-check"></i><b>6.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="ch-06.html"><a href="ch-06.html#tutorial-4"><i class="fa fa-check"></i><b>6.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="ch-06.html"><a href="ch-06.html#overfitting"><i class="fa fa-check"></i><b>6.2.1</b> Overfitting</a></li>
+<li class="chapter" data-level="6.2.2" data-path="ch-06.html"><a href="ch-06.html#motivation"><i class="fa fa-check"></i><b>6.2.2</b> Modelling challenge</a></li>
+<li class="chapter" data-level="6.2.3" data-path="ch-06.html"><a href="ch-06.html#a-selection-of-model-types"><i class="fa fa-check"></i><b>6.2.3</b> A selection of model types</a></li>
+<li class="chapter" data-level="6.2.4" data-path="ch-06.html"><a href="ch-06.html#data-splitting"><i class="fa fa-check"></i><b>6.2.4</b> Data splitting</a></li>
+<li class="chapter" data-level="6.2.5" data-path="ch-06.html"><a href="ch-06.html#preprocessing"><i class="fa fa-check"></i><b>6.2.5</b> Pre-processing</a></li>
+<li class="chapter" data-level="6.2.6" data-path="ch-06.html"><a href="ch-06.html#model-formulation"><i class="fa fa-check"></i><b>6.2.6</b> Model formulation</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="ch-06.html"><a href="ch-06.html#exercise-5"><i class="fa fa-check"></i><b>6.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="ch-06.html"><a href="ch-06.html#reading-and-cleaning"><i class="fa fa-check"></i><b>6.3.1</b> Reading and cleaning</a></li>
+<li class="chapter" data-level="6.3.2" data-path="ch-06.html"><a href="ch-06.html#data-splitting-1"><i class="fa fa-check"></i><b>6.3.2</b> Data splitting</a></li>
+<li class="chapter" data-level="6.3.3" data-path="ch-06.html"><a href="ch-06.html#linear-model"><i class="fa fa-check"></i><b>6.3.3</b> Linear model</a></li>
+<li class="chapter" data-level="6.3.4" data-path="ch-06.html"><a href="ch-06.html#pre-processing"><i class="fa fa-check"></i><b>6.3.4</b> Pre-processing</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="ch-07.html"><a href="ch-07.html"><i class="fa fa-check"></i><b>7</b> Supervised Machine Learning II</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="ch-07.html"><a href="ch-07.html#introduction-6"><i class="fa fa-check"></i><b>7.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="ch-07.html"><a href="ch-07.html#learning-objectives-3"><i class="fa fa-check"></i><b>7.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="7.1.2" data-path="ch-07.html"><a href="ch-07.html#key-points-from-the-lecture-4"><i class="fa fa-check"></i><b>7.1.2</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="ch-07.html"><a href="ch-07.html#tutorial-5"><i class="fa fa-check"></i><b>7.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="ch-07.html"><a href="ch-07.html#model-formulation-using-train"><i class="fa fa-check"></i><b>7.2.1</b> Model formulation using <code>train()</code></a></li>
+<li class="chapter" data-level="7.2.2" data-path="ch-07.html"><a href="ch-07.html#model-training"><i class="fa fa-check"></i><b>7.2.2</b> Model training</a></li>
+<li class="chapter" data-level="7.2.3" data-path="ch-07.html"><a href="ch-07.html#model-evaluation"><i class="fa fa-check"></i><b>7.2.3</b> Model evaluation</a></li>
+<li class="chapter" data-level="7.2.4" data-path="ch-07.html"><a href="ch-07.html#bonus-model-interpretation"><i class="fa fa-check"></i><b>7.2.4</b> Bonus: Model interpretation</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="ch-07.html"><a href="ch-07.html#exercise-6"><i class="fa fa-check"></i><b>7.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="ch-07.html"><a href="ch-07.html#setup"><i class="fa fa-check"></i><b>7.3.1</b> Setup</a></li>
+<li class="chapter" data-level="7.3.2" data-path="ch-07.html"><a href="ch-07.html#linear-model-1"><i class="fa fa-check"></i><b>7.3.2</b> Linear Model</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="ch-07.html"><a href="ch-07.html#knn"><i class="fa fa-check"></i><b>7.4</b> KNN</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="ch-07.html"><a href="ch-07.html#check-data"><i class="fa fa-check"></i><b>7.4.1</b> Check data</a></li>
+<li class="chapter" data-level="7.4.2" data-path="ch-07.html"><a href="ch-07.html#training-1"><i class="fa fa-check"></i><b>7.4.2</b> Training</a></li>
+<li class="chapter" data-level="7.4.3" data-path="ch-07.html"><a href="ch-07.html#prediction-1"><i class="fa fa-check"></i><b>7.4.3</b> Prediction</a></li>
+<li class="chapter" data-level="7.4.4" data-path="ch-07.html"><a href="ch-07.html#sample-hyperparameters"><i class="fa fa-check"></i><b>7.4.4</b> Sample hyperparameters</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="ch-07.html"><a href="ch-07.html#random-forest-1"><i class="fa fa-check"></i><b>7.5</b> Random forest</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="ch-07.html"><a href="ch-07.html#training-2"><i class="fa fa-check"></i><b>7.5.1</b> Training</a></li>
+<li class="chapter" data-level="7.5.2" data-path="ch-07.html"><a href="ch-07.html#prediction-2"><i class="fa fa-check"></i><b>7.5.2</b> Prediction</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="ch-08.html"><a href="ch-08.html"><i class="fa fa-check"></i><b>8</b> Application 1: Variable selection</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="ch-08.html"><a href="ch-08.html#introduction-7"><i class="fa fa-check"></i><b>8.1</b> Introduction</a></li>
+<li class="chapter" data-level="8.2" data-path="ch-08.html"><a href="ch-08.html#application"><i class="fa fa-check"></i><b>8.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="ch-08.html"><a href="ch-08.html#warm-up-1-nested-for-loop"><i class="fa fa-check"></i><b>8.2.1</b> Warm-up 1: Nested for-loop</a></li>
+<li class="chapter" data-level="8.2.2" data-path="ch-08.html"><a href="ch-08.html#warm-up-2-find-the-best-single-predictor"><i class="fa fa-check"></i><b>8.2.2</b> Warm-up 2: Find the best single predictor</a></li>
+<li class="chapter" data-level="8.2.3" data-path="ch-08.html"><a href="ch-08.html#full-stepwise-regression"><i class="fa fa-check"></i><b>8.2.3</b> Full stepwise regression</a></li>
+<li class="chapter" data-level="8.2.4" data-path="ch-08.html"><a href="ch-08.html#bonus-stepwise-regression-out-of-the-box"><i class="fa fa-check"></i><b>8.2.4</b> Bonus: Stepwise regression out-of-the-box</a></li>
+<li class="chapter" data-level="8.2.5" data-path="ch-08.html"><a href="ch-08.html#bonus-best-subset-selection---not-included-in-application-for-students-too-long"><i class="fa fa-check"></i><b>8.2.5</b> Bonus: Best Subset Selection - Not included in application for students (too long…)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="ch-09.html"><a href="ch-09.html"><i class="fa fa-check"></i><b>9</b> Supervised Neural Networks I</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ch-09.html"><a href="ch-09.html#introduction-8"><i class="fa fa-check"></i><b>9.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ch-09.html"><a href="ch-09.html#learning-objectives-4"><i class="fa fa-check"></i><b>9.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="9.1.2" data-path="ch-09.html"><a href="ch-09.html#important-points-from-the-lecture-1"><i class="fa fa-check"></i><b>9.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="ch-09.html"><a href="ch-09.html#tutorial-6"><i class="fa fa-check"></i><b>9.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="ch-09.html"><a href="ch-09.html#set-up"><i class="fa fa-check"></i><b>9.2.1</b> Set-up</a></li>
+<li class="chapter" data-level="9.2.2" data-path="ch-09.html"><a href="ch-09.html#keras-for-linear-models"><i class="fa fa-check"></i><b>9.2.2</b> Keras for linear models</a></li>
+<li class="chapter" data-level="9.2.3" data-path="ch-09.html"><a href="ch-09.html#tuning-learning-rate"><i class="fa fa-check"></i><b>9.2.3</b> Tuning learning rate</a></li>
+<li class="chapter" data-level="9.2.4" data-path="ch-09.html"><a href="ch-09.html#logistic-regression"><i class="fa fa-check"></i><b>9.2.4</b> Logistic Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="ch-09.html"><a href="ch-09.html#exercise-7"><i class="fa fa-check"></i><b>9.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ch-10.html"><a href="ch-10.html"><i class="fa fa-check"></i><b>10</b> Supervised Neural Networks II</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ch-10.html"><a href="ch-10.html#introduction-9"><i class="fa fa-check"></i><b>10.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="10.1.1" data-path="ch-10.html"><a href="ch-10.html#learning-objectives-5"><i class="fa fa-check"></i><b>10.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="10.1.2" data-path="ch-10.html"><a href="ch-10.html#important-points-from-the-lecture-2"><i class="fa fa-check"></i><b>10.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="ch-10.html"><a href="ch-10.html#tutorial-7"><i class="fa fa-check"></i><b>10.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="ch-10.html"><a href="ch-10.html#import-libraries-1"><i class="fa fa-check"></i><b>10.2.1</b> Import libraries</a></li>
+<li class="chapter" data-level="10.2.2" data-path="ch-10.html"><a href="ch-10.html#construct-a-toy-dataset"><i class="fa fa-check"></i><b>10.2.2</b> Construct a toy dataset</a></li>
+<li class="chapter" data-level="10.2.3" data-path="ch-10.html"><a href="ch-10.html#build-and-train-nn"><i class="fa fa-check"></i><b>10.2.3</b> Build and train NN</a></li>
+<li class="chapter" data-level="10.2.4" data-path="ch-10.html"><a href="ch-10.html#model-performance"><i class="fa fa-check"></i><b>10.2.4</b> Model performance</a></li>
+<li class="chapter" data-level="10.2.5" data-path="ch-10.html"><a href="ch-10.html#influence-of-nn-architecture"><i class="fa fa-check"></i><b>10.2.5</b> Influence of NN architecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="ch-10.html"><a href="ch-10.html#exercise-8"><i class="fa fa-check"></i><b>10.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="ch-11.html"><a href="ch-11.html"><i class="fa fa-check"></i><b>11</b> Application 2: Neural Networks and Hyperparameter Tuning</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="ch-11.html"><a href="ch-11.html#introduction-10"><i class="fa fa-check"></i><b>11.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="ch-11.html"><a href="ch-11.html#learning-goals"><i class="fa fa-check"></i><b>11.1.1</b> Learning Goals</a></li>
+<li class="chapter" data-level="11.1.2" data-path="ch-11.html"><a href="ch-11.html#key-points-from-previous-lectures"><i class="fa fa-check"></i><b>11.1.2</b> Key Points from Previous Lectures</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="ch-11.html"><a href="ch-11.html#application-1"><i class="fa fa-check"></i><b>11.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="ch-11.html"><a href="ch-11.html#problem-statement"><i class="fa fa-check"></i><b>11.2.1</b> Problem Statement</a></li>
+<li class="chapter" data-level="11.2.2" data-path="ch-11.html"><a href="ch-11.html#data-preparation"><i class="fa fa-check"></i><b>11.2.2</b> Data preparation</a></li>
+<li class="chapter" data-level="11.2.3" data-path="ch-11.html"><a href="ch-11.html#center-and-scale"><i class="fa fa-check"></i><b>11.2.3</b> Center and scale</a></li>
+<li class="chapter" data-level="11.2.4" data-path="ch-11.html"><a href="ch-11.html#building-a-simple-model-with-keras-subtask-1"><i class="fa fa-check"></i><b>11.2.4</b> Building a simple model with keras ( SubTask 1)</a></li>
+<li class="chapter" data-level="11.2.5" data-path="ch-11.html"><a href="ch-11.html#cross-validation"><i class="fa fa-check"></i><b>11.2.5</b> Cross validation</a></li>
+<li class="chapter" data-level="11.2.6" data-path="ch-11.html"><a href="ch-11.html#parameter-tuning"><i class="fa fa-check"></i><b>11.2.6</b> Parameter Tuning</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="ch-12.html"><a href="ch-12.html"><i class="fa fa-check"></i><b>12</b> Supervised Deep Learning I</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="ch-12.html"><a href="ch-12.html#introduction-11"><i class="fa fa-check"></i><b>12.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="12.1.1" data-path="ch-12.html"><a href="ch-12.html#learning-objectives-6"><i class="fa fa-check"></i><b>12.1.1</b> Learning objectives</a></li>
+</ul></li>
+<li class="chapter" data-level="12.2" data-path="ch-12.html"><a href="ch-12.html#tutorial-8"><i class="fa fa-check"></i><b>12.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="ch-12.html"><a href="ch-12.html#building-blocks-of-cnns"><i class="fa fa-check"></i><b>12.2.1</b> Building Blocks of CNNs</a></li>
+<li class="chapter" data-level="12.2.2" data-path="ch-12.html"><a href="ch-12.html#build-the-model"><i class="fa fa-check"></i><b>12.2.2</b> Build the model</a></li>
+<li class="chapter" data-level="12.2.3" data-path="ch-12.html"><a href="ch-12.html#compile-and-train-the-model"><i class="fa fa-check"></i><b>12.2.3</b> Compile and train the model</a></li>
+<li class="chapter" data-level="12.2.4" data-path="ch-12.html"><a href="ch-12.html#reduce-overfitting"><i class="fa fa-check"></i><b>12.2.4</b> Reduce Overfitting</a></li>
+<li class="chapter" data-level="12.2.5" data-path="ch-12.html"><a href="ch-12.html#visualizing-a-cnn"><i class="fa fa-check"></i><b>12.2.5</b> Visualizing a CNN</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="ch-12.html"><a href="ch-12.html#exercise-9"><i class="fa fa-check"></i><b>12.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="ch-12.html"><a href="ch-12.html#import-libraries-and-data"><i class="fa fa-check"></i><b>12.3.1</b> Import libraries and data</a></li>
+<li class="chapter" data-level="12.3.2" data-path="ch-12.html"><a href="ch-12.html#tasks"><i class="fa fa-check"></i><b>12.3.2</b> Tasks</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="ch-13.html"><a href="ch-13.html"><i class="fa fa-check"></i><b>13</b> Supervised Deep Learning II - <em>A Scenario of Environmental Systems</em></a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="ch-13.html"><a href="ch-13.html#introduction-12"><i class="fa fa-check"></i><b>13.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="13.1.1" data-path="ch-13.html"><a href="ch-13.html#learning-objectives-7"><i class="fa fa-check"></i><b>13.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="13.1.2" data-path="ch-13.html"><a href="ch-13.html#content-operations"><i class="fa fa-check"></i><b>13.1.2</b> Content &amp; Operations</a></li>
+</ul></li>
+<li class="chapter" data-level="13.2" data-path="ch-13.html"><a href="ch-13.html#tutorial-9"><i class="fa fa-check"></i><b>13.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="13.2.1" data-path="ch-13.html"><a href="ch-13.html#description-of-the-modelling-task"><i class="fa fa-check"></i><b>13.2.1</b> Description of the modelling task</a></li>
+<li class="chapter" data-level="13.2.2" data-path="ch-13.html"><a href="ch-13.html#goal-of-the-tutorial"><i class="fa fa-check"></i><b>13.2.2</b> Goal of the tutorial</a></li>
+<li class="chapter" data-level="13.2.3" data-path="ch-13.html"><a href="ch-13.html#dataset"><i class="fa fa-check"></i><b>13.2.3</b> Dataset</a></li>
+<li class="chapter" data-level="13.2.4" data-path="ch-13.html"><a href="ch-13.html#lets-dive-into-the-code"><i class="fa fa-check"></i><b>13.2.4</b> Let’s dive into the code</a></li>
+<li class="chapter" data-level="13.2.5" data-path="ch-13.html"><a href="ch-13.html#read-in-the-data"><i class="fa fa-check"></i><b>13.2.5</b> Read in the Data</a></li>
+<li class="chapter" data-level="13.2.6" data-path="ch-13.html"><a href="ch-13.html#naive-models-old-world-linear-models"><i class="fa fa-check"></i><b>13.2.6</b> Naive models (Old World): Linear Models</a></li>
+<li class="chapter" data-level="13.2.7" data-path="ch-13.html"><a href="ch-13.html#neural-networks-new-world"><i class="fa fa-check"></i><b>13.2.7</b> Neural Networks (New World)</a></li>
+<li class="chapter" data-level="13.2.8" data-path="ch-13.html"><a href="ch-13.html#convolutional-neural-network"><i class="fa fa-check"></i><b>13.2.8</b> Convolutional Neural Network</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="ch-13.html"><a href="ch-13.html#exercise-10"><i class="fa fa-check"></i><b>13.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Environmental Systems Data Science</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="ch-08" class="section level1" number="8">
+<h1><span class="header-section-number">Chapter 8</span> Application 1: Variable selection</h1>
+<div id="introduction-7" class="section level2" number="8.1">
+<h2><span class="header-section-number">8.1</span> Introduction</h2>
+<p>In Chapter <a href="ch-07.html#ch-07">7</a>, we noted that the coefficient of determination <span class="math inline">\(R^2\)</span> may increase even when uninformative predictors are added to a model. This will ascribe some predictive power to an uninformative predictor that is in fact misguided by its (random) correlation with the target variable. Often, we start out formulating models, not knowing beforehand what predictors should be considered and we are tempted to use them all because the full model will always yield the best <span class="math inline">\(R^2\)</span>. In such cases, we’re prone to building overconfident models that perform well on the training set, but will not perform well when predicting to new data.</p>
+<p>In this application session, we’ll implement an algorithm that sequentially searches the best additional predictor to be included in our model, starting from a single one. This is called <em>stepwise-forward</em> regression (see definition below). There is also <em>stepwise-backward</em> regression where predictors are sequentially removed from a model that includes them all. The challenge is that we often lack the possibility to confidently assess generalisability. The effect of spuriously increasing <span class="math inline">\(R^2\)</span> by adding uninformative predictors can be mitigated, as we noted in Chapter <a href="ch-07.html#ch-07">7</a>, by considering alternative metrics that penalize the number of predictors in a model. They balance the tradeoff between model complexity (number of variables in the linear regression case) and goodness of fit. Such metrics include the <em>adjusted-</em><span class="math inline">\(R^2\)</span>,the Akaike Information Criterion (AIC), or the Bayesian Information Criterion (BIC). In cases, where sufficient data is available, also cross-validation can be used for assessing the generalisability of alternative models. Here, we’ll assess how these different metrics behave for a sequence of linear regression models with an increasing number of predictors. You’ll learn to write code that implements an algorithm determining the order in which variables enter the model, starting from one and going up to fourteen predictors. You’ll write your own stepwise-forward regression code.</p>
+<p>Let’s get started!</p>
+</div>
+<div id="application" class="section level2" number="8.2">
+<h2><span class="header-section-number">8.2</span> Application</h2>
+<div id="warm-up-1-nested-for-loop" class="section level3" number="8.2.1">
+<h3><span class="header-section-number">8.2.1</span> Warm-up 1: Nested for-loop</h3>
+<p>Given a matrix A and a vector B (see below), do the following tasks:</p>
+<ul>
+<li><p>Replace the missing values (<code>NA</code>) in the first row of A by the largest value of B. After using that element of B for imputing A, drop that element from the vector B and proceed with imputing the second row of A, using the (now) largest value of the updated vector B, and drop that element from B after using it for imputing A. Repeat the same procedure for all four rows in A.</p></li>
+<li><p>After imputing (replacing) in each step, calculate the mean of the remaining values in B and record it as a single-row data frame with two columns <code>row_number</code> and <code>avg</code>, where <code>row_number</code> is the row number of A where the value was imputed, and <code>avg</code> is the mean of remaining values in B. As the algorithm proceeds through rows in A, sequentially bind the single-row data frame together so that after completion of the algorithm, the data frame contains four rows (corresponding to the number of rows in A).</p></li>
+</ul>
+<div class="sourceCode" id="cb725"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb725-1"><a href="ch-08.html#cb725-1" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">3</span>, <span class="cn">NA</span>, <span class="dv">15</span>, <span class="dv">6</span>, <span class="dv">7</span>, </span>
+<span id="cb725-2"><a href="ch-08.html#cb725-2" aria-hidden="true" tabindex="-1"></a>              <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">12</span>, <span class="dv">6</span>, <span class="dv">11</span>, <span class="cn">NA</span>, <span class="dv">3</span>, </span>
+<span id="cb725-3"><a href="ch-08.html#cb725-3" aria-hidden="true" tabindex="-1"></a>              <span class="dv">9</span>, <span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">3</span>, <span class="dv">21</span>, <span class="cn">NA</span>, <span class="dv">6</span>, </span>
+<span id="cb725-4"><a href="ch-08.html#cb725-4" aria-hidden="true" tabindex="-1"></a>              <span class="dv">7</span>, <span class="dv">19</span>, <span class="dv">6</span>, <span class="cn">NA</span>, <span class="dv">15</span>, <span class="dv">8</span>, <span class="dv">10</span>),</span>
+<span id="cb725-5"><a href="ch-08.html#cb725-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">nrow =</span> <span class="dv">4</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb725-6"><a href="ch-08.html#cb725-6" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">4</span>, <span class="dv">12</span>, <span class="dv">9</span>, <span class="dv">15</span>, <span class="dv">6</span>)</span></code></pre></div>
+<p>Before implementing these tasks, try to write down a pseudo code. This is code-like text that may not be executable, but describes the structure of real code and details where and how major steps are implemented. Next, you’ll need to write actual R code. For this, you will need to find answers to the following questions:</p>
+<ul>
+<li>How to go through each of the element in matrix?</li>
+<li>How to detect NA value?</li>
+<li>How to drop an element of a given value from a vector?</li>
+<li>How to add a row to an existing data frame?</li>
+</ul>
+<p><strong>Solution</strong>:</p>
+<div class="sourceCode" id="cb726"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb726-1"><a href="ch-08.html#cb726-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb726-2"><a href="ch-08.html#cb726-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb726-3"><a href="ch-08.html#cb726-3" aria-hidden="true" tabindex="-1"></a>summ <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb726-4"><a href="ch-08.html#cb726-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb726-5"><a href="ch-08.html#cb726-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(A)){</span>
+<span id="cb726-6"><a href="ch-08.html#cb726-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb726-7"><a href="ch-08.html#cb726-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(A)){</span>
+<span id="cb726-8"><a href="ch-08.html#cb726-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb726-9"><a href="ch-08.html#cb726-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.na</span>(A[i,j])){</span>
+<span id="cb726-10"><a href="ch-08.html#cb726-10" aria-hidden="true" tabindex="-1"></a>      A[i,j] <span class="ot">&lt;-</span> <span class="fu">max</span>(B)</span>
+<span id="cb726-11"><a href="ch-08.html#cb726-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb726-12"><a href="ch-08.html#cb726-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb726-13"><a href="ch-08.html#cb726-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb726-14"><a href="ch-08.html#cb726-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb726-15"><a href="ch-08.html#cb726-15" aria-hidden="true" tabindex="-1"></a>  B <span class="ot">&lt;-</span> B[<span class="sc">-</span><span class="fu">which</span>(B <span class="sc">==</span> <span class="fu">max</span>(B))] <span class="co"># update the B vector removing the biggest values</span></span>
+<span id="cb726-16"><a href="ch-08.html#cb726-16" aria-hidden="true" tabindex="-1"></a>  summ <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(summ, <span class="fu">data.frame</span>(<span class="at">row_number =</span> i, <span class="at">avg =</span> <span class="fu">mean</span>(B)))</span>
+<span id="cb726-17"><a href="ch-08.html#cb726-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb726-18"><a href="ch-08.html#cb726-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb726-19"><a href="ch-08.html#cb726-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb726-20"><a href="ch-08.html#cb726-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb726-21"><a href="ch-08.html#cb726-21" aria-hidden="true" tabindex="-1"></a>summ</span></code></pre></div>
+<pre><code>##   row_number  avg
+## 1          1 7.80
+## 2          2 6.75
+## 3          3 6.00
+## 4          4 5.00</code></pre>
+</div>
+<div id="warm-up-2-find-the-best-single-predictor" class="section level3" number="8.2.2">
+<h3><span class="header-section-number">8.2.2</span> Warm-up 2: Find the best single predictor</h3>
+<p><strong>The math behind forward stepwise regression:</strong></p>
+<ol style="list-style-type: decimal">
+<li><p>Let <span class="math inline">\(\mathcal{M_0}\)</span> denote the null model, which contains no predictors.</p></li>
+<li><p>For <span class="math inline">\(k=0,..,p-1\)</span>:</p>
+<ol style="list-style-type: lower-alpha">
+<li>Consider all <span class="math inline">\(p − k\)</span> models that augment <span class="math inline">\(\mathcal{M}_k\)</span> with one additional predictor.</li>
+<li>Choose the best model among these <span class="math inline">\(p − k\)</span> models, and call it <span class="math inline">\(\mathcal{M}_{k+1}\)</span>. Here <em>best</em> is defined as having the highest <span class="math inline">\(R^2\)</span> .</li>
+</ol></li>
+<li><p>Select a single best model from among <span class="math inline">\(\mathcal{M}_0\)</span>, . . . , <span class="math inline">\(\mathcal{M}_p\)</span> using cross-validated prediction error, AIC, BIC, or adjusted <span class="math inline">\(R^2\)</span>.</p></li>
+</ol>
+<p>The first step of a stepwise forward regression is to find the single most powerful predictor in a univariate linear regression model for the target variable <code>GPP_NT_VUT_REF</code> among all fourteen available predictors in our data set (all except those of type <code>date</code> or <code>character</code>). Implement this first part of the search, using the definition of the stepwise-forward algorithm above. Remove all rows with at least one missing value before starting the predictor search.</p>
+<ul>
+<li>Which predictor achieves the highest <span class="math inline">\(R^2\)</span>?</li>
+<li>What value is the <span class="math inline">\(R^2\)</span>?</li>
+<li>Visualise <span class="math inline">\(R^2\)</span> for all univariate models, ordered by their respective <span class="math inline">\(R^2\)</span> values.</li>
+<li>Do you note a particular pattern? Which variables yield similar <span class="math inline">\(R^2\)</span>? How do you expect them to be included in multivariate models of the subsequent steps in the stepwise forward regression?</li>
+</ul>
+<p><em>Hints</em>:</p>
+<ul>
+<li><p>Model structure:</p>
+<ul>
+<li>The “counter” variables in the for loop can be provided as a vector, and the counter will sequentially take on the value of each element in that vector. For example: <code>for (var in all_predictors){ ... }</code>.</li>
+</ul></li>
+<li><p>Algorithm:</p>
+<ul>
+<li><p>To record <span class="math inline">\(R^2\)</span> values for the different models, you may start by creating an empty vector (<code>vec &lt;- c()</code>) before the loop and then sequentially add elements to that vector inside the loop (<code>vec &lt;- c(vec, new_element)</code>). Alternatively, you can do something similar, but with a data frame (initialising with <code>df_rsq &lt;- data.frame()</code> before the loop, and adding rows by <code>df_rsq &lt;- bind_rows(df_rsq, data.frame(pred = predictor_name, rsq = rsq_result))</code> inside the loop).</p></li>
+<li><p>A clever way how to construct formulas dynamically is described, for example in <a href="https://stackoverflow.com/questions/4951442/formula-with-dynamic-number-of-variables">this stackoverflow post</a>.</p></li>
+</ul></li>
+<li><p>Value retrieving:</p>
+<ul>
+<li>Extract the <span class="math inline">\(R^2\)</span> from the linear model object: <code>summary(fit_lin)[["r.squared"]]</code></li>
+</ul></li>
+<li><p>Visualising:</p>
+<ul>
+<li>Search for solutions for how to change the order of levels to be plotted yourself.</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb728"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb728-1"><a href="ch-08.html#cb728-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb728-2"><a href="ch-08.html#cb728-2" aria-hidden="true" tabindex="-1"></a><span class="do">## read CSV and drop missing values in one step</span></span>
+<span id="cb728-3"><a href="ch-08.html#cb728-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;./data/ddf_for_08_application.csv&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb728-4"><a href="ch-08.html#cb728-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>()</span>
+<span id="cb728-5"><a href="ch-08.html#cb728-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb728-6"><a href="ch-08.html#cb728-6" aria-hidden="true" tabindex="-1"></a><span class="do">## specify target variable</span></span>
+<span id="cb728-7"><a href="ch-08.html#cb728-7" aria-hidden="true" tabindex="-1"></a>target <span class="ot">&lt;-</span> <span class="st">&#39;GPP_NT_VUT_REF&#39;</span></span>
+<span id="cb728-8"><a href="ch-08.html#cb728-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb728-9"><a href="ch-08.html#cb728-9" aria-hidden="true" tabindex="-1"></a><span class="do">## determine predictors as all except site ID, timestamp, and the target (should be 14)</span></span>
+<span id="cb728-10"><a href="ch-08.html#cb728-10" aria-hidden="true" tabindex="-1"></a>preds <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb728-11"><a href="ch-08.html#cb728-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>siteid, <span class="sc">-</span>TIMESTAMP, <span class="sc">-</span>GPP_NT_VUT_REF) <span class="sc">%&gt;%</span> </span>
+<span id="cb728-12"><a href="ch-08.html#cb728-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span>
+<span id="cb728-13"><a href="ch-08.html#cb728-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb728-14"><a href="ch-08.html#cb728-14" aria-hidden="true" tabindex="-1"></a><span class="do">## initialise an empty data frame (necessary, because otherwise we cannot use bind_rows() below)</span></span>
+<span id="cb728-15"><a href="ch-08.html#cb728-15" aria-hidden="true" tabindex="-1"></a>df_rsq <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb728-16"><a href="ch-08.html#cb728-16" aria-hidden="true" tabindex="-1"></a><span class="co"># rsq_list &lt;- c()  # alternative for vector</span></span>
+<span id="cb728-17"><a href="ch-08.html#cb728-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb728-18"><a href="ch-08.html#cb728-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (var <span class="cf">in</span> preds){</span>
+<span id="cb728-19"><a href="ch-08.html#cb728-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb728-20"><a href="ch-08.html#cb728-20" aria-hidden="true" tabindex="-1"></a>  <span class="do">## create formula dynamically</span></span>
+<span id="cb728-21"><a href="ch-08.html#cb728-21" aria-hidden="true" tabindex="-1"></a>  forml <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>(target, <span class="st">&quot;~&quot;</span>, var))</span>
+<span id="cb728-22"><a href="ch-08.html#cb728-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb728-23"><a href="ch-08.html#cb728-23" aria-hidden="true" tabindex="-1"></a>  <span class="do">## fit linear model</span></span>
+<span id="cb728-24"><a href="ch-08.html#cb728-24" aria-hidden="true" tabindex="-1"></a>  fit_lin <span class="ot">&lt;-</span> <span class="fu">lm</span>(forml, <span class="at">data =</span> df)</span>
+<span id="cb728-25"><a href="ch-08.html#cb728-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb728-26"><a href="ch-08.html#cb728-26" aria-hidden="true" tabindex="-1"></a>  <span class="do">## extract R2 from linear model</span></span>
+<span id="cb728-27"><a href="ch-08.html#cb728-27" aria-hidden="true" tabindex="-1"></a>  rsq <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_lin)[[<span class="st">&quot;r.squared&quot;</span>]]</span>
+<span id="cb728-28"><a href="ch-08.html#cb728-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb728-29"><a href="ch-08.html#cb728-29" aria-hidden="true" tabindex="-1"></a>  <span class="do">## add a row to the data frame that holds the results</span></span>
+<span id="cb728-30"><a href="ch-08.html#cb728-30" aria-hidden="true" tabindex="-1"></a>  df_rsq <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(df_rsq, <span class="fu">data.frame</span>(<span class="at">pred =</span> var, <span class="at">rsq =</span> rsq))</span>
+<span id="cb728-31"><a href="ch-08.html#cb728-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb728-32"><a href="ch-08.html#cb728-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rsq_list &lt;- c(rsq_list,rsq)  # alternative with vector</span></span>
+<span id="cb728-33"><a href="ch-08.html#cb728-33" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb728-34"><a href="ch-08.html#cb728-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb728-35"><a href="ch-08.html#cb728-35" aria-hidden="true" tabindex="-1"></a><span class="do">## print best single predictor and its R2</span></span>
+<span id="cb728-36"><a href="ch-08.html#cb728-36" aria-hidden="true" tabindex="-1"></a>df_rsq <span class="sc">%&gt;%</span> </span>
+<span id="cb728-37"><a href="ch-08.html#cb728-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>rsq) <span class="sc">%&gt;%</span>  <span class="co"># arrange by R2 in descending order (highest R2 on top)</span></span>
+<span id="cb728-38"><a href="ch-08.html#cb728-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>)           <span class="co"># print only the first row (with highest R2)</span></span></code></pre></div>
+<pre><code>##      pred       rsq
+## 1 PPFD_IN 0.5276123</code></pre>
+<div class="sourceCode" id="cb730"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb730-1"><a href="ch-08.html#cb730-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb730-2"><a href="ch-08.html#cb730-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb730-3"><a href="ch-08.html#cb730-3" aria-hidden="true" tabindex="-1"></a><span class="do">## alternative: determine the first variable to enter into our model</span></span>
+<span id="cb730-4"><a href="ch-08.html#cb730-4" aria-hidden="true" tabindex="-1"></a><span class="co"># preds[which.max(rsq_list)]</span></span>
+<span id="cb730-5"><a href="ch-08.html#cb730-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb730-6"><a href="ch-08.html#cb730-6" aria-hidden="true" tabindex="-1"></a><span class="do">## use the data frame that holds the results for plotting</span></span>
+<span id="cb730-7"><a href="ch-08.html#cb730-7" aria-hidden="true" tabindex="-1"></a>df_rsq <span class="sc">%&gt;%</span> </span>
+<span id="cb730-8"><a href="ch-08.html#cb730-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(pred, rsq), <span class="at">y =</span> rsq)) <span class="sc">+</span></span>
+<span id="cb730-9"><a href="ch-08.html#cb730-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">&quot;identity&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb730-10"><a href="ch-08.html#cb730-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="fu">expression</span>(<span class="fu">italic</span>(R)<span class="sc">^</span><span class="dv">2</span>), <span class="at">x =</span> <span class="st">&quot;Variable&quot;</span>) <span class="sc">+</span></span>
+<span id="cb730-11"><a href="ch-08.html#cb730-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-333-1.png" width="50%" style="display: block; margin: auto;" /></p>
+<p><strong>Solution</strong>:</p>
+<p><em><code>PPFD_IN</code> achieves the highest <span class="math inline">\(R^2\)</span> value, and the corresponding <span class="math inline">\(R^2\)</span> values is 0.5276123.</em></p>
+<p><em>We could see from the above plot that <code>LW_IN_F_MDS</code> and <code>LW_IN_F</code>, <code>VPD_F</code> and <code>VPD_F_MDS</code>, <code>SW_IN_F</code> and <code>SW_IN_F_MDS</code> share basically the same <span class="math inline">\(R^2\)</span> values. Those variables are highly correlated and are explaining the same amount of variance in the target variable. In the subsequent steps of the stepwise forward regression, since each of the two variables are highly correlated with each other, it’s likely that only one of them will be selected into our final model.</em></p>
+</div>
+<div id="full-stepwise-regression" class="section level3" number="8.2.3">
+<h3><span class="header-section-number">8.2.3</span> Full stepwise regression</h3>
+<p>Now, we take it to the next level and implement a full stepwise forward regression as described above. For each step (number of predictors <span class="math inline">\(k\)</span>), record the following metrics: <span class="math inline">\(R^2\)</span>, <em>adjusted-</em><span class="math inline">\(R^2\)</span>, the Akaike Information Criterion (AIC), Bayesian Information Criterion (BIC), and the 5-fold cross-validation <span class="math inline">\(R^2\)</span> and RMSE.</p>
+<ul>
+<li><p>Write pseudo-code for how you plan to implement the algorithm first.</p></li>
+<li><p>Implement the algorithm in R, run it and display the order in which predictors enter the model.</p></li>
+<li><p>Display a table with the metrics of all <span class="math inline">\(k\)</span> steps, and the single variable, added at each step.</p></li>
+</ul>
+<p><em>Hints</em>:</p>
+<ul>
+<li><p>Model structure:</p>
+<ul>
+<li>Recall what you learned in the breakout session, you may use the same idea on this task. Try to think of the blueprint (<em>pseudo-code</em>) first: How to go through different models in each forward step? How to store predictors added to the model and how to update candidate predictors?</li>
+</ul></li>
+<li><p>Algorithm:</p>
+<ul>
+<li><p>A complication is that the set of predictors is sequentially complemented at each step of the search through <span class="math inline">\(k\)</span>. You may again use <code>vec &lt;- list()</code> to create an empty vector, and then add elements to that vector by <code>vec &lt;- c(vec, new_element)</code>.</p></li>
+<li><p>It may be helpful to explicitly define a set of “candidate predictors” that may potentially be added to the model as a vector (e.g., <code>preds_candidate</code>), and define predictors retained in the model from the previous step in a separate vector (e.g., <code>preds_retained</code>). In each step, search through <code>preds_candidate</code>, select the best predictor, add it to <code>preds_retained</code> and remove it from <code>preds_candidate</code>.</p></li>
+<li><p>At each step, record the metrics and store them in a data frame for later plots. As in the first “warm-up” exercise, you may record metrics at each step as a single-row data frame and sequentially stack (bind) them together.</p></li>
+<li><p>(As above) A clever way how to construct formulas dynamically is described, for example in <a href="https://stackoverflow.com/questions/4951442/formula-with-dynamic-number-of-variables">this stackoverflow post</a>.</p></li>
+<li><p>The metrics for the <span class="math inline">\(k\)</span> models are assessed <em>after</em> the order of added variables is determined. To be able to determine the metrics, the <span class="math inline">\(k\)</span> models can be saved by constructing a list of models and sequentially add elements to that list (<code>mylist[[ name_new_element ]] &lt;- new_element</code>). You can also fit the model again after determining which predictor worked best.</p></li>
+<li><p>Your code will most certainly have bugs at first. To debug efficiently, write code first in a simple R script and use the debugging options in RStudio (see <a href="https://support.rstudio.com/hc/en-us/articles/205612627-Debugging-with-RStudio">here</a>).</p></li>
+</ul></li>
+<li><p>Value retrieving</p>
+<ul>
+<li><p>To get AIC and BIC values for a given model, use the base-R functions <code>AIC()</code> and <code>BIC()</code>.</p></li>
+<li><p>To get the cross-validated <span class="math inline">\(R^2\)</span> and RMSE, use the caret function <code>train()</code> with RMSE as the loss function, and <code>method = "lm"</code> (to fit a linear regression model). Then extract the values by <code>trained_model$results$Rsquared</code> and <code>trained_model$results$RMSE</code>.</p></li>
+</ul></li>
+<li><p>Displaying:</p>
+<ul>
+<li><p>To display a table nicely as part of the RMarkdown html output, use the function <code>knitr::kable()</code></p></li>
+<li><p>To avoid reordering of the list of variable names in plotting, change the type of variable names from “character” to “factor” by <code>pred &lt;- factor(pred, levels = pred)</code></p></li>
+</ul></li>
+</ul>
+<!-- - remove element by index number from a vector `vec[-2]` -->
+<!-- - concatenate string vectors with certain separations:  `paste(c("predictor_1","predictor_2","predictor_3"),collapse = '+')` gives `"predictor_1 + predictor_2 + predictor_3"` -->
+<!-- - fit a linear regression with three predictors: `fit_lin <- lm(target ~ predictor_1 + predictor_2 + predictor_3, data = df)` -->
+<!-- - execute a string-like expression: `eval(parse(text = <string>))`, for example: `eval(parse(text='mean(c(2,3,4))'))=3` -->
+<!-- - get AIC and BIC from a linear regression model object: `AIC(fit_lin)`, `BIC(fit_lin)` -->
+<div class="sourceCode" id="cb731"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb731-1"><a href="ch-08.html#cb731-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)  <span class="co"># need train() for cross-validation</span></span>
+<span id="cb731-2"><a href="ch-08.html#cb731-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb731-3"><a href="ch-08.html#cb731-3" aria-hidden="true" tabindex="-1"></a><span class="do">## specify target variable (as above)</span></span>
+<span id="cb731-4"><a href="ch-08.html#cb731-4" aria-hidden="true" tabindex="-1"></a>target <span class="ot">&lt;-</span> <span class="st">&#39;GPP_NT_VUT_REF&#39;</span></span>
+<span id="cb731-5"><a href="ch-08.html#cb731-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb731-6"><a href="ch-08.html#cb731-6" aria-hidden="true" tabindex="-1"></a><span class="do">## determine predictors as all except site ID, timestamp, and the target (should be 14)  (as above)</span></span>
+<span id="cb731-7"><a href="ch-08.html#cb731-7" aria-hidden="true" tabindex="-1"></a>preds <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
+<span id="cb731-8"><a href="ch-08.html#cb731-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>siteid, <span class="sc">-</span>TIMESTAMP, <span class="sc">-</span>GPP_NT_VUT_REF) <span class="sc">%&gt;%</span> </span>
+<span id="cb731-9"><a href="ch-08.html#cb731-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span>
+<span id="cb731-10"><a href="ch-08.html#cb731-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb731-11"><a href="ch-08.html#cb731-11" aria-hidden="true" tabindex="-1"></a><span class="co"># This is the vector of candidate predictors to be added in the model. To begin with, consider all as candidates.</span></span>
+<span id="cb731-12"><a href="ch-08.html#cb731-12" aria-hidden="true" tabindex="-1"></a>preds_candidate <span class="ot">&lt;-</span> preds </span>
+<span id="cb731-13"><a href="ch-08.html#cb731-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb731-14"><a href="ch-08.html#cb731-14" aria-hidden="true" tabindex="-1"></a><span class="co"># predictors retained in the model from the previous step. To begin with, is empty.</span></span>
+<span id="cb731-15"><a href="ch-08.html#cb731-15" aria-hidden="true" tabindex="-1"></a>preds_retained <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb731-16"><a href="ch-08.html#cb731-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb731-17"><a href="ch-08.html#cb731-17" aria-hidden="true" tabindex="-1"></a><span class="do">## work with lists as much as possible (more flexible!)</span></span>
+<span id="cb731-18"><a href="ch-08.html#cb731-18" aria-hidden="true" tabindex="-1"></a>df_metrics <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb731-19"><a href="ch-08.html#cb731-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb731-20"><a href="ch-08.html#cb731-20" aria-hidden="true" tabindex="-1"></a><span class="do">## outer loop for k predictors</span></span>
+<span id="cb731-21"><a href="ch-08.html#cb731-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k_index <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(preds)){</span>
+<span id="cb731-22"><a href="ch-08.html#cb731-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb731-23"><a href="ch-08.html#cb731-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rsq_candidates &lt;- c()</span></span>
+<span id="cb731-24"><a href="ch-08.html#cb731-24" aria-hidden="true" tabindex="-1"></a>  df_rsq_candidates <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb731-25"><a href="ch-08.html#cb731-25" aria-hidden="true" tabindex="-1"></a>  linmod_candidates <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb731-26"><a href="ch-08.html#cb731-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb731-27"><a href="ch-08.html#cb731-27" aria-hidden="true" tabindex="-1"></a>  <span class="do">## inner loop for single additional predictor</span></span>
+<span id="cb731-28"><a href="ch-08.html#cb731-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (ipred <span class="cf">in</span> preds_candidate){</span>
+<span id="cb731-29"><a href="ch-08.html#cb731-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb731-30"><a href="ch-08.html#cb731-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># variable vector (new variable + retained variables) used in regression</span></span>
+<span id="cb731-31"><a href="ch-08.html#cb731-31" aria-hidden="true" tabindex="-1"></a>    pred_add <span class="ot">&lt;-</span> <span class="fu">c</span>(preds_retained, ipred)</span>
+<span id="cb731-32"><a href="ch-08.html#cb731-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb731-33"><a href="ch-08.html#cb731-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># define formulate with newly-added predictor</span></span>
+<span id="cb731-34"><a href="ch-08.html#cb731-34" aria-hidden="true" tabindex="-1"></a>    forml  <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>( target, <span class="st">&#39;~&#39;</span>, <span class="fu">paste</span>(pred_add, <span class="at">collapse =</span> <span class="st">&#39;+&#39;</span>)))</span>
+<span id="cb731-35"><a href="ch-08.html#cb731-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb731-36"><a href="ch-08.html#cb731-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># fit linear model</span></span>
+<span id="cb731-37"><a href="ch-08.html#cb731-37" aria-hidden="true" tabindex="-1"></a>    fit_lin <span class="ot">&lt;-</span> <span class="fu">lm</span>(forml, <span class="at">data =</span> df)</span>
+<span id="cb731-38"><a href="ch-08.html#cb731-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb731-39"><a href="ch-08.html#cb731-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># add model object to list, and name the element according to the added variable</span></span>
+<span id="cb731-40"><a href="ch-08.html#cb731-40" aria-hidden="true" tabindex="-1"></a>    linmod_candidates[[ ipred ]] <span class="ot">&lt;-</span> fit_lin</span>
+<span id="cb731-41"><a href="ch-08.html#cb731-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb731-42"><a href="ch-08.html#cb731-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># record metrics for all candidates</span></span>
+<span id="cb731-43"><a href="ch-08.html#cb731-43" aria-hidden="true" tabindex="-1"></a>    rsq <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit_lin)[[<span class="st">&quot;r.squared&quot;</span>]]</span>
+<span id="cb731-44"><a href="ch-08.html#cb731-44" aria-hidden="true" tabindex="-1"></a>    df_rsq_candidates <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(df_rsq_candidates, <span class="fu">data.frame</span>(<span class="at">pred =</span> ipred, <span class="at">rsq =</span> rsq))  <span class="co"># when storing R2 in a data frame</span></span>
+<span id="cb731-45"><a href="ch-08.html#cb731-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># rsq_candidates &lt;- c(rsq_candidates,  rsq)  # when storing R2 as a vector</span></span>
+<span id="cb731-46"><a href="ch-08.html#cb731-46" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb731-47"><a href="ch-08.html#cb731-47" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb731-48"><a href="ch-08.html#cb731-48" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb731-49"><a href="ch-08.html#cb731-49" aria-hidden="true" tabindex="-1"></a>  <span class="do">## get name of candidate predictor that achieved the highest R2.</span></span>
+<span id="cb731-50"><a href="ch-08.html#cb731-50" aria-hidden="true" tabindex="-1"></a>  pred_add <span class="ot">&lt;-</span> df_rsq_candidates <span class="sc">%&gt;%</span>  <span class="co"># when storing R2 in a data frame</span></span>
+<span id="cb731-51"><a href="ch-08.html#cb731-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(rsq)) <span class="sc">%&gt;%</span> </span>
+<span id="cb731-52"><a href="ch-08.html#cb731-52" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb731-53"><a href="ch-08.html#cb731-53" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(pred) <span class="sc">%&gt;%</span> </span>
+<span id="cb731-54"><a href="ch-08.html#cb731-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.character</span>()</span>
+<span id="cb731-55"><a href="ch-08.html#cb731-55" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb731-56"><a href="ch-08.html#cb731-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># pred_add &lt;- preds_candidate[ which.max(rsq_candidates) ]   # when storing R2 as a vector</span></span>
+<span id="cb731-57"><a href="ch-08.html#cb731-57" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb731-58"><a href="ch-08.html#cb731-58" aria-hidden="true" tabindex="-1"></a>  <span class="do">## add best predictors to retained predictors </span></span>
+<span id="cb731-59"><a href="ch-08.html#cb731-59" aria-hidden="true" tabindex="-1"></a>  preds_retained <span class="ot">&lt;-</span> <span class="fu">c</span>(preds_retained, pred_add)</span>
+<span id="cb731-60"><a href="ch-08.html#cb731-60" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb731-61"><a href="ch-08.html#cb731-61" aria-hidden="true" tabindex="-1"></a>  <span class="do">## get the cross-validation R2</span></span>
+<span id="cb731-62"><a href="ch-08.html#cb731-62" aria-hidden="true" tabindex="-1"></a>  forml  <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste</span>( target, <span class="st">&#39;~&#39;</span>, <span class="fu">paste</span>(preds_retained, <span class="at">collapse =</span> <span class="st">&#39;+&#39;</span>)))</span>
+<span id="cb731-63"><a href="ch-08.html#cb731-63" aria-hidden="true" tabindex="-1"></a>  control <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">5</span>)</span>
+<span id="cb731-64"><a href="ch-08.html#cb731-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb731-65"><a href="ch-08.html#cb731-65" aria-hidden="true" tabindex="-1"></a>  <span class="co"># cv_modl &lt;- train(forml, data = df, method = &quot;lm&quot;, , metric = &quot;Rsquared&quot;, trControl = control)</span></span>
+<span id="cb731-66"><a href="ch-08.html#cb731-66" aria-hidden="true" tabindex="-1"></a>  cv_modl <span class="ot">&lt;-</span> <span class="fu">train</span>(forml, <span class="at">data =</span> df, <span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>, <span class="at">trControl =</span> control)</span>
+<span id="cb731-67"><a href="ch-08.html#cb731-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb731-68"><a href="ch-08.html#cb731-68" aria-hidden="true" tabindex="-1"></a>  <span class="co"># record AIC and BIC and adjusted-R2 of the respective model</span></span>
+<span id="cb731-69"><a href="ch-08.html#cb731-69" aria-hidden="true" tabindex="-1"></a>  df_metrics <span class="ot">&lt;-</span> df_metrics <span class="sc">%&gt;%</span> </span>
+<span id="cb731-70"><a href="ch-08.html#cb731-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(</span>
+<span id="cb731-71"><a href="ch-08.html#cb731-71" aria-hidden="true" tabindex="-1"></a>      <span class="fu">data.frame</span>( <span class="at">pred =</span> pred_add,</span>
+<span id="cb731-72"><a href="ch-08.html#cb731-72" aria-hidden="true" tabindex="-1"></a>                  <span class="at">rsq =</span> <span class="fu">summary</span>(linmod_candidates[[ pred_add ]])[[<span class="st">&quot;r.squared&quot;</span>]],</span>
+<span id="cb731-73"><a href="ch-08.html#cb731-73" aria-hidden="true" tabindex="-1"></a>                  <span class="at">adj_rsq =</span> <span class="fu">summary</span>(linmod_candidates[[ pred_add ]])[[<span class="st">&quot;adj.r.squared&quot;</span>]],</span>
+<span id="cb731-74"><a href="ch-08.html#cb731-74" aria-hidden="true" tabindex="-1"></a>                  <span class="at">cv_rsq =</span> cv_modl<span class="sc">$</span>results<span class="sc">$</span>Rsquared,</span>
+<span id="cb731-75"><a href="ch-08.html#cb731-75" aria-hidden="true" tabindex="-1"></a>                  <span class="at">cv_rmse =</span> cv_modl<span class="sc">$</span>results<span class="sc">$</span>RMSE,</span>
+<span id="cb731-76"><a href="ch-08.html#cb731-76" aria-hidden="true" tabindex="-1"></a>                  <span class="at">aic =</span> <span class="fu">AIC</span>(linmod_candidates[[ pred_add ]]),</span>
+<span id="cb731-77"><a href="ch-08.html#cb731-77" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bic =</span> <span class="fu">BIC</span>(linmod_candidates[[ pred_add ]])</span>
+<span id="cb731-78"><a href="ch-08.html#cb731-78" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb731-79"><a href="ch-08.html#cb731-79" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb731-80"><a href="ch-08.html#cb731-80" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb731-81"><a href="ch-08.html#cb731-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb731-82"><a href="ch-08.html#cb731-82" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove the selected variable from the candidate variable list</span></span>
+<span id="cb731-83"><a href="ch-08.html#cb731-83" aria-hidden="true" tabindex="-1"></a>  preds_candidate <span class="ot">&lt;-</span> preds_candidate[<span class="sc">-</span><span class="fu">which</span>(preds_candidate <span class="sc">==</span> pred_add)]</span>
+<span id="cb731-84"><a href="ch-08.html#cb731-84" aria-hidden="true" tabindex="-1"></a>  <span class="co"># preds_candidate &lt;- setdiff(preds_candidate,pred_add)  # alternative</span></span>
+<span id="cb731-85"><a href="ch-08.html#cb731-85" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb731-86"><a href="ch-08.html#cb731-86" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb731-87"><a href="ch-08.html#cb731-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb731-88"><a href="ch-08.html#cb731-88" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(df_metrics<span class="sc">$</span>pred) <span class="co"># order in which variables enter the model</span></span></code></pre></div>
+<pre><code>##    df_metrics.pred
+## 1          PPFD_IN
+## 2      LW_IN_F_MDS
+## 3            VPD_F
+## 4             WS_F
+## 5      SW_IN_F_MDS
+## 6        CO2_F_MDS
+## 7             TA_F
+## 8             PA_F
+## 9         TA_F_MDS
+## 10           USTAR
+## 11             P_F
+## 12       VPD_F_MDS
+## 13         LW_IN_F
+## 14         SW_IN_F</code></pre>
+<div class="sourceCode" id="cb733"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb733-1"><a href="ch-08.html#cb733-1" aria-hidden="true" tabindex="-1"></a>df_metrics <span class="sc">%&gt;%</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left">pred</th>
+<th align="right">rsq</th>
+<th align="right">adj_rsq</th>
+<th align="right">cv_rsq</th>
+<th align="right">cv_rmse</th>
+<th align="right">aic</th>
+<th align="right">bic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">PPFD_IN</td>
+<td align="right">0.5276123</td>
+<td align="right">0.5274601</td>
+<td align="right">0.5286098</td>
+<td align="right">2.946732</td>
+<td align="right">15529.18</td>
+<td align="right">15547.30</td>
+</tr>
+<tr class="even">
+<td align="left">LW_IN_F_MDS</td>
+<td align="right">0.6237535</td>
+<td align="right">0.6235110</td>
+<td align="right">0.6244311</td>
+<td align="right">2.631186</td>
+<td align="right">14824.62</td>
+<td align="right">14848.78</td>
+</tr>
+<tr class="odd">
+<td align="left">VPD_F</td>
+<td align="right">0.6482531</td>
+<td align="right">0.6479128</td>
+<td align="right">0.6488913</td>
+<td align="right">2.544541</td>
+<td align="right">14617.55</td>
+<td align="right">14647.76</td>
+</tr>
+<tr class="even">
+<td align="left">WS_F</td>
+<td align="right">0.6640335</td>
+<td align="right">0.6636000</td>
+<td align="right">0.6644851</td>
+<td align="right">2.486970</td>
+<td align="right">14477.03</td>
+<td align="right">14513.28</td>
+</tr>
+<tr class="odd">
+<td align="left">SW_IN_F_MDS</td>
+<td align="right">0.6669387</td>
+<td align="right">0.6664013</td>
+<td align="right">0.6672468</td>
+<td align="right">2.476793</td>
+<td align="right">14452.07</td>
+<td align="right">14494.35</td>
+</tr>
+<tr class="even">
+<td align="left">CO2_F_MDS</td>
+<td align="right">0.6696209</td>
+<td align="right">0.6689811</td>
+<td align="right">0.6695521</td>
+<td align="right">2.467823</td>
+<td align="right">14428.96</td>
+<td align="right">14477.28</td>
+</tr>
+<tr class="odd">
+<td align="left">TA_F</td>
+<td align="right">0.6708789</td>
+<td align="right">0.6701350</td>
+<td align="right">0.6703978</td>
+<td align="right">2.464609</td>
+<td align="right">14419.11</td>
+<td align="right">14473.48</td>
+</tr>
+<tr class="even">
+<td align="left">PA_F</td>
+<td align="right">0.6726644</td>
+<td align="right">0.6718185</td>
+<td align="right">0.6718171</td>
+<td align="right">2.459555</td>
+<td align="right">14404.22</td>
+<td align="right">14464.63</td>
+</tr>
+<tr class="odd">
+<td align="left">TA_F_MDS</td>
+<td align="right">0.6730699</td>
+<td align="right">0.6721192</td>
+<td align="right">0.6642220</td>
+<td align="right">2.487336</td>
+<td align="right">14402.37</td>
+<td align="right">14468.82</td>
+</tr>
+<tr class="even">
+<td align="left">USTAR</td>
+<td align="right">0.6733802</td>
+<td align="right">0.6723246</td>
+<td align="right">0.6639334</td>
+<td align="right">2.488412</td>
+<td align="right">14401.42</td>
+<td align="right">14473.91</td>
+</tr>
+<tr class="odd">
+<td align="left">P_F</td>
+<td align="right">0.6735098</td>
+<td align="right">0.6723487</td>
+<td align="right">0.6638548</td>
+<td align="right">2.488747</td>
+<td align="right">14402.19</td>
+<td align="right">14480.72</td>
+</tr>
+<tr class="even">
+<td align="left">VPD_F_MDS</td>
+<td align="right">0.6735755</td>
+<td align="right">0.6723086</td>
+<td align="right">0.6624537</td>
+<td align="right">2.493879</td>
+<td align="right">14403.57</td>
+<td align="right">14488.14</td>
+</tr>
+<tr class="odd">
+<td align="left">LW_IN_F</td>
+<td align="right">0.6736125</td>
+<td align="right">0.6722398</td>
+<td align="right">0.6623996</td>
+<td align="right">2.494079</td>
+<td align="right">14405.22</td>
+<td align="right">14495.83</td>
+</tr>
+<tr class="even">
+<td align="left">SW_IN_F</td>
+<td align="right">0.6736372</td>
+<td align="right">0.6721585</td>
+<td align="right">0.6620120</td>
+<td align="right">2.495602</td>
+<td align="right">14406.98</td>
+<td align="right">14503.63</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Visualise all metrics as a function of the number of predictors (add labels for the variable names of the added predictor). Highlight the best-performing model based on the respective metric. How many predictors are in the best performing model, when assessed based on each metric?</li>
+</ul>
+<div class="sourceCode" id="cb734"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb734-1"><a href="ch-08.html#cb734-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb734-2"><a href="ch-08.html#cb734-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb734-3"><a href="ch-08.html#cb734-3" aria-hidden="true" tabindex="-1"></a>df_metrics<span class="sc">$</span>pred <span class="ot">&lt;-</span>  <span class="fu">factor</span>(df_metrics<span class="sc">$</span>pred, <span class="at">levels =</span> df_metrics<span class="sc">$</span>pred)</span>
+<span id="cb734-4"><a href="ch-08.html#cb734-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb734-5"><a href="ch-08.html#cb734-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb734-6"><a href="ch-08.html#cb734-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics, <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> rsq)) <span class="sc">+</span></span>
+<span id="cb734-7"><a href="ch-08.html#cb734-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics, rsq <span class="sc">==</span> <span class="fu">max</span>(rsq)), <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> rsq), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb734-8"><a href="ch-08.html#cb734-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">expression</span>(<span class="fu">italic</span>(R)<span class="sc">^</span><span class="dv">2</span>)) <span class="sc">+</span> </span>
+<span id="cb734-9"><a href="ch-08.html#cb734-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span>
+<span id="cb734-10"><a href="ch-08.html#cb734-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb734-11"><a href="ch-08.html#cb734-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb734-12"><a href="ch-08.html#cb734-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics, <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> adj_rsq)) <span class="sc">+</span></span>
+<span id="cb734-13"><a href="ch-08.html#cb734-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics, adj_rsq <span class="sc">==</span> <span class="fu">max</span>(adj_rsq)), <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> adj_rsq), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb734-14"><a href="ch-08.html#cb734-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Adjusted-&quot;</span>, <span class="fu">italic</span>(R)<span class="sc">^</span><span class="dv">2</span>))) <span class="sc">+</span> </span>
+<span id="cb734-15"><a href="ch-08.html#cb734-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span>
+<span id="cb734-16"><a href="ch-08.html#cb734-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb734-17"><a href="ch-08.html#cb734-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb734-18"><a href="ch-08.html#cb734-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics, <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> cv_rsq)) <span class="sc">+</span></span>
+<span id="cb734-19"><a href="ch-08.html#cb734-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics, cv_rsq <span class="sc">==</span> <span class="fu">max</span>(cv_rsq)), <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> cv_rsq), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb734-20"><a href="ch-08.html#cb734-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Cross-validated &quot;</span>, <span class="fu">italic</span>(R)<span class="sc">^</span><span class="dv">2</span>))) <span class="sc">+</span> </span>
+<span id="cb734-21"><a href="ch-08.html#cb734-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span>
+<span id="cb734-22"><a href="ch-08.html#cb734-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb734-23"><a href="ch-08.html#cb734-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb734-24"><a href="ch-08.html#cb734-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics, <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> cv_rmse)) <span class="sc">+</span></span>
+<span id="cb734-25"><a href="ch-08.html#cb734-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics, cv_rmse <span class="sc">==</span> <span class="fu">min</span>(cv_rmse)), <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> cv_rmse), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb734-26"><a href="ch-08.html#cb734-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Cross-validated &quot;</span>, RMSE))) <span class="sc">+</span> </span>
+<span id="cb734-27"><a href="ch-08.html#cb734-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span>
+<span id="cb734-28"><a href="ch-08.html#cb734-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb734-29"><a href="ch-08.html#cb734-29" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb734-30"><a href="ch-08.html#cb734-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics, <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> aic)) <span class="sc">+</span></span>
+<span id="cb734-31"><a href="ch-08.html#cb734-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics, aic <span class="sc">==</span> <span class="fu">min</span>(aic)), <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> aic), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb734-32"><a href="ch-08.html#cb734-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;AIC&quot;</span>)<span class="sc">+</span> </span>
+<span id="cb734-33"><a href="ch-08.html#cb734-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span>
+<span id="cb734-34"><a href="ch-08.html#cb734-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb734-35"><a href="ch-08.html#cb734-35" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb734-36"><a href="ch-08.html#cb734-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics, <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> bic)) <span class="sc">+</span></span>
+<span id="cb734-37"><a href="ch-08.html#cb734-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics, bic <span class="sc">==</span> <span class="fu">min</span>(bic)), <span class="fu">aes</span>(<span class="at">x =</span> pred, <span class="at">y =</span> bic), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb734-38"><a href="ch-08.html#cb734-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;BIC&quot;</span>)<span class="sc">+</span> </span>
+<span id="cb734-39"><a href="ch-08.html#cb734-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code></pre></div>
+<ul>
+<li>Observe which predictors are selected into the final model and which not. Why?</li>
+</ul>
+<p><em>Solution:</em>
+Take the best model selected by BIC as an example, <code>VPD_F</code> is selected into the model and <code>VPD_F_MDS</code> is not. They won’t enter the model both because they are highly correlated and when one is in, the other doesn’t add information, which proves our expectation in the previous question.</p>
+<ul>
+<li>Whether it matters to the order of variables entering into the model which metric (i.e. AIC, BIC or <span class="math inline">\(R^2\)</span>) is used? Why?</li>
+</ul>
+<p><em>Solution:</em>
+No, it doesn’t matter. For each inner loop, when deciding which variable is sequentially chosen, we compare models of the same level (i.e. same number of variables). In this sense, model complexities for all the models are the same, and AIC/BIC only compares the goodness of fit part, which works the same as <span class="math inline">\(R^2\)</span>.</p>
+<ul>
+<li>Discuss your results. Which metric do you trust most? Why? Try out your algorithm without evaluating the cross-validated <span class="math inline">\(R^2\)</span>. Do you get a computational efficiency gain? Which metric comes closest to the cross-validated <span class="math inline">\(R^2\)</span> in terms of selecting the same number predictors?</li>
+</ul>
+<p><em>Solution:</em>
+Cross-validated <span class="math inline">\(R^2\)</span> is the “gold-standard” for assessing generalisability. However, it is computationally costly and may not provide robust results when the data set is small. Since AIC and BIC both penalise additional predictors, they both don’t select the full model with 14 variables as the best model (However, it could happen that the best model selected by AIC/BIC is the full model). The BIC selects for the same number of predictors as the cross-validated <span class="math inline">\(R^2\)</span> and RMSE, but without the disadvantage of the computational costs. It provides a conservative and apparently robust estimate for the model generalisability. Note that the order of added predictors is determined by the simple <span class="math inline">\(R^2\)</span> and is therefore independent of the final metrics we use for choosing the best <span class="math inline">\(k\)</span>.</p>
+</div>
+<div id="bonus-stepwise-regression-out-of-the-box" class="section level3" number="8.2.4">
+<h3><span class="header-section-number">8.2.4</span> Bonus: Stepwise regression out-of-the-box</h3>
+<p>In R, you can also conduct the above variable selection procedures automatically. <code>regsubsets()</code> from leaps package provides a convenient way to do so. It does model selection by exhaustive search, including forward or backward stepwise regression.</p>
+<ul>
+<li>Do a stepwise forward regression using <code>regsubsets()</code>.</li>
+<li>Create a data frame with the same metrics as above (except cross-validated <span class="math inline">\(R^2\)</span>).</li>
+<li>Visualise metrics as above.</li>
+<li>Are your result consistent?</li>
+</ul>
+<p><em>Hints</em>:</p>
+<ul>
+<li>Specify stepwise <em>forward</em> by setting <code>method = "forward"</code>.</li>
+<li>Specify the number of predictors to examine, that is all fourteen, by setting <code>nvmax = 14</code>.</li>
+<li>AIC values of each step are stored in <code>summary(regfit.fwd)$cp</code> and BIC values of each step are in <code>summary(regfit.fwd)$bic</code>, etc.</li>
+<li>Get order in which predictors <span class="math inline">\(k\)</span> are added (which corresponds to values returned by <code>summary(regfit.fwd)$bic</code>), by <code>all_predictors[regfit.fwd$vorder[2:15]-1]</code>. <code>vorder</code> is the order of variables entering into model. Note that <code>Intercept</code> is counted here as the first to enter into the model and should be removed.</li>
+<li>To avoid reordering of the list of variable names in plotting, change the type of variable names from “character” to “factor” by <code>preds_enter &lt;- factor(preds_enter, levels = preds_enter)</code></li>
+</ul>
+<div class="sourceCode" id="cb735"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb735-1"><a href="ch-08.html#cb735-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leaps)</span>
+<span id="cb735-2"><a href="ch-08.html#cb735-2" aria-hidden="true" tabindex="-1"></a>regfit.fwd <span class="ot">&lt;-</span> <span class="fu">regsubsets</span>(<span class="fu">as.formula</span>(<span class="fu">paste</span>(target, <span class="st">&quot;~&quot;</span>, <span class="fu">paste</span>(preds,<span class="at">collapse=</span><span class="st">&quot; + &quot;</span>))), <span class="at">data =</span> df, <span class="at">method =</span> <span class="st">&quot;forward&quot;</span>, <span class="at">nvmax =</span> <span class="dv">14</span>)</span>
+<span id="cb735-3"><a href="ch-08.html#cb735-3" aria-hidden="true" tabindex="-1"></a>reg.summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(regfit.fwd)</span>
+<span id="cb735-4"><a href="ch-08.html#cb735-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb735-5"><a href="ch-08.html#cb735-5" aria-hidden="true" tabindex="-1"></a><span class="co"># get variables in their order added to the model</span></span>
+<span id="cb735-6"><a href="ch-08.html#cb735-6" aria-hidden="true" tabindex="-1"></a>preds_enter <span class="ot">&lt;-</span> preds[regfit.fwd<span class="sc">$</span>vorder[<span class="dv">2</span><span class="sc">:</span><span class="dv">15</span>]<span class="sc">-</span><span class="dv">1</span>]</span>
+<span id="cb735-7"><a href="ch-08.html#cb735-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb735-8"><a href="ch-08.html#cb735-8" aria-hidden="true" tabindex="-1"></a><span class="do">## create metrics data frame</span></span>
+<span id="cb735-9"><a href="ch-08.html#cb735-9" aria-hidden="true" tabindex="-1"></a>df_metrics_auto <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb735-10"><a href="ch-08.html#cb735-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">preds =</span> <span class="fu">factor</span>(preds_enter, <span class="at">levels =</span> preds_enter),</span>
+<span id="cb735-11"><a href="ch-08.html#cb735-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">rsq =</span> reg.summary<span class="sc">$</span>rsq, </span>
+<span id="cb735-12"><a href="ch-08.html#cb735-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">adj_rsq =</span> reg.summary<span class="sc">$</span>adjr2, </span>
+<span id="cb735-13"><a href="ch-08.html#cb735-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">aic =</span> reg.summary<span class="sc">$</span>cp, </span>
+<span id="cb735-14"><a href="ch-08.html#cb735-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">bic =</span> reg.summary<span class="sc">$</span>bic</span>
+<span id="cb735-15"><a href="ch-08.html#cb735-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb735-16"><a href="ch-08.html#cb735-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb735-17"><a href="ch-08.html#cb735-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb735-18"><a href="ch-08.html#cb735-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics_auto, <span class="fu">aes</span>(<span class="at">x =</span> preds, <span class="at">y =</span> rsq)) <span class="sc">+</span></span>
+<span id="cb735-19"><a href="ch-08.html#cb735-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics_auto, rsq <span class="sc">==</span> <span class="fu">max</span>(rsq)), <span class="fu">aes</span>(<span class="at">x =</span> preds, <span class="at">y =</span> rsq), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb735-20"><a href="ch-08.html#cb735-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">expression</span>(<span class="fu">italic</span>(R)<span class="sc">^</span><span class="dv">2</span>)) <span class="sc">+</span> </span>
+<span id="cb735-21"><a href="ch-08.html#cb735-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-336-1.png" width="50%" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb736"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb736-1"><a href="ch-08.html#cb736-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb736-2"><a href="ch-08.html#cb736-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics_auto, <span class="fu">aes</span>(<span class="at">x =</span> preds, <span class="at">y =</span> adj_rsq)) <span class="sc">+</span></span>
+<span id="cb736-3"><a href="ch-08.html#cb736-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics_auto, adj_rsq <span class="sc">==</span> <span class="fu">max</span>(adj_rsq)), <span class="fu">aes</span>(<span class="at">x =</span> preds, <span class="at">y =</span> adj_rsq), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb736-4"><a href="ch-08.html#cb736-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Adjusted-&quot;</span>, <span class="fu">italic</span>(R)<span class="sc">^</span><span class="dv">2</span>))) <span class="sc">+</span> </span>
+<span id="cb736-5"><a href="ch-08.html#cb736-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-336-2.png" width="50%" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb737"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb737-1"><a href="ch-08.html#cb737-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb737-2"><a href="ch-08.html#cb737-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics_auto, <span class="fu">aes</span>(<span class="at">x =</span> preds, <span class="at">y =</span> aic)) <span class="sc">+</span></span>
+<span id="cb737-3"><a href="ch-08.html#cb737-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics_auto, aic <span class="sc">==</span> <span class="fu">min</span>(aic)), <span class="fu">aes</span>(<span class="at">x =</span> preds, <span class="at">y =</span> aic), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb737-4"><a href="ch-08.html#cb737-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;AIC&quot;</span>)<span class="sc">+</span> </span>
+<span id="cb737-5"><a href="ch-08.html#cb737-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-336-3.png" width="50%" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb738"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb738-1"><a href="ch-08.html#cb738-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb738-2"><a href="ch-08.html#cb738-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> df_metrics_auto, <span class="fu">aes</span>(<span class="at">x =</span> preds, <span class="at">y =</span> bic)) <span class="sc">+</span></span>
+<span id="cb738-3"><a href="ch-08.html#cb738-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">filter</span>(df_metrics_auto, bic <span class="sc">==</span> <span class="fu">min</span>(bic)), <span class="fu">aes</span>(<span class="at">x =</span> preds, <span class="at">y =</span> bic), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb738-4"><a href="ch-08.html#cb738-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;BIC&quot;</span>)<span class="sc">+</span> </span>
+<span id="cb738-5"><a href="ch-08.html#cb738-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-336-4.png" width="50%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="bonus-best-subset-selection---not-included-in-application-for-students-too-long" class="section level3" number="8.2.5">
+<h3><span class="header-section-number">8.2.5</span> Bonus: Best Subset Selection - Not included in application for students (too long…)</h3>
+<p>First we generate our data.</p>
+<div class="sourceCode" id="cb739"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb739-1"><a href="ch-08.html#cb739-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">41</span>)</span>
+<span id="cb739-2"><a href="ch-08.html#cb739-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb739-3"><a href="ch-08.html#cb739-3" aria-hidden="true" tabindex="-1"></a><span class="co">#data size</span></span>
+<span id="cb739-4"><a href="ch-08.html#cb739-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">=</span> <span class="dv">500</span></span>
+<span id="cb739-5"><a href="ch-08.html#cb739-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb739-6"><a href="ch-08.html#cb739-6" aria-hidden="true" tabindex="-1"></a><span class="co">#predictors</span></span>
+<span id="cb739-7"><a href="ch-08.html#cb739-7" aria-hidden="true" tabindex="-1"></a>x1 <span class="ot">=</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb739-8"><a href="ch-08.html#cb739-8" aria-hidden="true" tabindex="-1"></a>x2 <span class="ot">=</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb739-9"><a href="ch-08.html#cb739-9" aria-hidden="true" tabindex="-1"></a>x3 <span class="ot">=</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb739-10"><a href="ch-08.html#cb739-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb739-11"><a href="ch-08.html#cb739-11" aria-hidden="true" tabindex="-1"></a><span class="co">#generate output</span></span>
+<span id="cb739-12"><a href="ch-08.html#cb739-12" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="dv">4</span><span class="sc">*</span>x1 <span class="sc">+</span> <span class="dv">3</span><span class="sc">*</span>x3 <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb739-13"><a href="ch-08.html#cb739-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb739-14"><a href="ch-08.html#cb739-14" aria-hidden="true" tabindex="-1"></a>df_data <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">y =</span> y, <span class="at">x1 =</span> x1,<span class="at">x2 =</span> x2, <span class="at">x3 =</span> x3)</span>
+<span id="cb739-15"><a href="ch-08.html#cb739-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_data)</span></code></pre></div>
+<pre><code>##            y         x1          x2         x3
+## 1  3.5554726 -0.7943683 -0.08821170  2.3419290
+## 2 -7.2212212  0.1972575 -0.10062528 -2.3234496
+## 3  3.9247631  1.0017043  1.26570409  0.4460660
+## 4  0.7932959  1.2888254 -0.02288462 -0.9644862
+## 5  3.2901783  0.9057534 -0.24908328 -0.5791359
+## 6 -2.4142594  0.4936675  0.02378659 -1.4772818</code></pre>
+<p>The true underline model uses as predictors the variables x1 and x3. However in practise we do not know this information. What we really see is the df_data file. For this exercise we want to find those variables that are most informatives. Since we have 3 available predictors we can create 7 different models using all possible combinations of predictors. This type of variable selection is reffered as <em>Best Subset Selection</em>.</p>
+<div class="sourceCode" id="cb741"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb741-1"><a href="ch-08.html#cb741-1" aria-hidden="true" tabindex="-1"></a>formulas <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;y~x1&#39;</span>,<span class="st">&#39;y~x2&#39;</span>,<span class="st">&#39;y~x3&#39;</span>,<span class="st">&#39;y~x1+x2&#39;</span>,<span class="st">&#39;y~x1+x3&#39;</span>,<span class="st">&#39;y~x2+x3&#39;</span>,<span class="st">&#39;y~x1+x2+x3&#39;</span>)</span>
+<span id="cb741-2"><a href="ch-08.html#cb741-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;All possible models </span><span class="sc">\n</span><span class="st">&quot;</span>,<span class="fu">paste</span>(formulas,<span class="at">collapse =</span> <span class="st">&#39; , &#39;</span>),<span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span></code></pre></div>
+<pre><code>## All possible models 
+##  y~x1 , y~x2 , y~x3 , y~x1+x2 , y~x1+x3 , y~x2+x3 , y~x1+x2+x3</code></pre>
+<p>In order to find the optimal model we will use two methods:</p>
+<ol style="list-style-type: lower-alpha">
+<li>BIC</li>
+<li>Cross Validated MSE</li>
+</ol>
+<p>We note here that the BIC criterion uses all the available data while the MSE uses the cross validated test data.</p>
+<div id="bic" class="section level4" number="8.2.5.1">
+<h4><span class="header-section-number">8.2.5.1</span> BIC</h4>
+<div class="sourceCode" id="cb743"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb743-1"><a href="ch-08.html#cb743-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create vector that stores the BIC results for all the models</span></span>
+<span id="cb743-2"><a href="ch-08.html#cb743-2" aria-hidden="true" tabindex="-1"></a>bic_s <span class="ot">=</span> <span class="fu">rep</span>(<span class="cn">NA</span>,<span class="fu">length</span>(formulas))</span>
+<span id="cb743-3"><a href="ch-08.html#cb743-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb743-4"><a href="ch-08.html#cb743-4" aria-hidden="true" tabindex="-1"></a><span class="co">#iterate over the models</span></span>
+<span id="cb743-5"><a href="ch-08.html#cb743-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(formulas)){</span>
+<span id="cb743-6"><a href="ch-08.html#cb743-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#construct formula</span></span>
+<span id="cb743-7"><a href="ch-08.html#cb743-7" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">=</span> <span class="fu">as.formula</span>(formulas[i])</span>
+<span id="cb743-8"><a href="ch-08.html#cb743-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb743-9"><a href="ch-08.html#cb743-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#fit linear model</span></span>
+<span id="cb743-10"><a href="ch-08.html#cb743-10" aria-hidden="true" tabindex="-1"></a>  lm_fit <span class="ot">=</span> <span class="fu">lm</span>(formula,<span class="at">data =</span> df_data)</span>
+<span id="cb743-11"><a href="ch-08.html#cb743-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb743-12"><a href="ch-08.html#cb743-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">#calculate bic</span></span>
+<span id="cb743-13"><a href="ch-08.html#cb743-13" aria-hidden="true" tabindex="-1"></a>  bic_s[i] <span class="ot">=</span> <span class="fu">BIC</span>(lm_fit)</span>
+<span id="cb743-14"><a href="ch-08.html#cb743-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>find the optimal model according to BIC</p>
+<div class="sourceCode" id="cb744"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb744-1"><a href="ch-08.html#cb744-1" aria-hidden="true" tabindex="-1"></a><span class="co">#find the optimal model according to BIC</span></span>
+<span id="cb744-2"><a href="ch-08.html#cb744-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Optimal Model BIC: &quot;</span>,formulas[<span class="fu">which.min</span>(bic_s)])</span></code></pre></div>
+<pre><code>## Optimal Model BIC:  y~x1+x3</code></pre>
+</div>
+<div id="cross-validated-mse" class="section level4" number="8.2.5.2">
+<h4><span class="header-section-number">8.2.5.2</span> Cross Validated MSE</h4>
+<div class="sourceCode" id="cb746"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb746-1"><a href="ch-08.html#cb746-1" aria-hidden="true" tabindex="-1"></a><span class="co">#shuffle the data</span></span>
+<span id="cb746-2"><a href="ch-08.html#cb746-2" aria-hidden="true" tabindex="-1"></a>shuffled_id <span class="ot">=</span> <span class="fu">sample</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span>n, <span class="at">size =</span> n)</span>
+<span id="cb746-3"><a href="ch-08.html#cb746-3" aria-hidden="true" tabindex="-1"></a>df_data <span class="ot">=</span> df_data[shuffled_id,]</span>
+<span id="cb746-4"><a href="ch-08.html#cb746-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb746-5"><a href="ch-08.html#cb746-5" aria-hidden="true" tabindex="-1"></a><span class="co">#specify the number of folds</span></span>
+<span id="cb746-6"><a href="ch-08.html#cb746-6" aria-hidden="true" tabindex="-1"></a>n_folds <span class="ot">=</span> <span class="dv">5</span></span>
+<span id="cb746-7"><a href="ch-08.html#cb746-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb746-8"><a href="ch-08.html#cb746-8" aria-hidden="true" tabindex="-1"></a><span class="co">#folds assignments (in which folder each point is assigned)</span></span>
+<span id="cb746-9"><a href="ch-08.html#cb746-9" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">=</span> <span class="fu">cut</span>(<span class="dv">1</span><span class="sc">:</span>n,<span class="at">breaks =</span> n_folds,<span class="at">labels =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb746-10"><a href="ch-08.html#cb746-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb746-11"><a href="ch-08.html#cb746-11" aria-hidden="true" tabindex="-1"></a><span class="co">#create matrix to store the MSE from each test folder for all models : dimension 7 x n_folds</span></span>
+<span id="cb746-12"><a href="ch-08.html#cb746-12" aria-hidden="true" tabindex="-1"></a>mse_s <span class="ot">=</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,<span class="at">nrow =</span> <span class="fu">length</span>(formulas),<span class="at">ncol =</span> n_folds)</span>
+<span id="cb746-13"><a href="ch-08.html#cb746-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb746-14"><a href="ch-08.html#cb746-14" aria-hidden="true" tabindex="-1"></a><span class="co">#iterate over the models</span></span>
+<span id="cb746-15"><a href="ch-08.html#cb746-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(formulas)){</span>
+<span id="cb746-16"><a href="ch-08.html#cb746-16" aria-hidden="true" tabindex="-1"></a>  <span class="co">#construct formula</span></span>
+<span id="cb746-17"><a href="ch-08.html#cb746-17" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">=</span> <span class="fu">as.formula</span>(formulas[i])</span>
+<span id="cb746-18"><a href="ch-08.html#cb746-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb746-19"><a href="ch-08.html#cb746-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">#cross validation for the i-th model</span></span>
+<span id="cb746-20"><a href="ch-08.html#cb746-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_folds){</span>
+<span id="cb746-21"><a href="ch-08.html#cb746-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">#take train indixes for all folders except j</span></span>
+<span id="cb746-22"><a href="ch-08.html#cb746-22" aria-hidden="true" tabindex="-1"></a>    train_ind <span class="ot">=</span> (folds <span class="sc">!=</span> j)</span>
+<span id="cb746-23"><a href="ch-08.html#cb746-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">#take test indexes for folder j</span></span>
+<span id="cb746-24"><a href="ch-08.html#cb746-24" aria-hidden="true" tabindex="-1"></a>    test_ind <span class="ot">=</span> (folds <span class="sc">==</span> j)</span>
+<span id="cb746-25"><a href="ch-08.html#cb746-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb746-26"><a href="ch-08.html#cb746-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">#train data that contains all the points that do not belong in folder j</span></span>
+<span id="cb746-27"><a href="ch-08.html#cb746-27" aria-hidden="true" tabindex="-1"></a>    train_data <span class="ot">=</span> df_data[train_ind,]</span>
+<span id="cb746-28"><a href="ch-08.html#cb746-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">#test data that contains all the points that belong to folder j</span></span>
+<span id="cb746-29"><a href="ch-08.html#cb746-29" aria-hidden="true" tabindex="-1"></a>    test_data <span class="ot">=</span> df_data[test_ind,]</span>
+<span id="cb746-30"><a href="ch-08.html#cb746-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb746-31"><a href="ch-08.html#cb746-31" aria-hidden="true" tabindex="-1"></a>    <span class="co">#fit linear model using the training data</span></span>
+<span id="cb746-32"><a href="ch-08.html#cb746-32" aria-hidden="true" tabindex="-1"></a>    lm_fit <span class="ot">=</span> <span class="fu">lm</span>(formula, <span class="at">data =</span> train_data)</span>
+<span id="cb746-33"><a href="ch-08.html#cb746-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb746-34"><a href="ch-08.html#cb746-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># calculate mse on test data</span></span>
+<span id="cb746-35"><a href="ch-08.html#cb746-35" aria-hidden="true" tabindex="-1"></a>    <span class="do">## make predictions</span></span>
+<span id="cb746-36"><a href="ch-08.html#cb746-36" aria-hidden="true" tabindex="-1"></a>    y_pred <span class="ot">=</span> <span class="fu">predict</span>(lm_fit,test_data)</span>
+<span id="cb746-37"><a href="ch-08.html#cb746-37" aria-hidden="true" tabindex="-1"></a>    <span class="co">#calculate mse of test folder --&gt; jth folder</span></span>
+<span id="cb746-38"><a href="ch-08.html#cb746-38" aria-hidden="true" tabindex="-1"></a>    mse <span class="ot">=</span> <span class="fu">mean</span>((y_pred <span class="sc">-</span> test_data<span class="sc">$</span>y)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb746-39"><a href="ch-08.html#cb746-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb746-40"><a href="ch-08.html#cb746-40" aria-hidden="true" tabindex="-1"></a>    mse_s[i,j] <span class="ot">=</span> mse</span>
+<span id="cb746-41"><a href="ch-08.html#cb746-41" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb746-42"><a href="ch-08.html#cb746-42" aria-hidden="true" tabindex="-1"></a>}  </span></code></pre></div>
+<p>Check the MSE error for each test folder for every model.</p>
+<div class="sourceCode" id="cb747"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb747-1"><a href="ch-08.html#cb747-1" aria-hidden="true" tabindex="-1"></a>mse_s</span></code></pre></div>
+<pre><code>##           [,1]       [,2]      [,3]      [,4]      [,5]
+## [1,] 10.002892 11.2851440 11.046805 11.013381 10.312195
+## [2,] 25.203231 27.9475015 30.480528 26.647778 24.636545
+## [3,] 16.788547 16.7338477 19.004786 17.587077 15.700868
+## [4,] 10.140623 11.3226846 11.217637 11.081723 10.312199
+## [5,]  1.193298  0.8728441  1.054410  1.197727  1.035414
+## [6,] 17.112266 16.8149810 19.118716 17.582590 15.841135
+## [7,]  1.192072  0.8820639  1.053181  1.196406  1.035338</code></pre>
+<p>Calculate Cross Validated MSE for every model.</p>
+<div class="sourceCode" id="cb749"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb749-1"><a href="ch-08.html#cb749-1" aria-hidden="true" tabindex="-1"></a>cv_mse <span class="ot">=</span> <span class="fu">rowMeans</span>(mse_s)</span>
+<span id="cb749-2"><a href="ch-08.html#cb749-2" aria-hidden="true" tabindex="-1"></a>cv_mse</span></code></pre></div>
+<pre><code>## [1] 10.732083 26.983117 17.163025 10.814973  1.070739 17.293938  1.071812</code></pre>
+<p>Find the optimal model according to Cross Validated MSE.</p>
+<div class="sourceCode" id="cb751"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb751-1"><a href="ch-08.html#cb751-1" aria-hidden="true" tabindex="-1"></a><span class="co">#find the optimal model according to CV </span></span>
+<span id="cb751-2"><a href="ch-08.html#cb751-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Optimal Model CV_MSE: &quot;</span>,formulas[<span class="fu">which.min</span>(cv_mse)])</span></code></pre></div>
+<pre><code>## Optimal Model CV_MSE:  y~x1+x3</code></pre>
+
+</div>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="ch-07.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="ch-09.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

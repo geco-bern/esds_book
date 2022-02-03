@@ -1,0 +1,177 @@
+---
+title: "Exercise 09 - Solution"
+output: html_document
+---
+
+# Supervised Learning Neural Networks I
+
+```{r global-options, include=FALSE}
+knitr::opts_chunk$set(echo=T, warning=FALSE, message=FALSE)
+```
+
+# Hands on Logistic Regression
+
+ 1. Read the data, tokenize the iris Type (so that the output is a number) into a new column with name "y". Namely, "virginica" --> 1, "not_virginica" --> 0 
+ 2. Shuffle your data and create a train and test set with proportions 80% and 20% of the given data respectively.
+ 3. Plot the training data and give a different color for each Type.
+ 4. Create a Logistic Regression Model
+ 5. Plot the training data as in question 3 and also include the derived decision boundary (and Sigmoid output for configuration a) from the fitted model.
+ 6. Evaluate the accuracy of the model in the test set.
+ 7. Plot the testing data (use different colors for each Type), include the decision boundary from the fitted model and also use different point type for the misclassified predictions (if any).
+
+You have to solve tasks 3-7 with 2 different configurations.
+
+ a. Using only the Petal Width as predictor
+ b. Using both Petal Length and Petal Width as predictors
+
+
+```{r}
+## Import libraries
+library(tidyverse)
+library(reticulate)
+use_condaenv()
+library(keras)
+library(tensorflow)
+
+## 1. Read data
+data = read.csv('../data/exercise/data_iris.csv')
+head(data)
+
+## 2. Tokenize type
+#create a new column with name y where y=1 defines virginica while y=0 defines not_virginica
+data$y = ifelse(data$Type=='virginica',1,0)
+head(data)
+
+# Shuffle data
+set.seed(42)
+shuffle = sample(1:nrow(data),nrow(data))
+data = data[shuffle,]
+head(data)
+
+# Split data
+breakpoint = as.integer(0.8*nrow(data))
+df_train = data %>% slice(1:breakpoint)
+df_test = data %>% slice(-c(1:breakpoint))
+
+# Create input and output
+x_train = df_train[,c('Petal_Length', 'Petal_Width')]
+y_train= df_train$y
+ 
+x_test = df_test[,c('Petal_Length', 'Petal_Width')]   
+y_test = df_test$y
+ 
+```
+
+***
+**Configuration A for tasks 3-5**
+```{r}
+## A3. Plot training data
+df_train %>%
+  ggplot(aes(x=Petal_Width,y=y,color = Type))+
+  geom_point()+
+  scale_color_manual(breaks = c("virginica","not_virginica"),values=c("blue","red"))
+
+
+## A4. Create model
+set_random_seed(42) 
+model_a = keras_model_sequential()
+model_a %>% layer_dense(units = 1,activation = 'sigmoid') 
+opt = optimizer_adam(lr=0.1)
+model_a %>% compile(loss ='binary_crossentropy',optimizer = opt, metrics = 'accuracy')
+model_a %>% fit(x=x_train$Petal_Width,y=y_train,epochs=20,batch_size=32)
+
+w_a = unlist(get_weights(model_a))
+
+
+## A5. Plot decision boundary
+# Create grid of values
+grid = seq(from = 0,to = 4,length.out = 1000)
+
+# Take probabilities of grid values
+probs = predict(model_a,grid)
+
+# Create dataframe
+df = data.frame(x = grid, y = probs)
+
+df_train %>%
+    ggplot(aes(x = Petal_Width , y = y , color = Type))+
+    geom_point()+
+    geom_line(data = df , aes(x = x,y = probs,linetype = 'Sigmoid'),color = 'black')+
+    geom_vline(xintercept =  -w_a[2]/w_a[1], lty = 2)+
+    scale_color_manual(name = 'Class',values = c('virginica' = 'blue','not_virginica' = 'red'))+
+    scale_linetype_manual(name = 'Sigmoid Activation',values = 1,labels = 'P(positve) >= 0.5 \n predict 1 ')+
+ylab('P(positive')  
+
+
+## A6. Evaluate accuracy on test set
+# Take probabilities
+p_nn <- predict(model_a,x_test$Petal_Width)
+
+# Make decisions
+pred <- (p_nn > 0.5)*1
+
+# Accuracy
+accuracy = mean(pred == df_test$y)
+cat("Test Accuracy: ",round(accuracy,3),'\n')
+
+## A7. Plot missclassified predictions in the test data
+df_test %>% mutate(misclassified = (pred!= y_test))%>%
+  ggplot(aes(x = Petal_Width, y = y,color = Type))+
+  geom_point(aes(shape = misclassified))+
+  geom_line(data = df , aes(x = x,y = probs),color = 'black')+
+  geom_vline(xintercept = -w_a[2]/w_a[1])+
+  scale_color_manual(breaks = c("virginica","not_virginica"),values=c("blue","red"))+
+  scale_shape_manual(name = "Misclassified",breaks=c("TRUE","FALSE"),values=c(4,16),labels=c("Yes","No"))+
+ylab('P(positive')
+```
+
+***
+**Configuration B for tasks 3-5**
+
+```{r}
+## B3. Plot training data
+df_train %>%
+  ggplot(aes(x=Petal_Length,y=Petal_Width,color = Type))+
+  geom_point()+
+  scale_color_manual(breaks = c("virginica","not_virginica"),values=c("blue","red"))
+
+## B4. Create model
+set_random_seed(42) 
+model_b = keras_model_sequential()
+model_b %>% layer_dense(units = 1,activation = 'sigmoid') 
+opt = optimizer_adam(lr=0.1)
+model_b %>% compile(loss ='binary_crossentropy',optimizer = opt, metrics = 'accuracy')
+model_b %>% fit(x=as.matrix(x_train),y=y_train,epochs=30,batch_size=32)
+ 
+w_b = unlist(get_weights(model_b))
+
+## B5. Plot decision boundary
+text_b = paste(round(w_b[2],2),"x2 +",round(w_b[1],2),"x1 -",abs(round(w_b[3],2)),"= 0")
+
+df_train %>%
+  ggplot(aes(x=Petal_Length,y=Petal_Width,color = Type))+
+  geom_point()+
+  scale_color_manual(breaks = c("virginica","not_virginica"),values=c("blue","red"))+
+  geom_abline(intercept = -w_b[3]/w_b[2], slope = -w_b[1]/w_b[2])+
+  annotate("text", x = 2.8, y = 2.4,size=3, label = text_b)
+
+## B6. Evaluate the accuracy on test set
+# Take probabilities
+p_nn <- predict(model_b,as.matrix(x_test))
+
+# Make decisions
+pred = (p_nn > 0.5)*1
+
+# Accuracy
+accuracy = mean(pred == df_test$y)
+cat("Test Accuracy: ",round(accuracy,3),'\n')
+
+
+## B7. Plot misclassified predictions in the test data
+df_test %>% mutate(misclassified = pred!=y_test)%>%
+  ggplot(aes(x = Petal_Length, y = Petal_Width,color = Type,shape = misclassified))+
+  geom_point()+
+  scale_color_manual(breaks = c("virginica","not_virginica"),values=c("blue","red"))+
+  scale_shape_manual(name = "Misclassified",breaks=c("TRUE","FALSE"),values=c(4,16),labels=c("Yes","No"))+
+  geom_abline(intercept = -w_b[3]/w_b[2], slope = -w_b[1]/w_b[2])
+```

@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 4 Data Scraping | Environmental Systems Data Science</title>
+  <meta name="description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 4 Data Scraping | Environmental Systems Data Science" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 4 Data Scraping | Environmental Systems Data Science" />
+  
+  <meta name="twitter:description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  
+
+<meta name="author" content="Loïc Pellissier, Joshua Payne, Benjamin Stocker" />
+
+
+<meta name="date" content="2021-12-30" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="ch-03.html"/>
+<link rel="next" href="ch-05.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-description"><i class="fa fa-check"></i>Course Description</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-objectives"><i class="fa fa-check"></i>Course Objectives</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#content"><i class="fa fa-check"></i>Content</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#useful-prerequisites"><i class="fa fa-check"></i>Useful Prerequisites</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="ch-01.html"><a href="ch-01.html"><i class="fa fa-check"></i><b>1</b> Primers</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="ch-01.html"><a href="ch-01.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="ch-01.html"><a href="ch-01.html#key-points-from-the-lecture"><i class="fa fa-check"></i><b>1.1.1</b> Key Points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="ch-01.html"><a href="ch-01.html#tutorial"><i class="fa fa-check"></i><b>1.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="ch-01.html"><a href="ch-01.html#working-with-rstudio-on-renku"><i class="fa fa-check"></i><b>1.2.1</b> Working with RStudio on Renku</a></li>
+<li class="chapter" data-level="1.2.2" data-path="ch-01.html"><a href="ch-01.html#git"><i class="fa fa-check"></i><b>1.2.2</b> Git</a></li>
+<li class="chapter" data-level="1.2.3" data-path="ch-01.html"><a href="ch-01.html#libraries"><i class="fa fa-check"></i><b>1.2.3</b> Libraries</a></li>
+<li class="chapter" data-level="1.2.4" data-path="ch-01.html"><a href="ch-01.html#r-scripts"><i class="fa fa-check"></i><b>1.2.4</b> R scripts</a></li>
+<li class="chapter" data-level="1.2.5" data-path="ch-01.html"><a href="ch-01.html#rmarkdown"><i class="fa fa-check"></i><b>1.2.5</b> RMarkdown</a></li>
+<li class="chapter" data-level="1.2.6" data-path="ch-01.html"><a href="ch-01.html#functions"><i class="fa fa-check"></i><b>1.2.6</b> Functions</a></li>
+<li class="chapter" data-level="1.2.7" data-path="ch-01.html"><a href="ch-01.html#tidy-data"><i class="fa fa-check"></i><b>1.2.7</b> Tidy data</a></li>
+<li class="chapter" data-level="1.2.8" data-path="ch-01.html"><a href="ch-01.html#r-projects"><i class="fa fa-check"></i><b>1.2.8</b> R projects</a></li>
+<li class="chapter" data-level="1.2.9" data-path="ch-01.html"><a href="ch-01.html#working-with-data-frames"><i class="fa fa-check"></i><b>1.2.9</b> Working with data frames</a></li>
+<li class="chapter" data-level="1.2.10" data-path="ch-01.html"><a href="ch-01.html#r-objects"><i class="fa fa-check"></i><b>1.2.10</b> R objects</a></li>
+<li class="chapter" data-level="1.2.11" data-path="ch-01.html"><a href="ch-01.html#data-visualisation"><i class="fa fa-check"></i><b>1.2.11</b> Data visualisation</a></li>
+<li class="chapter" data-level="1.2.12" data-path="ch-01.html"><a href="ch-01.html#conditionals"><i class="fa fa-check"></i><b>1.2.12</b> Conditionals</a></li>
+<li class="chapter" data-level="1.2.13" data-path="ch-01.html"><a href="ch-01.html#loops"><i class="fa fa-check"></i><b>1.2.13</b> Loops</a></li>
+<li class="chapter" data-level="1.2.14" data-path="ch-01.html"><a href="ch-01.html#where-to-find-help"><i class="fa fa-check"></i><b>1.2.14</b> Where to find help</a></li>
+<li class="chapter" data-level="1.2.15" data-path="ch-01.html"><a href="ch-01.html#key-points-from-the-tutorial"><i class="fa fa-check"></i><b>1.2.15</b> Key points from the tutorial</a></li>
+<li class="chapter" data-level="1.2.16" data-path="ch-01.html"><a href="ch-01.html#further-reading"><i class="fa fa-check"></i><b>1.2.16</b> Further reading</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="ch-01.html"><a href="ch-01.html#exercise"><i class="fa fa-check"></i><b>1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="ch-02.html"><a href="ch-02.html"><i class="fa fa-check"></i><b>2</b> Data wrangling</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="ch-02.html"><a href="ch-02.html#introduction-1"><i class="fa fa-check"></i><b>2.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="ch-02.html"><a href="ch-02.html#learning-objectives"><i class="fa fa-check"></i><b>2.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="2.1.2" data-path="ch-02.html"><a href="ch-02.html#key-points-from-the-lecture-1"><i class="fa fa-check"></i><b>2.1.2</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="ch-02.html"><a href="ch-02.html#tutorial-1"><i class="fa fa-check"></i><b>2.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="ch-02.html"><a href="ch-02.html#libraries-1"><i class="fa fa-check"></i><b>2.2.1</b> Libraries</a></li>
+<li class="chapter" data-level="2.2.2" data-path="ch-02.html"><a href="ch-02.html#variables-in-a-data-frame"><i class="fa fa-check"></i><b>2.2.2</b> Variables in a data frame</a></li>
+<li class="chapter" data-level="2.2.3" data-path="ch-02.html"><a href="ch-02.html#time-objects"><i class="fa fa-check"></i><b>2.2.3</b> Time objects</a></li>
+<li class="chapter" data-level="2.2.4" data-path="ch-02.html"><a href="ch-02.html#variable-re--definition"><i class="fa fa-check"></i><b>2.2.4</b> Variable (re-) definition</a></li>
+<li class="chapter" data-level="2.2.5" data-path="ch-02.html"><a href="ch-02.html#selecting-cleaning-and-gap-filling"><i class="fa fa-check"></i><b>2.2.5</b> Selecting, cleaning and gap-filling</a></li>
+<li class="chapter" data-level="2.2.6" data-path="ch-02.html"><a href="ch-02.html#functions-1"><i class="fa fa-check"></i><b>2.2.6</b> Functions</a></li>
+<li class="chapter" data-level="2.2.7" data-path="ch-02.html"><a href="ch-02.html#data-overview"><i class="fa fa-check"></i><b>2.2.7</b> Data overview</a></li>
+<li class="chapter" data-level="2.2.8" data-path="ch-02.html"><a href="ch-02.html#data-visualisation-i"><i class="fa fa-check"></i><b>2.2.8</b> Data visualisation I</a></li>
+<li class="chapter" data-level="2.2.9" data-path="ch-02.html"><a href="ch-02.html#aggregating"><i class="fa fa-check"></i><b>2.2.9</b> Aggregating</a></li>
+<li class="chapter" data-level="2.2.10" data-path="ch-02.html"><a href="ch-02.html#data-visualisation-ii"><i class="fa fa-check"></i><b>2.2.10</b> Data visualisation II</a></li>
+<li class="chapter" data-level="2.2.11" data-path="ch-02.html"><a href="ch-02.html#functional-programming-i"><i class="fa fa-check"></i><b>2.2.11</b> Functional programming I</a></li>
+<li class="chapter" data-level="2.2.12" data-path="ch-02.html"><a href="ch-02.html#strings"><i class="fa fa-check"></i><b>2.2.12</b> Strings</a></li>
+<li class="chapter" data-level="2.2.13" data-path="ch-02.html"><a href="ch-02.html#combining-relational-data"><i class="fa fa-check"></i><b>2.2.13</b> Combining relational data</a></li>
+<li class="chapter" data-level="2.2.14" data-path="ch-02.html"><a href="ch-02.html#key-points-from-the-tutorial-1"><i class="fa fa-check"></i><b>2.2.14</b> Key points from the tutorial</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="ch-02.html"><a href="ch-02.html#exercise-1"><i class="fa fa-check"></i><b>2.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="ch-03.html"><a href="ch-03.html"><i class="fa fa-check"></i><b>3</b> Data variety</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="ch-03.html"><a href="ch-03.html#introduction-2"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="ch-03.html"><a href="ch-03.html#overview"><i class="fa fa-check"></i><b>3.1.1</b> Overview</a></li>
+<li class="chapter" data-level="3.1.2" data-path="ch-03.html"><a href="ch-03.html#learning-objectives-1"><i class="fa fa-check"></i><b>3.1.2</b> Learning objectives</a></li>
+<li class="chapter" data-level="3.1.3" data-path="ch-03.html"><a href="ch-03.html#key-points-from-the-lecture-2"><i class="fa fa-check"></i><b>3.1.3</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="ch-03.html"><a href="ch-03.html#tutorial-2"><i class="fa fa-check"></i><b>3.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="ch-03.html"><a href="ch-03.html#overview-1"><i class="fa fa-check"></i><b>3.2.1</b> Overview</a></li>
+<li class="chapter" data-level="3.2.2" data-path="ch-03.html"><a href="ch-03.html#modis-remote-download"><i class="fa fa-check"></i><b>3.2.2</b> MODIS remote download</a></li>
+<li class="chapter" data-level="3.2.3" data-path="ch-03.html"><a href="ch-03.html#points-on-the-globe"><i class="fa fa-check"></i><b>3.2.3</b> Points on the globe</a></li>
+<li class="chapter" data-level="3.2.4" data-path="ch-03.html"><a href="ch-03.html#shapefiles"><i class="fa fa-check"></i><b>3.2.4</b> Shapefiles</a></li>
+<li class="chapter" data-level="3.2.5" data-path="ch-03.html"><a href="ch-03.html#rasters"><i class="fa fa-check"></i><b>3.2.5</b> Rasters</a></li>
+<li class="chapter" data-level="3.2.6" data-path="ch-03.html"><a href="ch-03.html#key-points-from-the-tutorial-2"><i class="fa fa-check"></i><b>3.2.6</b> Key points from the tutorial</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="ch-03.html"><a href="ch-03.html#exercise-2"><i class="fa fa-check"></i><b>3.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="ch-04.html"><a href="ch-04.html"><i class="fa fa-check"></i><b>4</b> Data Scraping</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="ch-04.html"><a href="ch-04.html#introduction-3"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="ch-04.html"><a href="ch-04.html#key-points-from-the-lecture-3"><i class="fa fa-check"></i><b>4.1.1</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="ch-04.html"><a href="ch-04.html#tutorial-3"><i class="fa fa-check"></i><b>4.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="ch-04.html"><a href="ch-04.html#r-packages-and-functions"><i class="fa fa-check"></i><b>4.2.1</b> R-Packages and Functions</a></li>
+<li class="chapter" data-level="4.2.2" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-website"><i class="fa fa-check"></i><b>4.2.2</b> The FishBase website</a></li>
+<li class="chapter" data-level="4.2.3" data-path="ch-04.html"><a href="ch-04.html#accessing-fishbase"><i class="fa fa-check"></i><b>4.2.3</b> Accessing FishBase</a></li>
+<li class="chapter" data-level="4.2.4" data-path="ch-04.html"><a href="ch-04.html#scraping-numbers"><i class="fa fa-check"></i><b>4.2.4</b> Scraping Numbers</a></li>
+<li class="chapter" data-level="4.2.5" data-path="ch-04.html"><a href="ch-04.html#scraping-text-snippetrs"><i class="fa fa-check"></i><b>4.2.5</b> Scraping Text Snippetrs</a></li>
+<li class="chapter" data-level="4.2.6" data-path="ch-04.html"><a href="ch-04.html#scraping-tables"><i class="fa fa-check"></i><b>4.2.6</b> Scraping Tables</a></li>
+<li class="chapter" data-level="4.2.7" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-package"><i class="fa fa-check"></i><b>4.2.7</b> The Fishbase Package</a></li>
+<li class="chapter" data-level="4.2.8" data-path="ch-04.html"><a href="ch-04.html#summary"><i class="fa fa-check"></i><b>4.2.8</b> Summary</a></li>
+<li class="chapter" data-level="4.2.9" data-path="ch-04.html"><a href="ch-04.html#case-study"><i class="fa fa-check"></i><b>4.2.9</b> Case Study</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="ch-04.html"><a href="ch-04.html#exercise-3"><i class="fa fa-check"></i><b>4.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="ch-05.html"><a href="ch-05.html"><i class="fa fa-check"></i><b>5</b> Catch-up</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="ch-05.html"><a href="ch-05.html#loops-in-r"><i class="fa fa-check"></i><b>5.1</b> Loops in R</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="ch-05.html"><a href="ch-05.html#some-simple-examples"><i class="fa fa-check"></i><b>5.1.1</b> Some simple examples</a></li>
+<li class="chapter" data-level="5.1.2" data-path="ch-05.html"><a href="ch-05.html#nested-loops"><i class="fa fa-check"></i><b>5.1.2</b> Nested loops</a></li>
+<li class="chapter" data-level="5.1.3" data-path="ch-05.html"><a href="ch-05.html#exercise-4"><i class="fa fa-check"></i><b>5.1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="ch-05.html"><a href="ch-05.html#functional-programming-using-purr"><i class="fa fa-check"></i><b>5.2</b> Functional programming using purr</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="ch-05.html"><a href="ch-05.html#shortcuts-in-a-purrr-function"><i class="fa fa-check"></i><b>5.2.1</b> Shortcuts in a <code>purrr</code> function</a></li>
+<li class="chapter" data-level="5.2.2" data-path="ch-05.html"><a href="ch-05.html#workflow-nested-data-map-and-mutate"><i class="fa fa-check"></i><b>5.2.2</b> Workflow: nested data, map and mutate</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="ch-05.html"><a href="ch-05.html#string-manipulations"><i class="fa fa-check"></i><b>5.3</b> String Manipulations</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="ch-05.html"><a href="ch-05.html#introduction-to-strings"><i class="fa fa-check"></i><b>5.3.1</b> Introduction to strings</a></li>
+<li class="chapter" data-level="5.3.2" data-path="ch-05.html"><a href="ch-05.html#matching-and-extracting-patterns"><i class="fa fa-check"></i><b>5.3.2</b> Matching and extracting patterns</a></li>
+<li class="chapter" data-level="5.3.3" data-path="ch-05.html"><a href="ch-05.html#advanced-example"><i class="fa fa-check"></i><b>5.3.3</b> Advanced example</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="ch-05.html"><a href="ch-05.html#web-scraping-in-a-nut-shell"><i class="fa fa-check"></i><b>5.4</b> Web-scraping in a nut-shell</a></li>
+<li class="chapter" data-level="5.5" data-path="ch-05.html"><a href="ch-05.html#tidyverses-filter-and-select"><i class="fa fa-check"></i><b>5.5</b> Tidyverse’s filter and select</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="ch-05.html"><a href="ch-05.html#introduction-4"><i class="fa fa-check"></i><b>5.5.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.5.2" data-path="ch-05.html"><a href="ch-05.html#select"><i class="fa fa-check"></i><b>5.5.2</b> Select()</a></li>
+<li class="chapter" data-level="5.5.3" data-path="ch-05.html"><a href="ch-05.html#filter"><i class="fa fa-check"></i><b>5.5.3</b> Filter()</a></li>
+<li class="chapter" data-level="5.5.4" data-path="ch-05.html"><a href="ch-05.html#exercises"><i class="fa fa-check"></i><b>5.5.4</b> Exercises</a></li>
+<li class="chapter" data-level="5.5.5" data-path="ch-05.html"><a href="ch-05.html#solutions"><i class="fa fa-check"></i><b>5.5.5</b> Solutions</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="ch-05.html"><a href="ch-05.html#preparing-data-for-ggplot"><i class="fa fa-check"></i><b>5.6</b> Preparing data for ggplot()</a></li>
+<li class="chapter" data-level="5.7" data-path="ch-05.html"><a href="ch-05.html#base-r-functions"><i class="fa fa-check"></i><b>5.7</b> Base R functions</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="ch-06.html"><a href="ch-06.html"><i class="fa fa-check"></i><b>6</b> Supervised Machine Learning I</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="ch-06.html"><a href="ch-06.html#introduction-5"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="ch-06.html"><a href="ch-06.html#learning-objectives-2"><i class="fa fa-check"></i><b>6.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="6.1.2" data-path="ch-06.html"><a href="ch-06.html#important-points-from-the-lecture"><i class="fa fa-check"></i><b>6.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="ch-06.html"><a href="ch-06.html#tutorial-4"><i class="fa fa-check"></i><b>6.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="ch-06.html"><a href="ch-06.html#overfitting"><i class="fa fa-check"></i><b>6.2.1</b> Overfitting</a></li>
+<li class="chapter" data-level="6.2.2" data-path="ch-06.html"><a href="ch-06.html#motivation"><i class="fa fa-check"></i><b>6.2.2</b> Modelling challenge</a></li>
+<li class="chapter" data-level="6.2.3" data-path="ch-06.html"><a href="ch-06.html#a-selection-of-model-types"><i class="fa fa-check"></i><b>6.2.3</b> A selection of model types</a></li>
+<li class="chapter" data-level="6.2.4" data-path="ch-06.html"><a href="ch-06.html#data-splitting"><i class="fa fa-check"></i><b>6.2.4</b> Data splitting</a></li>
+<li class="chapter" data-level="6.2.5" data-path="ch-06.html"><a href="ch-06.html#preprocessing"><i class="fa fa-check"></i><b>6.2.5</b> Pre-processing</a></li>
+<li class="chapter" data-level="6.2.6" data-path="ch-06.html"><a href="ch-06.html#model-formulation"><i class="fa fa-check"></i><b>6.2.6</b> Model formulation</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="ch-06.html"><a href="ch-06.html#exercise-5"><i class="fa fa-check"></i><b>6.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="ch-06.html"><a href="ch-06.html#reading-and-cleaning"><i class="fa fa-check"></i><b>6.3.1</b> Reading and cleaning</a></li>
+<li class="chapter" data-level="6.3.2" data-path="ch-06.html"><a href="ch-06.html#data-splitting-1"><i class="fa fa-check"></i><b>6.3.2</b> Data splitting</a></li>
+<li class="chapter" data-level="6.3.3" data-path="ch-06.html"><a href="ch-06.html#linear-model"><i class="fa fa-check"></i><b>6.3.3</b> Linear model</a></li>
+<li class="chapter" data-level="6.3.4" data-path="ch-06.html"><a href="ch-06.html#pre-processing"><i class="fa fa-check"></i><b>6.3.4</b> Pre-processing</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="ch-07.html"><a href="ch-07.html"><i class="fa fa-check"></i><b>7</b> Supervised Machine Learning II</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="ch-07.html"><a href="ch-07.html#introduction-6"><i class="fa fa-check"></i><b>7.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="ch-07.html"><a href="ch-07.html#learning-objectives-3"><i class="fa fa-check"></i><b>7.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="7.1.2" data-path="ch-07.html"><a href="ch-07.html#key-points-from-the-lecture-4"><i class="fa fa-check"></i><b>7.1.2</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="ch-07.html"><a href="ch-07.html#tutorial-5"><i class="fa fa-check"></i><b>7.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="ch-07.html"><a href="ch-07.html#model-formulation-using-train"><i class="fa fa-check"></i><b>7.2.1</b> Model formulation using <code>train()</code></a></li>
+<li class="chapter" data-level="7.2.2" data-path="ch-07.html"><a href="ch-07.html#model-training"><i class="fa fa-check"></i><b>7.2.2</b> Model training</a></li>
+<li class="chapter" data-level="7.2.3" data-path="ch-07.html"><a href="ch-07.html#model-evaluation"><i class="fa fa-check"></i><b>7.2.3</b> Model evaluation</a></li>
+<li class="chapter" data-level="7.2.4" data-path="ch-07.html"><a href="ch-07.html#bonus-model-interpretation"><i class="fa fa-check"></i><b>7.2.4</b> Bonus: Model interpretation</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="ch-07.html"><a href="ch-07.html#exercise-6"><i class="fa fa-check"></i><b>7.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="ch-07.html"><a href="ch-07.html#setup"><i class="fa fa-check"></i><b>7.3.1</b> Setup</a></li>
+<li class="chapter" data-level="7.3.2" data-path="ch-07.html"><a href="ch-07.html#linear-model-1"><i class="fa fa-check"></i><b>7.3.2</b> Linear Model</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="ch-07.html"><a href="ch-07.html#knn"><i class="fa fa-check"></i><b>7.4</b> KNN</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="ch-07.html"><a href="ch-07.html#check-data"><i class="fa fa-check"></i><b>7.4.1</b> Check data</a></li>
+<li class="chapter" data-level="7.4.2" data-path="ch-07.html"><a href="ch-07.html#training-1"><i class="fa fa-check"></i><b>7.4.2</b> Training</a></li>
+<li class="chapter" data-level="7.4.3" data-path="ch-07.html"><a href="ch-07.html#prediction-1"><i class="fa fa-check"></i><b>7.4.3</b> Prediction</a></li>
+<li class="chapter" data-level="7.4.4" data-path="ch-07.html"><a href="ch-07.html#sample-hyperparameters"><i class="fa fa-check"></i><b>7.4.4</b> Sample hyperparameters</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="ch-07.html"><a href="ch-07.html#random-forest-1"><i class="fa fa-check"></i><b>7.5</b> Random forest</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="ch-07.html"><a href="ch-07.html#training-2"><i class="fa fa-check"></i><b>7.5.1</b> Training</a></li>
+<li class="chapter" data-level="7.5.2" data-path="ch-07.html"><a href="ch-07.html#prediction-2"><i class="fa fa-check"></i><b>7.5.2</b> Prediction</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="ch-08.html"><a href="ch-08.html"><i class="fa fa-check"></i><b>8</b> Application 1: Variable selection</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="ch-08.html"><a href="ch-08.html#introduction-7"><i class="fa fa-check"></i><b>8.1</b> Introduction</a></li>
+<li class="chapter" data-level="8.2" data-path="ch-08.html"><a href="ch-08.html#application"><i class="fa fa-check"></i><b>8.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="ch-08.html"><a href="ch-08.html#warm-up-1-nested-for-loop"><i class="fa fa-check"></i><b>8.2.1</b> Warm-up 1: Nested for-loop</a></li>
+<li class="chapter" data-level="8.2.2" data-path="ch-08.html"><a href="ch-08.html#warm-up-2-find-the-best-single-predictor"><i class="fa fa-check"></i><b>8.2.2</b> Warm-up 2: Find the best single predictor</a></li>
+<li class="chapter" data-level="8.2.3" data-path="ch-08.html"><a href="ch-08.html#full-stepwise-regression"><i class="fa fa-check"></i><b>8.2.3</b> Full stepwise regression</a></li>
+<li class="chapter" data-level="8.2.4" data-path="ch-08.html"><a href="ch-08.html#bonus-stepwise-regression-out-of-the-box"><i class="fa fa-check"></i><b>8.2.4</b> Bonus: Stepwise regression out-of-the-box</a></li>
+<li class="chapter" data-level="8.2.5" data-path="ch-08.html"><a href="ch-08.html#bonus-best-subset-selection---not-included-in-application-for-students-too-long"><i class="fa fa-check"></i><b>8.2.5</b> Bonus: Best Subset Selection - Not included in application for students (too long…)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="ch-09.html"><a href="ch-09.html"><i class="fa fa-check"></i><b>9</b> Supervised Neural Networks I</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ch-09.html"><a href="ch-09.html#introduction-8"><i class="fa fa-check"></i><b>9.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ch-09.html"><a href="ch-09.html#learning-objectives-4"><i class="fa fa-check"></i><b>9.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="9.1.2" data-path="ch-09.html"><a href="ch-09.html#important-points-from-the-lecture-1"><i class="fa fa-check"></i><b>9.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="ch-09.html"><a href="ch-09.html#tutorial-6"><i class="fa fa-check"></i><b>9.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="ch-09.html"><a href="ch-09.html#set-up"><i class="fa fa-check"></i><b>9.2.1</b> Set-up</a></li>
+<li class="chapter" data-level="9.2.2" data-path="ch-09.html"><a href="ch-09.html#keras-for-linear-models"><i class="fa fa-check"></i><b>9.2.2</b> Keras for linear models</a></li>
+<li class="chapter" data-level="9.2.3" data-path="ch-09.html"><a href="ch-09.html#tuning-learning-rate"><i class="fa fa-check"></i><b>9.2.3</b> Tuning learning rate</a></li>
+<li class="chapter" data-level="9.2.4" data-path="ch-09.html"><a href="ch-09.html#logistic-regression"><i class="fa fa-check"></i><b>9.2.4</b> Logistic Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="ch-09.html"><a href="ch-09.html#exercise-7"><i class="fa fa-check"></i><b>9.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ch-10.html"><a href="ch-10.html"><i class="fa fa-check"></i><b>10</b> Supervised Neural Networks II</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ch-10.html"><a href="ch-10.html#introduction-9"><i class="fa fa-check"></i><b>10.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="10.1.1" data-path="ch-10.html"><a href="ch-10.html#learning-objectives-5"><i class="fa fa-check"></i><b>10.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="10.1.2" data-path="ch-10.html"><a href="ch-10.html#important-points-from-the-lecture-2"><i class="fa fa-check"></i><b>10.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="ch-10.html"><a href="ch-10.html#tutorial-7"><i class="fa fa-check"></i><b>10.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="ch-10.html"><a href="ch-10.html#import-libraries-1"><i class="fa fa-check"></i><b>10.2.1</b> Import libraries</a></li>
+<li class="chapter" data-level="10.2.2" data-path="ch-10.html"><a href="ch-10.html#construct-a-toy-dataset"><i class="fa fa-check"></i><b>10.2.2</b> Construct a toy dataset</a></li>
+<li class="chapter" data-level="10.2.3" data-path="ch-10.html"><a href="ch-10.html#build-and-train-nn"><i class="fa fa-check"></i><b>10.2.3</b> Build and train NN</a></li>
+<li class="chapter" data-level="10.2.4" data-path="ch-10.html"><a href="ch-10.html#model-performance"><i class="fa fa-check"></i><b>10.2.4</b> Model performance</a></li>
+<li class="chapter" data-level="10.2.5" data-path="ch-10.html"><a href="ch-10.html#influence-of-nn-architecture"><i class="fa fa-check"></i><b>10.2.5</b> Influence of NN architecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="ch-10.html"><a href="ch-10.html#exercise-8"><i class="fa fa-check"></i><b>10.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="ch-11.html"><a href="ch-11.html"><i class="fa fa-check"></i><b>11</b> Application 2: Neural Networks and Hyperparameter Tuning</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="ch-11.html"><a href="ch-11.html#introduction-10"><i class="fa fa-check"></i><b>11.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="ch-11.html"><a href="ch-11.html#learning-goals"><i class="fa fa-check"></i><b>11.1.1</b> Learning Goals</a></li>
+<li class="chapter" data-level="11.1.2" data-path="ch-11.html"><a href="ch-11.html#key-points-from-previous-lectures"><i class="fa fa-check"></i><b>11.1.2</b> Key Points from Previous Lectures</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="ch-11.html"><a href="ch-11.html#application-1"><i class="fa fa-check"></i><b>11.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="ch-11.html"><a href="ch-11.html#problem-statement"><i class="fa fa-check"></i><b>11.2.1</b> Problem Statement</a></li>
+<li class="chapter" data-level="11.2.2" data-path="ch-11.html"><a href="ch-11.html#data-preparation"><i class="fa fa-check"></i><b>11.2.2</b> Data preparation</a></li>
+<li class="chapter" data-level="11.2.3" data-path="ch-11.html"><a href="ch-11.html#center-and-scale"><i class="fa fa-check"></i><b>11.2.3</b> Center and scale</a></li>
+<li class="chapter" data-level="11.2.4" data-path="ch-11.html"><a href="ch-11.html#building-a-simple-model-with-keras-subtask-1"><i class="fa fa-check"></i><b>11.2.4</b> Building a simple model with keras ( SubTask 1)</a></li>
+<li class="chapter" data-level="11.2.5" data-path="ch-11.html"><a href="ch-11.html#cross-validation"><i class="fa fa-check"></i><b>11.2.5</b> Cross validation</a></li>
+<li class="chapter" data-level="11.2.6" data-path="ch-11.html"><a href="ch-11.html#parameter-tuning"><i class="fa fa-check"></i><b>11.2.6</b> Parameter Tuning</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="ch-12.html"><a href="ch-12.html"><i class="fa fa-check"></i><b>12</b> Supervised Deep Learning I</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="ch-12.html"><a href="ch-12.html#introduction-11"><i class="fa fa-check"></i><b>12.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="12.1.1" data-path="ch-12.html"><a href="ch-12.html#learning-objectives-6"><i class="fa fa-check"></i><b>12.1.1</b> Learning objectives</a></li>
+</ul></li>
+<li class="chapter" data-level="12.2" data-path="ch-12.html"><a href="ch-12.html#tutorial-8"><i class="fa fa-check"></i><b>12.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="ch-12.html"><a href="ch-12.html#building-blocks-of-cnns"><i class="fa fa-check"></i><b>12.2.1</b> Building Blocks of CNNs</a></li>
+<li class="chapter" data-level="12.2.2" data-path="ch-12.html"><a href="ch-12.html#build-the-model"><i class="fa fa-check"></i><b>12.2.2</b> Build the model</a></li>
+<li class="chapter" data-level="12.2.3" data-path="ch-12.html"><a href="ch-12.html#compile-and-train-the-model"><i class="fa fa-check"></i><b>12.2.3</b> Compile and train the model</a></li>
+<li class="chapter" data-level="12.2.4" data-path="ch-12.html"><a href="ch-12.html#reduce-overfitting"><i class="fa fa-check"></i><b>12.2.4</b> Reduce Overfitting</a></li>
+<li class="chapter" data-level="12.2.5" data-path="ch-12.html"><a href="ch-12.html#visualizing-a-cnn"><i class="fa fa-check"></i><b>12.2.5</b> Visualizing a CNN</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="ch-12.html"><a href="ch-12.html#exercise-9"><i class="fa fa-check"></i><b>12.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="ch-12.html"><a href="ch-12.html#import-libraries-and-data"><i class="fa fa-check"></i><b>12.3.1</b> Import libraries and data</a></li>
+<li class="chapter" data-level="12.3.2" data-path="ch-12.html"><a href="ch-12.html#tasks"><i class="fa fa-check"></i><b>12.3.2</b> Tasks</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="ch-13.html"><a href="ch-13.html"><i class="fa fa-check"></i><b>13</b> Supervised Deep Learning II - <em>A Scenario of Environmental Systems</em></a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="ch-13.html"><a href="ch-13.html#introduction-12"><i class="fa fa-check"></i><b>13.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="13.1.1" data-path="ch-13.html"><a href="ch-13.html#learning-objectives-7"><i class="fa fa-check"></i><b>13.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="13.1.2" data-path="ch-13.html"><a href="ch-13.html#content-operations"><i class="fa fa-check"></i><b>13.1.2</b> Content &amp; Operations</a></li>
+</ul></li>
+<li class="chapter" data-level="13.2" data-path="ch-13.html"><a href="ch-13.html#tutorial-9"><i class="fa fa-check"></i><b>13.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="13.2.1" data-path="ch-13.html"><a href="ch-13.html#description-of-the-modelling-task"><i class="fa fa-check"></i><b>13.2.1</b> Description of the modelling task</a></li>
+<li class="chapter" data-level="13.2.2" data-path="ch-13.html"><a href="ch-13.html#goal-of-the-tutorial"><i class="fa fa-check"></i><b>13.2.2</b> Goal of the tutorial</a></li>
+<li class="chapter" data-level="13.2.3" data-path="ch-13.html"><a href="ch-13.html#dataset"><i class="fa fa-check"></i><b>13.2.3</b> Dataset</a></li>
+<li class="chapter" data-level="13.2.4" data-path="ch-13.html"><a href="ch-13.html#lets-dive-into-the-code"><i class="fa fa-check"></i><b>13.2.4</b> Let’s dive into the code</a></li>
+<li class="chapter" data-level="13.2.5" data-path="ch-13.html"><a href="ch-13.html#read-in-the-data"><i class="fa fa-check"></i><b>13.2.5</b> Read in the Data</a></li>
+<li class="chapter" data-level="13.2.6" data-path="ch-13.html"><a href="ch-13.html#naive-models-old-world-linear-models"><i class="fa fa-check"></i><b>13.2.6</b> Naive models (Old World): Linear Models</a></li>
+<li class="chapter" data-level="13.2.7" data-path="ch-13.html"><a href="ch-13.html#neural-networks-new-world"><i class="fa fa-check"></i><b>13.2.7</b> Neural Networks (New World)</a></li>
+<li class="chapter" data-level="13.2.8" data-path="ch-13.html"><a href="ch-13.html#convolutional-neural-network"><i class="fa fa-check"></i><b>13.2.8</b> Convolutional Neural Network</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="ch-13.html"><a href="ch-13.html#exercise-10"><i class="fa fa-check"></i><b>13.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Environmental Systems Data Science</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="ch-04" class="section level1" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Data Scraping</h1>
+<div id="introduction-3" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Introduction</h2>
+<p>This chapter covers <em>data scraping</em> in R and yes, this is not a typo. <em>Scraping</em> means to gather or to extract whereas <em>scrapping</em> means to get rid of something. The goal of the sections below is to gather and convert online data into a structured format that can be easily accessed and modified in R. As a case study, we will scrape data from a website containing various information about fish species, called <a href="https://www.fishbase.in/search.php">FishBase</a>.</p>
+<p>We will first learn how to access the website and how to extract useful useful information from plain text. Then, we will look at how to access a table that is embedded in the website and how to generate a new table in R which holds all information we want to extract. Next up is cleaning up the scraped data for visualization and analysis. At the end we will conduct a case study where we create a model to make predictions about fish species richness.</p>
+<div id="key-points-from-the-lecture-3" class="section level3" number="4.1.1">
+<h3><span class="header-section-number">4.1.1</span> Key points from the lecture</h3>
+<p>Let us first have a brief review of the main concept of the lecture. The web is the largest source of information and often free to access. In some cases the information is already presented in a nice format and can be easily copied into an excel spreadsheet. However, this is often not the case and data-sets are only presented in a format that is not easy to download or modify. Manually copying data from different sub pages and sections is a tedious, slow and error prone approach. We therefore need a more automated and efficient technique to access such data.</p>
+<p>Web scraping is a popular technique to extract information directly from a website by accessing its underlying HTML code. Scraping allows us to gather this unstructured data from many websites and put it all together in a ready-to-use data format. This structured data can then be further used as training, validation or test data sets for our machine learning algorithms.</p>
+<p><strong>Important Concepts of Websites</strong></p>
+<ul>
+<li><p><strong>HTTP</strong>: The <strong>H</strong>yper<strong>t</strong>ext <strong>T</strong>ransfer <strong>P</strong>rotocol is a widely used protocol for information systems. Hypertext documents include hyperlinks that can be clicked to access other resources. Put simply, HTTP is the foundation of how information, i.e., data, is communicated in the world wide web.</p></li>
+<li><p><strong>HTML</strong>: <strong>H</strong>yper<strong>t</strong>ext <strong>M</strong>arkup <strong>L</strong>anguage is the coding language in which most websites are written. This includes elements like formatting or structuring and is often combined using CSS or JavaScript. HTML is organized using tags, which are surrounded by <code>&lt; &gt;</code>. Each HTML document is made of elements that are specified using tags. HTML elements and HTML tags are often confused. Tags are used to open and close the object, whereas elements include both tags and its content.</p>
+<p>Let’s consider an example with the <code>&lt;h1&gt;</code> tag: <code>&lt;h1&gt; Title of the document &lt;/h1&gt;</code> is an element, and <code>&lt;h1&gt;</code>, <code>&lt;/h1&gt;</code> - are the tags enclosing it. The <code>&lt;&gt;</code> symbol is used to open a tag or an element and <code>&lt;/&gt;</code> is used to close it. HTML documents have a hierarchical or tree like structure with different types of nodes as described in <a href="ch-04.html#fig:node-tree">4.1</a>. The rectangular boxes are referred to as nodes. The <em>Text</em> node is also called as a child node of the <em>Element</em> node and also a leaf node as it only contains text and no links to further nodes. Both of the <em>Element</em> nodes that are attached to the <em>Root Element</em> node are called sibling nodes of the <em>Root Element</em> node. When we do web scraping we go through such a hierarchical structure to get the content (here text in the <em>Test</em> node). Keep in mind that every HTML document can vary with respect to its structure. This example is to just to provide you some knowledge about HTML document and its structure.</p></li>
+</ul>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:node-tree"></span>
+<img src="figures/node-tree.png" alt="Visualization of the structure of an HTML document." width="50%" />
+<p class="caption">
+Figure 4.1: Visualization of the structure of an HTML document.
+</p>
+</div>
+<ul>
+<li><p><strong>XML</strong>: The E<strong>x</strong>tensible <strong>M</strong>arkup <strong>L</strong>anguage has some similarities to HTML but the format is generally easier to read for machines. While HTML has a number of pre-defined tags, one can create (“extend”) new tags as needed . This allows to define and control the meaning of the elements contained in a document or text.</p></li>
+<li><p><strong>API</strong>: An <strong>A</strong>pplication <strong>P</strong>rogramming <strong>I</strong>nterface is a set of procedures and communication protocols that provide access to the data of an application, operating system or other services. Both APIs and web scraping are used to retrieve data from websites, but their methodology differs substantially. APIs give us direct access to the data we would want, but they are limited to the corresponding website. As a result, we might find us in a scenario where there might not be an API to access the data we want. In these scenarios, web scrapping would allow us to access the data as long as it is available on a website. Hence APIs are very source/website specific and we can only do what is already implemented but in a clean fashion, while scrapping is more flexible and can be applied (nearly) everywhere but we have to handle all the formatting, inconsistencies, extraction, etc. by yourself.</p></li>
+</ul>
+<p>Next, we will demonstrate the principles of web scraping using a simple case study. We will extract fish occurrence data from an online database and perform some basic correlations with the obtained data.</p>
+</div>
+</div>
+<div id="tutorial-3" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Tutorial</h2>
+<div id="r-packages-and-functions" class="section level3" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> R-Packages and Functions</h3>
+<p>We will now load all packages necessary to perform web scraping on FishBase, namely <strong>RCurl</strong> <span class="citation">(<a href="#ref-R-RCurl" role="doc-biblioref">Temple Lang 2021a</a>)</span> and <strong>XML</strong> <span class="citation">(<a href="#ref-R-XML" role="doc-biblioref">Temple Lang 2021b</a>)</span>. <strong>RCurl</strong> provides functions to allow us to compose general HTTP requests and provides convenient functions to fetch URLs via get and post requests and process the results returned by the web server.
+<strong>XML</strong> give us approaches for both reading (get request) and creating (post request) XML and HTML documents, both locally and on the web via HTTP. Later in this tutorial, we will create some spatial visualization and load the packages <strong>raster</strong>, <strong>sf</strong> and <strong>rgdal</strong> to do so. Before we proceed further to accessing FishBase, we will have a quick look at the useful functions <code>lapply()</code> and <code>sapply()</code>.</p>
+<div class="sourceCode" id="cb265"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb265-1"><a href="ch-04.html#cb265-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Check for missing packages</span></span>
+<span id="cb265-2"><a href="ch-04.html#cb265-2" aria-hidden="true" tabindex="-1"></a>list_pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;RCurl&quot;</span>, <span class="st">&quot;XML&quot;</span>, <span class="st">&quot;raster&quot;</span>, <span class="st">&quot;rgdal&quot;</span>, <span class="st">&quot;rfishbase&quot;</span>, <span class="st">&quot;tidyverse&quot;</span>, <span class="st">&quot;sf&quot;</span>) </span>
+<span id="cb265-3"><a href="ch-04.html#cb265-3" aria-hidden="true" tabindex="-1"></a>new_pkgs <span class="ot">&lt;-</span> list_pkgs[<span class="sc">!</span>(list_pkgs <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[, <span class="st">&quot;Package&quot;</span>])]</span>
+<span id="cb265-4"><a href="ch-04.html#cb265-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(new_pkgs) <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="fu">install.packages</span>(new_pkgs)</span>
+<span id="cb265-5"><a href="ch-04.html#cb265-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb265-6"><a href="ch-04.html#cb265-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Load packages</span></span>
+<span id="cb265-7"><a href="ch-04.html#cb265-7" aria-hidden="true" tabindex="-1"></a>lib_vec <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;RCurl&quot;</span>, <span class="st">&quot;XML&quot;</span>, <span class="st">&quot;raster&quot;</span>, <span class="st">&quot;rgdal&quot;</span>, <span class="st">&quot;rfishbase&quot;</span>, <span class="st">&quot;tidyverse&quot;</span>, <span class="st">&quot;sf&quot;</span>)</span>
+<span id="cb265-8"><a href="ch-04.html#cb265-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(lib_vec, library, <span class="at">character.only =</span> <span class="cn">TRUE</span>) <span class="co"># See below for how sapply() works</span></span></code></pre></div>
+<div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb266-1"><a href="ch-04.html#cb266-1" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(<span class="at">package =</span> <span class="st">&quot;XML&quot;</span>) <span class="co"># Use this code line in the RStudio console to learn more about loaded packages</span></span></code></pre></div>
+<p>Sidenote: For data scraping in R one can also use ‘rjson’ to convert R objects into JSON objects and vice-versa. Another option we will use later are APIs. To get information about the loaded packages we can type the following command in the console:</p>
+<div id="lapply" class="section level4 unnumbered">
+<h4>lapply()</h4>
+<p><code>lapply()</code> allows us to apply the same function to a vector of objects. The respective arguments are <code>X</code> (the vector or object we give as input) and <code>FUN</code> (the function which is applied to each element of <code>X</code>). The output of <code>lapply()</code> is a list of the same length as <code>X</code> where each element of <code>X</code> is the result of applying <code>FUN</code> to the corresponding element of <code>X</code>. <code>X</code> is a vector (atomic, list or data frame) or an expression object. The <code>l</code> in <code>lapply()</code> thus stands for list.</p>
+<p>A simple example is to change the string value of a matrix to lower case with the R-function <code>tolower()</code> function. First, we set up a vector with string objects that we want to apply the function on. Then we create a pipe that feeds this vector into <code>lapply()</code> which applies <code>tolower</code>. The output is a list of the original two string objects but now written in lower case.</p>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb267-1"><a href="ch-04.html#cb267-1" aria-hidden="true" tabindex="-1"></a>fish <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;FAMILY&quot;</span>,<span class="st">&quot;SPECIES&quot;</span>)</span>
+<span id="cb267-2"><a href="ch-04.html#cb267-2" aria-hidden="true" tabindex="-1"></a>fish <span class="sc">%&gt;%</span> <span class="fu">lapply</span>(tolower) <span class="co"># Note that tolower() must not be written with brackets</span></span></code></pre></div>
+<pre><code>## [[1]]
+## [1] &quot;family&quot;
+## 
+## [[2]]
+## [1] &quot;species&quot;</code></pre>
+</div>
+<div id="sapply" class="section level4 unnumbered">
+<h4>sapply()</h4>
+<p><code>sapply()</code> takes a list, vector or data frame as input and gives a vector or matrix as output. This is very useful if we have to use another function which only accepts a vector as input but does not accept a list. Note that we can apply the same function using <code>lapply()</code> or <code>sapply</code> but their outputs are not the same.</p>
+<p>As an example we can have a look at the cars data where the speed and respective stopping distance are saved. We can apply the <code>min()</code> function to both features of the data set to get their minimal values. If we are using <code>lapply()</code>, we get a list that is accessible using <code>$</code>. With <code>sapply()</code> we get a named vector which can be seen at the headings <code>speed</code> and <code>dist</code> in the output below (those headings are of course the same as the variable names in the outputted list of <code>lapply()</code>).</p>
+<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb269-1"><a href="ch-04.html#cb269-1" aria-hidden="true" tabindex="-1"></a>(df <span class="ot">&lt;-</span> <span class="fu">head</span>(cars))</span></code></pre></div>
+<pre><code>##   speed dist
+## 1     4    2
+## 2     4   10
+## 3     7    4
+## 4     7   22
+## 5     8   16
+## 6     9   10</code></pre>
+<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb271-1"><a href="ch-04.html#cb271-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">sapply</span>(min)</span></code></pre></div>
+<pre><code>## speed  dist 
+##     4     2</code></pre>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb273-1"><a href="ch-04.html#cb273-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">lapply</span>(min)</span></code></pre></div>
+<pre><code>## $speed
+## [1] 4
+## 
+## $dist
+## [1] 2</code></pre>
+</div>
+</div>
+<div id="the-fishbase-website" class="section level3" number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> The FishBase website</h3>
+<p><a href="https://www.fishbase.in/search.php">FishBase</a> is a global species database of fish species. It provides data of various fish species, including information on taxonomy, geographical distribution, biometrics and morphology, behaviour and habitats, ecology and population dynamics as well as reproductive, metabolic and genetic data. Different tools, such as trophic pyramids, identification keys, biogeographical modelling and fishery statistics can be accessed on the website. Furthermore, direct species level links to information in other databases such as LarvalBase, GenBank, the IUCN Red List and the Catalog of Fishes exist. As of November 2018, FishBase included descriptions of 34,000 species and subspecies.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:screen"></span>
+<img src="figures/screen.png" alt="Screenshot of the FishBase webpage for the species *Coregonus lavaretus*, a member of the family Salmonidae. As can be read in the distribution paragraph, it is widespread in freshwater systems from central and northwest Europe to Siberia." width="50%" />
+<p class="caption">
+Figure 4.2: Screenshot of the FishBase webpage for the species <em>Coregonus lavaretus</em>, a member of the family Salmonidae. As can be read in the distribution paragraph, it is widespread in freshwater systems from central and northwest Europe to Siberia.
+</p>
+</div>
+<p>As shown in Figure <a href="ch-04.html#fig:screen">4.2</a>, the website contains lots of information for all the different species and this information is stored in various different data types. A few examples of these data types are:</p>
+<ul>
+<li>Numbers in different formats and units (temperature ranges, latitudinal distribution)</li>
+<li>Text blocks (description of the distribution)</li>
+<li>Tables (fecundity, larvae information)</li>
+<li>Pictures and videos (of the species, embedded into HTML code)</li>
+</ul>
+<p>For a better understanding of the following R code, you are strongly encouraged to have a look at the <a href="https://fishbase.de">FishBase</a> website in your browser. In the next sections you will learn how to deal with these different complex data types. A careful approach is required when extracting and downloading such information. Understanding the structure of the website is an important first step and it will save you coding time. So, always identify the relevant information you want to extract first and then write a suitable extraction code which fits the needs of your machine learning algorithm.</p>
+</div>
+<div id="accessing-fishbase" class="section level3" number="4.2.3">
+<h3><span class="header-section-number">4.2.3</span> Accessing FishBase</h3>
+<p>We are now ready to extract data from the <em>Coregonus lavaretus</em> website on <a href="https://fishbase.de">FishBase</a>. For this we first create a string object which holds the name of the fish profile we want to access. Using a variable to do this, adds flexibility in functions as will be shown below. If we want to get data about other species we can simply assign a new value to the object <code>x</code>with the desired species name.</p>
+<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb275-1"><a href="ch-04.html#cb275-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="st">&quot;Coregonus-lavaretus&quot;</span></span>
+<span id="cb275-2"><a href="ch-04.html#cb275-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## [1] &quot;Coregonus-lavaretus&quot;</code></pre>
+<p>Next, we use the function <code>paste()</code> to create an object holding the URL to the fish profile. Attaching strings like this is called concatenate and will be used quite often in later tutorials, so remember this wording. To create the URL we do not have to add any separation between the arguments, so we use <code>sep = ""</code>. Using the flexibility of using <code>x</code> allows us here to add any species name directly into <code>paste()</code> instead of deleting and adding another Latin name every time.</p>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb277-1"><a href="ch-04.html#cb277-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;http://www.fishbase.de/summary/&quot;</span>, x ,<span class="st">&quot;.html&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb277-2"><a href="ch-04.html#cb277-2" aria-hidden="true" tabindex="-1"></a>url</span></code></pre></div>
+<pre><code>## [1] &quot;http://www.fishbase.de/summary/Coregonus-lavaretus.html&quot;</code></pre>
+<p>For <code>url</code> we could also directly use <em><a href="http://www.fishbase.de/summary/Coregonus-lavaretus" class="uri">http://www.fishbase.de/summary/Coregonus-lavaretus</a></em> but then we would loose flexibility if we want to look for information about other species.</p>
+<p><strong>Checkpoint</strong>
+Try to do the same for the URL of other species by changing the code above.</p>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb279-1"><a href="ch-04.html#cb279-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change the object x_end to desired species name</span></span>
+<span id="cb279-2"><a href="ch-04.html#cb279-2" aria-hidden="true" tabindex="-1"></a>x_ex<span class="ot">&lt;-</span> <span class="st">&quot;Salvelinus alpinus&quot;</span></span>
+<span id="cb279-3"><a href="ch-04.html#cb279-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb279-4"><a href="ch-04.html#cb279-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Concatenate the URK</span></span>
+<span id="cb279-5"><a href="ch-04.html#cb279-5" aria-hidden="true" tabindex="-1"></a>url_ex <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;http://www.fishbase.de/summary/&quot;</span>,x_ex,<span class="st">&quot;.html&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<p>To access the URL and its HTML documents, we will use various functions from the <code>XML</code> package. First, we want to get the URL content using <code>getURLContent()</code> which takes a URL as input argument. Then, we use <code>htmlParse()</code> to read the HTML document from the URL content into an R object. To get help on functions we can always use <code>help("htmlParse")</code>.</p>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb280-1"><a href="ch-04.html#cb280-1" aria-hidden="true" tabindex="-1"></a>fishbase <span class="ot">&lt;-</span> url <span class="sc">%&gt;%</span> <span class="fu">getURLContent</span>(<span class="at">followlocation =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">htmlParse</span>() </span></code></pre></div>
+<p>The HTML document saved in <code>fishbase</code> is quite long to show it entirely but a snapshot is displayed in Figure <a href="ch-04.html#fig:fishbase">4.3</a>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:fishbase"></span>
+<img src="figures/fishbase.png" alt="Extract from the HTML document saved in the variable `fishbase`." width="50%" />
+<p class="caption">
+Figure 4.3: Extract from the HTML document saved in the variable <code>fishbase</code>.
+</p>
+</div>
+<p>Somewhere in this gigantic object we can find the relevant information we are looking for. For example, Figure <a href="ch-04.html#fig:maxle">4.4</a> below shows the extract where the maximal lenght of the fish is documented. Check out the online profile to double check whether the value is correct.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:maxle"></span>
+<img src="figures/fishbase_maxle.png" alt="Extract of `fishbase` documenting maximal length of *Coregonus lavaretus*." width="50%" />
+<p class="caption">
+Figure 4.4: Extract of <code>fishbase</code> documenting maximal length of <em>Coregonus lavaretus</em>.
+</p>
+</div>
+<p>Highlighted in red are the opening and closing tags of the element where the information on the maximal length is stored. Knowing these tags, we can identify where our information is stored and how to extract it. In this example, we need to target either the <code>span</code> or <code>\div</code> tags. In order to extract the information inside these two tags, we use the function <code>getNodeSet()</code>. This function finds XML nodes that match a particular criterion. <code>span</code> is used for a small chunk of HTML inside a line whereas <code>div</code> is used to group larger chunks of code.</p>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb281-1"><a href="ch-04.html#cb281-1" aria-hidden="true" tabindex="-1"></a>fishbase_div <span class="ot">&lt;-</span> fishbase <span class="sc">%&gt;%</span> <span class="fu">getNodeSet</span>(<span class="st">&quot;//div &quot;</span>) </span>
+<span id="cb281-2"><a href="ch-04.html#cb281-2" aria-hidden="true" tabindex="-1"></a>fishbase_span <span class="ot">&lt;-</span> fishbase <span class="sc">%&gt;%</span> <span class="fu">getNodeSet</span>(<span class="st">&quot;//span &quot;</span>) </span></code></pre></div>
+<p>In the next two Figures <a href="ch-04.html#fig:before">4.5</a> and <a href="ch-04.html#fig:after">4.6</a> we can see the differences of what is stored in variable <code>fishbase</code> and <code>fishbase_div</code>. The difference to <code>fishbase_span</code> is similar. We see that instead of having this one long unstructured extract in Figure <a href="ch-04.html#fig:before">4.5</a>, we have now a list of objects that we easily access. In Figure <a href="ch-04.html#fig:after">4.6</a>, the list can be identified by the <code>[[22]]</code> in the top left corner which marks the position of the object within the list. In short, <code>getNodeSet()</code> identifies all the sections for a given tag (i.e., nodes), separates them and gathers them in a list.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:before"></span>
+<img src="figures/before.png" alt="`fishbase` before the command `getNodeSet()`" width="50%" />
+<p class="caption">
+Figure 4.5: <code>fishbase</code> before the command <code>getNodeSet()</code>
+</p>
+</div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:after"></span>
+<img src="figures/after.png" alt="`fishbase` after the command `getNodeSet()`" width="50%" />
+<p class="caption">
+Figure 4.6: <code>fishbase</code> after the command <code>getNodeSet()</code>
+</p>
+</div>
+</div>
+<div id="scraping-numbers" class="section level3" number="4.2.4">
+<h3><span class="header-section-number">4.2.4</span> Scraping Numbers</h3>
+<p>Next, we now want to extract the maximal body length of <em>Coregonus lavaretus</em> out of the list of nodes we created in the previous section. For this, we will use the function <code>xmlValue()</code> which allows us to access the text in the nodes by converting them into strings. To proceed further, we briefly have a look at regular expressions.</p>
+<p>A <em>regular expression</em> is basically a sequence of characters (think of a certain word or a number) that can be searched for in a string (which is nothing else but a sequence of characters). The <code>regexec()</code> (for <strong>reg</strong>ular <strong>ex</strong>pression) function allows us to search for a pattern within a string. The output of <code>regexec()</code> gives you different information. For now it enough to know that it returns a list where the first object holds the position of the pattern in the string or simply a <code>-1</code> if the pattern is not found. In our case, we are going to look for the pattern “Max length” because after this pattern, the value we are looking for is saved (see Figure <a href="ch-04.html#fig:length">4.7</a>).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:length"></span>
+<img src="figures/length.png" alt="In blue highlighted is the regular expression on the FishBase website which we are looking for." width="50%" />
+<p class="caption">
+Figure 4.7: In blue highlighted is the regular expression on the FishBase website which we are looking for.
+</p>
+</div>
+<p>The code to identify the position where the regular expression <em>Max Length</em> is located is rather complex, so here is a step-by-step breakdown. You can run each part of the pipe below one-by-one to better understand what is happening.</p>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="ch-04.html#cb282-1" aria-hidden="true" tabindex="-1"></a>pos <span class="ot">&lt;-</span> fishbase_span <span class="sc">%&gt;%</span> <span class="fu">lapply</span>(xmlValue) <span class="sc">%&gt;%</span>  <span class="co"># 1. Convert all list objects in fishbase_span into strings</span></span>
+<span id="cb282-2"><a href="ch-04.html#cb282-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">regexec</span>(<span class="at">pattern =</span><span class="st">&quot; Max length&quot;</span>) <span class="sc">%&gt;%</span>          <span class="co"># 2. Search strings for pattern </span></span>
+<span id="cb282-3"><a href="ch-04.html#cb282-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">which.max</span>()                                  <span class="co"># 3. Return position in list where highest number is found</span></span>
+<span id="cb282-4"><a href="ch-04.html#cb282-4" aria-hidden="true" tabindex="-1"></a>                                               <span class="co"># (just one way to identify the node with relevant information)</span></span>
+<span id="cb282-5"><a href="ch-04.html#cb282-5" aria-hidden="true" tabindex="-1"></a>pos</span></code></pre></div>
+<pre><code>## [1] 44</code></pre>
+<p>Now we know that our regular expression <em>Max length</em> can be found in node number 42. To get access to the text in this node we simply access <code>fishbase_span</code> via the list notation <code>[[ ]]</code> and turn the object into a string and save it as <code>fish_length</code>. As you can see in the output, the information on max length has been found correctly.</p>
+<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="ch-04.html#cb284-1" aria-hidden="true" tabindex="-1"></a>fish_length <span class="ot">&lt;-</span> fishbase_span[[pos]] <span class="sc">%&gt;%</span> <span class="fu">xmlValue</span>()</span>
+<span id="cb284-2"><a href="ch-04.html#cb284-2" aria-hidden="true" tabindex="-1"></a>fish_length</span></code></pre></div>
+<pre><code>## [1] &quot;\r\n\t\t\t\t\tMaturity: Lm27.1, range 40 - ? cm Max length : 73.0 cm TL male/unsexed; (Ref. 40637); max. published weight: 10.0 kg (Ref. 35388)\t\t\t\t&quot;</code></pre>
+<p>We now use the function <code>substr()</code>, which allows to extract a section of a string that lies between two characters. Think of this as extracting a number interval in a series of numbers. Unfortuntaly, identifying this start and end has to be done somewhat by hand. In Figure <a href="ch-04.html#fig:length">4.7</a> you can see that, starting from the <em>‘M’</em> in <em>Max Length</em>, there are 13 characters until the value begins with a <em>7</em> and 16 characters until it ends with a <em>0</em>. Keep in mind that every blank space is also counted as character. Knowing this, we can first use <code>regexec()</code> to get the character position where <em>Max Length</em> starts and just add 13, respectively 16 to the value.</p>
+<p>Two things to note here: (i) Keep in mind that every blank space is also counted. (ii) Note that the output of <code>regexec()</code> is a list where the first object is the character position where the pattern begins in the string. Thus, we need to access this position number by using <code>[[1]][1]</code>. Another way instead of using <code>regexec()</code> is just by typing in some numbers into <code>substr()</code> and find the relevant characters by trial and error.</p>
+<div class="sourceCode" id="cb286"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb286-1"><a href="ch-04.html#cb286-1" aria-hidden="true" tabindex="-1"></a>start_M <span class="ot">&lt;-</span> fish_length <span class="sc">%&gt;%</span>  <span class="fu">regexec</span>(<span class="at">pattern=</span> <span class="st">&quot;Max length&quot;</span>)</span>
+<span id="cb286-2"><a href="ch-04.html#cb286-2" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> fish_length <span class="sc">%&gt;%</span> <span class="fu">substr</span>(start_M[[<span class="dv">1</span>]][<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">13</span>,</span>
+<span id="cb286-3"><a href="ch-04.html#cb286-3" aria-hidden="true" tabindex="-1"></a>                                     start_M[[<span class="dv">1</span>]][<span class="dv">1</span>] <span class="sc">+</span> <span class="dv">16</span>)</span>
+<span id="cb286-4"><a href="ch-04.html#cb286-4" aria-hidden="true" tabindex="-1"></a>max_length</span></code></pre></div>
+<pre><code>## [1] &quot;73.0&quot;</code></pre>
+<p>At last, we have to convert the value of the maximal length (which is a string of characters) into a number using the function <code>as.double()</code>. This converts the value into a machine readable format which makes things easier later. We see from the output below that we correctly exctracted a maximal length of <em>Coregonus lavaretus</em> of 73 cm. Now, we can start thinking about looping this approach to extract the maximal length of various species and collect them in a nicely formatted data frame.</p>
+<p>To demonstrate fexibility in data reading: This entire approach can also be used to for example to identify any numeric value that is followed by any one or enclosed by any two characters.</p>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb288-1"><a href="ch-04.html#cb288-1" aria-hidden="true" tabindex="-1"></a>max_length <span class="ot">&lt;-</span> <span class="fu">as.double</span>(max_length)</span>
+<span id="cb288-2"><a href="ch-04.html#cb288-2" aria-hidden="true" tabindex="-1"></a>max_length</span></code></pre></div>
+<pre><code>## [1] 73</code></pre>
+</div>
+<div id="scraping-text-snippetrs" class="section level3" number="4.2.5">
+<h3><span class="header-section-number">4.2.5</span> Scraping Text Snippetrs</h3>
+<div id="international-union-for-conservation-of-nature" class="section level4 unnumbered">
+<h4>International Union for Conservation of Nature</h4>
+<p>Another interesting information on FishBase is the IUCN (International Union for Conservation of Nature) status of each species. The IUCN Red List of threatened Species has evolved to become the world’s most comprehensive information source on the global extinction risk status of animal, fungus and plant species.</p>
+<p>The IUCN Red List is a critical indicator of world’s biodiversity and has been established in 1994. It contains explicit criteria and categories to classify the conservation status of individual species on the basis of their probability of extinction. After a species is evaluated by the IUCN, it is placed into one of eight categories based on its current conservation status as shown in the figure.</p>
+<p>Far more than a list of species and their status, it is a powerful tool to inform and catalyze action for biodiversity conservation and policy change, critical to protecting the natural resources we depend on for survival. The IUCN also provides information about the range, population size, habitat and ecology, use and/or trade, threats, and conservation actions that will help inform necessary conservation decisions.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:iucn"></span>
+<img src="figures/iucn.png" alt="Structure of IUCN categories." width="50%" />
+<p class="caption">
+Figure 4.8: Structure of IUCN categories.
+</p>
+</div>
+</div>
+<div id="extracting-iucn-status" class="section level4 unnumbered">
+<h4>Extracting IUCN Status</h4>
+<p>Now that we learned how to extract values, we can move on to extracting text snippets! In this part, we are going to get the IUCN Status of <em>Coregonus lavaretus</em>. In contrary to above, we are going to use the function <code>which()</code> (not <code>which.max()</code>) to find the position of the elements we are looking for. We use <code>regexec()</code> to search for matches of our pattern within each element of a character vector. In this case, the pattern is simply <em>IUCN</em>. As for the maximal length, we can look up this pattern on the website we are scraping from.</p>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="ch-04.html#cb290-1" aria-hidden="true" tabindex="-1"></a>IUCN_pos <span class="ot">&lt;-</span> <span class="fu">which</span>(                 <span class="co"># which() gives us the numbers of nodes where pattern was found</span></span>
+<span id="cb290-2"><a href="ch-04.html#cb290-2" aria-hidden="true" tabindex="-1"></a>  fishbase_div <span class="sc">%&gt;%</span>                 <span class="co"># pipe from above to find pattern put into which()</span></span>
+<span id="cb290-3"><a href="ch-04.html#cb290-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(xmlValue) <span class="sc">%&gt;%</span>   </span>
+<span id="cb290-4"><a href="ch-04.html#cb290-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">regexec</span>(<span class="at">pattern =</span> <span class="st">&quot;IUCN&quot;</span>)      <span class="co"># end of pipe</span></span>
+<span id="cb290-5"><a href="ch-04.html#cb290-5" aria-hidden="true" tabindex="-1"></a>  <span class="sc">&gt;</span> <span class="dv">0</span>                              <span class="co"># check for which() to only give positive numbers for nodes</span></span>
+<span id="cb290-6"><a href="ch-04.html#cb290-6" aria-hidden="true" tabindex="-1"></a>)                                  <span class="co"># we do this because if pattern is not found, regexec returns a -1</span></span>
+<span id="cb290-7"><a href="ch-04.html#cb290-7" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb290-8"><a href="ch-04.html#cb290-8" aria-hidden="true" tabindex="-1"></a>IUCN_pos                           <span class="co"># pattern can be found in nodes 5, 14 and 24</span></span></code></pre></div>
+<pre><code>## [1]  5 14 24</code></pre>
+<p>If the pattern cannot be found in <code>fishbase_div</code>, the variable <code>w_IUCN</code> will be empty (we use <code>fishbase_div</code> here because the pattern was not found in <code>fishbase_span</code>). To avoid complications later, we better do a quick check and set the variable to <code>NA</code> if it is empty and else use <code>xmlValue()</code> to get the value at the last node where the pattern was found.</p>
+<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb292-1"><a href="ch-04.html#cb292-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">length</span>(IUCN_pos)<span class="sc">==</span><span class="dv">0</span>){              <span class="co"># if which() from above returned 0 (no node with &gt;0)</span></span>
+<span id="cb292-2"><a href="ch-04.html#cb292-2" aria-hidden="true" tabindex="-1"></a>  IUCN_stat <span class="ot">=</span> <span class="st">&quot;NA&quot;</span>                    <span class="co"># set status to NA</span></span>
+<span id="cb292-3"><a href="ch-04.html#cb292-3" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {                              <span class="co"># else</span></span>
+<span id="cb292-4"><a href="ch-04.html#cb292-4" aria-hidden="true" tabindex="-1"></a>  IUCN_xml <span class="ot">&lt;-</span> fishbase_div[[          <span class="co"># access fishbase_div nodes with [[</span></span>
+<span id="cb292-5"><a href="ch-04.html#cb292-5" aria-hidden="true" tabindex="-1"></a>    IUCN_pos[<span class="fu">length</span>(IUCN_pos)]]] <span class="sc">%&gt;%</span>  <span class="co"># access last node where pattern was found, length(IUCN_pos) = 24</span></span>
+<span id="cb292-6"><a href="ch-04.html#cb292-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">xmlValue</span>()                        <span class="co"># feed node into xmlValue() to return readable string</span></span>
+<span id="cb292-7"><a href="ch-04.html#cb292-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb292-8"><a href="ch-04.html#cb292-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb292-9"><a href="ch-04.html#cb292-9" aria-hidden="true" tabindex="-1"></a>IUCN_xml</span></code></pre></div>
+<pre><code>## [1] &quot;\r\n\t\t\t\t\r\n\t\t\t\t\tIUCN Red List Status   (Ref. 124695)\r\n\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\t  Vulnerable (VU) (D2); Date assessed: 01 January 2008\t\t\t\t\r\n\t\t\t\t&quot;</code></pre>
+<p>The <code>IUCN_xml</code> looks a little confusing and we only need a tiny part of it, namely <em>VU</em>. We can see that in this node <em>VU</em> has a unique character pattern which does not appear twice: The closing bracket <code>)</code>is right after <code>U</code>, an alphabetical character. We can use this pattern to extract <em>VU</em>! Here, the <code>str_extract()</code> function from tidyverse comes in very handy. We can directly specify the pattern we are looking for and extract the substring from the original string. Note that for generalization, we need to specify <code>[[:alpha:]]</code> for any alphabetical character <code>+[)]</code> for the closing bracket.</p>
+<p>However, if we do so, we still extract the bracket as well. To get rid of it, we can simply remove it by replacing it with “nothing” using <code>str_replace()</code>. Instead of specifying the closing bracket, we use <code>[:punct:]</code> which generalizes punctuations like <code>. , : ; ? !</code> etc. As we see in the output below, the IUCN status <em>VU</em> has been correctly extracted - nice! Plus, we don’t need to convert it and can use it as string later on.</p>
+<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb294-1"><a href="ch-04.html#cb294-1" aria-hidden="true" tabindex="-1"></a>IUCN_sta <span class="ot">&lt;-</span> IUCN_xml <span class="sc">%&gt;%</span></span>
+<span id="cb294-2"><a href="ch-04.html#cb294-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_extract</span>(<span class="at">pattern =</span> <span class="st">&quot;[:alpha:]+[)]&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb294-3"><a href="ch-04.html#cb294-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_replace</span>(<span class="at">pattern =</span> <span class="st">&quot;[:punct:]&quot;</span>, <span class="at">replacement =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb294-4"><a href="ch-04.html#cb294-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb294-5"><a href="ch-04.html#cb294-5" aria-hidden="true" tabindex="-1"></a>IUCN_sta</span></code></pre></div>
+<pre><code>## [1] &quot;VU&quot;</code></pre>
+</div>
+</div>
+<div id="scraping-tables" class="section level3" number="4.2.6">
+<h3><span class="header-section-number">4.2.6</span> Scraping Tables</h3>
+<p>The next step is to read a table from a website. Here, we are going to get information on the eggs of <em>Coregonus lavaretus</em>. Have a look at its <a href="https://www.fishbase.de/summary/Coregonus-lavaretus.html">profile</a>. In section <strong>Life cycle and mating behavior</strong> you can see that the table for information on eggs is a link and not a table directly. Foruntatley for us, we can use the function <code>getHTMLLinks()</code> to retrieve links within an HTML document or the collection of names of external files referenced in an HTML document. In Figure <a href="ch-04.html#fig:eggs">4.9</a>, an extract is shown of the list with more than 100 links found on the profile page.</p>
+<p>We see that either we could directly access link number 100 or search for the substring <em>FishEggInfoSummary</em> to look for other links. In fact, we will find two links with this substring (see Figure <a href="ch-04.html#fig:outputlink">4.10</a>. For this reason, we quickly check if the links are identical of if they lead to different pages. We can do this by using the logic operator <code>==</code>. The link comparison gives <code>TRUE</code> as output meaning that both links are completely identical and it does not matter which one we use. Let us save the first one in <code>egg_link</code>.</p>
+<div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb296-1"><a href="ch-04.html#cb296-1" aria-hidden="true" tabindex="-1"></a>egg_link <span class="ot">&lt;-</span> fishbase <span class="sc">%&gt;%</span> <span class="fu">getHTMLLinks</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb296-2"><a href="ch-04.html#cb296-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_subset</span>(<span class="at">pattern =</span> <span class="st">&quot;FishEggInfoSummary&quot;</span>)</span>
+<span id="cb296-3"><a href="ch-04.html#cb296-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb296-4"><a href="ch-04.html#cb296-4" aria-hidden="true" tabindex="-1"></a>egg_link[<span class="dv">1</span>] <span class="sc">==</span> egg_link[<span class="dv">2</span>]</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb298"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb298-1"><a href="ch-04.html#cb298-1" aria-hidden="true" tabindex="-1"></a>egg_link <span class="ot">&lt;-</span> egg_link[<span class="dv">1</span>]</span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:eggs"></span>
+<img src="figures/eggs.png" alt="Extract of the list of links found on the FishBase profile of *Coregonus lavaretus*." width="50%" />
+<p class="caption">
+Figure 4.9: Extract of the list of links found on the FishBase profile of <em>Coregonus lavaretus</em>.
+</p>
+</div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:outputlink"></span>
+<img src="figures/outputlink.png" alt="List of links that have the substring *FishEggInfoSummary*." width="50%" />
+<p class="caption">
+Figure 4.10: List of links that have the substring <em>FishEggInfoSummary</em>.
+</p>
+</div>
+<p><strong>Checkpoint</strong>
+Call the variable <em>egg_link</em>, you will notice the link begins with ‘..’ (see above <a href="ch-04.html#fig:outputlink">4.10</a>). Try to remove these dots so that the link begins with ‘/Reproduction/..’. As a hint, you can use the function <code>str_replace()</code> as was done above. You will need this code later, so make sure that you run it.</p>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb299-1"><a href="ch-04.html#cb299-1" aria-hidden="true" tabindex="-1"></a><span class="co"># your code</span></span></code></pre></div>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb300-1"><a href="ch-04.html#cb300-1" aria-hidden="true" tabindex="-1"></a>egg_link <span class="ot">&lt;-</span> egg_link <span class="sc">%&gt;%</span> <span class="fu">str_replace</span>(<span class="st">&quot;..&quot;</span>, <span class="st">&quot;&quot;</span> )</span>
+<span id="cb300-2"><a href="ch-04.html#cb300-2" aria-hidden="true" tabindex="-1"></a>egg_link</span></code></pre></div>
+<pre><code>## [1] &quot;/Reproduction/FishEggInfoSummary.php?ID=232&amp;GenusName=Coregonus&amp;SpeciesName=lavaretus&amp;fc=76&amp;StockCode=246&quot;</code></pre>
+<p>As you can see, this is no proper URL yet. Thus, we first need to create a working URL to access its content. Similarly to what we did previously, we do this using the function <code>getURLContent()</code>. Since we know that this link leads to a table, we can pipe the URL content into <code>readHTMLTable()</code>. The output here is a list and we have access the first object as done below.</p>
+<div class="sourceCode" id="cb302"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb302-1"><a href="ch-04.html#cb302-1" aria-hidden="true" tabindex="-1"></a>egg_tab <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;http://www.fishbase.de/&quot;</span>, egg_link, <span class="at">sep=</span><span class="st">&quot;&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb302-2"><a href="ch-04.html#cb302-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">getURLContent</span>(<span class="at">followlocation=</span><span class="cn">TRUE</span>, <span class="at">.encoding=</span><span class="st">&quot;CE_UTF8&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb302-3"><a href="ch-04.html#cb302-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readHTMLTable</span>()</span>
+<span id="cb302-4"><a href="ch-04.html#cb302-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb302-5"><a href="ch-04.html#cb302-5" aria-hidden="true" tabindex="-1"></a>egg_tab <span class="ot">&lt;-</span> egg_tab[[<span class="dv">1</span>]] <span class="co"># To save the list object as a data frame</span></span>
+<span id="cb302-6"><a href="ch-04.html#cb302-6" aria-hidden="true" tabindex="-1"></a>egg_tab</span></code></pre></div>
+<pre><code>##               Main Ref.       
+## 1  Place of Development       
+## 2          Shape of Egg       
+## 3            Attributes       
+## 4         Color of Eggs       
+## 5  Color of Oil Globule       
+## 6 Additional Characters       
+## 7    Get Information on Scirus</code></pre>
+<p>Now we can extract information from this table by using the function <code>which()</code>. We want to find the position in this table, where <em>Shape of Egg</em> is defined. To identify the right row, we look in the first column for the respective string and extract the value stored in the second column of this row. To automatize, we add a check to see whether any information was extracted at all from the table. If not (as it is the case here), we just set <code>egg_shape</code> to NA.</p>
+<div class="sourceCode" id="cb304"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb304-1"><a href="ch-04.html#cb304-1" aria-hidden="true" tabindex="-1"></a>egg_shape <span class="ot">&lt;-</span> egg_tab[                     <span class="co"># Accessing rows of egg_tab (remember: df[rows, cols])</span></span>
+<span id="cb304-2"><a href="ch-04.html#cb304-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">which</span>(egg_tab[, <span class="dv">1</span>] <span class="sc">==</span> <span class="st">&quot;Shape of Egg&quot;</span>),  <span class="co"># Get number of row where &quot;Shape of Egg&quot; appears in the first column</span></span>
+<span id="cb304-3"><a href="ch-04.html#cb304-3" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span>]                                      <span class="co"># Access the second column</span></span>
+<span id="cb304-4"><a href="ch-04.html#cb304-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb304-5"><a href="ch-04.html#cb304-5" aria-hidden="true" tabindex="-1"></a>egg_shape</span></code></pre></div>
+<pre><code>## [1] &quot;&quot;</code></pre>
+<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="ch-04.html#cb306-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(egg_shape <span class="sc">==</span> <span class="st">&quot;&quot;</span>) {egg_shape <span class="ot">=</span> <span class="st">&quot;NA&quot;</span>}</span>
+<span id="cb306-2"><a href="ch-04.html#cb306-2" aria-hidden="true" tabindex="-1"></a>egg_shape</span></code></pre></div>
+<pre><code>## [1] &quot;NA&quot;</code></pre>
+<p>Now we can put all the information into a data frame for the entry <em>Coregonus lavaretus</em> by using the function <code>tibble()</code>. Having done this entire data scraping for one species, we can start to automatize the process for multiple species and simply append the data to our data frame.</p>
+<div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb308-1"><a href="ch-04.html#cb308-1" aria-hidden="true" tabindex="-1"></a>species_df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Species =</span> <span class="st">&quot;Coregonus-lavaretus&quot;</span>, <span class="at">Length =</span> max_length, <span class="at">IUCN =</span> IUCN_sta, <span class="at">Egg =</span> egg_shape)</span>
+<span id="cb308-2"><a href="ch-04.html#cb308-2" aria-hidden="true" tabindex="-1"></a>species_df</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 4
+##   Species             Length IUCN  Egg  
+##   &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 Coregonus-lavaretus     73 VU    NA</code></pre>
+<p><strong>Checkpoint</strong>
+Try to create and add a new variable <em>egg_color</em> to the data frame and feed it with the respective information from our <code>egg_table</code> (follow the same process used for ‘egg_shape’).</p>
+<div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb310-1"><a href="ch-04.html#cb310-1" aria-hidden="true" tabindex="-1"></a><span class="co"># your code </span></span></code></pre></div>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb311-1"><a href="ch-04.html#cb311-1" aria-hidden="true" tabindex="-1"></a>egg_color <span class="ot">=</span> egg_tab[<span class="fu">which</span>(egg_tab[, <span class="dv">1</span>] <span class="sc">==</span> <span class="st">&quot;Color of Eggs&quot;</span>), <span class="dv">2</span>]  <span class="co"># extract information</span></span>
+<span id="cb311-2"><a href="ch-04.html#cb311-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(egg_color <span class="sc">==</span> <span class="st">&quot;&quot;</span>){egg_color <span class="ot">=</span> <span class="st">&quot;NA&quot;</span>}                           <span class="co"># set missing information to NA</span></span>
+<span id="cb311-3"><a href="ch-04.html#cb311-3" aria-hidden="true" tabindex="-1"></a>species_df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(species_df, <span class="at">Color =</span> egg_color)             <span class="co"># Add new variable to data frane</span></span>
+<span id="cb311-4"><a href="ch-04.html#cb311-4" aria-hidden="true" tabindex="-1"></a>species_df</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 5
+##   Species             Length IUCN  Egg   Color
+##   &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 Coregonus-lavaretus     73 VU    NA    NA</code></pre>
+</div>
+<div id="the-fishbase-package" class="section level3" number="4.2.7">
+<h3><span class="header-section-number">4.2.7</span> The Fishbase Package</h3>
+<div id="using-an-api" class="section level4 unnumbered">
+<h4>Using an API</h4>
+<p>As we saw in the previous sections, web scraping can be tedious. In this subsection, we want to get data using an API which is a much easier way. We use the R package <strong>rfishbase</strong> <span class="citation">(<a href="#ref-R-rfishbase" role="doc-biblioref">Boettiger, Temple Lang, and Wainwright 2012</a>)</span> to get data from <a href="https://www.fishbase.de">https://www.fishbase.de</a>. This package makes it very easy to look up for information on the most well-known fish species. It simplifies the data extraction process but also has some limits as we will see below. You ca have a look at the functions built into <code>rfishbase</code> by typing <code>help(package = "rfishbase")</code> into your RStudio console or have a look at the <a href="https://www.rdocumentation.org/packages/rfishbase/versions/3.0.4">RDocumentation</a>. Most functions have straight forward names and have a sring as input which holds the Latin name of the wanted fish species.</p>
+<p>Let us get some information on <em>Coregonus lavaretus</em> with this new package! We see that the super short code <code>species("Coregonus lavaretus")</code>provides us with 101 variables with entries for our fish species - think about the hand-written web scraping code this would require! To directly asses the maximal length of the species, we can directly use the <code>$</code> notation. As you might recall, this is the same length as we got above.</p>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="ch-04.html#cb313-1" aria-hidden="true" tabindex="-1"></a>CL <span class="ot">&lt;-</span> <span class="fu">species</span>(<span class="st">&quot;Coregonus avaretus&quot;</span>)</span>
+<span id="cb313-2"><a href="ch-04.html#cb313-2" aria-hidden="true" tabindex="-1"></a>CL<span class="sc">$</span>Length</span></code></pre></div>
+<pre><code>## [1] NA</code></pre>
+<p>In the next step we are interested to get information about the diet of <em>Coregonus lavaretus</em> by using the function <code>diet_items()</code>. It allows us to access the table on the food items of the chosen species. To extract information on food, we can save the diet items in a table and use the tidyverse notation plus the respective variables <em>FoodI</em>, <em>FoodII</em>:</p>
+<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="ch-04.html#cb315-1" aria-hidden="true" tabindex="-1"></a>food <span class="ot">&lt;-</span> <span class="fu">diet_items</span>(<span class="st">&quot;Coregonus lavaretus&quot;</span>) <span class="sc">%&gt;%</span> as_tibble</span>
+<span id="cb315-2"><a href="ch-04.html#cb315-2" aria-hidden="true" tabindex="-1"></a>food <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(FoodI, FoodII) <span class="sc">%&gt;%</span> <span class="fu">head</span>() <span class="co"># We&#39;re using dplyr:: here to avoid package conflicts</span></span></code></pre></div>
+<pre><code>## # A tibble: 6 × 2
+##   FoodI      FoodII       
+##   &lt;chr&gt;      &lt;chr&gt;        
+## 1 zoobenthos mollusks     
+## 2 nekton     finfish      
+## 3 zoobenthos benth. crust.
+## 4 zoobenthos worms        
+## 5 zoobenthos benth. crust.
+## 6 zoobenthos benth. crust.</code></pre>
+<p><strong>Checkpoint</strong>
+Now your next task is to get information on predators (hint: the function is exactly named like that).</p>
+<div class="sourceCode" id="cb317"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb317-1"><a href="ch-04.html#cb317-1" aria-hidden="true" tabindex="-1"></a><span class="co"># your code</span></span></code></pre></div>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="ch-04.html#cb318-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use function &#39;predators()&#39; for Coregonus lavaretus</span></span>
+<span id="cb318-2"><a href="ch-04.html#cb318-2" aria-hidden="true" tabindex="-1"></a>pre <span class="ot">&lt;-</span> <span class="fu">predators</span>(<span class="st">&quot;Coregonus lavaretus&quot;</span>)</span>
+<span id="cb318-3"><a href="ch-04.html#cb318-3" aria-hidden="true" tabindex="-1"></a>pre <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(PredatorName) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 1
+##   PredatorName        
+##   &lt;chr&gt;               
+## 1 Coregonus peled     
+## 2 Esox lucius         
+## 3 Sander lucioperca   
+## 4 Lampetra fluviatilis
+## 5 Phocoena phocoena   
+## 6 Salmo trutta trutta</code></pre>
+</div>
+<div id="limits-of-apis" class="section level4 unnumbered">
+<h4>Limits of APIs</h4>
+<p>One of the major limitations of an API is that we can only use already implemented functions. For example, in our case, we cannot get the IUCN Status of a given species because it is not built into <strong>rfishbase</strong>. In order to obtain the IUCN Status we must use another API, namely the package <strong>rredlist</strong> <span class="citation">(<a href="#ref-R-rredlist" role="doc-biblioref">Chamberlain 2020</a>)</span>. Unfortunately, to have access to the <em>rredlist</em> API we need an authentication key which we only get for a small fee. As it is with other things in life, either you try to put in the work yourself or you can pay someone to do so (except for the amazing open source community).</p>
+</div>
+</div>
+<div id="summary" class="section level3" number="4.2.8">
+<h3><span class="header-section-number">4.2.8</span> Summary</h3>
+<ul>
+<li>In this third section we learned how to extract data from a website.</li>
+<li>We saw that this can be done either with web scraping or using APIs.</li>
+<li>We saw that web scraping can be tedious, but we learned about some limitations of APIs.</li>
+</ul>
+<p><strong>Additional Resources:</strong></p>
+<ul>
+<li><a href="http://www.columbia.edu/~cjd11/charles_dimaggio/DIRE/styled-4/styled-6/code-13/" class="uri">http://www.columbia.edu/~cjd11/charles_dimaggio/DIRE/styled-4/styled-6/code-13/</a></li>
+<li><a href="https://ourcodingclub.github.io/tutorials/webscraping/" class="uri">https://ourcodingclub.github.io/tutorials/webscraping/</a></li>
+<li><a href="https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/" class="uri">https://www.earthdatascience.org/courses/earth-analytics/get-data-using-apis/use-twitter-api-r/</a></li>
+</ul>
+</div>
+<div id="case-study" class="section level3" number="4.2.9">
+<h3><span class="header-section-number">4.2.9</span> Case Study</h3>
+<p><em>Please note that the code below is written in base R and not tidyverse which makes the codes a bit more difficult to read. But do not worry about this and simply just enjoy the beauty of what R is capable of.</em></p>
+<p>Next, we look at another case study on species richness and red list species proportions. To proceed with the case study we need to prepare our dataset. First, we need to get a list of species for the dataset. In this subsection we will see how to get all the species in a given family.</p>
+<div id="creating-list-of-species" class="section level4" number="4.2.9.1">
+<h4><span class="header-section-number">4.2.9.1</span> Creating List of Species</h4>
+<p>In this section, we want to get all the species of the family of <em>Salmonidae</em>. As we did above, for flexibility we will create an object <em>x</em> with the name of the family and use <code>paste()</code> to get the link.
+We then use <code>getURLContent()</code> to get the content of the link <code>url</code> and save it in <code>con_sal</code>.</p>
+<div class="sourceCode" id="cb320"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb320-1"><a href="ch-04.html#cb320-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="st">&quot;Salmonidae&quot;</span></span>
+<span id="cb320-2"><a href="ch-04.html#cb320-2" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;http://www.fishbase.de/Nomenclature/FamilySearchList.php?Family=&quot;</span>, x, <span class="at">sep=</span><span class="st">&quot;&quot;</span>) </span>
+<span id="cb320-3"><a href="ch-04.html#cb320-3" aria-hidden="true" tabindex="-1"></a>con_sal <span class="ot">&lt;-</span> <span class="fu">getURLContent</span>(url, <span class="at">followlocation =</span> <span class="cn">TRUE</span>) </span></code></pre></div>
+<p>Next we create a dataframe using <code>data.frame()</code> and get a list of variables. We will extract the variables with the same number of rows and unique row names. The function <code>readHTMLTable()</code> (from earlier) helps to extract data from HTML tables in an HTML document. Then we can extract the species from the given family with <code>as.character()</code>. We use <code>z[,1]</code> to get the first column which is the column with the scientific names of species. Now we can print the first element of the column with the scientific names.</p>
+<div class="sourceCode" id="cb321"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb321-1"><a href="ch-04.html#cb321-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">readHTMLTable</span>(con_sal))</span>
+<span id="cb321-2"><a href="ch-04.html#cb321-2" aria-hidden="true" tabindex="-1"></a>sp_per_family <span class="ot">&lt;-</span> <span class="fu">as.character</span>(df[,<span class="dv">1</span>])</span>
+<span id="cb321-3"><a href="ch-04.html#cb321-3" aria-hidden="true" tabindex="-1"></a>sp_per_family[<span class="dv">1</span>]</span></code></pre></div>
+<pre><code>## [1] &quot;Brachymystax lenok&quot;</code></pre>
+<p>Using <code>str_replace()</code> function we can substitute the empty space between the Genus and the Species with a <code>"-"</code>. Finally we can print the first element of <em>sp_per_family</em> again.</p>
+<div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="ch-04.html#cb323-1" aria-hidden="true" tabindex="-1"></a>sp_per_family <span class="ot">&lt;-</span> <span class="fu">str_replace</span>(sp_per_family, <span class="st">&quot; &quot;</span>, <span class="st">&quot;-&quot;</span>)</span>
+<span id="cb323-2"><a href="ch-04.html#cb323-2" aria-hidden="true" tabindex="-1"></a>sp_per_family[<span class="dv">1</span>]</span></code></pre></div>
+<pre><code>## [1] &quot;Brachymystax-lenok&quot;</code></pre>
+</div>
+<div id="extracting-iucn-status-for-all-species" class="section level4" number="4.2.9.2">
+<h4><span class="header-section-number">4.2.9.2</span> Extracting IUCN Status for all species</h4>
+<p>In this section, we are going to get the IUCN Status for a given List of species using a ‘for loop’. We will extract the IUCN Status of all the species from the Netherlands.
+First, we are going to upload the dataset containing the list of the species and some other data that is going to be useful for the next sections. We will do that by using the function <code>read_csv()</code>. This data is taken from this <a href="https://www.nature.com/articles/sdata2017141">nature article</a> by cropping it to Western Europe. As we only need data related to Netherlands, we will use the function <code>grep()</code> and pass <em>Netherlands</em> as an argument.</p>
+<div class="sourceCode" id="cb325"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb325-1"><a href="ch-04.html#cb325-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;./data/dataset2.csv&quot;</span>)</span>
+<span id="cb325-2"><a href="ch-04.html#cb325-2" aria-hidden="true" tabindex="-1"></a>subset <span class="ot">&lt;-</span> dataset[<span class="fu">grep</span>(<span class="st">&quot;Netherlands&quot;</span>, dataset<span class="sc">$</span>Country),]</span></code></pre></div>
+<p>Let us first briefly discuss how to construct a ‘for loop’, since it’s been a while since you used it in previous chapters (also see Chapter Chapter <a href="ch-05.html#ch-05">5</a> for examples). To get the IUCN Status of a list of species we always change the value of <em>x</em> (the species) and run the code, but if we have to do that for many species it will be very long and tedious. In this case ‘for loops’ come in handy. In a ‘for loop’ the variable <em>x</em> runs over the vector (here each species) and returns the IUCN Status. Before getting the IUCN status we will go over an easy example, such as printing the integers from 1 to 10 using a ‘for loop’. In this case, we iterate over the vector 1:10.</p>
+<div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb326-1"><a href="ch-04.html#cb326-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>) {</span>
+<span id="cb326-2"><a href="ch-04.html#cb326-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(j) <span class="co"># this prints the value of j for that given loop</span></span>
+<span id="cb326-3"><a href="ch-04.html#cb326-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## [1] 1
+## [1] 2
+## [1] 3
+## [1] 4
+## [1] 5
+## [1] 6
+## [1] 7
+## [1] 8
+## [1] 9
+## [1] 10</code></pre>
+<p>Now we can make a ‘for loop’ in order to get the IUCN status of all the species in the above subset (Netherlands) of the initial dataset. We are going to iterate over the column of the dataset with the valid FishBase species names. The code lines inside the loop are exactly a copy-paste of what we had for the <em>Coregonus lavaretus</em>, but in this case, we have to look for other species. In the last line of the code below, we created a new column in the data frame <em>subset</em> in order to save the IUCN Status. The ‘i’ in <code>subset$IUCN[i]</code> is used to save the IUCN status of the species we are iterating over in the ‘for loop’. It will save the results of the species one by one.</p>
+<div class="sourceCode" id="cb328"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb328-1"><a href="ch-04.html#cb328-1" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb328-2"><a href="ch-04.html#cb328-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(x <span class="cf">in</span> subset<span class="sc">$</span>X6.Fishbase.Valid.Species.Name) {</span>
+<span id="cb328-3"><a href="ch-04.html#cb328-3" aria-hidden="true" tabindex="-1"></a>  i <span class="ot">&lt;-</span> i <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb328-4"><a href="ch-04.html#cb328-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb328-5"><a href="ch-04.html#cb328-5" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;http://www.fishbase.de/summary/&quot;</span>,x,<span class="st">&quot;.html&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)       <span class="co"># we call the url</span></span>
+<span id="cb328-6"><a href="ch-04.html#cb328-6" aria-hidden="true" tabindex="-1"></a>  fish_species <span class="ot">&lt;-</span> <span class="fu">htmlParse</span>(<span class="fu">getURLContent</span>(url, <span class="at">followlocation=</span><span class="cn">TRUE</span>))     <span class="co"># get the content</span></span>
+<span id="cb328-7"><a href="ch-04.html#cb328-7" aria-hidden="true" tabindex="-1"></a>  fish_species_div <span class="ot">&lt;-</span><span class="fu">getNodeSet</span>(fish_species, <span class="st">&quot;//div &quot;</span>)                  <span class="co"># get the nodes with species</span></span>
+<span id="cb328-8"><a href="ch-04.html#cb328-8" aria-hidden="true" tabindex="-1"></a>  w_IUCN  <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">sapply</span>(<span class="fu">lapply</span>(fish_species_div,xmlValue),<span class="cf">function</span>(x)  <span class="co"># look for the IUCN pattern </span></span>
+<span id="cb328-9"><a href="ch-04.html#cb328-9" aria-hidden="true" tabindex="-1"></a>    {<span class="fu">regexec</span>(<span class="at">pattern=</span><span class="st">&quot;IUCN&quot;</span>, x)[[<span class="dv">1</span>]][<span class="dv">1</span>]})<span class="sc">&gt;</span><span class="dv">0</span>)</span>
+<span id="cb328-10"><a href="ch-04.html#cb328-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb328-11"><a href="ch-04.html#cb328-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">length</span>(w_IUCN)<span class="sc">==</span><span class="dv">0</span>){                                                 <span class="co"># NA if no IUCN status</span></span>
+<span id="cb328-12"><a href="ch-04.html#cb328-12" aria-hidden="true" tabindex="-1"></a>    IUCN_status<span class="ot">=</span><span class="st">&quot;NA&quot;</span></span>
+<span id="cb328-13"><a href="ch-04.html#cb328-13" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {                                                                 <span class="co"># else access information</span></span>
+<span id="cb328-14"><a href="ch-04.html#cb328-14" aria-hidden="true" tabindex="-1"></a>    d1_IUCN  <span class="ot">&lt;-</span> <span class="fu">xmlValue</span>(fish_species_div[[w_IUCN[<span class="fu">length</span>(w_IUCN)]]])</span>
+<span id="cb328-15"><a href="ch-04.html#cb328-15" aria-hidden="true" tabindex="-1"></a>    IUCN <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">regmatches</span>(d1_IUCN,<span class="fu">gregexpr</span>(<span class="at">pattern=</span> <span class="st">&quot;[[:alpha:]]+)&quot;</span>,     </span>
+<span id="cb328-16"><a href="ch-04.html#cb328-16" aria-hidden="true" tabindex="-1"></a>    d1_IUCN)))</span>
+<span id="cb328-17"><a href="ch-04.html#cb328-17" aria-hidden="true" tabindex="-1"></a>    IUCN_status <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="at">pattern=</span><span class="st">&quot;[[:punct:]]&quot;</span>,<span class="at">replacement=</span><span class="st">&quot;&quot;</span>,IUCN[<span class="dv">1</span>] ) </span>
+<span id="cb328-18"><a href="ch-04.html#cb328-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb328-19"><a href="ch-04.html#cb328-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb328-20"><a href="ch-04.html#cb328-20" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(IUCN_status)</span>
+<span id="cb328-21"><a href="ch-04.html#cb328-21" aria-hidden="true" tabindex="-1"></a>subset<span class="sc">$</span>IUCN[i] <span class="ot">&lt;-</span> IUCN_status <span class="co"># make a new column in &#39;subset&#39; containing the IUCN status</span></span>
+<span id="cb328-22"><a href="ch-04.html#cb328-22" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## [1] &quot;LC&quot;
+## [1] &quot;LC&quot;
+## [1] &quot;LC&quot;
+## [1] &quot;LC&quot;
+## [1] &quot;LC&quot;
+## [1] &quot;LC&quot;
+## [1] &quot;VU&quot;
+## [1] &quot;LC&quot;
+## [1] &quot;LC&quot;</code></pre>
+<p>We can see which IUCN statuses are present in Netherlands by using the <code>unique()</code> function. There are LC for least concern, VU for vulnerable and of course NA for unknown values.</p>
+<div class="sourceCode" id="cb330"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb330-1"><a href="ch-04.html#cb330-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(subset<span class="sc">$</span>IUCN)</span></code></pre></div>
+<pre><code>## [1] &quot;LC&quot; &quot;VU&quot;</code></pre>
+</div>
+<div id="proportion-of-species-in-netherlands" class="section level4" number="4.2.9.3">
+<h4><span class="header-section-number">4.2.9.3</span> Proportion of species in Netherlands</h4>
+<p>We will now plot the proportion of species in each category for the Netherlands. So let us calculate the number of species in each category (from above we just have 2 outputs,* <em>LC</em> &amp; <em>NT</em>). In general in other countries, we also have other IUCN Status, for example, VU. In this section, we will focus only on the two listed statuses. Using the function <code>length()</code> we can obtain the number of species in each category.</p>
+<div class="sourceCode" id="cb332"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb332-1"><a href="ch-04.html#cb332-1" aria-hidden="true" tabindex="-1"></a>number_lc <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">which</span>(subset<span class="sc">$</span>IUCN <span class="sc">==</span> <span class="st">&quot;LC&quot;</span>))</span>
+<span id="cb332-2"><a href="ch-04.html#cb332-2" aria-hidden="true" tabindex="-1"></a>number_vu <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">which</span>(subset<span class="sc">$</span>IUCN <span class="sc">==</span> <span class="st">&quot;VU&quot;</span>))</span>
+<span id="cb332-3"><a href="ch-04.html#cb332-3" aria-hidden="true" tabindex="-1"></a>number_na <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">which</span>(<span class="fu">is.na</span>(subset<span class="sc">$</span>IUCN)))</span>
+<span id="cb332-4"><a href="ch-04.html#cb332-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb332-5"><a href="ch-04.html#cb332-5" aria-hidden="true" tabindex="-1"></a><span class="co"># print the values for NT, VU and NA</span></span>
+<span id="cb332-6"><a href="ch-04.html#cb332-6" aria-hidden="true" tabindex="-1"></a><span class="fu">paste0</span>(<span class="st">&quot;LC:&quot;</span>, <span class="st">&quot; &quot;</span>, number_lc)</span></code></pre></div>
+<pre><code>## [1] &quot;LC: 8&quot;</code></pre>
+<div class="sourceCode" id="cb334"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb334-1"><a href="ch-04.html#cb334-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste0</span>(<span class="st">&quot;VU:&quot;</span>, <span class="st">&quot; &quot;</span>, number_vu)</span></code></pre></div>
+<pre><code>## [1] &quot;VU: 1&quot;</code></pre>
+<div class="sourceCode" id="cb336"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb336-1"><a href="ch-04.html#cb336-1" aria-hidden="true" tabindex="-1"></a><span class="fu">paste0</span>(<span class="st">&quot;NA:&quot;</span>, <span class="st">&quot; &quot;</span>, number_na)</span></code></pre></div>
+<pre><code>## [1] &quot;NA: 0&quot;</code></pre>
+<p>We are ready to plot this as pie chart.</p>
+<div class="sourceCode" id="cb338"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb338-1"><a href="ch-04.html#cb338-1" aria-hidden="true" tabindex="-1"></a>slices <span class="ot">&lt;-</span> <span class="fu">c</span>(number_lc, number_vu, number_na)</span>
+<span id="cb338-2"><a href="ch-04.html#cb338-2" aria-hidden="true" tabindex="-1"></a>lbls <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;LC&quot;</span>,<span class="st">&quot;NT&quot;</span>, <span class="st">&quot;NA&quot;</span>)</span>
+<span id="cb338-3"><a href="ch-04.html#cb338-3" aria-hidden="true" tabindex="-1"></a><span class="fu">pie</span>(slices, <span class="at">labels =</span> lbls, <span class="at">font.main =</span> <span class="dv">1</span>, </span>
+<span id="cb338-4"><a href="ch-04.html#cb338-4" aria-hidden="true" tabindex="-1"></a><span class="at">main =</span> <span class="st">&quot;Proportion of species per IUCN Status in Netherlands&quot;</span>, <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;grey&quot;</span>)) </span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-217-1.png" width="50%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cleaning-data-with-iucn-status" class="section level4" number="4.2.9.4">
+<h4><span class="header-section-number">4.2.9.4</span> Cleaning data with IUCN Status</h4>
+<p>In this part of the tutorial, we have to clean the data that we will use for the correlations. We have provided the dataset already with the IUCN status since the code needs a lot of time to run, but the procedure is exactly the same as we did in the previous sections. So, let us load the dataset, it’s called <em>datasetIUCN</em>.</p>
+<p>In the previous sections, we saw that for some species we did not have information on the IUCN status. In these cases, we set the IUCN status as NA. We can check for possible NA values by calling the <code>unique()</code> function.</p>
+<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="ch-04.html#cb339-1" aria-hidden="true" tabindex="-1"></a>dataset_IUCN <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;./data/datasetIUCN.csv&quot;</span>)</span>
+<span id="cb339-2"><a href="ch-04.html#cb339-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(dataset_IUCN<span class="sc">$</span>IUCN)</span></code></pre></div>
+<pre><code>##  [1] &quot;LC&quot; &quot;CR&quot; &quot;lc&quot; &quot;VU&quot; NA   &quot;EX&quot; &quot;NT&quot; &quot;DD&quot; &quot;EN&quot; &quot;EW&quot;</code></pre>
+<p><strong>Checkpoint</strong>
+Now your task is to remove the row with the IUCN status as NA. You can use the function <code>subset()</code> to get the subset of the dataset with information about the IUCN status.</p>
+<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="ch-04.html#cb341-1" aria-hidden="true" tabindex="-1"></a><span class="co"># your code</span></span></code></pre></div>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="ch-04.html#cb342-1" aria-hidden="true" tabindex="-1"></a><span class="co"># subset the data without NAs (!=NA; not equal to NA), so this effectively removes NAs</span></span>
+<span id="cb342-2"><a href="ch-04.html#cb342-2" aria-hidden="true" tabindex="-1"></a>dataset_IUCN_NA <span class="ot">&lt;-</span> <span class="fu">subset</span>(dataset_IUCN, dataset_IUCN<span class="sc">$</span>IUCN <span class="sc">!=</span> <span class="st">&quot;NA&quot;</span>)</span>
+<span id="cb342-3"><a href="ch-04.html#cb342-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb342-4"><a href="ch-04.html#cb342-4" aria-hidden="true" tabindex="-1"></a><span class="co"># check if it worked</span></span>
+<span id="cb342-5"><a href="ch-04.html#cb342-5" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(dataset_IUCN_NA<span class="sc">$</span>IUCN)</span></code></pre></div>
+<pre><code>## [1] &quot;LC&quot; &quot;CR&quot; &quot;lc&quot; &quot;VU&quot; &quot;EX&quot; &quot;NT&quot; &quot;DD&quot; &quot;EN&quot; &quot;EW&quot;</code></pre>
+<p>Next, we will load the shapefile of glacial basins using the package <code>rgdal</code> and the function <code>readOGR()</code>. We fetch the data from different fish basins across Europe in the <code>basin_shapefile</code> from the data stored in the basins folder. In order to plot the basins on the map we will use <code>fortify()</code> function on the <code>basin_shapefile</code>. This function helps to convert a lines-and-points object into a data frame for ggplot. We will store this dataframe as <code>fort_basin</code>.</p>
+<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb344-1"><a href="ch-04.html#cb344-1" aria-hidden="true" tabindex="-1"></a>basin_shapefile <span class="ot">&lt;-</span> <span class="fu">readOGR</span>(<span class="st">&quot;./data/basins&quot;</span>)</span></code></pre></div>
+<pre><code>## OGR data source with driver: ESRI Shapefile 
+## Source: &quot;/Users/pascalschneider/Polybox/Shared/Data Science Lecture Planning - shared folder/4 Datasets/basins&quot;, layer: &quot;basins&quot;
+## with 3119 features
+## It has 9 fields</code></pre>
+<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="ch-04.html#cb346-1" aria-hidden="true" tabindex="-1"></a>fort_basin <span class="ot">&lt;-</span> <span class="fu">fortify</span>(basin_shapefile)</span>
+<span id="cb346-2"><a href="ch-04.html#cb346-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fort_basin)</span></code></pre></div>
+<pre><code>##        long       lat order  hole piece id group
+## 1 -43.00000 -22.55000     1 FALSE     1  0   0.1
+## 2 -43.03750 -22.69583     2 FALSE     1  0   0.1
+## 3 -43.05325 -22.69523     3 FALSE     1  0   0.1
+## 4 -43.05507 -22.68816     4 FALSE     1  0   0.1
+## 5 -43.06888 -22.68693     5 FALSE     1  0   0.1
+## 6 -43.07279 -22.68390     6 FALSE     1  0   0.1</code></pre>
+<p>We can visualise our <code>basin_shapefile</code> using <code>ggplot()</code>.</p>
+<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb348-1"><a href="ch-04.html#cb348-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>() <span class="sc">+</span> <span class="fu">geom_polygon</span>(<span class="at">data =</span> fort_basin, <span class="fu">aes</span>(<span class="at">x =</span> long, <span class="at">y =</span> lat, <span class="at">group =</span> group), <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>, <span class="at">fill =</span> <span class="cn">NA</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:europe"></span>
+<img src="figures/output_186_0.png" alt="Plot of `fort_basin`." width="50%" />
+<p class="caption">
+Figure 4.11: Plot of <code>fort_basin</code>.
+</p>
+</div>
+</div>
+<div id="maps-of-species-richness-and-red-list-species-proportions" class="section level4" number="4.2.9.5">
+<h4><span class="header-section-number">4.2.9.5</span> Maps of species richness and Red List species proportions</h4>
+<div id="preparing-data" class="section level5 unnumbered">
+<h5>Preparing data</h5>
+<p>We now want to map the species richness and Red List species proportions. Let us first calculate the species richness and proportion of Red List species per basin. Species richness is the number of species pro basin and the proportion of red list species is the ratio between the number of species in the red list and the number of species pro basin. We will iterate over the vector with the basin names and we will use the function <code>nrow()</code> to find the number of occurrences.</p>
+<div class="sourceCode" id="cb349"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb349-1"><a href="ch-04.html#cb349-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (x <span class="cf">in</span> <span class="fu">as.character</span>(basin_shapefile<span class="sc">$</span>BasinName)) {</span>
+<span id="cb349-2"><a href="ch-04.html#cb349-2" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb349-3"><a href="ch-04.html#cb349-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># we now restrict to dataset to the basin x</span></span>
+<span id="cb349-4"><a href="ch-04.html#cb349-4" aria-hidden="true" tabindex="-1"></a>  dataset_basins <span class="ot">&lt;-</span> dataset_IUCN[dataset_IUCN<span class="sc">$</span>X1.Basin.Name<span class="sc">==</span>x,]</span>
+<span id="cb349-5"><a href="ch-04.html#cb349-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb349-6"><a href="ch-04.html#cb349-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># number of species in the given country x</span></span>
+<span id="cb349-7"><a href="ch-04.html#cb349-7" aria-hidden="true" tabindex="-1"></a>  n1 <span class="ot">&lt;-</span> <span class="fu">nrow</span>(dataset_basins)</span>
+<span id="cb349-8"><a href="ch-04.html#cb349-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb349-9"><a href="ch-04.html#cb349-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># we now restrict to dataset to the country x and Red List</span></span>
+<span id="cb349-10"><a href="ch-04.html#cb349-10" aria-hidden="true" tabindex="-1"></a>  dataset_c_IUCN <span class="ot">&lt;-</span> dataset_basins[<span class="fu">grep</span>(<span class="st">&quot;VU|EN|EX|EW|CR&quot;</span>, dataset_basins<span class="sc">$</span>IUCN),] </span>
+<span id="cb349-11"><a href="ch-04.html#cb349-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb349-12"><a href="ch-04.html#cb349-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># number of species in the given country x with given IUCN Status</span></span>
+<span id="cb349-13"><a href="ch-04.html#cb349-13" aria-hidden="true" tabindex="-1"></a>  n2 <span class="ot">&lt;-</span> <span class="fu">nrow</span>(dataset_c_IUCN)</span>
+<span id="cb349-14"><a href="ch-04.html#cb349-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb349-15"><a href="ch-04.html#cb349-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># compute the proportion </span></span>
+<span id="cb349-16"><a href="ch-04.html#cb349-16" aria-hidden="true" tabindex="-1"></a>  basin_shapefile<span class="sc">$</span>proportion[basin_shapefile<span class="sc">$</span>BasinName<span class="sc">==</span>x] <span class="ot">&lt;-</span> n2<span class="sc">/</span>n1</span>
+<span id="cb349-17"><a href="ch-04.html#cb349-17" aria-hidden="true" tabindex="-1"></a>  basin_shapefile<span class="sc">$</span>richness[basin_shapefile<span class="sc">$</span>BasinName<span class="sc">==</span>x] <span class="ot">&lt;-</span> n1  </span>
+<span id="cb349-18"><a href="ch-04.html#cb349-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>We can see the newly computed data for the columns <em>‘proportion’</em> and <em>‘richness’</em> with respect to each basin in the <code>basin_shapefile</code>.</p>
+<div class="sourceCode" id="cb350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb350-1"><a href="ch-04.html#cb350-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(basin_shapefile<span class="sc">@</span>data)</span></code></pre></div>
+<pre><code>##       BasinName   Country Ecoregion Endorheic Out_Longit  Out_Latit Med_Longit
+## 0  Cachoeirinha    Brazil Neotropic      &lt;NA&gt;  -43.10344 -22.693658  -43.06899
+## 1      Comprido    Brazil Neotropic      &lt;NA&gt;  -47.07734 -24.451571  -47.15300
+## 2 Arroyo.Walker Argentina Neotropic      &lt;NA&gt;  -62.29922 -40.628898  -62.59625
+## 3     Aconcagua     Chile Neotropic      &lt;NA&gt;  -71.53604 -32.912822  -70.65645
+## 4        Amazon    Brazil Neotropic      &lt;NA&gt;  -52.23409  -1.619426  -64.57286
+## 5      Andalien     Chile Neotropic      &lt;NA&gt;  -73.09136 -36.664541  -72.81968
+##    Med_Latit    Surf_area proportion richness
+## 0 -22.595111     228.8151        NaN        0
+## 1 -24.465831     204.7977        NaN        0
+## 2 -40.507344     969.1561        NaN        0
+## 3 -32.770645    7318.8768        NaN        0
+## 4  -6.714857 5888416.9156        NaN        0
+## 5 -36.824925     767.4691        NaN        0</code></pre>
+<p>Next we get the map of Europe. We will read the data in <code>continent_shapefile</code> and then will extract the continent ‘Europe’ map. If you call the variable <code>europe</code> you will see that the dataframe is empty. This is because it extracts only the map data which we can simply plot by passing the europe as an argument in <code>plot()</code> function. We will do it in the upcoming code cells.</p>
+<div class="sourceCode" id="cb352"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb352-1"><a href="ch-04.html#cb352-1" aria-hidden="true" tabindex="-1"></a>continents <span class="ot">&lt;-</span> <span class="fu">readOGR</span>(<span class="st">&#39;./data/continent_shapefile&#39;</span>)</span></code></pre></div>
+<pre><code>## OGR data source with driver: ESRI Shapefile 
+## Source: &quot;/Users/pascalschneider/Polybox/Shared/Data Science Lecture Planning - shared folder/4 Datasets/continent_shapefile&quot;, layer: &quot;continent&quot;
+## with 8 features
+## It has 1 fields</code></pre>
+<div class="sourceCode" id="cb354"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb354-1"><a href="ch-04.html#cb354-1" aria-hidden="true" tabindex="-1"></a>europe <span class="ot">&lt;-</span> continents[continents<span class="sc">$</span>CONTINENT <span class="sc">==</span> <span class="st">&#39;Europe&#39;</span>,]</span></code></pre></div>
+<pre><code>Warning message in readOGR(&quot;../data/continent_shapefile&quot;):
+“First layer europe_map read; multiple layers present in
+/work/04_data_scraping/data/continent_shapefile, check layers with ogrListLayers()”
+
+
+OGR data source with driver: ESRI Shapefile 
+Source: &quot;/work/04_data_scraping/data/continent_shapefile&quot;, layer: &quot;europe_map&quot;
+with 53 features
+It has 94 fields</code></pre>
+</div>
+<div id="plotting-data" class="section level5 unnumbered">
+<h5>Plotting data</h5>
+<p>So now let us plot the proportions of Red List species. First, we will create a new column <em>‘proportion_colour’</em> and in this column, we will store the colours. Then we will break the proportions into 10 different parts by grouping the values in the proportion column into 10 using the <code>cut()</code> function. Then we get rid of the index vector using <code>as.numeric()</code> and get all the values as numeric values. We used the <code>rev()</code> function to reverse the colours, red colour indicates the species that are getting distinct and have very less proportion pro basin and yellow indicates the species with comparatively more proportion in the basin. Finally, we store these colours to the column proportion_colour. The colour indicates the proportion of Red List species occurring in the corresponding basin. We do the same for the species richness.</p>
+<div class="sourceCode" id="cb356"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb356-1"><a href="ch-04.html#cb356-1" aria-hidden="true" tabindex="-1"></a>basin_shapefile<span class="sc">$</span>proportion_colour <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">heat.colors</span>(<span class="dv">11</span>))[<span class="fu">as.numeric</span>(<span class="fu">cut</span>(basin_shapefile<span class="sc">$</span>proportion, <span class="at">breaks =</span> <span class="dv">10</span>))]</span></code></pre></div>
+<p>Now we create a new column in the <em>fort_basin</em> dataframe and map the values of <em>‘proportion_colour’</em> into the new color column. We are doing this to have the colour (species proportion divided into 10 parts) and lat-long values in one datframe which helps to plot the graph using <code>ggplot()</code>. Remember, above we extracted the continent <em>‘europe’</em> from the <code>continent_shapefile</code>, here we will use <code>fortiy()</code> on the europe dataset to plot it. In detail, we will plot the <code>fort_europe</code> and <code>fort_basin</code> data on the map.</p>
+<div class="sourceCode" id="cb357"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb357-1"><a href="ch-04.html#cb357-1" aria-hidden="true" tabindex="-1"></a>fort_basin<span class="sc">$</span>color <span class="ot">&lt;-</span> fort_basin<span class="sc">$</span>id   <span class="co"># create a new column color</span></span>
+<span id="cb357-2"><a href="ch-04.html#cb357-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb357-3"><a href="ch-04.html#cb357-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">as.numeric</span>(<span class="fu">unique</span>(fort_basin<span class="sc">$</span>id))){   <span class="co"># map the values into color column by id</span></span>
+<span id="cb357-4"><a href="ch-04.html#cb357-4" aria-hidden="true" tabindex="-1"></a>   fort_basin<span class="sc">$</span>color[fort_basin<span class="sc">$</span>id <span class="sc">==</span> i] <span class="ot">&lt;-</span> basin_shapefile<span class="sc">@</span>data<span class="sc">$</span>proportion_colour[i<span class="sc">+</span><span class="dv">1</span>]</span>
+<span id="cb357-5"><a href="ch-04.html#cb357-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb357-6"><a href="ch-04.html#cb357-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb357-7"><a href="ch-04.html#cb357-7" aria-hidden="true" tabindex="-1"></a>fort_europe <span class="ot">&lt;-</span> <span class="fu">fortify</span>(europe)</span></code></pre></div>
+<div class="sourceCode" id="cb358"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb358-1"><a href="ch-04.html#cb358-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(fort_basin, <span class="fu">aes</span>(<span class="at">x =</span> long, <span class="at">y =</span> lat, <span class="at">group =</span> group)) <span class="sc">+</span></span>
+<span id="cb358-2"><a href="ch-04.html#cb358-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_polygon</span>(<span class="at">data =</span> fort_europe, <span class="fu">aes</span>(<span class="at">x =</span> long, <span class="at">y =</span> lat, <span class="at">group =</span> group), <span class="at">colour =</span> <span class="st">&#39;white&#39;</span>) <span class="sc">+</span></span>
+<span id="cb358-3"><a href="ch-04.html#cb358-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_polygon</span>(<span class="at">fill =</span> fort_basin<span class="sc">$</span>color, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>)<span class="sc">+</span></span>
+<span id="cb358-4"><a href="ch-04.html#cb358-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">25</span>, <span class="dv">28</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:europe2"></span>
+<img src="figures/output_201_0.png" alt="Proportions of Red List species in Europe." width="50%" />
+<p class="caption">
+Figure 4.12: Proportions of Red List species in Europe.
+</p>
+</div>
+<p>From the Figure <a href="ch-04.html#fig:europe2">4.12</a>, we see that the proportion of Red List species is highest in South-Western Europe. The aim of the Red List is to inform decision-makers about potentially endangered species, i.e. species whose population size has been rapidly declining during the last decades or the species that only occur in small numbers at present. The proportion of species on the Red List of each region, therefore, gives an indication of the risk of species going extinct in a region and represents an important tool for conservation strategies.</p>
+</div>
+<div id="repeat-for-mapping-species-richness" class="section level5 unnumbered">
+<h5>Repeat for mapping species richness</h5>
+<p>We will repeat the above steps all together for plotting the species richness on map.</p>
+<div class="sourceCode" id="cb359"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb359-1"><a href="ch-04.html#cb359-1" aria-hidden="true" tabindex="-1"></a><span class="co"># break the richness  of the species into 10 parts and then we assign colors to each part </span></span>
+<span id="cb359-2"><a href="ch-04.html#cb359-2" aria-hidden="true" tabindex="-1"></a>basin_shapefile<span class="sc">$</span>richness_colour <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">heat.colors</span>(<span class="dv">11</span>))[<span class="fu">as.numeric</span>(<span class="fu">cut</span>(basin_shapefile<span class="sc">$</span>richness, <span class="at">breaks =</span> <span class="dv">10</span>))]</span>
+<span id="cb359-3"><a href="ch-04.html#cb359-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-4"><a href="ch-04.html#cb359-4" aria-hidden="true" tabindex="-1"></a>fort_basin<span class="sc">$</span>rich_color <span class="ot">&lt;-</span> fort_basin<span class="sc">$</span>id    <span class="co"># create a new column rich_color</span></span>
+<span id="cb359-5"><a href="ch-04.html#cb359-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-6"><a href="ch-04.html#cb359-6" aria-hidden="true" tabindex="-1"></a><span class="co"># mapping the values from basin_shapefile to fort_basin</span></span>
+<span id="cb359-7"><a href="ch-04.html#cb359-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-8"><a href="ch-04.html#cb359-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">as.numeric</span>(<span class="fu">unique</span>(fort_basin<span class="sc">$</span>id))) </span>
+<span id="cb359-9"><a href="ch-04.html#cb359-9" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb359-10"><a href="ch-04.html#cb359-10" aria-hidden="true" tabindex="-1"></a>   fort_basin<span class="sc">$</span>rich_color[fort_basin<span class="sc">$</span>id <span class="sc">==</span> i] <span class="ot">&lt;-</span> basin_shapefile<span class="sc">@</span>data<span class="sc">$</span>richness_colour[i<span class="sc">+</span><span class="dv">1</span>]</span>
+<span id="cb359-11"><a href="ch-04.html#cb359-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb359-12"><a href="ch-04.html#cb359-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb359-13"><a href="ch-04.html#cb359-13" aria-hidden="true" tabindex="-1"></a><span class="co"># plot</span></span>
+<span id="cb359-14"><a href="ch-04.html#cb359-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(fort_basin, <span class="fu">aes</span>(<span class="at">x =</span> long, <span class="at">y =</span> lat, <span class="at">group =</span> group)) <span class="sc">+</span></span>
+<span id="cb359-15"><a href="ch-04.html#cb359-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_polygon</span>(<span class="at">data =</span> fort_europe, <span class="fu">aes</span>(<span class="at">x =</span> long, <span class="at">y =</span> lat, <span class="at">group =</span> group), <span class="at">colour =</span> <span class="st">&#39;white&#39;</span>) <span class="sc">+</span></span>
+<span id="cb359-16"><a href="ch-04.html#cb359-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_polygon</span>(<span class="at">fill =</span> fort_basin<span class="sc">$</span>rich_color, <span class="at">colour =</span> <span class="st">&quot;black&quot;</span>)<span class="sc">+</span></span>
+<span id="cb359-17"><a href="ch-04.html#cb359-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="sc">-</span><span class="dv">25</span>, <span class="dv">28</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:europe3"></span>
+<img src="figures/output_204_0.png" alt="Species richness in Europe." width="50%" />
+<p class="caption">
+Figure 4.13: Species richness in Europe.
+</p>
+</div>
+</div>
+</div>
+<div id="relation-of-basin-size-and-species-richness" class="section level4" number="4.2.9.6">
+<h4><span class="header-section-number">4.2.9.6</span> Relation of basin size and species richness</h4>
+<p>In the previous section, you observed the spatial patterns of fish diversity across Europe. In this section, we will try to explain these patterns. To achieve this, we will correlate the fish species richness of each basin to the surface area of the corresponding area to see how the species richness varies with respect to the surface area of the basin. We begin with plotting a simple scatterplot. We will log transform the data we have on surface area as it helps to make data conform to normality and also helps to deal with the outliers and skeweness in the data. Then we will plot this data against species richness. Since the data-deficient basins show zero observations in the dataframe, we will remove those first.</p>
+<p>Now we will create a new dataframe with the <em>surface area</em> and <em>richness</em>. We’ll rename the columns as <em>‘Basin_area’</em> and <em>‘Species_richness’</em> respectively. We make a simple scatterplot with a regression line to visualise the relationship.</p>
+<div class="sourceCode" id="cb360"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb360-1"><a href="ch-04.html#cb360-1" aria-hidden="true" tabindex="-1"></a>basin_shapefile <span class="ot">&lt;-</span> basin_shapefile[basin_shapefile<span class="sc">$</span>richness<span class="sc">!=</span><span class="dv">0</span>,]</span>
+<span id="cb360-2"><a href="ch-04.html#cb360-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb360-3"><a href="ch-04.html#cb360-3" aria-hidden="true" tabindex="-1"></a>bs_sr <span class="ot">&lt;-</span> <span class="fu">tibble</span>(basin_shapefile<span class="sc">@</span>data<span class="sc">$</span>Surf_area, basin_shapefile<span class="sc">@</span>data<span class="sc">$</span>richness )</span>
+<span id="cb360-4"><a href="ch-04.html#cb360-4" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(bs_sr)[<span class="dv">1</span>]<span class="ot">&lt;-</span> <span class="st">&#39;Basin_area&#39;</span></span>
+<span id="cb360-5"><a href="ch-04.html#cb360-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(bs_sr)[<span class="dv">2</span>]<span class="ot">&lt;-</span> <span class="st">&#39;Species_richness&#39;</span></span>
+<span id="cb360-6"><a href="ch-04.html#cb360-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb360-7"><a href="ch-04.html#cb360-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bs_sr, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(Basin_area), <span class="at">y =</span> Species_richness)) <span class="sc">+</span></span>
+<span id="cb360-8"><a href="ch-04.html#cb360-8" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb360-9"><a href="ch-04.html#cb360-9" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">&#39;lm&#39;</span>, <span class="at">color=</span><span class="st">&quot;red&quot;</span>, <span class="at">size=</span><span class="fl">0.5</span>, <span class="at">se=</span><span class="cn">FALSE</span>)<span class="sc">+</span></span>
+<span id="cb360-10"><a href="ch-04.html#cb360-10" aria-hidden="true" tabindex="-1"></a><span class="fu">xlab</span>(<span class="st">&quot;Basin Area&quot;</span>) <span class="sc">+</span></span>
+<span id="cb360-11"><a href="ch-04.html#cb360-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ylab</span>(<span class="st">&quot;Species Richness&quot;</span>) <span class="sc">+</span></span>
+<span id="cb360-12"><a href="ch-04.html#cb360-12" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_classic</span>()</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-230-1.png" width="50%" style="display: block; margin: auto;" /></p>
+<p>The plot shows a positive correlation between basin area and fish richness, meaning that we expect to see a higher richness in larger basins. This pattern is commonly observed in ecology and one explanation for this is that larger areas provide different habitat types (niches), which allows more species to co-exist.</p>
+<p>As a next step, we will create a simple model of this relationship. This allows us to make predictions on the richness of fish species in other basins based on the basin area.</p>
+<div class="sourceCode" id="cb361"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb361-1"><a href="ch-04.html#cb361-1" aria-hidden="true" tabindex="-1"></a>richness_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(richness<span class="sc">~</span><span class="fu">log</span>(Surf_area), <span class="at">data=</span>basin_shapefile<span class="sc">@</span>data) <span class="co">#create a linear model</span></span></code></pre></div>
+<p>We now want to calculate the confidence intervals of the model to have a better idea of the uncertainty of the model. We will then coerce the basin surface, the model fit and the confidence interval into a new data frame called <em>model_df</em>.</p>
+<div class="sourceCode" id="cb362"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb362-1"><a href="ch-04.html#cb362-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate the confidence intervals</span></span>
+<span id="cb362-2"><a href="ch-04.html#cb362-2" aria-hidden="true" tabindex="-1"></a>model_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">cbind</span>(<span class="fu">log</span>(basin_shapefile<span class="sc">$</span>Surf_area), <span class="fu">predict</span>(richness_model, <span class="at">interval=</span><span class="st">&#39;confidence&#39;</span>)))</span>
+<span id="cb362-3"><a href="ch-04.html#cb362-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(model_df)[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="st">&#39;log_area&#39;</span></span>
+<span id="cb362-4"><a href="ch-04.html#cb362-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(model_df)</span></code></pre></div>
+<pre><code>##     log_area      fit      lwr      upr
+## 174 8.274449 28.39050 26.57731 30.20369
+## 291 9.960755 37.89576 35.13808 40.65343
+## 335 7.949240 26.55739 24.82776 28.28701
+## 340 5.953703 15.30907 13.07901 17.53914
+## 392 9.074369 32.89944 30.71907 35.07981
+## 393 5.538369 12.96794 10.47659 15.45930</code></pre>
+<p>The final step is to plot the model fit and prediction intervals over the data. To get nice lines in the plot, the <em>model_df</em> dataframe needs to be ordered by the basin area first.</p>
+<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb364-1"><a href="ch-04.html#cb364-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bs_sr, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">log</span>(Basin_area), <span class="at">y =</span> Species_richness)) <span class="sc">+</span></span>
+<span id="cb364-2"><a href="ch-04.html#cb364-2" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb364-3"><a href="ch-04.html#cb364-3" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> model_df<span class="sc">$</span>log_area, <span class="at">y=</span> model_df<span class="sc">$</span>fit ), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>)<span class="sc">+</span></span>
+<span id="cb364-4"><a href="ch-04.html#cb364-4" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> model_df<span class="sc">$</span>log_area, <span class="at">y=</span> model_df<span class="sc">$</span>lwr ), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;dotted&quot;</span>)<span class="sc">+</span></span>
+<span id="cb364-5"><a href="ch-04.html#cb364-5" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> model_df<span class="sc">$</span>log_area, <span class="at">y=</span> model_df<span class="sc">$</span>upr ), <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;dotted&quot;</span>)<span class="sc">+</span></span>
+<span id="cb364-6"><a href="ch-04.html#cb364-6" aria-hidden="true" tabindex="-1"></a><span class="fu">xlab</span>(<span class="st">&quot;Basin Area&quot;</span>) <span class="sc">+</span></span>
+<span id="cb364-7"><a href="ch-04.html#cb364-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ylab</span>(<span class="st">&quot;Species Richness&quot;</span>) <span class="sc">+</span></span>
+<span id="cb364-8"><a href="ch-04.html#cb364-8" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_classic</span>()</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-233-1.png" width="50%" style="display: block; margin: auto;" /></p>
+<p><strong>Checkpoint</strong>
+You have now seen how you can calculate and plot the confidence interval of your data. Based on your model you can also create a so-called <strong>prediction interval</strong> which gives an estimate of the range in which the model will most likely predict the y-values (for a given x-value). In our case the prediction interval would indicate in which range the model would expect the fish richness to be for a given basin surface area. Do you think that these prediction intervals will be broader or narrower than the confidence interval? Try to write the code for calculating and plotting the prediction intervals by yourself.</p>
+<div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb365-1"><a href="ch-04.html#cb365-1" aria-hidden="true" tabindex="-1"></a><span class="co"># your code</span></span></code></pre></div>
+<p><strong>Solution</strong></p>
+<div class="sourceCode" id="cb366"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb366-1"><a href="ch-04.html#cb366-1" aria-hidden="true" tabindex="-1"></a><span class="co">#prediction intervals</span></span>
+<span id="cb366-2"><a href="ch-04.html#cb366-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb366-3"><a href="ch-04.html#cb366-3" aria-hidden="true" tabindex="-1"></a><span class="co"># make a dataframe of area and richness model predictions</span></span>
+<span id="cb366-4"><a href="ch-04.html#cb366-4" aria-hidden="true" tabindex="-1"></a>model_df_prediction <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">cbind</span>(<span class="fu">log</span>(basin_shapefile<span class="sc">$</span>Surf_area), <span class="fu">predict</span>(richness_model, <span class="at">interval=</span><span class="st">&#39;prediction&#39;</span>)))</span>
+<span id="cb366-5"><a href="ch-04.html#cb366-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(model_df_prediction)[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="st">&#39;log_area&#39;</span> </span>
+<span id="cb366-6"><a href="ch-04.html#cb366-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb366-7"><a href="ch-04.html#cb366-7" aria-hidden="true" tabindex="-1"></a><span class="co"># order the basins by size</span></span>
+<span id="cb366-8"><a href="ch-04.html#cb366-8" aria-hidden="true" tabindex="-1"></a>model_df_prediction <span class="ot">&lt;-</span> model_df_prediction[<span class="fu">order</span>(model_df_prediction<span class="sc">$</span>log_area),]</span>
+<span id="cb366-9"><a href="ch-04.html#cb366-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb366-10"><a href="ch-04.html#cb366-10" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the model</span></span>
+<span id="cb366-11"><a href="ch-04.html#cb366-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">log</span>(basin_shapefile<span class="sc">$</span>Surf_area), basin_shapefile<span class="sc">$</span>richness, <span class="at">pch=</span><span class="dv">16</span>, <span class="at">cex=</span><span class="dv">1</span>, <span class="at">col=</span><span class="fu">rgb</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="fl">0.6</span>), <span class="at">xlab=</span><span class="st">&#39;Basin area&#39;</span>, <span class="at">ylab=</span><span class="st">&#39;Basin species richness&#39;</span>)</span>
+<span id="cb366-12"><a href="ch-04.html#cb366-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(model_df_prediction<span class="sc">$</span>log_area, model_df_prediction<span class="sc">$</span>fit, <span class="at">col=</span><span class="st">&#39;skyblue3&#39;</span>, <span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb366-13"><a href="ch-04.html#cb366-13" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(model_df_prediction<span class="sc">$</span>log_area, model_df_prediction<span class="sc">$</span>lwr, <span class="at">col=</span><span class="st">&#39;skyblue2&#39;</span>, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">lty=</span><span class="dv">3</span>)</span>
+<span id="cb366-14"><a href="ch-04.html#cb366-14" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(model_df_prediction<span class="sc">$</span>log_area, model_df_prediction<span class="sc">$</span>upr, <span class="at">col=</span><span class="st">&#39;skyblue2&#39;</span>, <span class="at">lwd=</span><span class="dv">2</span>, <span class="at">lty=</span><span class="dv">3</span>)</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-235-1.png" width="50%" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</div>
+<div id="exercise-3" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Exercise</h2>
+<p>Today’s exercise is about getting data from the web and extracting useful insights from it. This exercise is about getting the data from the web. Once you have finished the exercise please <code>knit</code> this document to create an .html file, export it and upload it to moodle.</p>
+<ol style="list-style-type: decimal">
+<li>Get the data
+<ol style="list-style-type: lower-alpha">
+<li>Following the steps described in the tutorial, get the maximal length of the species <em>Salvelinus alpinus</em> and the <em>Salmo trutta</em> using an API. After fetching the values create a table to store these values in one dataframe.</li>
+<li>Get the IUCN Status and eggs shape for <em>Salvelinus alpinus</em> and <em>Salmo trutta</em> using web scraping. Again follow the same steps you learned in the tutorial. In the end, add the new information to the dataframe.</li>
+</ol></li>
+<li>Get all the species in a family and the IUCN status
+<ol style="list-style-type: lower-alpha">
+<li>Your next task is to get all the species in the family <em>‘Neoscopelidae’</em> and print the first 5 elements of the family.</li>
+<li>Extract the ‘Native Exotic Status’ of all the species from France. Then end get the unique values of the Native Exotic Status. For this task you will need to use the file <em>‘ex02_data.csv’</em>.</li>
+<li>Now, use the information you got above to plot the proportion of species in each category for France.</li>
+</ol></li>
+<li>Extract the mean temperature for <strong>Coregonus lavaretus</strong> and <strong>Salvelinus alpinus</strong> using the function <code>stocks()</code> from <code>rfishbase</code> package and store the values in a new dataframe.</li>
+</ol>
+
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-R-rfishbase" class="csl-entry">
+Boettiger, Carl, Duncan Temple Lang, and Peter Wainwright. 2012. <span>“Rfishbase: Exploring, Manipulating and Visualizing <span>FishBase</span> Data from r.”</span> <em>Journal of Fish Biology</em>, November. <a href="https://doi.org/10.1111/j.1095-8649.2012.03464.x">https://doi.org/10.1111/j.1095-8649.2012.03464.x</a>.
+</div>
+<div id="ref-R-rredlist" class="csl-entry">
+Chamberlain, Scott. 2020. <em>Rredlist: ’IUCN’ Red List Client</em>. <a href="https://CRAN.R-project.org/package=rredlist">https://CRAN.R-project.org/package=rredlist</a>.
+</div>
+<div id="ref-R-RCurl" class="csl-entry">
+Temple Lang, Duncan. 2021a. <em>RCurl: General Network (HTTP/FTP/...) Client Interface for r</em>. <a href="https://CRAN.R-project.org/package=RCurl">https://CRAN.R-project.org/package=RCurl</a>.
+</div>
+<div id="ref-R-XML" class="csl-entry">
+———. 2021b. <em>XML: Tools for Parsing and Generating XML Within r and s-Plus</em>. <a href="https://CRAN.R-project.org/package=XML">https://CRAN.R-project.org/package=XML</a>.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="ch-03.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="ch-05.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

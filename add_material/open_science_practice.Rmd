@@ -1,5 +1,7 @@
 # Data wrangling {#ch-02}
+
 CIAONE PROVAAAAAAAAAA
+
 ## Introduction
 
 In this chapter, you will learn to efficiently explore data. This includes understanding how the data is structured, what "dimensions" are in a dataset, how to manipulate the data and how to visualise it. Efficient data exploration and wrangling are the basis for generating hypotheses, testing them, and repeating the wrangling-visualisation-hypothesis circle over and over. This is science.

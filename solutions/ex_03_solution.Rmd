@@ -1,0 +1,186 @@
+---
+title: 'Exercise 03 - Solution'
+output: html_document
+---
+
+# Data Variety
+
+## Part 1: Plotting Elevation differences
+
+In this first part of the exercise, we consider elevation data from the ETOPO dataset. ETOPO is a 1 arc-minute global relief model of the Earth's surface that integrates land topography and ocean bathymetry. Since it is modelled date there is a certain level of uncertainty associated with it. In this exercise, you will look at the differences between the elevations from the tower data, which is directly measured at the site, and the values you will extract from this modelled ETOPO data.
+
+***
+**a. Load the _'dataset_ex3.csv'_ file containing the elevations of the towers.**
+```{r}
+library(tidyverse)
+df <- read_csv("../data/ex03_data.csv")
+```
+
+***
+**b. Load both the _'ETOPO.tif'_ raster and the _'europe_shape'_ shapefile. Plot the shape of Europe over the raster.**
+(Since we used the shapefile in the tutorial too, it isn't located in the same folder as the data for this exercise. You'll have to use the correct pathway to load it, if you are unsure about how to find this use the 'Files' tab on the right can help you figure it out.)
+```{r}
+## XXX would be good to use the same data and functions for continent outline as in Ex. 1e: geom_sf(data = world)
+library(raster)
+library(rgdal)
+rtopo <- raster("../data/ETOPO.tif")
+europe_shape <- readOGR(dsn="../data/shapefiles", layer="europe_map")
+plot(rtopo)
+plot(europe_shape, add = TRUE)
+```
+
+***
+**c. Extract the elevations from the raster at the tower sites.**
+```{r}
+elevations_etopo <- raster::extract(rtopo, df[,c("longitude","latitude")])
+```
+
+We plot the values of elevation against each other with the 1:1 line in red.
+
+```{r}
+plot(elevations_etopo~df$elevation, pch=16,
+                     xlab = "Correct elevations",
+                     ylab = "ETOPO elevations") +
+abline(a = 0, b = 1, col = "red") 
+```
+
+Or with ggplot, this is
+```{r}
+ggplot(data = df, aes(elevations_etopo, elevation)) +
+  geom_point() +
+  labs(x = "Correct elevations (m)",
+       y = "ETOPO elevations (m)") + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dotted") +
+  theme_classic()   # personal preference over default theme
+```
+
+***
+**d. Calculate the difference between the elevations of the towers and the one extracted from the ETOPO.**
+```{r}
+differences <- elevations_etopo - df$elevation
+```
+
+***
+**e. Plot the difference of the elevations on a map of Europe.**
+_Hint:_ there are several ways to do this, one could be to using ifelse().
+```{r}
+library(maps)
+library(ggplot2)
+library(sf)
+library(spData)
+
+# option 1: To just show if the difference is positive or negative
+cols_diff <- ifelse(differences > 0, "orangered1" ,"royalblue2")
+ggplot() +
+  geom_sf(data = world) +
+  geom_point(data = df, aes(x = longitude, y = latitude), color = cols_diff) +
+  labs(x = "Longitude", y = "Latitude") +
+  coord_sf(xlim = c(-30,40), ylim = c(35,80), expand = FALSE)
+
+# option 2: To also show differences between positive and negative values
+pospal <- colorRampPalette(c("royalblue2", "orangered1"))
+datColabs <- pospal(10)[as.numeric(cut(differences, breaks = 10))]
+ggplot() +
+  geom_sf(data = world) +
+  geom_point(data = df, aes(x = longitude, y = latitude), color = datColabs) +
+  labs(x = "Longitude", y = "Latitude") +
+  coord_sf(xlim = c(-30,40), ylim = c(35,80), expand = FALSE)
+```
+
+
+## Part 2: Temperature and Elevation Correlation
+
+In this second part, we want to find out which of the elevations we gathered in the first part (ETOPO and towers) correlates better with the temperatures measured at the towers.
+
+Let us add the ETOPO elevations to the dataset.
+
+```{r}
+df <- tibble(df, elevations_etopo)
+```
+
+***
+**a. Correlate the ETOPO elevations at the towers sites with the temperatures measured at the towers.**
+
+```{r}
+reg1 <- lm(temperature ~ elevations_etopo, data = df) 
+```
+
+We plot our data with the linear model.
+```{r out.width = "75%"}
+plot(temperature ~ elevations_etopo, data = df, pch = 16,
+                     xlab = "ETOPO elevation",
+                     ylab = "Temperature (°C)") +
+abline(reg1, col = "red") 
+```
+
+***
+
+**b. Correlate the elevations measured at the tower sites with the temperatures measured at the towers.**
+
+```{r}
+reg2 <- lm(temperature ~ elevation, data = df) 
+```
+
+We plot our data with the linear model.
+```{r out.width = "75%"}
+plot(temperature ~ elevation, data = df, pch=16,
+                     xlab = "Measured elevation (m)",
+                     ylab = "Temperature (°C)") +
+abline(reg2, col = "red") 
+```
+
+With ggplot, we can use `geom_smooth(method = "lm")` to add a linear regression fit as a "smoothing" line through the points.
+```{r}
+ggplot(data = df, aes(elevation, temperature)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(x = "Measured elevation (m)", y = "Temperature (°C)") +
+  theme_classic()
+```
+
+
+
+***
+**c. What is the mean squared errors of the two models above. Which of the two correlates better?**
+
+```{r}
+# ETOPO
+mean(reg1$residuals^2)
+
+# Correct elevations
+mean(reg2$residuals^2)
+```
+
+Correct elevations suits a bit better, but there is no big difference.
+
+We can plot the residuals on the European map.
+
+```{r}
+## xxx please explain pospal(), can you find a simpler solution for displaying a continuous color scale
+## and make sure the color scale is added to the plot as a legend.
+pospal <- colorRampPalette(c("royalblue2", "orangered1"))
+datColabs1 <- pospal(10)[as.numeric(cut(reg1$residuals,breaks = 10))] 
+
+ggplot() +
+  geom_sf(data = world) +
+  geom_point(data = df, aes(x = longitude, y = latitude), color = datColabs1) +
+  labs(x = "Longitude", y = "Latitude") +
+  coord_sf(xlim = c(-30,40), ylim = c(35,80), expand = FALSE) +
+  theme_bw()
+```
+
+The points with the highest residuals are situated in the north. This means that not only elevation but additionnal factor such as latitude or continentality can explain variation in temperature across Europe.
+
+***
+**d. Find and compare the _lapse rate_ of the two models.**
+    The _'lapse rate'_ is known as the rate of decrease of an atmospheric variable, in our case temperature, with increased elevation (also altitude). This _lapse_ (gradual fall)  in temperature with increasing altitude at a given time and place, is the slope of your models above. _Hint:_ if you are stuck take a closer look at your model with summary().
+
+```{r}
+# ETOPO
+-reg1$coefficients
+
+# Correct elevations
+-reg2$coefficients
+```
+
+The two models have almost the same lapse rate. Now, that you've made it to the end of the exercise, remember to `knit` this document so you can upload the html to moodle.

@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 9 Supervised Neural Networks I | Environmental Systems Data Science</title>
+  <meta name="description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 9 Supervised Neural Networks I | Environmental Systems Data Science" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 9 Supervised Neural Networks I | Environmental Systems Data Science" />
+  
+  <meta name="twitter:description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  
+
+<meta name="author" content="Loïc Pellissier, Joshua Payne, Benjamin Stocker" />
+
+
+<meta name="date" content="2021-12-30" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="ch-08.html"/>
+<link rel="next" href="ch-10.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-description"><i class="fa fa-check"></i>Course Description</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-objectives"><i class="fa fa-check"></i>Course Objectives</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#content"><i class="fa fa-check"></i>Content</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#useful-prerequisites"><i class="fa fa-check"></i>Useful Prerequisites</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="ch-01.html"><a href="ch-01.html"><i class="fa fa-check"></i><b>1</b> Primers</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="ch-01.html"><a href="ch-01.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="ch-01.html"><a href="ch-01.html#key-points-from-the-lecture"><i class="fa fa-check"></i><b>1.1.1</b> Key Points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="ch-01.html"><a href="ch-01.html#tutorial"><i class="fa fa-check"></i><b>1.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="ch-01.html"><a href="ch-01.html#working-with-rstudio-on-renku"><i class="fa fa-check"></i><b>1.2.1</b> Working with RStudio on Renku</a></li>
+<li class="chapter" data-level="1.2.2" data-path="ch-01.html"><a href="ch-01.html#git"><i class="fa fa-check"></i><b>1.2.2</b> Git</a></li>
+<li class="chapter" data-level="1.2.3" data-path="ch-01.html"><a href="ch-01.html#libraries"><i class="fa fa-check"></i><b>1.2.3</b> Libraries</a></li>
+<li class="chapter" data-level="1.2.4" data-path="ch-01.html"><a href="ch-01.html#r-scripts"><i class="fa fa-check"></i><b>1.2.4</b> R scripts</a></li>
+<li class="chapter" data-level="1.2.5" data-path="ch-01.html"><a href="ch-01.html#rmarkdown"><i class="fa fa-check"></i><b>1.2.5</b> RMarkdown</a></li>
+<li class="chapter" data-level="1.2.6" data-path="ch-01.html"><a href="ch-01.html#functions"><i class="fa fa-check"></i><b>1.2.6</b> Functions</a></li>
+<li class="chapter" data-level="1.2.7" data-path="ch-01.html"><a href="ch-01.html#tidy-data"><i class="fa fa-check"></i><b>1.2.7</b> Tidy data</a></li>
+<li class="chapter" data-level="1.2.8" data-path="ch-01.html"><a href="ch-01.html#r-projects"><i class="fa fa-check"></i><b>1.2.8</b> R projects</a></li>
+<li class="chapter" data-level="1.2.9" data-path="ch-01.html"><a href="ch-01.html#working-with-data-frames"><i class="fa fa-check"></i><b>1.2.9</b> Working with data frames</a></li>
+<li class="chapter" data-level="1.2.10" data-path="ch-01.html"><a href="ch-01.html#r-objects"><i class="fa fa-check"></i><b>1.2.10</b> R objects</a></li>
+<li class="chapter" data-level="1.2.11" data-path="ch-01.html"><a href="ch-01.html#data-visualisation"><i class="fa fa-check"></i><b>1.2.11</b> Data visualisation</a></li>
+<li class="chapter" data-level="1.2.12" data-path="ch-01.html"><a href="ch-01.html#conditionals"><i class="fa fa-check"></i><b>1.2.12</b> Conditionals</a></li>
+<li class="chapter" data-level="1.2.13" data-path="ch-01.html"><a href="ch-01.html#loops"><i class="fa fa-check"></i><b>1.2.13</b> Loops</a></li>
+<li class="chapter" data-level="1.2.14" data-path="ch-01.html"><a href="ch-01.html#where-to-find-help"><i class="fa fa-check"></i><b>1.2.14</b> Where to find help</a></li>
+<li class="chapter" data-level="1.2.15" data-path="ch-01.html"><a href="ch-01.html#key-points-from-the-tutorial"><i class="fa fa-check"></i><b>1.2.15</b> Key points from the tutorial</a></li>
+<li class="chapter" data-level="1.2.16" data-path="ch-01.html"><a href="ch-01.html#further-reading"><i class="fa fa-check"></i><b>1.2.16</b> Further reading</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="ch-01.html"><a href="ch-01.html#exercise"><i class="fa fa-check"></i><b>1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="ch-02.html"><a href="ch-02.html"><i class="fa fa-check"></i><b>2</b> Data wrangling</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="ch-02.html"><a href="ch-02.html#introduction-1"><i class="fa fa-check"></i><b>2.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="ch-02.html"><a href="ch-02.html#learning-objectives"><i class="fa fa-check"></i><b>2.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="2.1.2" data-path="ch-02.html"><a href="ch-02.html#key-points-from-the-lecture-1"><i class="fa fa-check"></i><b>2.1.2</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="ch-02.html"><a href="ch-02.html#tutorial-1"><i class="fa fa-check"></i><b>2.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="ch-02.html"><a href="ch-02.html#libraries-1"><i class="fa fa-check"></i><b>2.2.1</b> Libraries</a></li>
+<li class="chapter" data-level="2.2.2" data-path="ch-02.html"><a href="ch-02.html#variables-in-a-data-frame"><i class="fa fa-check"></i><b>2.2.2</b> Variables in a data frame</a></li>
+<li class="chapter" data-level="2.2.3" data-path="ch-02.html"><a href="ch-02.html#time-objects"><i class="fa fa-check"></i><b>2.2.3</b> Time objects</a></li>
+<li class="chapter" data-level="2.2.4" data-path="ch-02.html"><a href="ch-02.html#variable-re--definition"><i class="fa fa-check"></i><b>2.2.4</b> Variable (re-) definition</a></li>
+<li class="chapter" data-level="2.2.5" data-path="ch-02.html"><a href="ch-02.html#selecting-cleaning-and-gap-filling"><i class="fa fa-check"></i><b>2.2.5</b> Selecting, cleaning and gap-filling</a></li>
+<li class="chapter" data-level="2.2.6" data-path="ch-02.html"><a href="ch-02.html#functions-1"><i class="fa fa-check"></i><b>2.2.6</b> Functions</a></li>
+<li class="chapter" data-level="2.2.7" data-path="ch-02.html"><a href="ch-02.html#data-overview"><i class="fa fa-check"></i><b>2.2.7</b> Data overview</a></li>
+<li class="chapter" data-level="2.2.8" data-path="ch-02.html"><a href="ch-02.html#data-visualisation-i"><i class="fa fa-check"></i><b>2.2.8</b> Data visualisation I</a></li>
+<li class="chapter" data-level="2.2.9" data-path="ch-02.html"><a href="ch-02.html#aggregating"><i class="fa fa-check"></i><b>2.2.9</b> Aggregating</a></li>
+<li class="chapter" data-level="2.2.10" data-path="ch-02.html"><a href="ch-02.html#data-visualisation-ii"><i class="fa fa-check"></i><b>2.2.10</b> Data visualisation II</a></li>
+<li class="chapter" data-level="2.2.11" data-path="ch-02.html"><a href="ch-02.html#functional-programming-i"><i class="fa fa-check"></i><b>2.2.11</b> Functional programming I</a></li>
+<li class="chapter" data-level="2.2.12" data-path="ch-02.html"><a href="ch-02.html#strings"><i class="fa fa-check"></i><b>2.2.12</b> Strings</a></li>
+<li class="chapter" data-level="2.2.13" data-path="ch-02.html"><a href="ch-02.html#combining-relational-data"><i class="fa fa-check"></i><b>2.2.13</b> Combining relational data</a></li>
+<li class="chapter" data-level="2.2.14" data-path="ch-02.html"><a href="ch-02.html#key-points-from-the-tutorial-1"><i class="fa fa-check"></i><b>2.2.14</b> Key points from the tutorial</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="ch-02.html"><a href="ch-02.html#exercise-1"><i class="fa fa-check"></i><b>2.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="ch-03.html"><a href="ch-03.html"><i class="fa fa-check"></i><b>3</b> Data variety</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="ch-03.html"><a href="ch-03.html#introduction-2"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="ch-03.html"><a href="ch-03.html#overview"><i class="fa fa-check"></i><b>3.1.1</b> Overview</a></li>
+<li class="chapter" data-level="3.1.2" data-path="ch-03.html"><a href="ch-03.html#learning-objectives-1"><i class="fa fa-check"></i><b>3.1.2</b> Learning objectives</a></li>
+<li class="chapter" data-level="3.1.3" data-path="ch-03.html"><a href="ch-03.html#key-points-from-the-lecture-2"><i class="fa fa-check"></i><b>3.1.3</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="ch-03.html"><a href="ch-03.html#tutorial-2"><i class="fa fa-check"></i><b>3.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="ch-03.html"><a href="ch-03.html#overview-1"><i class="fa fa-check"></i><b>3.2.1</b> Overview</a></li>
+<li class="chapter" data-level="3.2.2" data-path="ch-03.html"><a href="ch-03.html#modis-remote-download"><i class="fa fa-check"></i><b>3.2.2</b> MODIS remote download</a></li>
+<li class="chapter" data-level="3.2.3" data-path="ch-03.html"><a href="ch-03.html#points-on-the-globe"><i class="fa fa-check"></i><b>3.2.3</b> Points on the globe</a></li>
+<li class="chapter" data-level="3.2.4" data-path="ch-03.html"><a href="ch-03.html#shapefiles"><i class="fa fa-check"></i><b>3.2.4</b> Shapefiles</a></li>
+<li class="chapter" data-level="3.2.5" data-path="ch-03.html"><a href="ch-03.html#rasters"><i class="fa fa-check"></i><b>3.2.5</b> Rasters</a></li>
+<li class="chapter" data-level="3.2.6" data-path="ch-03.html"><a href="ch-03.html#key-points-from-the-tutorial-2"><i class="fa fa-check"></i><b>3.2.6</b> Key points from the tutorial</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="ch-03.html"><a href="ch-03.html#exercise-2"><i class="fa fa-check"></i><b>3.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="ch-04.html"><a href="ch-04.html"><i class="fa fa-check"></i><b>4</b> Data Scraping</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="ch-04.html"><a href="ch-04.html#introduction-3"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="ch-04.html"><a href="ch-04.html#key-points-from-the-lecture-3"><i class="fa fa-check"></i><b>4.1.1</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="ch-04.html"><a href="ch-04.html#tutorial-3"><i class="fa fa-check"></i><b>4.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="ch-04.html"><a href="ch-04.html#r-packages-and-functions"><i class="fa fa-check"></i><b>4.2.1</b> R-Packages and Functions</a></li>
+<li class="chapter" data-level="4.2.2" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-website"><i class="fa fa-check"></i><b>4.2.2</b> The FishBase website</a></li>
+<li class="chapter" data-level="4.2.3" data-path="ch-04.html"><a href="ch-04.html#accessing-fishbase"><i class="fa fa-check"></i><b>4.2.3</b> Accessing FishBase</a></li>
+<li class="chapter" data-level="4.2.4" data-path="ch-04.html"><a href="ch-04.html#scraping-numbers"><i class="fa fa-check"></i><b>4.2.4</b> Scraping Numbers</a></li>
+<li class="chapter" data-level="4.2.5" data-path="ch-04.html"><a href="ch-04.html#scraping-text-snippetrs"><i class="fa fa-check"></i><b>4.2.5</b> Scraping Text Snippetrs</a></li>
+<li class="chapter" data-level="4.2.6" data-path="ch-04.html"><a href="ch-04.html#scraping-tables"><i class="fa fa-check"></i><b>4.2.6</b> Scraping Tables</a></li>
+<li class="chapter" data-level="4.2.7" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-package"><i class="fa fa-check"></i><b>4.2.7</b> The Fishbase Package</a></li>
+<li class="chapter" data-level="4.2.8" data-path="ch-04.html"><a href="ch-04.html#summary"><i class="fa fa-check"></i><b>4.2.8</b> Summary</a></li>
+<li class="chapter" data-level="4.2.9" data-path="ch-04.html"><a href="ch-04.html#case-study"><i class="fa fa-check"></i><b>4.2.9</b> Case Study</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="ch-04.html"><a href="ch-04.html#exercise-3"><i class="fa fa-check"></i><b>4.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="ch-05.html"><a href="ch-05.html"><i class="fa fa-check"></i><b>5</b> Catch-up</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="ch-05.html"><a href="ch-05.html#loops-in-r"><i class="fa fa-check"></i><b>5.1</b> Loops in R</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="ch-05.html"><a href="ch-05.html#some-simple-examples"><i class="fa fa-check"></i><b>5.1.1</b> Some simple examples</a></li>
+<li class="chapter" data-level="5.1.2" data-path="ch-05.html"><a href="ch-05.html#nested-loops"><i class="fa fa-check"></i><b>5.1.2</b> Nested loops</a></li>
+<li class="chapter" data-level="5.1.3" data-path="ch-05.html"><a href="ch-05.html#exercise-4"><i class="fa fa-check"></i><b>5.1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="ch-05.html"><a href="ch-05.html#functional-programming-using-purr"><i class="fa fa-check"></i><b>5.2</b> Functional programming using purr</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="ch-05.html"><a href="ch-05.html#shortcuts-in-a-purrr-function"><i class="fa fa-check"></i><b>5.2.1</b> Shortcuts in a <code>purrr</code> function</a></li>
+<li class="chapter" data-level="5.2.2" data-path="ch-05.html"><a href="ch-05.html#workflow-nested-data-map-and-mutate"><i class="fa fa-check"></i><b>5.2.2</b> Workflow: nested data, map and mutate</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="ch-05.html"><a href="ch-05.html#string-manipulations"><i class="fa fa-check"></i><b>5.3</b> String Manipulations</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="ch-05.html"><a href="ch-05.html#introduction-to-strings"><i class="fa fa-check"></i><b>5.3.1</b> Introduction to strings</a></li>
+<li class="chapter" data-level="5.3.2" data-path="ch-05.html"><a href="ch-05.html#matching-and-extracting-patterns"><i class="fa fa-check"></i><b>5.3.2</b> Matching and extracting patterns</a></li>
+<li class="chapter" data-level="5.3.3" data-path="ch-05.html"><a href="ch-05.html#advanced-example"><i class="fa fa-check"></i><b>5.3.3</b> Advanced example</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="ch-05.html"><a href="ch-05.html#web-scraping-in-a-nut-shell"><i class="fa fa-check"></i><b>5.4</b> Web-scraping in a nut-shell</a></li>
+<li class="chapter" data-level="5.5" data-path="ch-05.html"><a href="ch-05.html#tidyverses-filter-and-select"><i class="fa fa-check"></i><b>5.5</b> Tidyverse’s filter and select</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="ch-05.html"><a href="ch-05.html#introduction-4"><i class="fa fa-check"></i><b>5.5.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.5.2" data-path="ch-05.html"><a href="ch-05.html#select"><i class="fa fa-check"></i><b>5.5.2</b> Select()</a></li>
+<li class="chapter" data-level="5.5.3" data-path="ch-05.html"><a href="ch-05.html#filter"><i class="fa fa-check"></i><b>5.5.3</b> Filter()</a></li>
+<li class="chapter" data-level="5.5.4" data-path="ch-05.html"><a href="ch-05.html#exercises"><i class="fa fa-check"></i><b>5.5.4</b> Exercises</a></li>
+<li class="chapter" data-level="5.5.5" data-path="ch-05.html"><a href="ch-05.html#solutions"><i class="fa fa-check"></i><b>5.5.5</b> Solutions</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="ch-05.html"><a href="ch-05.html#preparing-data-for-ggplot"><i class="fa fa-check"></i><b>5.6</b> Preparing data for ggplot()</a></li>
+<li class="chapter" data-level="5.7" data-path="ch-05.html"><a href="ch-05.html#base-r-functions"><i class="fa fa-check"></i><b>5.7</b> Base R functions</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="ch-06.html"><a href="ch-06.html"><i class="fa fa-check"></i><b>6</b> Supervised Machine Learning I</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="ch-06.html"><a href="ch-06.html#introduction-5"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="ch-06.html"><a href="ch-06.html#learning-objectives-2"><i class="fa fa-check"></i><b>6.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="6.1.2" data-path="ch-06.html"><a href="ch-06.html#important-points-from-the-lecture"><i class="fa fa-check"></i><b>6.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="ch-06.html"><a href="ch-06.html#tutorial-4"><i class="fa fa-check"></i><b>6.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="ch-06.html"><a href="ch-06.html#overfitting"><i class="fa fa-check"></i><b>6.2.1</b> Overfitting</a></li>
+<li class="chapter" data-level="6.2.2" data-path="ch-06.html"><a href="ch-06.html#motivation"><i class="fa fa-check"></i><b>6.2.2</b> Modelling challenge</a></li>
+<li class="chapter" data-level="6.2.3" data-path="ch-06.html"><a href="ch-06.html#a-selection-of-model-types"><i class="fa fa-check"></i><b>6.2.3</b> A selection of model types</a></li>
+<li class="chapter" data-level="6.2.4" data-path="ch-06.html"><a href="ch-06.html#data-splitting"><i class="fa fa-check"></i><b>6.2.4</b> Data splitting</a></li>
+<li class="chapter" data-level="6.2.5" data-path="ch-06.html"><a href="ch-06.html#preprocessing"><i class="fa fa-check"></i><b>6.2.5</b> Pre-processing</a></li>
+<li class="chapter" data-level="6.2.6" data-path="ch-06.html"><a href="ch-06.html#model-formulation"><i class="fa fa-check"></i><b>6.2.6</b> Model formulation</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="ch-06.html"><a href="ch-06.html#exercise-5"><i class="fa fa-check"></i><b>6.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="ch-06.html"><a href="ch-06.html#reading-and-cleaning"><i class="fa fa-check"></i><b>6.3.1</b> Reading and cleaning</a></li>
+<li class="chapter" data-level="6.3.2" data-path="ch-06.html"><a href="ch-06.html#data-splitting-1"><i class="fa fa-check"></i><b>6.3.2</b> Data splitting</a></li>
+<li class="chapter" data-level="6.3.3" data-path="ch-06.html"><a href="ch-06.html#linear-model"><i class="fa fa-check"></i><b>6.3.3</b> Linear model</a></li>
+<li class="chapter" data-level="6.3.4" data-path="ch-06.html"><a href="ch-06.html#pre-processing"><i class="fa fa-check"></i><b>6.3.4</b> Pre-processing</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="ch-07.html"><a href="ch-07.html"><i class="fa fa-check"></i><b>7</b> Supervised Machine Learning II</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="ch-07.html"><a href="ch-07.html#introduction-6"><i class="fa fa-check"></i><b>7.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="ch-07.html"><a href="ch-07.html#learning-objectives-3"><i class="fa fa-check"></i><b>7.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="7.1.2" data-path="ch-07.html"><a href="ch-07.html#key-points-from-the-lecture-4"><i class="fa fa-check"></i><b>7.1.2</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="ch-07.html"><a href="ch-07.html#tutorial-5"><i class="fa fa-check"></i><b>7.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="ch-07.html"><a href="ch-07.html#model-formulation-using-train"><i class="fa fa-check"></i><b>7.2.1</b> Model formulation using <code>train()</code></a></li>
+<li class="chapter" data-level="7.2.2" data-path="ch-07.html"><a href="ch-07.html#model-training"><i class="fa fa-check"></i><b>7.2.2</b> Model training</a></li>
+<li class="chapter" data-level="7.2.3" data-path="ch-07.html"><a href="ch-07.html#model-evaluation"><i class="fa fa-check"></i><b>7.2.3</b> Model evaluation</a></li>
+<li class="chapter" data-level="7.2.4" data-path="ch-07.html"><a href="ch-07.html#bonus-model-interpretation"><i class="fa fa-check"></i><b>7.2.4</b> Bonus: Model interpretation</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="ch-07.html"><a href="ch-07.html#exercise-6"><i class="fa fa-check"></i><b>7.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="ch-07.html"><a href="ch-07.html#setup"><i class="fa fa-check"></i><b>7.3.1</b> Setup</a></li>
+<li class="chapter" data-level="7.3.2" data-path="ch-07.html"><a href="ch-07.html#linear-model-1"><i class="fa fa-check"></i><b>7.3.2</b> Linear Model</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="ch-07.html"><a href="ch-07.html#knn"><i class="fa fa-check"></i><b>7.4</b> KNN</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="ch-07.html"><a href="ch-07.html#check-data"><i class="fa fa-check"></i><b>7.4.1</b> Check data</a></li>
+<li class="chapter" data-level="7.4.2" data-path="ch-07.html"><a href="ch-07.html#training-1"><i class="fa fa-check"></i><b>7.4.2</b> Training</a></li>
+<li class="chapter" data-level="7.4.3" data-path="ch-07.html"><a href="ch-07.html#prediction-1"><i class="fa fa-check"></i><b>7.4.3</b> Prediction</a></li>
+<li class="chapter" data-level="7.4.4" data-path="ch-07.html"><a href="ch-07.html#sample-hyperparameters"><i class="fa fa-check"></i><b>7.4.4</b> Sample hyperparameters</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="ch-07.html"><a href="ch-07.html#random-forest-1"><i class="fa fa-check"></i><b>7.5</b> Random forest</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="ch-07.html"><a href="ch-07.html#training-2"><i class="fa fa-check"></i><b>7.5.1</b> Training</a></li>
+<li class="chapter" data-level="7.5.2" data-path="ch-07.html"><a href="ch-07.html#prediction-2"><i class="fa fa-check"></i><b>7.5.2</b> Prediction</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="ch-08.html"><a href="ch-08.html"><i class="fa fa-check"></i><b>8</b> Application 1: Variable selection</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="ch-08.html"><a href="ch-08.html#introduction-7"><i class="fa fa-check"></i><b>8.1</b> Introduction</a></li>
+<li class="chapter" data-level="8.2" data-path="ch-08.html"><a href="ch-08.html#application"><i class="fa fa-check"></i><b>8.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="ch-08.html"><a href="ch-08.html#warm-up-1-nested-for-loop"><i class="fa fa-check"></i><b>8.2.1</b> Warm-up 1: Nested for-loop</a></li>
+<li class="chapter" data-level="8.2.2" data-path="ch-08.html"><a href="ch-08.html#warm-up-2-find-the-best-single-predictor"><i class="fa fa-check"></i><b>8.2.2</b> Warm-up 2: Find the best single predictor</a></li>
+<li class="chapter" data-level="8.2.3" data-path="ch-08.html"><a href="ch-08.html#full-stepwise-regression"><i class="fa fa-check"></i><b>8.2.3</b> Full stepwise regression</a></li>
+<li class="chapter" data-level="8.2.4" data-path="ch-08.html"><a href="ch-08.html#bonus-stepwise-regression-out-of-the-box"><i class="fa fa-check"></i><b>8.2.4</b> Bonus: Stepwise regression out-of-the-box</a></li>
+<li class="chapter" data-level="8.2.5" data-path="ch-08.html"><a href="ch-08.html#bonus-best-subset-selection---not-included-in-application-for-students-too-long"><i class="fa fa-check"></i><b>8.2.5</b> Bonus: Best Subset Selection - Not included in application for students (too long…)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="ch-09.html"><a href="ch-09.html"><i class="fa fa-check"></i><b>9</b> Supervised Neural Networks I</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ch-09.html"><a href="ch-09.html#introduction-8"><i class="fa fa-check"></i><b>9.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ch-09.html"><a href="ch-09.html#learning-objectives-4"><i class="fa fa-check"></i><b>9.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="9.1.2" data-path="ch-09.html"><a href="ch-09.html#important-points-from-the-lecture-1"><i class="fa fa-check"></i><b>9.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="ch-09.html"><a href="ch-09.html#tutorial-6"><i class="fa fa-check"></i><b>9.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="ch-09.html"><a href="ch-09.html#set-up"><i class="fa fa-check"></i><b>9.2.1</b> Set-up</a></li>
+<li class="chapter" data-level="9.2.2" data-path="ch-09.html"><a href="ch-09.html#keras-for-linear-models"><i class="fa fa-check"></i><b>9.2.2</b> Keras for linear models</a></li>
+<li class="chapter" data-level="9.2.3" data-path="ch-09.html"><a href="ch-09.html#tuning-learning-rate"><i class="fa fa-check"></i><b>9.2.3</b> Tuning learning rate</a></li>
+<li class="chapter" data-level="9.2.4" data-path="ch-09.html"><a href="ch-09.html#logistic-regression"><i class="fa fa-check"></i><b>9.2.4</b> Logistic Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="ch-09.html"><a href="ch-09.html#exercise-7"><i class="fa fa-check"></i><b>9.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ch-10.html"><a href="ch-10.html"><i class="fa fa-check"></i><b>10</b> Supervised Neural Networks II</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ch-10.html"><a href="ch-10.html#introduction-9"><i class="fa fa-check"></i><b>10.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="10.1.1" data-path="ch-10.html"><a href="ch-10.html#learning-objectives-5"><i class="fa fa-check"></i><b>10.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="10.1.2" data-path="ch-10.html"><a href="ch-10.html#important-points-from-the-lecture-2"><i class="fa fa-check"></i><b>10.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="ch-10.html"><a href="ch-10.html#tutorial-7"><i class="fa fa-check"></i><b>10.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="ch-10.html"><a href="ch-10.html#import-libraries-1"><i class="fa fa-check"></i><b>10.2.1</b> Import libraries</a></li>
+<li class="chapter" data-level="10.2.2" data-path="ch-10.html"><a href="ch-10.html#construct-a-toy-dataset"><i class="fa fa-check"></i><b>10.2.2</b> Construct a toy dataset</a></li>
+<li class="chapter" data-level="10.2.3" data-path="ch-10.html"><a href="ch-10.html#build-and-train-nn"><i class="fa fa-check"></i><b>10.2.3</b> Build and train NN</a></li>
+<li class="chapter" data-level="10.2.4" data-path="ch-10.html"><a href="ch-10.html#model-performance"><i class="fa fa-check"></i><b>10.2.4</b> Model performance</a></li>
+<li class="chapter" data-level="10.2.5" data-path="ch-10.html"><a href="ch-10.html#influence-of-nn-architecture"><i class="fa fa-check"></i><b>10.2.5</b> Influence of NN architecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="ch-10.html"><a href="ch-10.html#exercise-8"><i class="fa fa-check"></i><b>10.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="ch-11.html"><a href="ch-11.html"><i class="fa fa-check"></i><b>11</b> Application 2: Neural Networks and Hyperparameter Tuning</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="ch-11.html"><a href="ch-11.html#introduction-10"><i class="fa fa-check"></i><b>11.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="ch-11.html"><a href="ch-11.html#learning-goals"><i class="fa fa-check"></i><b>11.1.1</b> Learning Goals</a></li>
+<li class="chapter" data-level="11.1.2" data-path="ch-11.html"><a href="ch-11.html#key-points-from-previous-lectures"><i class="fa fa-check"></i><b>11.1.2</b> Key Points from Previous Lectures</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="ch-11.html"><a href="ch-11.html#application-1"><i class="fa fa-check"></i><b>11.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="ch-11.html"><a href="ch-11.html#problem-statement"><i class="fa fa-check"></i><b>11.2.1</b> Problem Statement</a></li>
+<li class="chapter" data-level="11.2.2" data-path="ch-11.html"><a href="ch-11.html#data-preparation"><i class="fa fa-check"></i><b>11.2.2</b> Data preparation</a></li>
+<li class="chapter" data-level="11.2.3" data-path="ch-11.html"><a href="ch-11.html#center-and-scale"><i class="fa fa-check"></i><b>11.2.3</b> Center and scale</a></li>
+<li class="chapter" data-level="11.2.4" data-path="ch-11.html"><a href="ch-11.html#building-a-simple-model-with-keras-subtask-1"><i class="fa fa-check"></i><b>11.2.4</b> Building a simple model with keras ( SubTask 1)</a></li>
+<li class="chapter" data-level="11.2.5" data-path="ch-11.html"><a href="ch-11.html#cross-validation"><i class="fa fa-check"></i><b>11.2.5</b> Cross validation</a></li>
+<li class="chapter" data-level="11.2.6" data-path="ch-11.html"><a href="ch-11.html#parameter-tuning"><i class="fa fa-check"></i><b>11.2.6</b> Parameter Tuning</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="ch-12.html"><a href="ch-12.html"><i class="fa fa-check"></i><b>12</b> Supervised Deep Learning I</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="ch-12.html"><a href="ch-12.html#introduction-11"><i class="fa fa-check"></i><b>12.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="12.1.1" data-path="ch-12.html"><a href="ch-12.html#learning-objectives-6"><i class="fa fa-check"></i><b>12.1.1</b> Learning objectives</a></li>
+</ul></li>
+<li class="chapter" data-level="12.2" data-path="ch-12.html"><a href="ch-12.html#tutorial-8"><i class="fa fa-check"></i><b>12.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="ch-12.html"><a href="ch-12.html#building-blocks-of-cnns"><i class="fa fa-check"></i><b>12.2.1</b> Building Blocks of CNNs</a></li>
+<li class="chapter" data-level="12.2.2" data-path="ch-12.html"><a href="ch-12.html#build-the-model"><i class="fa fa-check"></i><b>12.2.2</b> Build the model</a></li>
+<li class="chapter" data-level="12.2.3" data-path="ch-12.html"><a href="ch-12.html#compile-and-train-the-model"><i class="fa fa-check"></i><b>12.2.3</b> Compile and train the model</a></li>
+<li class="chapter" data-level="12.2.4" data-path="ch-12.html"><a href="ch-12.html#reduce-overfitting"><i class="fa fa-check"></i><b>12.2.4</b> Reduce Overfitting</a></li>
+<li class="chapter" data-level="12.2.5" data-path="ch-12.html"><a href="ch-12.html#visualizing-a-cnn"><i class="fa fa-check"></i><b>12.2.5</b> Visualizing a CNN</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="ch-12.html"><a href="ch-12.html#exercise-9"><i class="fa fa-check"></i><b>12.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="ch-12.html"><a href="ch-12.html#import-libraries-and-data"><i class="fa fa-check"></i><b>12.3.1</b> Import libraries and data</a></li>
+<li class="chapter" data-level="12.3.2" data-path="ch-12.html"><a href="ch-12.html#tasks"><i class="fa fa-check"></i><b>12.3.2</b> Tasks</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="ch-13.html"><a href="ch-13.html"><i class="fa fa-check"></i><b>13</b> Supervised Deep Learning II - <em>A Scenario of Environmental Systems</em></a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="ch-13.html"><a href="ch-13.html#introduction-12"><i class="fa fa-check"></i><b>13.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="13.1.1" data-path="ch-13.html"><a href="ch-13.html#learning-objectives-7"><i class="fa fa-check"></i><b>13.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="13.1.2" data-path="ch-13.html"><a href="ch-13.html#content-operations"><i class="fa fa-check"></i><b>13.1.2</b> Content &amp; Operations</a></li>
+</ul></li>
+<li class="chapter" data-level="13.2" data-path="ch-13.html"><a href="ch-13.html#tutorial-9"><i class="fa fa-check"></i><b>13.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="13.2.1" data-path="ch-13.html"><a href="ch-13.html#description-of-the-modelling-task"><i class="fa fa-check"></i><b>13.2.1</b> Description of the modelling task</a></li>
+<li class="chapter" data-level="13.2.2" data-path="ch-13.html"><a href="ch-13.html#goal-of-the-tutorial"><i class="fa fa-check"></i><b>13.2.2</b> Goal of the tutorial</a></li>
+<li class="chapter" data-level="13.2.3" data-path="ch-13.html"><a href="ch-13.html#dataset"><i class="fa fa-check"></i><b>13.2.3</b> Dataset</a></li>
+<li class="chapter" data-level="13.2.4" data-path="ch-13.html"><a href="ch-13.html#lets-dive-into-the-code"><i class="fa fa-check"></i><b>13.2.4</b> Let’s dive into the code</a></li>
+<li class="chapter" data-level="13.2.5" data-path="ch-13.html"><a href="ch-13.html#read-in-the-data"><i class="fa fa-check"></i><b>13.2.5</b> Read in the Data</a></li>
+<li class="chapter" data-level="13.2.6" data-path="ch-13.html"><a href="ch-13.html#naive-models-old-world-linear-models"><i class="fa fa-check"></i><b>13.2.6</b> Naive models (Old World): Linear Models</a></li>
+<li class="chapter" data-level="13.2.7" data-path="ch-13.html"><a href="ch-13.html#neural-networks-new-world"><i class="fa fa-check"></i><b>13.2.7</b> Neural Networks (New World)</a></li>
+<li class="chapter" data-level="13.2.8" data-path="ch-13.html"><a href="ch-13.html#convolutional-neural-network"><i class="fa fa-check"></i><b>13.2.8</b> Convolutional Neural Network</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="ch-13.html"><a href="ch-13.html#exercise-10"><i class="fa fa-check"></i><b>13.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Environmental Systems Data Science</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="ch-09" class="section level1" number="9">
+<h1><span class="header-section-number">Chapter 9</span> Supervised Neural Networks I</h1>
+<div id="introduction-8" class="section level2" number="9.1">
+<h2><span class="header-section-number">9.1</span> Introduction</h2>
+<div id="learning-objectives-4" class="section level3" number="9.1.1">
+<h3><span class="header-section-number">9.1.1</span> Learning objectives</h3>
+<p>After this learning unit, you will be able to …
+* Practice some of the fundamentals of data cleaning.
+* Prepare data for use in machine learning by shuffling and splitting the data into training and testing sets.
+* Gain hands-on experience with a Keras, an important API for machine learning
+* Apply gradient descent in the context of linear regression, specifically to learn w and b in the model y = wx + b.
+* Observe how gradient descent (nearly) converges on the exact solution for y = wx + b
+* Explore how a hyper-parameter (the learning rate) influences whether the model converges and if so, how quickly.
+* Visualize the solution space for this problem to get an intuition for why gradient descent is so effective in finding the (nearly) optimal parameter combination.
+* Apply logistic regression to a simple classification problem.
+* Recall and apply measures of model performance and loss for classification, specifically accuracy and cross-entropy.</p>
+</div>
+<div id="important-points-from-the-lecture-1" class="section level3" number="9.1.2">
+<h3><span class="header-section-number">9.1.2</span> Important points from the lecture</h3>
+<ul>
+<li>It is always worthwhile to perform an initial exploratory analysis of your data, e.g. to identify outliers, missing values, etc.</li>
+<li>To train a statistical model using machine learning, we split our data into training and testing sets. Sometimes we also include a validation set.</li>
+<li>Loss is a measure of how well our trained model predicts training labels. Loss is high when predictions are poor. Loss is low when predictions are good.</li>
+<li>There are several ways to measure loss. RMSE (Root Mean Squared Error) is one such measure. It is used in regression problems.</li>
+<li>Gradient descent is a method that searches for model parameters that minimize loss.</li>
+<li>Machine learning algorithms have hyper-parameters. These are parameters that are set by the user rather than learned during training. An example is the learning rate in gradient descent.</li>
+<li>Logistic regression is a classification technique.</li>
+<li>Logistic regression is similar in model structure to linear regression. It is different in that it can capture non-linearities in data.</li>
+<li>As compared to regression problems, classification problems require different loss functions and measures of model performance. For example, loss can be measured using cross-entropy and model performance can be measured using accuracy.</li>
+</ul>
+</div>
+</div>
+<div id="tutorial-6" class="section level2" number="9.2">
+<h2><span class="header-section-number">9.2</span> Tutorial</h2>
+<div id="set-up" class="section level3" number="9.2.1">
+<h3><span class="header-section-number">9.2.1</span> Set-up</h3>
+<div id="import-libraries" class="section level4" number="9.2.1.1">
+<h4><span class="header-section-number">9.2.1.1</span> Import libraries</h4>
+<p>We first need to import some libraries. Most of these will be familiar from previous tutorials, with the exception of <code>keras</code>, which uses <code>TensorFlow</code> as a backend. For those who may be unfamiliar with the term <em>backend</em> this simply refers to a program’s code or parts of a computer application that enable it to run but isn’t accessed by the user and works in the background.</p>
+<p>These packages will be explained in detail later.</p>
+<div class="sourceCode" id="cb753"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb753-1"><a href="ch-09.html#cb753-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rjson)</span>
+<span id="cb753-2"><a href="ch-09.html#cb753-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb753-3"><a href="ch-09.html#cb753-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb753-4"><a href="ch-09.html#cb753-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb753-5"><a href="ch-09.html#cb753-5" aria-hidden="true" tabindex="-1"></a><span class="co"># use_condaenv()</span></span>
+<span id="cb753-6"><a href="ch-09.html#cb753-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
+<span id="cb753-7"><a href="ch-09.html#cb753-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tensorflow)</span>
+<span id="cb753-8"><a href="ch-09.html#cb753-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(IRdisplay)</span>
+<span id="cb753-9"><a href="ch-09.html#cb753-9" aria-hidden="true" tabindex="-1"></a><span class="co"># plot size </span></span>
+<span id="cb753-10"><a href="ch-09.html#cb753-10" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">repr.plot.width =</span> <span class="dv">10</span>, <span class="at">repr.plot.height =</span> <span class="dv">7</span>)</span></code></pre></div>
+</div>
+<div id="load-your-data" class="section level4" number="9.2.1.2">
+<h4><span class="header-section-number">9.2.1.2</span> Load your data</h4>
+<p>Load the hourly data from the eddy covariance flux towers. You’ll be quite familiar with this by now.</p>
+<p>For this first example, we’ll only load one feature (PPFD_IN - incoming photosynthetic photon flux density) and our dependent variable (GPP_NT_VUT_REF - gross primary production).</p>
+<p>Use the <code>head()</code> command to get an initial glimpse of the first few rows of data. Notice anything strange?</p>
+<div class="sourceCode" id="cb754"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb754-1"><a href="ch-09.html#cb754-1" aria-hidden="true" tabindex="-1"></a><span class="co">#path to the file</span></span>
+<span id="cb754-2"><a href="ch-09.html#cb754-2" aria-hidden="true" tabindex="-1"></a>file_path <span class="ot">=</span> <span class="st">&quot;./data/SLNN_I/flx_ch-lae/data.rds&quot;</span></span>
+<span id="cb754-3"><a href="ch-09.html#cb754-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb754-4"><a href="ch-09.html#cb754-4" aria-hidden="true" tabindex="-1"></a><span class="co">#read data</span></span>
+<span id="cb754-5"><a href="ch-09.html#cb754-5" aria-hidden="true" tabindex="-1"></a>df_data <span class="ot">=</span> <span class="fu">readRDS</span>(file_path)</span>
+<span id="cb754-6"><a href="ch-09.html#cb754-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_data)</span></code></pre></div>
+<pre><code>##   PPFD_IN GPP_NT_VUT_REF
+## 1   -9999       -1.33329
+## 2   -9999       -2.77788
+## 3   -9999       -3.22186
+## 4   -9999       -3.24148
+## 5   -9999       -3.99006
+## 6   -9999       -4.29533</code></pre>
+</div>
+<div id="clean-your-data" class="section level4" number="9.2.1.3">
+<h4><span class="header-section-number">9.2.1.3</span> Clean your data</h4>
+<p>Looks like the value of PPFD_IN has been set to -9999 in some examples. As you’ll recall from previous tutorials, this is a flag to indicate missing data. Let’s remove these examples and create a scatterplot of the remaining data.</p>
+<div class="sourceCode" id="cb756"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb756-1"><a href="ch-09.html#cb756-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Remove examples with PPFD_IN = -9999. They are missing values.</span></span>
+<span id="cb756-2"><a href="ch-09.html#cb756-2" aria-hidden="true" tabindex="-1"></a>df_data_cleaned <span class="ot">=</span> df_data <span class="sc">%&gt;%</span> <span class="fu">na_if</span>(<span class="sc">-</span><span class="dv">9999</span>) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>()</span>
+<span id="cb756-3"><a href="ch-09.html#cb756-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb756-4"><a href="ch-09.html#cb756-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Visualize the remaining data using a scatterplot</span></span>
+<span id="cb756-5"><a href="ch-09.html#cb756-5" aria-hidden="true" tabindex="-1"></a>df_data_cleaned <span class="sc">%&gt;%</span> </span>
+<span id="cb756-6"><a href="ch-09.html#cb756-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>( <span class="at">x =</span> PPFD_IN, <span class="at">y =</span> GPP_NT_VUT_REF))<span class="sc">+</span></span>
+<span id="cb756-7"><a href="ch-09.html#cb756-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>()</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-347-1.png" width="50%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="prepare-your-data-for-learning" class="section level4" number="9.2.1.4">
+<h4><span class="header-section-number">9.2.1.4</span> Prepare your data for learning</h4>
+<p>In previous lectures and tutorials, you’ve been taught the importance of splitting data into training and testing sets. Sometimes we produce a further split of the training data to include a validation set, although that won’t be necessary for the purposes of this tutorial.</p>
+<p>It is also important to shuffle your data. <em>Why?</em> Imagine you have temporal data that is laid out in chronological order. If you do not shuffle your data, your training set may contain examples from Spring, Summer, and Fall, whereas your testing data will contain examples from Winter. If the phenomena of interest depends on the season, then the patterns you learn in the training data may not be applicable to the patterns inherent in the test data.</p>
+<p>Let’s first shuffle the data, seeding the random number generator for reproducible results:</p>
+<div class="sourceCode" id="cb757"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb757-1"><a href="ch-09.html#cb757-1" aria-hidden="true" tabindex="-1"></a><span class="co">#We can set a seed for reproducible results.</span></span>
+<span id="cb757-2"><a href="ch-09.html#cb757-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">0</span>) </span>
+<span id="cb757-3"><a href="ch-09.html#cb757-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb757-4"><a href="ch-09.html#cb757-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Shuffle the data</span></span>
+<span id="cb757-5"><a href="ch-09.html#cb757-5" aria-hidden="true" tabindex="-1"></a>shuffled_id <span class="ot">=</span> <span class="fu">sample</span>(<span class="at">x=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(df_data_cleaned),<span class="at">size =</span> <span class="fu">nrow</span>(df_data_cleaned),<span class="at">replace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb757-6"><a href="ch-09.html#cb757-6" aria-hidden="true" tabindex="-1"></a>df_data_cleaned <span class="ot">=</span> df_data_cleaned[shuffled_id,]</span></code></pre></div>
+<p>Next let’s split the data into training (80%) and test (20%) sets:</p>
+<div class="sourceCode" id="cb758"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb758-1"><a href="ch-09.html#cb758-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Make a breakpoint at 80%</span></span>
+<span id="cb758-2"><a href="ch-09.html#cb758-2" aria-hidden="true" tabindex="-1"></a>breakpoint <span class="ot">=</span><span class="fu">as.integer</span>(<span class="fl">0.8</span> <span class="sc">*</span> <span class="fu">nrow</span>(df_data_cleaned))</span>
+<span id="cb758-3"><a href="ch-09.html#cb758-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb758-4"><a href="ch-09.html#cb758-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Use this breakpoint to delineate the training data from the test data</span></span>
+<span id="cb758-5"><a href="ch-09.html#cb758-5" aria-hidden="true" tabindex="-1"></a>df_train <span class="ot">=</span> df_data_cleaned <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span>breakpoint)</span>
+<span id="cb758-6"><a href="ch-09.html#cb758-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb758-7"><a href="ch-09.html#cb758-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Past the breakpoint is the test data</span></span>
+<span id="cb758-8"><a href="ch-09.html#cb758-8" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">=</span> df_data_cleaned <span class="sc">%&gt;%</span> <span class="fu">slice</span>((breakpoint<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(df_data_cleaned))</span></code></pre></div>
+</div>
+</div>
+<div id="keras-for-linear-models" class="section level3" number="9.2.2">
+<h3><span class="header-section-number">9.2.2</span> Keras for linear models</h3>
+<p><a href="https://tensorflow.rstudio.com/guide/keras/">Keras</a> is a powerful API for machine learning. It provides a rich library of easy-to-use functions for building, training, and evaluating artificial neural networks. It interfaces with several backend machine learning libraries. Here we’ll use it with the TensorFlow backend, which was developed by Google Brain for deep learning applications.</p>
+<p>A fundamental object in Keras is the “layer”, which contains a number of computational units called <em>neurons</em>. The <em>neurons</em> of each layer are connected to one another in sequence by directed edges, starting from the input layer, progressing through (possibly many) hidden layers, and ending in the output layer (see image below).</p>
+<p>Each layer except has its own bias term that is connected to all neurons in the successive layer. All edges have associated weights, which we learn during training.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:network"></span>
+<img src="figures/Chollet_Fig1.5.jpg" alt="Visualization of a neural network with four Layers and a multi-classification output. Figure from [Deep Learning with Python](https://www.manning.com/books/deep-learning-with-python)." width="50%" />
+<p class="caption">
+Figure 9.1: Visualization of a neural network with four Layers and a multi-classification output. Figure from <a href="https://www.manning.com/books/deep-learning-with-python">Deep Learning with Python</a>.
+</p>
+</div>
+<p>Below we define a function for building and training the simple model <code>y = wx + b</code> using gradient descent. While this task does not require a sophisticated artificial neural network, recall from lecture video 9B (nonlinear problems) that this task can be formulated using a network schematic, so the tools for training sophisticated artificial neural networks are also applicable in this simpler context. Thus, for this example, we only need a single layer of a single unit.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:network-ch"></span>
+<img src="figures/network.png" alt="Visualization of a neural network with one layer and one neuron. Figure from [Deep Learning with Python](https://www.manning.com/books/deep-learning-with-python)." width="50%" />
+<p class="caption">
+Figure 9.2: Visualization of a neural network with one layer and one neuron. Figure from <a href="https://www.manning.com/books/deep-learning-with-python">Deep Learning with Python</a>.
+</p>
+</div>
+<p>Notice the inputs to <code>build_and_train_model</code> function:</p>
+<p>The first two are for the training data. The variable <em>x_train</em> contains our independent variable <code>PPFD_IN</code> and <em>y_train</em> contains our dependent variable <code>GPP_NT_VUT_REF</code>.</p>
+<p>What about the other inputs?
+* <strong>learning_rate</strong>: recall from lecture 6B (loss and its minimization) that the learning rate is a hyper-parameter for gradient descent. It controls the size of the steps we take in parameter space in the opposite direction of the gradient of the loss function. Remember, we are trying to <em>minimize</em> loss.
+* <strong>num_epochs</strong>: specifies the number of passes we’ll make through the data during model training.
+* <strong>batch_size</strong>: specifies the number of examples used to compute the gradient. The gradient will therefore be computed <em>len(x_train) / batch_size times per epoch</em>.
+* <strong>save_path</strong>: is simply a file path for saving our results.</p>
+<p>It is worthwhile to study the innerworkings of this function to get a feel for some of the basic functionality of Keras. This will become particularly valuable in later tutorials, which use Keras to train more sophisticated models.</p>
+<div class="sourceCode" id="cb759"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb759-1"><a href="ch-09.html#cb759-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Let&#39;s save our output in the current working directory</span></span>
+<span id="cb759-2"><a href="ch-09.html#cb759-2" aria-hidden="true" tabindex="-1"></a>save_path_logs <span class="ot">=</span> <span class="st">&#39;./&#39;</span></span>
+<span id="cb759-3"><a href="ch-09.html#cb759-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb759-4"><a href="ch-09.html#cb759-4" aria-hidden="true" tabindex="-1"></a>build_and_train_model <span class="ot">=</span> <span class="cf">function</span>(x_train,y_train,learning_rate,num_epochs,batch_size,save_path){</span>
+<span id="cb759-5"><a href="ch-09.html#cb759-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-6"><a href="ch-09.html#cb759-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Most Keras models are so-called &#39;sequential&#39; models</span></span>
+<span id="cb759-7"><a href="ch-09.html#cb759-7" aria-hidden="true" tabindex="-1"></a>  model<span class="ot">=</span><span class="fu">keras_model_sequential</span>()</span>
+<span id="cb759-8"><a href="ch-09.html#cb759-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-9"><a href="ch-09.html#cb759-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Name the model</span></span>
+<span id="cb759-10"><a href="ch-09.html#cb759-10" aria-hidden="true" tabindex="-1"></a>  model.name <span class="ot">=</span> <span class="st">&#39;linear_regression_&#39;</span></span>
+<span id="cb759-11"><a href="ch-09.html#cb759-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-12"><a href="ch-09.html#cb759-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Name the log file</span></span>
+<span id="cb759-13"><a href="ch-09.html#cb759-13" aria-hidden="true" tabindex="-1"></a>  path<span class="ot">=</span><span class="fu">file.path</span>(save_path,<span class="st">&#39;logs&#39;</span>)</span>
+<span id="cb759-14"><a href="ch-09.html#cb759-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(path)</span>
+<span id="cb759-15"><a href="ch-09.html#cb759-15" aria-hidden="true" tabindex="-1"></a>  fname<span class="ot">=</span><span class="fu">file.path</span>(path,<span class="fu">paste</span>(model.name,<span class="st">&#39;lr_&#39;</span>,<span class="fu">toString</span>(learning_rate),<span class="st">&#39;.json&#39;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
+<span id="cb759-16"><a href="ch-09.html#cb759-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-17"><a href="ch-09.html#cb759-17" aria-hidden="true" tabindex="-1"></a>  <span class="co">#The simple model y = wx + b requires only one layer of one unit.</span></span>
+<span id="cb759-18"><a href="ch-09.html#cb759-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">#The input shape is a scalar because we only have one independent variable x.</span></span>
+<span id="cb759-19"><a href="ch-09.html#cb759-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">#The linear activation function is the default setting for the function layer_dense.  </span></span>
+<span id="cb759-20"><a href="ch-09.html#cb759-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">#We will initialize the weights with a constant value in this tutorial, to facilitate</span></span>
+<span id="cb759-21"><a href="ch-09.html#cb759-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#a fair comparison across different learning rates. However, in practice, you would</span></span>
+<span id="cb759-22"><a href="ch-09.html#cb759-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#randomly initialize the weights.  </span></span>
+<span id="cb759-23"><a href="ch-09.html#cb759-23" aria-hidden="true" tabindex="-1"></a>  model <span class="sc">%&gt;%</span> <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">input_shape =</span> <span class="dv">1</span>,<span class="at">activation =</span> <span class="st">&#39;linear&#39;</span>,</span>
+<span id="cb759-24"><a href="ch-09.html#cb759-24" aria-hidden="true" tabindex="-1"></a>                        <span class="at">kernel_initializer =</span> <span class="fu">initializer_constant</span>(<span class="fl">1.5</span>),</span>
+<span id="cb759-25"><a href="ch-09.html#cb759-25" aria-hidden="true" tabindex="-1"></a>                        <span class="at">bias_initializer =</span> <span class="fu">initializer_constant</span>(<span class="dv">1</span>))  </span>
+<span id="cb759-26"><a href="ch-09.html#cb759-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-27"><a href="ch-09.html#cb759-27" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Print the model description</span></span>
+<span id="cb759-28"><a href="ch-09.html#cb759-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>(model)</span>
+<span id="cb759-29"><a href="ch-09.html#cb759-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-30"><a href="ch-09.html#cb759-30" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Specify the learning rate and learning algorithm for stochastic gradient descent</span></span>
+<span id="cb759-31"><a href="ch-09.html#cb759-31" aria-hidden="true" tabindex="-1"></a>  opt<span class="ot">=</span><span class="fu">optimizer_adam</span>(<span class="at">lr =</span> learning_rate)</span>
+<span id="cb759-32"><a href="ch-09.html#cb759-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-33"><a href="ch-09.html#cb759-33" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Compile the model, using mean squared error to define loss</span></span>
+<span id="cb759-34"><a href="ch-09.html#cb759-34" aria-hidden="true" tabindex="-1"></a>  model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(<span class="at">loss =</span> <span class="st">&#39;mse&#39;</span>,<span class="at">optimizer =</span> opt,<span class="at">metrics=</span><span class="fu">list</span>(<span class="st">&#39;mse&#39;</span>))</span>
+<span id="cb759-35"><a href="ch-09.html#cb759-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-36"><a href="ch-09.html#cb759-36" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Create a callback function so we can monitor w and b during training, </span></span>
+<span id="cb759-37"><a href="ch-09.html#cb759-37" aria-hidden="true" tabindex="-1"></a>  <span class="co">#writing these data in json format, overwriting any existing file by</span></span>
+<span id="cb759-38"><a href="ch-09.html#cb759-38" aria-hidden="true" tabindex="-1"></a>  <span class="co">#the same name. This is fairly advanced Keras functionality,</span></span>
+<span id="cb759-39"><a href="ch-09.html#cb759-39" aria-hidden="true" tabindex="-1"></a>  <span class="co">#so if the code is over your head, don&#39;t worry about it.</span></span>
+<span id="cb759-40"><a href="ch-09.html#cb759-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (fname <span class="sc">%in%</span> <span class="fu">list.files</span>(path,<span class="at">full.names =</span> <span class="cn">TRUE</span>)){<span class="fu">file.remove</span>(fname)}</span>
+<span id="cb759-41"><a href="ch-09.html#cb759-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-42"><a href="ch-09.html#cb759-42" aria-hidden="true" tabindex="-1"></a>  json_log<span class="ot">=</span><span class="fu">file</span>(fname)</span>
+<span id="cb759-43"><a href="ch-09.html#cb759-43" aria-hidden="true" tabindex="-1"></a>  json_logging_callback <span class="ot">=</span> <span class="fu">callback_lambda</span>(</span>
+<span id="cb759-44"><a href="ch-09.html#cb759-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">on_epoch_end =</span> <span class="cf">function</span>(epoch, logs) {<span class="fu">write</span>(</span>
+<span id="cb759-45"><a href="ch-09.html#cb759-45" aria-hidden="true" tabindex="-1"></a>      <span class="fu">toJSON</span>(<span class="fu">data.frame</span>(<span class="at">epoch=</span>epoch<span class="sc">+</span><span class="dv">1</span>,</span>
+<span id="cb759-46"><a href="ch-09.html#cb759-46" aria-hidden="true" tabindex="-1"></a>                        <span class="at">loss=</span>logs[[<span class="st">&#39;loss&#39;</span>]],</span>
+<span id="cb759-47"><a href="ch-09.html#cb759-47" aria-hidden="true" tabindex="-1"></a>                        <span class="at">w=</span><span class="fu">get_weights</span>(model)[[<span class="dv">1</span>]],</span>
+<span id="cb759-48"><a href="ch-09.html#cb759-48" aria-hidden="true" tabindex="-1"></a>                        <span class="at">b=</span><span class="fu">get_weights</span>(model)[[<span class="dv">2</span>]])),</span>
+<span id="cb759-49"><a href="ch-09.html#cb759-49" aria-hidden="true" tabindex="-1"></a>      <span class="at">file=</span>fname,<span class="at">append =</span> <span class="cn">TRUE</span>)},</span>
+<span id="cb759-50"><a href="ch-09.html#cb759-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">on_train_end =</span> <span class="cf">function</span>(logs) {<span class="fu">close</span>(json_log)})</span>
+<span id="cb759-51"><a href="ch-09.html#cb759-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb759-52"><a href="ch-09.html#cb759-52" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Fit the model y = Wx + b</span></span>
+<span id="cb759-53"><a href="ch-09.html#cb759-53" aria-hidden="true" tabindex="-1"></a>  history <span class="ot">=</span> model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(x_train,y_train,</span>
+<span id="cb759-54"><a href="ch-09.html#cb759-54" aria-hidden="true" tabindex="-1"></a>                        <span class="at">epochs=</span>num_epochs,</span>
+<span id="cb759-55"><a href="ch-09.html#cb759-55" aria-hidden="true" tabindex="-1"></a>                        <span class="at">batch_size=</span>batch_size,</span>
+<span id="cb759-56"><a href="ch-09.html#cb759-56" aria-hidden="true" tabindex="-1"></a>                        <span class="at">callbacks =</span> json_logging_callback,</span>
+<span id="cb759-57"><a href="ch-09.html#cb759-57" aria-hidden="true" tabindex="-1"></a>                        )</span>
+<span id="cb759-58"><a href="ch-09.html#cb759-58" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-59"><a href="ch-09.html#cb759-59" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Extract W and b</span></span>
+<span id="cb759-60"><a href="ch-09.html#cb759-60" aria-hidden="true" tabindex="-1"></a>  W <span class="ot">=</span> <span class="fu">get_weights</span>(model)[[<span class="dv">1</span>]]</span>
+<span id="cb759-61"><a href="ch-09.html#cb759-61" aria-hidden="true" tabindex="-1"></a>  b <span class="ot">=</span> <span class="fu">get_weights</span>(model)[[<span class="dv">2</span>]]</span>
+<span id="cb759-62"><a href="ch-09.html#cb759-62" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-63"><a href="ch-09.html#cb759-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (<span class="fu">list</span>(<span class="at">model=</span>model,<span class="at">history=</span>history,W,b))</span>
+<span id="cb759-64"><a href="ch-09.html#cb759-64" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb759-65"><a href="ch-09.html#cb759-65" aria-hidden="true" tabindex="-1"></a>  }</span></code></pre></div>
+<div id="exact-solution-of-y-wx-b" class="section level4" number="9.2.2.1">
+<h4><span class="header-section-number">9.2.2.1</span> Exact solution of <code>y = wx + b</code></h4>
+<p>The loss function for the linear regression is the Root Mean Squared Error, given by <span class="math inline">\(L((w,b)) = \frac{1}{n}\sum_{i = 1}^{n} (wx_i + b-y_i)^2\)</span> where <span class="math inline">\((x_i,y_i)\)</span> are points of the training data.
+Our aim is to retrieve those <em>w</em> and <em>b</em>, which minimize the loss function or equivalently to find the line which best fits our training data. In order to minimize this objective function with respect to <em>w</em> and <em>b</em> we need to solve the following system:</p>
+<p><span class="math display">\[
+\begin{align}
+ \frac{\partial L}{\partial w} &amp; = 0 \\
+ \frac{\partial L}{\partial b} &amp; = 0
+\end{align}
+\]</span></p>
+<p>which gives <span class="math inline">\(\hat{w} = \frac{n \sum_{i = 1}^{n} x_iy_i -\sum_{i = 1}^{n}x_i\sum_{i = 1}^{n}y_i}{n\sum_{i = 1}^{n}x_i^2 - (\sum_{i = 1}^{n}x_i)^2}\)</span> and <span class="math inline">\(\hat{b} = \bar{y}-\hat{w} \bar{x}\)</span>.</p>
+<p>This is the so called <strong>exact solution</strong> for the linear regression problem where <span class="math inline">\(\hat{w}\)</span> and <span class="math inline">\(\hat{b}\)</span> denote the <em>slope</em> and the <em>intercept</em> of the line respectively.</p>
+<p>As we have already seen in the previous lectures we can also use the <code>lm</code> function in order to fit our linear model. The <code>lm</code> function uses the exact solution to find the optimal w and b.</p>
+<div class="sourceCode" id="cb760"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb760-1"><a href="ch-09.html#cb760-1" aria-hidden="true" tabindex="-1"></a>lm_fit <span class="ot">=</span> <span class="fu">lm</span>(GPP_NT_VUT_REF <span class="sc">~</span> PPFD_IN, <span class="at">data =</span> df_train)</span>
+<span id="cb760-2"><a href="ch-09.html#cb760-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lm_fit)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = GPP_NT_VUT_REF ~ PPFD_IN, data = df_train)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -42.242  -2.429  -0.529   2.054  54.205 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 0.9372117  0.0181264    51.7   &lt;2e-16 ***
+## PPFD_IN     0.0137657  0.0000327   421.0   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 5.894 on 143266 degrees of freedom
+## Multiple R-squared:  0.553,  Adjusted R-squared:  0.553 
+## F-statistic: 1.773e+05 on 1 and 143266 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>In the output above, the intercept corresponds to <em>b</em> and <code>PPFD_IN</code> corresponds to <em>w</em>.</p>
+</div>
+<div id="gradient-descent-solution" class="section level4" number="9.2.2.2">
+<h4><span class="header-section-number">9.2.2.2</span> Gradient descent solution</h4>
+<p>Not all models have an exact solution. Consequently, we need another way to approximate a sufficient solution of the objective function for any model class. To this end, we use the so called “gradient descent”, which you’ll recall from lecture 6B (loss and its minimization) is the following algorithm:</p>
+<ul>
+<li><p>Initialize <span class="math inline">\(w_0,b_0\)</span></p></li>
+<li><p>For <em>t=1,2,…</em> repeat until convergence:
+<span class="math display">\[\begin{align*}
+  b_t &amp;= b_{t-1}-\gamma \frac{\partial L}{\partial b}(w_{t-1},b_{t-1}) \\
+  w_t &amp;= w_{t-1} -\gamma \frac{\partial L}{\partial w}(w_{t-1},b_{t-1})
+\end{align*}\]</span></p>
+<p>where <span class="math inline">\(\gamma &gt;0\)</span> is the learning rate.</p></li>
+</ul>
+<p>The partial derivative <span class="math inline">\(\frac{\partial L}{\partial b}(w_{t-1},b_{t-1})\)</span> gives the gradient of the loss function with respect to <span class="math inline">\(b\)</span> at the point in parameter space (<span class="math inline">\(w_{t-1},b_{t-1}\)</span>).</p>
+<p>Similarly, the partial derivative <span class="math inline">\(\frac{\partial L}{\partial w}(w_{t-1},b_{t-1})\)</span> gives the gradient of the loss function with respect to <span class="math inline">\(w\)</span> at the point in parameter space (<span class="math inline">\(w_{t-1},b_{t-1}\)</span>).</p>
+<p><em>Checkpoint</em>
+Can you apply the gradient descent algorithm in order to find the minimum of <span class="math inline">\(f(x) = x^2 +1\)</span>? Use as starting point <span class="math inline">\(x_0=10\)</span>, learning rate 0.01 and make 1000 iterations. Hint: Recall from Calculus I, that the derivative of <span class="math inline">\(x^2\)</span> is <span class="math inline">\(2x\)</span>.</p>
+<p><em>Solution</em></p>
+<div class="sourceCode" id="cb762"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb762-1"><a href="ch-09.html#cb762-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Solution</span></span>
+<span id="cb762-2"><a href="ch-09.html#cb762-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb762-3"><a href="ch-09.html#cb762-3" aria-hidden="true" tabindex="-1"></a><span class="co"># derivative_f = 2*x</span></span>
+<span id="cb762-4"><a href="ch-09.html#cb762-4" aria-hidden="true" tabindex="-1"></a>x0 <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb762-5"><a href="ch-09.html#cb762-5" aria-hidden="true" tabindex="-1"></a>learning_rate <span class="ot">=</span> <span class="fl">0.01</span></span>
+<span id="cb762-6"><a href="ch-09.html#cb762-6" aria-hidden="true" tabindex="-1"></a>num_iterations <span class="ot">=</span> <span class="dv">1000</span> </span>
+<span id="cb762-7"><a href="ch-09.html#cb762-7" aria-hidden="true" tabindex="-1"></a>x_new <span class="ot">=</span> x0</span>
+<span id="cb762-8"><a href="ch-09.html#cb762-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb762-9"><a href="ch-09.html#cb762-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>num_iterations){</span>
+<span id="cb762-10"><a href="ch-09.html#cb762-10" aria-hidden="true" tabindex="-1"></a>    x_new <span class="ot">=</span> x_new <span class="sc">-</span> learning_rate<span class="sc">*</span><span class="dv">2</span><span class="sc">*</span>x_new</span>
+<span id="cb762-11"><a href="ch-09.html#cb762-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb762-12"><a href="ch-09.html#cb762-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb762-13"><a href="ch-09.html#cb762-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;Gradient descent output: x =&#39;</span>, <span class="fu">round</span>(x_new,<span class="dv">5</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Gradient descent output: x = 0</code></pre>
+<div class="sourceCode" id="cb764"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb764-1"><a href="ch-09.html#cb764-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The true minimum of the function is given at x = 0. </span></span>
+<span id="cb764-2"><a href="ch-09.html#cb764-2" aria-hidden="true" tabindex="-1"></a><span class="co"># As we can see the gradient descent algorithm returns a value very close</span></span>
+<span id="cb764-3"><a href="ch-09.html#cb764-3" aria-hidden="true" tabindex="-1"></a><span class="co"># to zero after 1000 iterations </span></span></code></pre></div>
+<p>Let’s use the function we wrote above, <code>build_and_train_model</code>, to apply gradient descent to the problem of solving <code>y = wx + b</code>, using a <em>learning rate</em> of <span class="math inline">\(0.01\)</span>. Note that we set the <em>batch_size</em> to 512, which means that each step of the algorithm will use only 512 training examples, rather than the entire training set. We set the maximum number of <em>epochs</em> to 20, which means that training will terminate after 20 full passes through the data.</p>
+<p>The algorithm will therefore make <span class="math inline">\(\frac{len(training \ data)}{batch\_size}\times epochs\)</span> steps in total, where each step corresponds to a calculation of the gradient and an update of the model parameters.</p>
+<div class="sourceCode" id="cb765"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb765-1"><a href="ch-09.html#cb765-1" aria-hidden="true" tabindex="-1"></a><span class="fu">use_session_with_seed</span>(<span class="dv">0</span>)</span>
+<span id="cb765-2"><a href="ch-09.html#cb765-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb765-3"><a href="ch-09.html#cb765-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Set the number of epochs to 20</span></span>
+<span id="cb765-4"><a href="ch-09.html#cb765-4" aria-hidden="true" tabindex="-1"></a>num_epochs <span class="ot">=</span> <span class="dv">20</span></span>
+<span id="cb765-5"><a href="ch-09.html#cb765-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb765-6"><a href="ch-09.html#cb765-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Build and train a model</span></span>
+<span id="cb765-7"><a href="ch-09.html#cb765-7" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(model,history,w,b) <span class="sc">%&lt;-%</span>  <span class="fu">build_and_train_model</span>(</span>
+<span id="cb765-8"><a href="ch-09.html#cb765-8" aria-hidden="true" tabindex="-1"></a>                            <span class="at">x_train =</span> df_train<span class="sc">$</span>PPFD_IN,</span>
+<span id="cb765-9"><a href="ch-09.html#cb765-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">y_train =</span> df_train<span class="sc">$</span>GPP_NT_VUT_REF,</span>
+<span id="cb765-10"><a href="ch-09.html#cb765-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">learning_rate =</span> <span class="fl">0.01</span>,</span>
+<span id="cb765-11"><a href="ch-09.html#cb765-11" aria-hidden="true" tabindex="-1"></a>                            <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb765-12"><a href="ch-09.html#cb765-12" aria-hidden="true" tabindex="-1"></a>                            <span class="at">num_epochs =</span> num_epochs,</span>
+<span id="cb765-13"><a href="ch-09.html#cb765-13" aria-hidden="true" tabindex="-1"></a>                            <span class="at">save_path =</span> save_path_logs</span>
+<span id="cb765-14"><a href="ch-09.html#cb765-14" aria-hidden="true" tabindex="-1"></a>                            )</span>
+<span id="cb765-15"><a href="ch-09.html#cb765-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb765-16"><a href="ch-09.html#cb765-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;</span><span class="sc">\n</span><span class="st">Final solution: w =&#39;</span>, w, <span class="st">&#39; b = &#39;</span>, b, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb766"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb766-1"><a href="ch-09.html#cb766-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Model: &quot;sequential&quot;</span></span>
+<span id="cb766-2"><a href="ch-09.html#cb766-2" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb766-3"><a href="ch-09.html#cb766-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Layer (type)                        Output Shape                    Param #     </span></span>
+<span id="cb766-4"><a href="ch-09.html#cb766-4" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb766-5"><a href="ch-09.html#cb766-5" aria-hidden="true" tabindex="-1"></a><span class="do">## dense (Dense)                       (None, 1)                       2           </span></span>
+<span id="cb766-6"><a href="ch-09.html#cb766-6" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb766-7"><a href="ch-09.html#cb766-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Total params: 2</span></span>
+<span id="cb766-8"><a href="ch-09.html#cb766-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Trainable params: 2</span></span>
+<span id="cb766-9"><a href="ch-09.html#cb766-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Non-trainable params: 0</span></span>
+<span id="cb766-10"><a href="ch-09.html#cb766-10" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb766-11"><a href="ch-09.html#cb766-11" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb766-12"><a href="ch-09.html#cb766-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Final solution: w = 0.01373669  b =  0.7571406 </span></span></code></pre></div>
+<p>Compare the solution found by gradient descent to the exact solution determined above. What do you observe?</p>
+<p>Let’s now save the model so we can retrieve it for a later use.</p>
+<div class="sourceCode" id="cb767"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb767-1"><a href="ch-09.html#cb767-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a file path for saving the model</span></span>
+<span id="cb767-2"><a href="ch-09.html#cb767-2" aria-hidden="true" tabindex="-1"></a>file_folder <span class="ot">=</span> <span class="st">&#39;./saved_models&#39;</span></span>
+<span id="cb767-3"><a href="ch-09.html#cb767-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(file_folder)</span>
+<span id="cb767-4"><a href="ch-09.html#cb767-4" aria-hidden="true" tabindex="-1"></a>save_path <span class="ot">=</span> <span class="fu">file.path</span>(file_folder,<span class="st">&#39;model_lr_0.01.h5&#39;</span>)</span>
+<span id="cb767-5"><a href="ch-09.html#cb767-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb767-6"><a href="ch-09.html#cb767-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the model</span></span>
+<span id="cb767-7"><a href="ch-09.html#cb767-7" aria-hidden="true" tabindex="-1"></a><span class="fu">save_model_hdf5</span>(model, save_path)</span></code></pre></div>
+<p>Let’s build our intuition for how gradient descent works by visualizing the loss function versus the fitting line for each (w,b) pair derived from the gradient descent. This is an advantage of working with a two-parameter problem - we can actually visualize loss across the solution space. This is not easy to do with problems that have more parameters. In fact, it’s typically impossible. For example, try to imagine what the surface of a loss function might look like for a four-parameter problem. Not easy right? Now consider that may problems have thousands of parameters - sometimes billions. Good luck wrapping your head around that!</p>
+<p>Have a look at Figure <a href="ch-09.html#fig:gradient">9.3</a> - what we actually observe is the fitted line to the data (right plot) for each step of gradient descent (red point of left plot). As the gradient descent update step approaches the minimum of the loss function, the line fits the data better, i.e it minimizes <span class="math inline">\(\sum_{i = 1}^{n} (\hat{y}_i-y_i)^2\)</span>.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:gradient"></span>
+<img src="figures/09_gradient.gif" alt="Animated gradient descent: __Left plot__: The gradient descent algorithm (red trace). __Right plot__: The fitting line for the respective step of gradient descent. Animation taken from [Miro](https://miro.medium.com/proxy/0*D7zG46WrdKx54pbU.gif)." width="50%" />
+<p class="caption">
+Figure 9.3: Animated gradient descent: <strong>Left plot</strong>: The gradient descent algorithm (red trace). <strong>Right plot</strong>: The fitting line for the respective step of gradient descent. Animation taken from <a href="https://miro.medium.com/proxy/0*D7zG46WrdKx54pbU.gif">Miro</a>.
+</p>
+</div>
+<p>We can also observe the convergence (gradient descent update causes tiny changes) of the algorithm by looking at either plot.</p>
+<p>Next let’s visualize the best fit inferred by gradient descent, as compared to the exact solution, in the context of the data we’re trying to fit.</p>
+<div class="sourceCode" id="cb768"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb768-1"><a href="ch-09.html#cb768-1" aria-hidden="true" tabindex="-1"></a>df_train <span class="sc">%&gt;%</span></span>
+<span id="cb768-2"><a href="ch-09.html#cb768-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> PPFD_IN, <span class="at">y =</span> GPP_NT_VUT_REF))<span class="sc">+</span></span>
+<span id="cb768-3"><a href="ch-09.html#cb768-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">#plot points</span></span>
+<span id="cb768-4"><a href="ch-09.html#cb768-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb768-5"><a href="ch-09.html#cb768-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># plot lines</span></span>
+<span id="cb768-6"><a href="ch-09.html#cb768-6" aria-hidden="true" tabindex="-1"></a>    <span class="do">##plot the best fit for learning rate = 0.01</span></span>
+<span id="cb768-7"><a href="ch-09.html#cb768-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_abline</span>(<span class="fu">aes</span>(<span class="at">intercept =</span> b_est, <span class="at">slope =</span> w_est ,<span class="at">color=</span><span class="st">&#39;GD Solution&#39;</span>,<span class="at">linetype=</span><span class="st">&#39;GD Solution&#39;</span>),<span class="at">lwd =</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb768-8"><a href="ch-09.html#cb768-8" aria-hidden="true" tabindex="-1"></a>    <span class="do">##plot exact line</span></span>
+<span id="cb768-9"><a href="ch-09.html#cb768-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_abline</span>(<span class="fu">aes</span>(<span class="at">intercept =</span> <span class="fu">coef</span>(lm_fit)[<span class="dv">1</span>], <span class="at">slope =</span> <span class="fu">coef</span>(lm_fit)[<span class="dv">2</span>],<span class="at">color=</span><span class="st">&#39;Exact Solution&#39;</span>,<span class="at">linetype=</span><span class="st">&#39;Exact Solution&#39;</span>),<span class="at">lwd =</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb768-10"><a href="ch-09.html#cb768-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_colour_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">&#39;GD Solution&#39;</span> <span class="ot">=</span> <span class="st">&quot;red&quot;</span>,<span class="st">&#39;Exact Solution&#39;</span> <span class="ot">=</span> <span class="st">&#39;green&#39;</span>))<span class="sc">+</span></span>
+<span id="cb768-11"><a href="ch-09.html#cb768-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_linetype_manual</span>(<span class="at">values=</span><span class="fu">c</span>(<span class="st">&#39;GD Solution&#39;</span> <span class="ot">=</span> <span class="dv">1</span>,<span class="st">&#39;Exact Solution&#39;</span> <span class="ot">=</span> <span class="dv">2</span>))<span class="sc">+</span></span>
+<span id="cb768-12"><a href="ch-09.html#cb768-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">color  =</span> <span class="st">&quot;&quot;</span>, <span class="at">linetype =</span> <span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<p><img src="figures/output_36_0.png" /></p>
+<p>As we can see by the overlapping of the red and green lines, the gradient descent algorithm sufficiently approximates the exact solution. Although especially at the edges of the plot we can see that it is not a perfect match to the exact solution.</p>
+</div>
+</div>
+<div id="tuning-learning-rate" class="section level3" number="9.2.3">
+<h3><span class="header-section-number">9.2.3</span> Tuning learning rate</h3>
+<p>So far, we’ve only considered a single learning rate. Recall from lecture 6B (loss and its minimization) that this hyper-parameter has an important influence on the behavior of gradient descent, influencing its rate of convergence and whether it converges at all.</p>
+<p>Let’s tune the learning rate from 0.001 to 1 to see how this hyper-parameter influences model convergence. The code below calls the <code>build_and_train_model function</code> for four different learning rates.</p>
+<div class="sourceCode" id="cb769"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb769-1"><a href="ch-09.html#cb769-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Set the learning rates</span></span>
+<span id="cb769-2"><a href="ch-09.html#cb769-2" aria-hidden="true" tabindex="-1"></a>learning_rates<span class="ot">=</span><span class="fu">c</span>(<span class="fl">0.001</span>,<span class="fl">0.01</span>,<span class="fl">0.1</span>,<span class="fl">1.0</span>)</span>
+<span id="cb769-3"><a href="ch-09.html#cb769-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb769-4"><a href="ch-09.html#cb769-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Initialize some arrays to store our output</span></span>
+<span id="cb769-5"><a href="ch-09.html#cb769-5" aria-hidden="true" tabindex="-1"></a>loss_all <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb769-6"><a href="ch-09.html#cb769-6" aria-hidden="true" tabindex="-1"></a>W_all <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb769-7"><a href="ch-09.html#cb769-7" aria-hidden="true" tabindex="-1"></a>b_all <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb769-8"><a href="ch-09.html#cb769-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb769-9"><a href="ch-09.html#cb769-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Loop over the four learning rates</span></span>
+<span id="cb769-10"><a href="ch-09.html#cb769-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(learning_rates)){</span>
+<span id="cb769-11"><a href="ch-09.html#cb769-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb769-12"><a href="ch-09.html#cb769-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Build and train a model using learning rate i  </span></span>
+<span id="cb769-13"><a href="ch-09.html#cb769-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(model,history,w,b) <span class="sc">%&lt;-%</span>  <span class="fu">build_and_train_model</span>(</span>
+<span id="cb769-14"><a href="ch-09.html#cb769-14" aria-hidden="true" tabindex="-1"></a>                              <span class="at">x_train =</span> df_train<span class="sc">$</span>PPFD_IN,</span>
+<span id="cb769-15"><a href="ch-09.html#cb769-15" aria-hidden="true" tabindex="-1"></a>                              <span class="at">y_train =</span> df_train<span class="sc">$</span>GPP_NT_VUT_REF,</span>
+<span id="cb769-16"><a href="ch-09.html#cb769-16" aria-hidden="true" tabindex="-1"></a>                              <span class="at">learning_rate =</span> learning_rates[i] ,</span>
+<span id="cb769-17"><a href="ch-09.html#cb769-17" aria-hidden="true" tabindex="-1"></a>                              <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb769-18"><a href="ch-09.html#cb769-18" aria-hidden="true" tabindex="-1"></a>                              <span class="at">num_epochs =</span> num_epochs,</span>
+<span id="cb769-19"><a href="ch-09.html#cb769-19" aria-hidden="true" tabindex="-1"></a>                              <span class="at">save_path =</span> save_path_logs</span>
+<span id="cb769-20"><a href="ch-09.html#cb769-20" aria-hidden="true" tabindex="-1"></a>                              )</span>
+<span id="cb769-21"><a href="ch-09.html#cb769-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb769-22"><a href="ch-09.html#cb769-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Store the loss and final solution for each learning rate</span></span>
+<span id="cb769-23"><a href="ch-09.html#cb769-23" aria-hidden="true" tabindex="-1"></a>  loss_all<span class="ot">=</span><span class="fu">c</span>(loss_all,<span class="fu">list</span>(history<span class="sc">$</span>metrics<span class="sc">$</span>loss))</span>
+<span id="cb769-24"><a href="ch-09.html#cb769-24" aria-hidden="true" tabindex="-1"></a>  W_all<span class="ot">=</span><span class="fu">c</span>(W_all,w)</span>
+<span id="cb769-25"><a href="ch-09.html#cb769-25" aria-hidden="true" tabindex="-1"></a>  b_all<span class="ot">=</span><span class="fu">c</span>(W_all,b)</span>
+<span id="cb769-26"><a href="ch-09.html#cb769-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb769-27"><a href="ch-09.html#cb769-27" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb770"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb770-1"><a href="ch-09.html#cb770-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Model: &quot;sequential_1&quot;</span></span>
+<span id="cb770-2"><a href="ch-09.html#cb770-2" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb770-3"><a href="ch-09.html#cb770-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Layer (type)                        Output Shape                    Param #     </span></span>
+<span id="cb770-4"><a href="ch-09.html#cb770-4" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb770-5"><a href="ch-09.html#cb770-5" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_1 (Dense)                     (None, 1)                       2           </span></span>
+<span id="cb770-6"><a href="ch-09.html#cb770-6" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb770-7"><a href="ch-09.html#cb770-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Total params: 2</span></span>
+<span id="cb770-8"><a href="ch-09.html#cb770-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Trainable params: 2</span></span>
+<span id="cb770-9"><a href="ch-09.html#cb770-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Non-trainable params: 0</span></span>
+<span id="cb770-10"><a href="ch-09.html#cb770-10" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb770-11"><a href="ch-09.html#cb770-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Model: &quot;sequential_2&quot;</span></span>
+<span id="cb770-12"><a href="ch-09.html#cb770-12" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb770-13"><a href="ch-09.html#cb770-13" aria-hidden="true" tabindex="-1"></a><span class="do">## Layer (type)                        Output Shape                    Param #     </span></span>
+<span id="cb770-14"><a href="ch-09.html#cb770-14" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb770-15"><a href="ch-09.html#cb770-15" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_2 (Dense)                     (None, 1)                       2           </span></span>
+<span id="cb770-16"><a href="ch-09.html#cb770-16" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb770-17"><a href="ch-09.html#cb770-17" aria-hidden="true" tabindex="-1"></a><span class="do">## Total params: 2</span></span>
+<span id="cb770-18"><a href="ch-09.html#cb770-18" aria-hidden="true" tabindex="-1"></a><span class="do">## Trainable params: 2</span></span>
+<span id="cb770-19"><a href="ch-09.html#cb770-19" aria-hidden="true" tabindex="-1"></a><span class="do">## Non-trainable params: 0</span></span>
+<span id="cb770-20"><a href="ch-09.html#cb770-20" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb770-21"><a href="ch-09.html#cb770-21" aria-hidden="true" tabindex="-1"></a><span class="do">## Model: &quot;sequential_3&quot;</span></span>
+<span id="cb770-22"><a href="ch-09.html#cb770-22" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb770-23"><a href="ch-09.html#cb770-23" aria-hidden="true" tabindex="-1"></a><span class="do">## Layer (type)                        Output Shape                    Param #     </span></span>
+<span id="cb770-24"><a href="ch-09.html#cb770-24" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb770-25"><a href="ch-09.html#cb770-25" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_3 (Dense)                     (None, 1)                       2           </span></span>
+<span id="cb770-26"><a href="ch-09.html#cb770-26" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb770-27"><a href="ch-09.html#cb770-27" aria-hidden="true" tabindex="-1"></a><span class="do">## Total params: 2</span></span>
+<span id="cb770-28"><a href="ch-09.html#cb770-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Trainable params: 2</span></span>
+<span id="cb770-29"><a href="ch-09.html#cb770-29" aria-hidden="true" tabindex="-1"></a><span class="do">## Non-trainable params: 0</span></span>
+<span id="cb770-30"><a href="ch-09.html#cb770-30" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb770-31"><a href="ch-09.html#cb770-31" aria-hidden="true" tabindex="-1"></a><span class="do">## Model: &quot;sequential_4&quot;</span></span>
+<span id="cb770-32"><a href="ch-09.html#cb770-32" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb770-33"><a href="ch-09.html#cb770-33" aria-hidden="true" tabindex="-1"></a><span class="do">## Layer (type)                        Output Shape                    Param #     </span></span>
+<span id="cb770-34"><a href="ch-09.html#cb770-34" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb770-35"><a href="ch-09.html#cb770-35" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_4 (Dense)                     (None, 1)                       2           </span></span>
+<span id="cb770-36"><a href="ch-09.html#cb770-36" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb770-37"><a href="ch-09.html#cb770-37" aria-hidden="true" tabindex="-1"></a><span class="do">## Total params: 2</span></span>
+<span id="cb770-38"><a href="ch-09.html#cb770-38" aria-hidden="true" tabindex="-1"></a><span class="do">## Trainable params: 2</span></span>
+<span id="cb770-39"><a href="ch-09.html#cb770-39" aria-hidden="true" tabindex="-1"></a><span class="do">## Non-trainable params: 0</span></span>
+<span id="cb770-40"><a href="ch-09.html#cb770-40" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb770-41"><a href="ch-09.html#cb770-41" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span></code></pre></div>
+<p>Let’s now plot the dynamics of learning, specifically how loss and the two model parameters change throughout training. Let’s start with loss.</p>
+<div class="sourceCode" id="cb771"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb771-1"><a href="ch-09.html#cb771-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Set the symbol labels and colors for the four different learning rates</span></span>
+<span id="cb771-2"><a href="ch-09.html#cb771-2" aria-hidden="true" tabindex="-1"></a>labels <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;0.001&#39;</span>, <span class="st">&#39;0.01&#39;</span>, <span class="st">&#39;0.1&#39;</span>, <span class="st">&#39;1&#39;</span>)</span>
+<span id="cb771-3"><a href="ch-09.html#cb771-3" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;purple&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;blue&quot;</span>,<span class="st">&quot;green&quot;</span>)</span>
+<span id="cb771-4"><a href="ch-09.html#cb771-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb771-5"><a href="ch-09.html#cb771-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Create a data frame</span></span>
+<span id="cb771-6"><a href="ch-09.html#cb771-6" aria-hidden="true" tabindex="-1"></a>df_loss <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">epoch =</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span>num_epochs,<span class="at">times=</span><span class="dv">4</span>), </span>
+<span id="cb771-7"><a href="ch-09.html#cb771-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">loss =</span><span class="fu">c</span>(loss_all[[<span class="dv">1</span>]],loss_all[[<span class="dv">2</span>]],loss_all[[<span class="dv">3</span>]],loss_all[[<span class="dv">4</span>]]),</span>
+<span id="cb771-8"><a href="ch-09.html#cb771-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">group =</span> <span class="fu">as.factor</span>(<span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,<span class="at">each=</span>num_epochs)))</span>
+<span id="cb771-9"><a href="ch-09.html#cb771-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb771-10"><a href="ch-09.html#cb771-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Plot loss for the four different learning rates</span></span>
+<span id="cb771-11"><a href="ch-09.html#cb771-11" aria-hidden="true" tabindex="-1"></a>df_loss <span class="sc">%&gt;%</span></span>
+<span id="cb771-12"><a href="ch-09.html#cb771-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>epoch,<span class="at">y=</span>loss,<span class="at">color =</span> group))<span class="sc">+</span></span>
+<span id="cb771-13"><a href="ch-09.html#cb771-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb771-14"><a href="ch-09.html#cb771-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">&#39;black&#39;</span>,<span class="at">shape =</span> <span class="dv">4</span>)<span class="sc">+</span></span>
+<span id="cb771-15"><a href="ch-09.html#cb771-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">labels=</span>labels,<span class="at">values =</span> colors)<span class="sc">+</span></span>
+<span id="cb771-16"><a href="ch-09.html#cb771-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">color=</span> <span class="st">&#39;Learning Rate&#39;</span>,<span class="at">y=</span><span class="st">&#39;Loss&#39;</span>,<span class="at">title=</span><span class="st">&#39;Loss with different learning rates&#39;</span>)<span class="sc">+</span></span>
+<span id="cb771-17"><a href="ch-09.html#cb771-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">#log scale</span></span>
+<span id="cb771-18"><a href="ch-09.html#cb771-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">trans=</span><span class="st">&#39;log&#39;</span>)<span class="sc">+</span></span>
+<span id="cb771-19"><a href="ch-09.html#cb771-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">15</span>)</span></code></pre></div>
+<p><img src="figures/output_40_0.png" /></p>
+<p>What do you observe?</p>
+<p>Using the learning rate 0.001, the algorithm slowly converges on a solution. Using the learning rates 0.01 and 0.1, we observe more rapid convergence. In stark contrast, using a learning rate of 1 causes divergence. Why is that?</p>
+<p>To find out, let’s have a look at the dynamics of our model parameters <em>w</em> and <em>b</em> during model training.</p>
+<div class="sourceCode" id="cb772"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb772-1"><a href="ch-09.html#cb772-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Get the list of file names</span></span>
+<span id="cb772-2"><a href="ch-09.html#cb772-2" aria-hidden="true" tabindex="-1"></a>fnames <span class="ot">=</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(save_path_logs,<span class="st">&#39;logs&#39;</span>),<span class="at">full.names =</span> T)</span>
+<span id="cb772-3"><a href="ch-09.html#cb772-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-4"><a href="ch-09.html#cb772-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Allocate space for saving the model parameters</span></span>
+<span id="cb772-5"><a href="ch-09.html#cb772-5" aria-hidden="true" tabindex="-1"></a>w <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="at">nrow =</span> num_epochs, <span class="at">ncol=</span><span class="fu">length</span>(fnames))    </span>
+<span id="cb772-6"><a href="ch-09.html#cb772-6" aria-hidden="true" tabindex="-1"></a>b <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="at">nrow =</span> num_epochs, <span class="at">ncol=</span><span class="fu">length</span>(fnames))    </span>
+<span id="cb772-7"><a href="ch-09.html#cb772-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-8"><a href="ch-09.html#cb772-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Loop over the four learning rates</span></span>
+<span id="cb772-9"><a href="ch-09.html#cb772-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (file_index <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(fnames)){</span>
+<span id="cb772-10"><a href="ch-09.html#cb772-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb772-11"><a href="ch-09.html#cb772-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">#read the file line by line</span></span>
+<span id="cb772-12"><a href="ch-09.html#cb772-12" aria-hidden="true" tabindex="-1"></a>  file_lines<span class="ot">=</span><span class="fu">readLines</span>(fnames[file_index])</span>
+<span id="cb772-13"><a href="ch-09.html#cb772-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb772-14"><a href="ch-09.html#cb772-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(file_lines)){</span>
+<span id="cb772-15"><a href="ch-09.html#cb772-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">#convert each line to json object</span></span>
+<span id="cb772-16"><a href="ch-09.html#cb772-16" aria-hidden="true" tabindex="-1"></a>    row_file<span class="ot">=</span><span class="fu">fromJSON</span>(file_lines[i])</span>
+<span id="cb772-17"><a href="ch-09.html#cb772-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb772-18"><a href="ch-09.html#cb772-18" aria-hidden="true" tabindex="-1"></a>    w[i,file_index]<span class="ot">=</span>row_file<span class="sc">$</span>w</span>
+<span id="cb772-19"><a href="ch-09.html#cb772-19" aria-hidden="true" tabindex="-1"></a>    b[i,file_index]<span class="ot">=</span>row_file<span class="sc">$</span>b</span>
+<span id="cb772-20"><a href="ch-09.html#cb772-20" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb772-21"><a href="ch-09.html#cb772-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb772-22"><a href="ch-09.html#cb772-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb772-23"><a href="ch-09.html#cb772-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-24"><a href="ch-09.html#cb772-24" aria-hidden="true" tabindex="-1"></a><span class="co">#plot w</span></span>
+<span id="cb772-25"><a href="ch-09.html#cb772-25" aria-hidden="true" tabindex="-1"></a>df_w <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">loss =</span> <span class="fu">c</span>(w),<span class="at">group =</span> <span class="fu">as.factor</span>(<span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,<span class="at">each=</span>num_epochs)),<span class="at">epoch =</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>,<span class="at">times=</span><span class="dv">4</span>))</span>
+<span id="cb772-26"><a href="ch-09.html#cb772-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-27"><a href="ch-09.html#cb772-27" aria-hidden="true" tabindex="-1"></a>gg1 <span class="ot">&lt;-</span> df_w <span class="sc">%&gt;%</span></span>
+<span id="cb772-28"><a href="ch-09.html#cb772-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> epoch,<span class="at">y =</span> loss,<span class="at">color =</span> group ))<span class="sc">+</span></span>
+<span id="cb772-29"><a href="ch-09.html#cb772-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb772-30"><a href="ch-09.html#cb772-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape=</span><span class="dv">4</span>,<span class="at">color =</span> <span class="st">&#39;black&#39;</span>)<span class="sc">+</span></span>
+<span id="cb772-31"><a href="ch-09.html#cb772-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="fl">0.01378</span>, <span class="at">linetype=</span><span class="st">&#39;lt&#39;</span>))<span class="sc">+</span></span>
+<span id="cb772-32"><a href="ch-09.html#cb772-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">name =</span> <span class="st">&#39;Learning Rate&#39;</span>,<span class="at">values =</span> colors,<span class="at">labels =</span> labels)<span class="sc">+</span></span>
+<span id="cb772-33"><a href="ch-09.html#cb772-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">labels =</span><span class="st">&#39;&#39;</span>,<span class="at">name=</span><span class="st">&#39;exact value&#39;</span>,<span class="at">values =</span> <span class="dv">3</span>)<span class="sc">+</span></span>
+<span id="cb772-34"><a href="ch-09.html#cb772-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">15</span>)<span class="sc">+</span></span>
+<span id="cb772-35"><a href="ch-09.html#cb772-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;top&quot;</span>,<span class="at">legend.direction =</span> <span class="st">&#39;horizontal&#39;</span>) <span class="sc">+</span></span>
+<span id="cb772-36"><a href="ch-09.html#cb772-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Estimated w&quot;</span>)</span>
+<span id="cb772-37"><a href="ch-09.html#cb772-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-38"><a href="ch-09.html#cb772-38" aria-hidden="true" tabindex="-1"></a>gg1<span class="fl">.1</span> <span class="ot">&lt;-</span> df_w <span class="sc">%&gt;%</span></span>
+<span id="cb772-39"><a href="ch-09.html#cb772-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> epoch,<span class="at">y =</span> loss,<span class="at">color =</span> group ))<span class="sc">+</span></span>
+<span id="cb772-40"><a href="ch-09.html#cb772-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb772-41"><a href="ch-09.html#cb772-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape=</span><span class="dv">4</span>,<span class="at">color =</span> <span class="st">&#39;black&#39;</span>)<span class="sc">+</span></span>
+<span id="cb772-42"><a href="ch-09.html#cb772-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="fl">0.01378</span>, <span class="at">linetype=</span><span class="st">&#39;lt&#39;</span>))<span class="sc">+</span></span>
+<span id="cb772-43"><a href="ch-09.html#cb772-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">name =</span> <span class="st">&#39;Learning Rate&#39;</span>,<span class="at">values =</span> colors,<span class="at">labels =</span> labels)<span class="sc">+</span></span>
+<span id="cb772-44"><a href="ch-09.html#cb772-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">labels =</span><span class="st">&#39;&#39;</span>,<span class="at">name=</span><span class="st">&#39;exact value&#39;</span>,<span class="at">values =</span> <span class="dv">3</span>)<span class="sc">+</span></span>
+<span id="cb772-45"><a href="ch-09.html#cb772-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">15</span>)<span class="sc">+</span></span>
+<span id="cb772-46"><a href="ch-09.html#cb772-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;top&quot;</span>,<span class="at">legend.direction =</span> <span class="st">&#39;horizontal&#39;</span>) <span class="sc">+</span></span>
+<span id="cb772-47"><a href="ch-09.html#cb772-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Estimated w (zoomed)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb772-48"><a href="ch-09.html#cb772-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="fl">0.04</span>)</span>
+<span id="cb772-49"><a href="ch-09.html#cb772-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-50"><a href="ch-09.html#cb772-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-51"><a href="ch-09.html#cb772-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-52"><a href="ch-09.html#cb772-52" aria-hidden="true" tabindex="-1"></a><span class="co">#plot b</span></span>
+<span id="cb772-53"><a href="ch-09.html#cb772-53" aria-hidden="true" tabindex="-1"></a>df_b <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">loss =</span> <span class="fu">c</span>(b),<span class="at">group =</span> <span class="fu">as.factor</span>(<span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,<span class="at">each=</span>num_epochs)), <span class="at">epoch =</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>,<span class="at">times=</span><span class="dv">4</span>))</span>
+<span id="cb772-54"><a href="ch-09.html#cb772-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-55"><a href="ch-09.html#cb772-55" aria-hidden="true" tabindex="-1"></a>gg2 <span class="ot">&lt;-</span> df_b <span class="sc">%&gt;%</span></span>
+<span id="cb772-56"><a href="ch-09.html#cb772-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>()<span class="sc">+</span></span>
+<span id="cb772-57"><a href="ch-09.html#cb772-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> epoch,<span class="at">y =</span> loss, <span class="at">color =</span> group) <span class="sc">+</span></span>
+<span id="cb772-58"><a href="ch-09.html#cb772-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb772-59"><a href="ch-09.html#cb772-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">shape=</span><span class="dv">4</span>,<span class="at">color =</span> <span class="st">&#39;black&#39;</span>) <span class="sc">+</span></span>
+<span id="cb772-60"><a href="ch-09.html#cb772-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="fu">aes</span>(<span class="at">yintercept =</span> <span class="fl">0.93987</span>, <span class="at">linetype=</span><span class="st">&#39;lt&#39;</span>)) <span class="sc">+</span></span>
+<span id="cb772-61"><a href="ch-09.html#cb772-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">name =</span> <span class="st">&#39;Learning Rate&#39;</span>,<span class="at">values =</span> colors,<span class="at">labels =</span> labels) <span class="sc">+</span></span>
+<span id="cb772-62"><a href="ch-09.html#cb772-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linetype_manual</span>(<span class="at">labels =</span><span class="st">&#39;&#39;</span>,<span class="at">name=</span><span class="st">&#39;exact value&#39;</span>,<span class="at">values =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb772-63"><a href="ch-09.html#cb772-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">15</span>) <span class="sc">+</span></span>
+<span id="cb772-64"><a href="ch-09.html#cb772-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;top&quot;</span>,<span class="at">legend.direction =</span> <span class="st">&#39;horizontal&#39;</span>) <span class="sc">+</span></span>
+<span id="cb772-65"><a href="ch-09.html#cb772-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Estimated b&quot;</span>)</span>
+<span id="cb772-66"><a href="ch-09.html#cb772-66" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb772-67"><a href="ch-09.html#cb772-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb772-68"><a href="ch-09.html#cb772-68" aria-hidden="true" tabindex="-1"></a>gg1 <span class="sc">+</span> gg1<span class="fl">.1</span> <span class="sc">+</span> gg2 <span class="sc">+</span> <span class="fu">plot_spacer</span>() <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">guides =</span> <span class="st">&quot;collect&quot;</span>) <span class="sc">&amp;</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div>
+<p><img src="figures/output_42_0.png" /></p>
+<p>What do you observe?</p>
+<p>Notice when the learning rate is 1, the value of <em>b</em> (right figure) jumps above and below the optimal value, which we know from the exact solution to be ~0.94. Why does that happen?</p>
+<p>When using the learning rates 0.01 and 0.1, the algorithm converges (or nearly so) on the optimal solution, but when using the learning rate 0.001, the algoritm is misled from the optimal value of <em>b</em>, although it looks like it might recover in later epochs. What is going on here? Could it be that this solution space contains local, deceptive optima? Might that explain what’s happening with the lowest learning rate? What other explanations can you imagine?</p>
+<p>To get a better understanding of what is happening here, let’s visualize the surface of the loss function in relation to <em>w</em> and <em>b</em>.</p>
+<div class="sourceCode" id="cb773"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb773-1"><a href="ch-09.html#cb773-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Define a function that calculates mean squared error, our loss function</span></span>
+<span id="cb773-2"><a href="ch-09.html#cb773-2" aria-hidden="true" tabindex="-1"></a>MSE <span class="ot">=</span> <span class="cf">function</span>(observed,predicted) {</span>
+<span id="cb773-3"><a href="ch-09.html#cb773-3" aria-hidden="true" tabindex="-1"></a>  val <span class="ot">=</span> <span class="fu">mean</span>((observed <span class="sc">-</span> predicted)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb773-4"><a href="ch-09.html#cb773-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (val)</span>
+<span id="cb773-5"><a href="ch-09.html#cb773-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb773-6"><a href="ch-09.html#cb773-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb773-7"><a href="ch-09.html#cb773-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Get the observed PPFD_IN and GPP_NT_VUT_REF         </span></span>
+<span id="cb773-8"><a href="ch-09.html#cb773-8" aria-hidden="true" tabindex="-1"></a>x_observed <span class="ot">=</span> df_train<span class="sc">$</span>PPFD_IN <span class="co">#PPFD_IN</span></span>
+<span id="cb773-9"><a href="ch-09.html#cb773-9" aria-hidden="true" tabindex="-1"></a>y_observed <span class="ot">=</span> df_train<span class="sc">$</span>GPP_NT_VUT_REF <span class="co">#GPP_NT_VUT_REF</span></span>
+<span id="cb773-10"><a href="ch-09.html#cb773-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb773-11"><a href="ch-09.html#cb773-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Create 50x50 combinations of w and b</span></span>
+<span id="cb773-12"><a href="ch-09.html#cb773-12" aria-hidden="true" tabindex="-1"></a>numpoints <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb773-13"><a href="ch-09.html#cb773-13" aria-hidden="true" tabindex="-1"></a>w <span class="ot">=</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.2</span>, <span class="fl">0.2</span>,<span class="at">length.out =</span> numpoints)</span>
+<span id="cb773-14"><a href="ch-09.html#cb773-14" aria-hidden="true" tabindex="-1"></a>b <span class="ot">=</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">1</span>, <span class="at">length.out =</span> numpoints)</span>
+<span id="cb773-15"><a href="ch-09.html#cb773-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb773-16"><a href="ch-09.html#cb773-16" aria-hidden="true" tabindex="-1"></a><span class="co">#Initialize space for our measure of loss across </span></span>
+<span id="cb773-17"><a href="ch-09.html#cb773-17" aria-hidden="true" tabindex="-1"></a><span class="co">#the 50x50 combinations of w and b</span></span>
+<span id="cb773-18"><a href="ch-09.html#cb773-18" aria-hidden="true" tabindex="-1"></a>loss <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,numpoints,numpoints)</span>
+<span id="cb773-19"><a href="ch-09.html#cb773-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>numpoints){</span>
+<span id="cb773-20"><a href="ch-09.html#cb773-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>numpoints){</span>
+<span id="cb773-21"><a href="ch-09.html#cb773-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb773-22"><a href="ch-09.html#cb773-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#use y = wx + b to make prediction</span></span>
+<span id="cb773-23"><a href="ch-09.html#cb773-23" aria-hidden="true" tabindex="-1"></a>  predicted <span class="ot">=</span> w[i]<span class="sc">*</span>x_observed <span class="sc">+</span> b[j]</span>
+<span id="cb773-24"><a href="ch-09.html#cb773-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">#calculate loss</span></span>
+<span id="cb773-25"><a href="ch-09.html#cb773-25" aria-hidden="true" tabindex="-1"></a>  loss[i,j] <span class="ot">=</span> <span class="fu">MSE</span>(y_observed, predicted)</span>
+<span id="cb773-26"><a href="ch-09.html#cb773-26" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb773-27"><a href="ch-09.html#cb773-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb773-28"><a href="ch-09.html#cb773-28" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb773-29"><a href="ch-09.html#cb773-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb773-30"><a href="ch-09.html#cb773-30" aria-hidden="true" tabindex="-1"></a><span class="co">#Visualize the surface</span></span>
+<span id="cb773-31"><a href="ch-09.html#cb773-31" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb773-32"><a href="ch-09.html#cb773-32" aria-hidden="true" tabindex="-1"></a><span class="fu">persp</span>(w,b,loss,<span class="at">theta =</span> <span class="dv">30</span>, <span class="at">phi =</span> <span class="dv">15</span>,</span>
+<span id="cb773-33"><a href="ch-09.html#cb773-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="st">&quot;deepskyblue1&quot;</span>, <span class="at">shade =</span> <span class="fl">0.5</span>)</span></code></pre></div>
+<p><img src="figures/output_44_0.png" /></p>
+<p>What features of this surface stand out to you?</p>
+<p>Notice that it does not appear to have local optima. Notice also that the value of <em>w</em> has a much stronger impact on loss than the value of <em>b</em>. To get a better sense of this, let’s look at two slices of the data.</p>
+<p>First, look at loss as a function of <em>w</em> for <span class="math inline">\(b \approx 0.76\)</span> . Second, look at loss as a function of <em>b</em> for <span class="math inline">\(w \approx 0.01\)</span> . This pair of (<em>w</em>,<em>b</em>) are the weights found when training with a learning rate of 0.01.</p>
+<div class="sourceCode" id="cb774"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb774-1"><a href="ch-09.html#cb774-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Create data frames for w and b</span></span>
+<span id="cb774-2"><a href="ch-09.html#cb774-2" aria-hidden="true" tabindex="-1"></a>df_w <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">loss =</span> loss[,<span class="dv">92</span>],<span class="at">w =</span> w)</span>
+<span id="cb774-3"><a href="ch-09.html#cb774-3" aria-hidden="true" tabindex="-1"></a>df_b <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">loss =</span> loss[<span class="dv">55</span>,],<span class="at">b =</span> b)</span>
+<span id="cb774-4"><a href="ch-09.html#cb774-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb774-5"><a href="ch-09.html#cb774-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Load (w,b) found by model with lr = 0.01</span></span>
+<span id="cb774-6"><a href="ch-09.html#cb774-6" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">load_model_hdf5</span>(<span class="st">&quot;./data/SLNN_I/saved_models/model_lr_0.01.h5&quot;</span>) </span>
+<span id="cb774-7"><a href="ch-09.html#cb774-7" aria-hidden="true" tabindex="-1"></a>w_est <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="fu">get_weights</span>(model)[<span class="dv">1</span>])</span>
+<span id="cb774-8"><a href="ch-09.html#cb774-8" aria-hidden="true" tabindex="-1"></a>b_est <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="fu">get_weights</span>(model)[<span class="dv">2</span>])</span>
+<span id="cb774-9"><a href="ch-09.html#cb774-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb774-10"><a href="ch-09.html#cb774-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Plot loss as a function of w, when b = 0.76</span></span>
+<span id="cb774-11"><a href="ch-09.html#cb774-11" aria-hidden="true" tabindex="-1"></a>gg1 <span class="ot">=</span> df_w <span class="sc">%&gt;%</span></span>
+<span id="cb774-12"><a href="ch-09.html#cb774-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>w,<span class="at">y=</span>loss))<span class="sc">+</span></span>
+<span id="cb774-13"><a href="ch-09.html#cb774-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb774-14"><a href="ch-09.html#cb774-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept =</span> w_est,<span class="at">linetype =</span> <span class="st">&#39;Infered w&#39;</span>),<span class="at">lwd=</span><span class="dv">1</span>,<span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
+<span id="cb774-15"><a href="ch-09.html#cb774-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_linetype_manual</span>(<span class="at">name=</span><span class="st">&#39;&#39;</span>,<span class="at">values=</span><span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb774-16"><a href="ch-09.html#cb774-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">title=</span><span class="fu">paste</span>(<span class="st">&quot;Loss for b = &quot;</span>,<span class="fl">0.76</span>,<span class="at">sep=</span><span class="st">&quot; &quot;</span> ))<span class="sc">+</span></span>
+<span id="cb774-17"><a href="ch-09.html#cb774-17" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">20</span>)<span class="sc">+</span></span>
+<span id="cb774-18"><a href="ch-09.html#cb774-18" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;top&quot;</span>)</span>
+<span id="cb774-19"><a href="ch-09.html#cb774-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb774-20"><a href="ch-09.html#cb774-20" aria-hidden="true" tabindex="-1"></a><span class="co">#Plot loss as a function of b, when w = 0.01</span></span>
+<span id="cb774-21"><a href="ch-09.html#cb774-21" aria-hidden="true" tabindex="-1"></a>gg2 <span class="ot">=</span> df_b <span class="sc">%&gt;%</span></span>
+<span id="cb774-22"><a href="ch-09.html#cb774-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>b,<span class="at">y=</span>loss))<span class="sc">+</span></span>
+<span id="cb774-23"><a href="ch-09.html#cb774-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb774-24"><a href="ch-09.html#cb774-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept =</span> b_est,<span class="at">linetype =</span> <span class="st">&#39;Inferred b&#39;</span>),<span class="at">lwd=</span><span class="dv">1</span>,<span class="at">alpha =</span> <span class="fl">0.6</span>)<span class="sc">+</span></span>
+<span id="cb774-25"><a href="ch-09.html#cb774-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_linetype_manual</span>(<span class="at">name=</span><span class="st">&#39;&#39;</span>,<span class="at">values=</span><span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb774-26"><a href="ch-09.html#cb774-26" aria-hidden="true" tabindex="-1"></a>        <span class="fu">labs</span>(<span class="at">title=</span><span class="fu">paste</span>(<span class="st">&quot;Loss for w = &quot;</span>,<span class="fl">0.01</span>,<span class="at">sep=</span><span class="st">&quot; &quot;</span>))<span class="sc">+</span></span>
+<span id="cb774-27"><a href="ch-09.html#cb774-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">20</span>)<span class="sc">+</span></span>
+<span id="cb774-28"><a href="ch-09.html#cb774-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">&quot;top&quot;</span>)</span>
+<span id="cb774-29"><a href="ch-09.html#cb774-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb774-30"><a href="ch-09.html#cb774-30" aria-hidden="true" tabindex="-1"></a>gg1<span class="sc">+</span>gg2</span></code></pre></div>
+<p><img src="figures/output_46_0.png" /></p>
+<p>Notice how little loss changes as a function of <em>b</em>, relative to <em>w</em>. Also notice that we can decrease loss further than what was found in our best model by decreasing b. Why didn’t our model find this solution?</p>
+<p>Let’s use our model to make predictions on our test data. First, let’s calculate loss on our test data for a learning rate of 0.01.</p>
+<div class="sourceCode" id="cb775"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb775-1"><a href="ch-09.html#cb775-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load model with lr = 0.01</span></span>
+<span id="cb775-2"><a href="ch-09.html#cb775-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">load_model_hdf5</span>(<span class="st">&quot;./data/SLNN_I/saved_models/model_lr_0.01.h5&quot;</span>)</span>
+<span id="cb775-3"><a href="ch-09.html#cb775-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb775-4"><a href="ch-09.html#cb775-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict on test data</span></span>
+<span id="cb775-5"><a href="ch-09.html#cb775-5" aria-hidden="true" tabindex="-1"></a>y_predicted <span class="ot">=</span>  model <span class="sc">%&gt;%</span> <span class="fu">predict</span>(df_test<span class="sc">$</span>PPFD_IN)</span>
+<span id="cb775-6"><a href="ch-09.html#cb775-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb775-7"><a href="ch-09.html#cb775-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute loss on test data</span></span>
+<span id="cb775-8"><a href="ch-09.html#cb775-8" aria-hidden="true" tabindex="-1"></a>y_observed <span class="ot">=</span> df_test<span class="sc">$</span>GPP_NT_VUT_REF</span>
+<span id="cb775-9"><a href="ch-09.html#cb775-9" aria-hidden="true" tabindex="-1"></a>loss_test <span class="ot">=</span> <span class="fu">MSE</span>(y_observed, y_predicted)</span>
+<span id="cb775-10"><a href="ch-09.html#cb775-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb775-11"><a href="ch-09.html#cb775-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Print loss</span></span>
+<span id="cb775-12"><a href="ch-09.html#cb775-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&#39;</span><span class="sc">\n</span><span class="st">Loss on test data: &#39;</span>, loss_test, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Loss on test data: 34.42075</code></pre>
+<p>How does this compare to the loss observed on the training data?
+Next let’s visualize the correlation between the predictions and observations for the test data and calculate its squared correlation.</p>
+<div class="sourceCode" id="cb777"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb777-1"><a href="ch-09.html#cb777-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate squared correlation</span></span>
+<span id="cb777-2"><a href="ch-09.html#cb777-2" aria-hidden="true" tabindex="-1"></a>cor2<span class="ot">=</span><span class="fu">cor</span>(df_test<span class="sc">$</span>GPP_NT_VUT_REF,y_predicted)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb777-3"><a href="ch-09.html#cb777-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb777-4"><a href="ch-09.html#cb777-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize observed vs. predicted GPP_NT_VUT_REF</span></span>
+<span id="cb777-5"><a href="ch-09.html#cb777-5" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">Observed =</span> df_test<span class="sc">$</span>GPP_NT_VUT_REF, <span class="at">Predicted =</span> y_predicted)</span>
+<span id="cb777-6"><a href="ch-09.html#cb777-6" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Observed,<span class="at">y =</span> Predicted))<span class="sc">+</span></span>
+<span id="cb777-7"><a href="ch-09.html#cb777-7" aria-hidden="true" tabindex="-1"></a>       <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb777-8"><a href="ch-09.html#cb777-8" aria-hidden="true" tabindex="-1"></a>       <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">bquote</span>(<span class="st">&#39;Observed Vs Predicted&#39;</span> <span class="sc">~</span> cor<span class="sc">^</span><span class="dv">2</span> <span class="sc">==</span> .(<span class="fu">round</span>(cor2,<span class="dv">2</span>))))</span></code></pre></div>
+<p><img src="figures/output_51_0.png" /></p>
+<p>Can you think of any problems with this approach?</p>
+<p>Notice the difference in scale of the x- and y-axis. Despite the strong(ish) positive correlation, observe that our model never predicts negative values, even though they’re present in the data. This highlights that the correlation between the observed and predicted values can be misleading, even though this correlation is often used as a measure of model performance. To hammer this point home, consider this simple example: Let the true data be 1,2,3,4 and the predicted data be 1001,1002,1003,1004. The correlation between them is 1, yet the error between the two sets of values is huge.</p>
+<p>Another common approach for measuring model performance is via comparison to a less complex model. Let’s compare our model to a null model that always predicts the mean of <code>y_train</code>.</p>
+<div class="sourceCode" id="cb778"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb778-1"><a href="ch-09.html#cb778-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare with a null model that always predicts the mean of y_train</span></span>
+<span id="cb778-2"><a href="ch-09.html#cb778-2" aria-hidden="true" tabindex="-1"></a>null_model <span class="ot">=</span> <span class="fu">mean</span>(df_train<span class="sc">$</span>GPP_NT_VUT_REF)</span>
+<span id="cb778-3"><a href="ch-09.html#cb778-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb778-4"><a href="ch-09.html#cb778-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Train MSE</span></span>
+<span id="cb778-5"><a href="ch-09.html#cb778-5" aria-hidden="true" tabindex="-1"></a>pred_train <span class="ot">=</span> model <span class="sc">%&gt;%</span> <span class="fu">predict</span>(df_train<span class="sc">$</span>PPFD_IN)</span>
+<span id="cb778-6"><a href="ch-09.html#cb778-6" aria-hidden="true" tabindex="-1"></a>mse_lm_train <span class="ot">=</span> <span class="fu">MSE</span>(df_train<span class="sc">$</span>GPP_NT_VUT_REF,pred_train)</span>
+<span id="cb778-7"><a href="ch-09.html#cb778-7" aria-hidden="true" tabindex="-1"></a>mse_null_train <span class="ot">=</span> <span class="fu">MSE</span>(df_train<span class="sc">$</span>GPP_NT_VUT_REF,null_model)</span>
+<span id="cb778-8"><a href="ch-09.html#cb778-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb778-9"><a href="ch-09.html#cb778-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Test MSE  </span></span>
+<span id="cb778-10"><a href="ch-09.html#cb778-10" aria-hidden="true" tabindex="-1"></a>mse_lm_test <span class="ot">=</span> <span class="fu">MSE</span>(df_test<span class="sc">$</span>GPP_NT_VUT_REF,y_predicted)</span>
+<span id="cb778-11"><a href="ch-09.html#cb778-11" aria-hidden="true" tabindex="-1"></a>mse_null_test <span class="ot">=</span> <span class="fu">MSE</span>(df_test<span class="sc">$</span>GPP_NT_VUT_REF,null_model)</span>
+<span id="cb778-12"><a href="ch-09.html#cb778-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb778-13"><a href="ch-09.html#cb778-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Results </span></span>
+<span id="cb778-14"><a href="ch-09.html#cb778-14" aria-hidden="true" tabindex="-1"></a>results <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">Model =</span> <span class="fu">c</span>(<span class="st">&#39;Null&#39;</span>,<span class="st">&quot;Linear&quot;</span>), </span>
+<span id="cb778-15"><a href="ch-09.html#cb778-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">Train_MSE =</span> <span class="fu">c</span>(mse_null_train,mse_lm_train), </span>
+<span id="cb778-16"><a href="ch-09.html#cb778-16" aria-hidden="true" tabindex="-1"></a>                     <span class="at">Test_MSE =</span> <span class="fu">c</span>(mse_null_test,mse_lm_test))</span>
+<span id="cb778-17"><a href="ch-09.html#cb778-17" aria-hidden="true" tabindex="-1"></a>results</span></code></pre></div>
+<p><img src="figures/SLNN_I_output3.png" /></p>
+<p>What do you observe? How does the loss compare to that obtained during training? Is the linear model better than the null model?</p>
+</div>
+<div id="logistic-regression" class="section level3" number="9.2.4">
+<h3><span class="header-section-number">9.2.4</span> Logistic Regression</h3>
+<p>So far in this tutorial, we have studied gradient descent in the context of linear regression. Such a linear model is given by the following formula: <span class="math inline">\(y = w_1x_1 +...+ w_nx_n + b\)</span></p>
+<p>where <em>y</em> is measured on a continuous scale, <span class="math inline">\(x_1\)</span> through <span class="math inline">\(x_n\)</span> are the <span class="math inline">\(n\)</span> features of the data and <span class="math inline">\(w_1\)</span> through <span class="math inline">\(w_n\)</span> are the weights you’re trying to learn.</p>
+<p>Recall from lecture 9B (nonlinear problems), that by applying a sigmoid function to the right-hand side of the above equation, you transition from a linear regression to a logistic regression. Unlike for linear regressions, the outputs or predictions from a logistic regression are not continuous. Logistic regressions can be used to model targets that lie in the range [0,1], such as probabilities. It is also commonly used to model binary targets (e.g., this image does contain a cat (presence) vs. this image does not contain a cat (absence)).</p>
+<p>Let’s consider a hypothetical binary classification example. That is, assume <span class="math inline">\(y\)</span> either takes the value <span class="math inline">\(0\)</span> (no cat) or <span class="math inline">\(1\)</span> (cat). We are interested in modeling the relation between <span class="math inline">\(P(Y=1|x)\)</span> and <span class="math inline">\(x = (x_1,x_2,...,x_n)\)</span>. The aforementioned relation can be defined as <span class="math inline">\(P(Y=1|x) = \sigma(w_1x_1 +...+ w_nx_n + b)\)</span>, where <span class="math inline">\(\sigma(t) = \frac{1}{1+e^{-t}}\)</span>. Figure @ref(fig:log_fun) shows what such a logistic function looks like.</p>
+<div class="figure" style="text-align: center">
+<img src="figures/log_fun.jpg" alt="Visualization of a logistic function." width="50%" />
+<p class="caption">
+(#fig:log_fun)Visualization of a logistic function.
+</p>
+</div>
+<p>In a nutshell, logistic regression is just a linear model with the sigmoid activation function applied on the output, which converts the range to a probability. Any values of <em>t</em> below 0 will result in a probability closer to 0 (e.g no cat), while any values of <em>t</em> above 0 will result in a probability closer to 1 (e.g. presence of a cat).</p>
+<div id="prediction-3" class="section level4" number="9.2.4.1">
+<h4><span class="header-section-number">9.2.4.1</span> Prediction</h4>
+<p>The parameters of logistic regression can be estimated using gradient descent, just as we saw in this tutorial for linear regression, albeit with a different loss function. More on that below.</p>
+<p>Once the parameters have been estimated, the probability <span class="math inline">\(\hat{p} = \sigma(w_1x_1 +...+ w_nx_n + b)\)</span> that an example belongs to the positive class can be predicted as follows:</p>
+<p><span class="math display">\[
+\hat{y} = 
+     \begin{cases}
+      1, &amp;\quad if \  \hat{p} \geq 0.5\\ 
+      0, &amp;\quad if \ \hat{p}&lt; 0.5
+     \end{cases}
+\]</span></p>
+<p>Here, we also have to highlight that:</p>
+<ul>
+<li><span class="math inline">\(\hat{p}\geq 0.5\)</span> when <span class="math inline">\(w_1x_1 +...+ w_nx_n + b \geq 0\)</span></li>
+<li><span class="math inline">\(\hat{p}&lt; 0.5\)</span> when <span class="math inline">\(w_1x_1 +...+ w_nx_n + b &lt; 0\)</span></li>
+</ul>
+<p>The equation <span class="math inline">\(w_1x_1 +...+ w_nx_n + b = 0\)</span> is referred to as the <em>decision boundary</em> (the vertical black line in the figure above where t=0 on the x-axis and crossing the dotted of 0.5 on the y-axis).</p>
+</div>
+<div id="training-and-loss-function" class="section level4" number="9.2.4.2">
+<h4><span class="header-section-number">9.2.4.2</span> Training and Loss Function</h4>
+<p>The objective of training is to find a set of weights <span class="math inline">\(w_1...w_n\)</span> and a bias <span class="math inline">\(b\)</span>, such that the model estimates high probabilities for positive instances <span class="math inline">\((y = 1)\)</span> and low probabilities for negative instances <span class="math inline">\((y=0)\)</span>. How well the model performs this task can be quantified using the following loss function, shown here for a single training example <span class="math inline">\(\boldsymbol{x}=x_1...x_n\)</span>:</p>
+<p><span class="math display">\[   
+\mathrm{Loss}(\boldsymbol{(w,b)}) = 
+     \begin{cases}
+      -\log{\hat{p}}, &amp;\quad \mathrm{if} \  y \ = \ 1 \\ 
+      -\log({1-\hat{p}}), &amp;\quad \mathrm{if} \ y \ = \ 0
+     \end{cases}
+\]</span></p>
+<p>This function makes sense because <span class="math inline">\(-\log(\hat{p})\)</span> grows large when <span class="math inline">\(\hat{p}\)</span> approaches 0, so the loss will be large if the model estimates a probability close to 0 for a positive instance. Similarly, <span class="math inline">\(-\log(1-\hat{p})\)</span> grows large when <span class="math inline">\(\hat{p}\)</span> approaches 1, so the loss will be large if the model estimates a probability close to 1 for a negative instance.</p>
+<p>The loss function can be applied to the entire training set by taking the average over all training examples. It can be written in a single expression:
+<span class="math display">\[
+\mathrm{Loss}(\boldsymbol{(w,b)}) = -\frac{1}{n}\sum_{i=1}^{n} \left[ y_i\log(\hat{p}_i)+(1-y_i)\log(1-\hat{p}_i)\right]
+\]</span></p>
+<p>This loss function is called <em>binary cross-entropy</em>, as you’ll recall from lectures 6B (and will see in 10B). Unfortunately, there is no a closed form solution for this loss function, so we have to use heuristics such as the gradient descent algorithm to minimize it.</p>
+</div>
+<div id="measures-of-model-performance-for-classification" class="section level4" number="9.2.4.3">
+<h4><span class="header-section-number">9.2.4.3</span> Measures of model performance for classification</h4>
+<p>In this tutorial, we introduce a common classification metric called <em>accuracy</em>, which we will revist in lecture 10B (model performance). The <em>accuracy</em> of a model is defined as</p>
+<p><span class="math display">\[
+\mathrm{Accuracy} = \frac{TP + TN}{n} 
+\]</span></p>
+<p>where <em>TP</em> stands for ‘True Positives’ and <em>TN</em> stands for ‘True Negatives’, respectively, and <em>n</em> is the number of examples in the test set. Put simply: accuracy is the number of correct predictions divided by the total number of predictions. This measure ranges from 0 and 1, where 0 means our model never makes a correct prediction and 1 means it always makes correct predictions. This measure comes with caveats, especially for so-called class-imbalanced datasets, where the vast majority of examples have one label, whereas a small minority have another label. We’ll revisit this limitation in lecture 10B and tutorial 10. For now, let’s just ignore these caveats.</p>
+</div>
+<div id="example" class="section level4" number="9.2.4.4">
+<h4><span class="header-section-number">9.2.4.4</span> Example</h4>
+<p>For this example we use the R function <code>glm</code> in order to fit a logistic regression model.</p>
+<p>Let’s first generate some synthetic data. For this example, our data will have only a single feature. The <strong>instances</strong> with label <strong>0</strong> will have their features drawn from a normal distribution with mean 2 and standard deviation 0.5. The <strong>instances</strong> with label <strong>1</strong> will have their features drawn from a normal distribution with mean 6 and standard deviation 1 (we also draw some instances with label 0 from this distribution so that our distributions are not totally separated). These distributions were chosen because they are clearly separable, yet have some overlap in their tails. Also the problem is not totally separable because of the noisy labels.</p>
+<div class="sourceCode" id="cb779"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb779-1"><a href="ch-09.html#cb779-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Seed the random number generator to ensure reproducibility</span></span>
+<span id="cb779-2"><a href="ch-09.html#cb779-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>)</span>
+<span id="cb779-3"><a href="ch-09.html#cb779-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb779-4"><a href="ch-09.html#cb779-4" aria-hidden="true" tabindex="-1"></a><span class="co">#We will have 150 examples with label 0 and 200 examples with label 1</span></span>
+<span id="cb779-5"><a href="ch-09.html#cb779-5" aria-hidden="true" tabindex="-1"></a>n1 <span class="ot">=</span> <span class="dv">150</span></span>
+<span id="cb779-6"><a href="ch-09.html#cb779-6" aria-hidden="true" tabindex="-1"></a>n2 <span class="ot">=</span> <span class="dv">200</span></span>
+<span id="cb779-7"><a href="ch-09.html#cb779-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb779-8"><a href="ch-09.html#cb779-8" aria-hidden="true" tabindex="-1"></a><span class="co">#For examples with label 0, randomly generate features using a normal </span></span>
+<span id="cb779-9"><a href="ch-09.html#cb779-9" aria-hidden="true" tabindex="-1"></a><span class="co">#distribution with mean 2 and standard deviation 0.5</span></span>
+<span id="cb779-10"><a href="ch-09.html#cb779-10" aria-hidden="true" tabindex="-1"></a>x1 <span class="ot">=</span> <span class="fu">rnorm</span>(n1,<span class="dv">2</span>,<span class="fl">0.5</span>)</span>
+<span id="cb779-11"><a href="ch-09.html#cb779-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb779-12"><a href="ch-09.html#cb779-12" aria-hidden="true" tabindex="-1"></a><span class="co">#For examples with label 1, randomly generate features using a normal </span></span>
+<span id="cb779-13"><a href="ch-09.html#cb779-13" aria-hidden="true" tabindex="-1"></a><span class="co">#distribution with mean 6 and standard deviation 1</span></span>
+<span id="cb779-14"><a href="ch-09.html#cb779-14" aria-hidden="true" tabindex="-1"></a>x2 <span class="ot">=</span> <span class="fu">rnorm</span>(n2,<span class="dv">6</span>,<span class="dv">1</span>)</span>
+<span id="cb779-15"><a href="ch-09.html#cb779-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb779-16"><a href="ch-09.html#cb779-16" aria-hidden="true" tabindex="-1"></a><span class="co">#Concatenate the features for all examples</span></span>
+<span id="cb779-17"><a href="ch-09.html#cb779-17" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">c</span>(x1,x2)</span>
+<span id="cb779-18"><a href="ch-09.html#cb779-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb779-19"><a href="ch-09.html#cb779-19" aria-hidden="true" tabindex="-1"></a><span class="co">#Associate labels with examples</span></span>
+<span id="cb779-20"><a href="ch-09.html#cb779-20" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">=</span> <span class="fu">rep</span>(<span class="dv">0</span>,n1)</span>
+<span id="cb779-21"><a href="ch-09.html#cb779-21" aria-hidden="true" tabindex="-1"></a>y2 <span class="ot">=</span> <span class="fu">sample</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="at">size =</span> n2 , <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="fl">0.9</span>),<span class="at">replace =</span> T) <span class="co"># we include some noisy data here</span></span>
+<span id="cb779-22"><a href="ch-09.html#cb779-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb779-23"><a href="ch-09.html#cb779-23" aria-hidden="true" tabindex="-1"></a><span class="co">#Concatenate the labels for all examples</span></span>
+<span id="cb779-24"><a href="ch-09.html#cb779-24" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">c</span>(y1,y2)</span>
+<span id="cb779-25"><a href="ch-09.html#cb779-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb779-26"><a href="ch-09.html#cb779-26" aria-hidden="true" tabindex="-1"></a><span class="co">#Print statistics describing the number of examples with each label</span></span>
+<span id="cb779-27"><a href="ch-09.html#cb779-27" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Proportion of examples with label 0: &quot;</span>,<span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(y<span class="sc">==</span><span class="dv">0</span>),<span class="st">&quot;%</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Proportion of examples with label 0:  48.57143 %</code></pre>
+<div class="sourceCode" id="cb781"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb781-1"><a href="ch-09.html#cb781-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Proportion of examples with label 1: &quot;</span>,<span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(y<span class="sc">==</span><span class="dv">1</span>),<span class="st">&quot;%</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## Proportion of examples with label 1:  51.42857 %</code></pre>
+<p>Now let ’s plot the data.</p>
+<div class="sourceCode" id="cb783"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb783-1"><a href="ch-09.html#cb783-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create dataframe</span></span>
+<span id="cb783-2"><a href="ch-09.html#cb783-2" aria-hidden="true" tabindex="-1"></a>df_data <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x =</span> x , <span class="at">y =</span> y)</span>
+<span id="cb783-3"><a href="ch-09.html#cb783-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb783-4"><a href="ch-09.html#cb783-4" aria-hidden="true" tabindex="-1"></a><span class="co">#plot</span></span>
+<span id="cb783-5"><a href="ch-09.html#cb783-5" aria-hidden="true" tabindex="-1"></a>df_data <span class="sc">%&gt;%</span></span>
+<span id="cb783-6"><a href="ch-09.html#cb783-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x , <span class="at">y =</span> y , <span class="at">color =</span> <span class="fu">as.factor</span>(y)))<span class="sc">+</span></span>
+<span id="cb783-7"><a href="ch-09.html#cb783-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb783-8"><a href="ch-09.html#cb783-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">name =</span> <span class="st">&#39;Label&#39;</span>,<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&#39;0&#39;</span> <span class="ot">=</span> <span class="st">&#39;red&#39;</span>,<span class="st">&#39;1&#39;</span> <span class="ot">=</span> <span class="st">&#39;blue&#39;</span>))<span class="sc">+</span></span>
+<span id="cb783-9"><a href="ch-09.html#cb783-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;P(positive)&quot;</span>)<span class="sc">+</span></span>
+<span id="cb783-10"><a href="ch-09.html#cb783-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">15</span>)</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-368-1.png" width="50%" style="display: block; margin: auto;" /></p>
+<p>Prepare the data for training and testing, by shuffling and using an 80/20 split, as before.</p>
+<div class="sourceCode" id="cb784"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb784-1"><a href="ch-09.html#cb784-1" aria-hidden="true" tabindex="-1"></a><span class="co">#We can set a seed for reproducible results.</span></span>
+<span id="cb784-2"><a href="ch-09.html#cb784-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>) </span>
+<span id="cb784-3"><a href="ch-09.html#cb784-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb784-4"><a href="ch-09.html#cb784-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Shuffle the data</span></span>
+<span id="cb784-5"><a href="ch-09.html#cb784-5" aria-hidden="true" tabindex="-1"></a>shuffled_id <span class="ot">=</span> <span class="fu">sample</span>(<span class="at">x=</span><span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(df_data),<span class="at">size =</span> <span class="fu">nrow</span>(df_data),<span class="at">replace =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb784-6"><a href="ch-09.html#cb784-6" aria-hidden="true" tabindex="-1"></a>df_data <span class="ot">=</span> df_data[shuffled_id,]</span>
+<span id="cb784-7"><a href="ch-09.html#cb784-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb784-8"><a href="ch-09.html#cb784-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Make a breakpoint</span></span>
+<span id="cb784-9"><a href="ch-09.html#cb784-9" aria-hidden="true" tabindex="-1"></a>breakpoint <span class="ot">=</span> <span class="fu">as.integer</span>(<span class="fl">0.8</span> <span class="sc">*</span> <span class="fu">nrow</span>(df_data))</span>
+<span id="cb784-10"><a href="ch-09.html#cb784-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb784-11"><a href="ch-09.html#cb784-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Training data</span></span>
+<span id="cb784-12"><a href="ch-09.html#cb784-12" aria-hidden="true" tabindex="-1"></a>df_train <span class="ot">=</span> df_data <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span>breakpoint)</span>
+<span id="cb784-13"><a href="ch-09.html#cb784-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb784-14"><a href="ch-09.html#cb784-14" aria-hidden="true" tabindex="-1"></a><span class="co">#Testing data</span></span>
+<span id="cb784-15"><a href="ch-09.html#cb784-15" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">=</span> df_data <span class="sc">%&gt;%</span> <span class="fu">slice</span>((breakpoint<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(df_data))</span></code></pre></div>
+<p>A more appropriate way to split the data would be to use the <code>r-sample</code> package and select stratified samples according to the labels. The reason is that we want each label to be represented in a proprotion of 80% and 20% to each of training and testing set respectively. Especially for imbalanced data we want to ensure that both labels are represented to the specified proportion on training and testing sets. In essence, what we would like to avoid is to have an over represantation of one label into the training set and an under represantaion on testing data. More on this in tutorial 10.</p>
+<p>Use the <code>glm</code> function to fit a logistic regression model to the training data. For a logisitic regression model the appropriate <code>family = binomial</code></p>
+<div class="sourceCode" id="cb785"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb785-1"><a href="ch-09.html#cb785-1" aria-hidden="true" tabindex="-1"></a>lg_fit <span class="ot">=</span> <span class="fu">glm</span>(y <span class="sc">~</span> x , <span class="at">family =</span> <span class="st">&#39;binomial&#39;</span>,<span class="at">data =</span> df_train)</span>
+<span id="cb785-2"><a href="ch-09.html#cb785-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lg_fit)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## glm(formula = y ~ x, family = &quot;binomial&quot;, data = df_train)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.8559  -0.2164   0.0881   0.3190   1.9610  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -7.1477     0.8874  -8.055 7.96e-16 ***
+## x             1.6944     0.1883   8.998  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 387.00  on 279  degrees of freedom
+## Residual deviance: 108.83  on 278  degrees of freedom
+## AIC: 112.83
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<p>Note that the decision boundary is <span class="math inline">\(-7.1477 + 1.6944 x = 0\)</span>.</p>
+<p>This means examples with <span class="math inline">\(x \geq 4.22\)</span> are predicted to have a label of <code>1</code> (i.e., they belong to the ‘positive class’), whereas examples with <span class="math inline">\(x &lt; 4.22\)</span> are predicted to have a label of <code>0</code> (i.e., they belong to the ‘negative class’).</p>
+<p>Let’s plot the learned sigmoid function as well as the decision boundary.</p>
+<div class="sourceCode" id="cb787"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb787-1"><a href="ch-09.html#cb787-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create a grid of values ranging from 0 to 10</span></span>
+<span id="cb787-2"><a href="ch-09.html#cb787-2" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">=</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span> ,<span class="at">to =</span> <span class="dv">10</span>,<span class="at">length.out =</span> <span class="dv">1000</span>)</span>
+<span id="cb787-3"><a href="ch-09.html#cb787-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x =</span> grid)</span>
+<span id="cb787-4"><a href="ch-09.html#cb787-4" aria-hidden="true" tabindex="-1"></a><span class="co">#take predictions --&gt; it is probability of an instance to belong to the positive class </span></span>
+<span id="cb787-5"><a href="ch-09.html#cb787-5" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">=</span> <span class="fu">predict</span>(lg_fit,<span class="at">newdata =</span> df , <span class="at">type =</span> <span class="st">&#39;response&#39;</span>)</span>
+<span id="cb787-6"><a href="ch-09.html#cb787-6" aria-hidden="true" tabindex="-1"></a>df_pred <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">grid =</span> grid,<span class="at">pred =</span> pred)</span>
+<span id="cb787-7"><a href="ch-09.html#cb787-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb787-8"><a href="ch-09.html#cb787-8" aria-hidden="true" tabindex="-1"></a>df_train <span class="sc">%&gt;%</span></span>
+<span id="cb787-9"><a href="ch-09.html#cb787-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x,<span class="at">y =</span> y , <span class="at">color =</span> <span class="fu">as.factor</span>(y)))<span class="sc">+</span></span>
+<span id="cb787-10"><a href="ch-09.html#cb787-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>()<span class="sc">+</span></span>
+<span id="cb787-11"><a href="ch-09.html#cb787-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">data =</span> df_pred, <span class="fu">aes</span>(<span class="at">x =</span> grid,<span class="at">y =</span> pred,<span class="at">linetype =</span> <span class="st">&#39;Sigmoid&#39;</span>),<span class="at">color =</span> <span class="st">&#39;black&#39;</span>)<span class="sc">+</span></span>
+<span id="cb787-12"><a href="ch-09.html#cb787-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fl">4.22</span>, <span class="at">lty =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
+<span id="cb787-13"><a href="ch-09.html#cb787-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">&#39;text&#39;</span>,<span class="at">x =</span> <span class="fl">3.3</span> ,<span class="at">y =</span> <span class="fl">0.5</span>,<span class="at">label =</span> <span class="st">&#39;Decision Boundary </span><span class="sc">\n</span><span class="st"> x &gt;= 4.22 </span><span class="sc">\n</span><span class="st"> predict 1&#39;</span>)<span class="sc">+</span></span>
+<span id="cb787-14"><a href="ch-09.html#cb787-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">name =</span> <span class="st">&#39;Class&#39;</span>,<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&#39;0&#39;</span> <span class="ot">=</span> <span class="st">&#39;red&#39;</span>,<span class="st">&#39;1&#39;</span> <span class="ot">=</span> <span class="st">&#39;blue&#39;</span>))<span class="sc">+</span></span>
+<span id="cb787-15"><a href="ch-09.html#cb787-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_linetype_manual</span>(<span class="at">name =</span> <span class="st">&#39;Sigmoid Activation&#39;</span>,<span class="at">values =</span> <span class="dv">1</span>,<span class="at">labels =</span> <span class="st">&#39;P(positve) &gt;= 0.5 </span><span class="sc">\n</span><span class="st"> predict 1 &#39;</span>)<span class="sc">+</span> </span>
+<span id="cb787-16"><a href="ch-09.html#cb787-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ylab</span>(<span class="st">&quot;P(positive)&quot;</span>)<span class="sc">+</span></span>
+<span id="cb787-17"><a href="ch-09.html#cb787-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_grey</span>(<span class="at">base_size =</span> <span class="dv">15</span>)</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-371-1.png" width="50%" style="display: block; margin: auto;" /></p>
+<p>It seems the trained model does a good job at predicting which examples should be associated with which labels, although some examples are clearly misclassified. How else might we quantify model performance here? Remember the accuracy metric we introduced? Let’s apply it to our model.</p>
+<div class="sourceCode" id="cb788"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb788-1"><a href="ch-09.html#cb788-1" aria-hidden="true" tabindex="-1"></a><span class="co">#take probabilites</span></span>
+<span id="cb788-2"><a href="ch-09.html#cb788-2" aria-hidden="true" tabindex="-1"></a>pred_test <span class="ot">=</span> <span class="fu">predict</span>(lg_fit,<span class="at">newdata =</span> df_test , <span class="at">type =</span> <span class="st">&#39;response&#39;</span>)</span>
+<span id="cb788-3"><a href="ch-09.html#cb788-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb788-4"><a href="ch-09.html#cb788-4" aria-hidden="true" tabindex="-1"></a><span class="co">#make decisions</span></span>
+<span id="cb788-5"><a href="ch-09.html#cb788-5" aria-hidden="true" tabindex="-1"></a>pred_y <span class="ot">=</span> (pred_test <span class="sc">&gt;=</span> <span class="fl">0.5</span>)<span class="sc">*</span><span class="dv">1</span></span>
+<span id="cb788-6"><a href="ch-09.html#cb788-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb788-7"><a href="ch-09.html#cb788-7" aria-hidden="true" tabindex="-1"></a><span class="co">#calculate accuracy</span></span>
+<span id="cb788-8"><a href="ch-09.html#cb788-8" aria-hidden="true" tabindex="-1"></a>acc <span class="ot">=</span> <span class="fu">mean</span>(pred_y <span class="sc">==</span> df_test<span class="sc">$</span>y)</span>
+<span id="cb788-9"><a href="ch-09.html#cb788-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Test Accuracy: &quot;</span>,acc,<span class="st">&#39;</span><span class="sc">\n</span><span class="st">&#39;</span>)</span></code></pre></div>
+<pre><code>## Test Accuracy:  0.9</code></pre>
+<p>Wow, an accuracy of 90%. Sounds good right!? In this case it actually is, but we’ll see in the next tutorial where this metric breaks down.</p>
+</div>
+</div>
+</div>
+<div id="exercise-7" class="section level2" number="9.3">
+<h2><span class="header-section-number">9.3</span> Exercise</h2>
+<ol style="list-style-type: decimal">
+<li>Read in the data, tokenize the iris type (so that the output is a number) into a new column with name “y”. Namely, “virginica” –&gt; 1, “not_virginica” –&gt; 0</li>
+<li>Shuffle your data and create a train and test set with proportions 80% and 20% of the given data respectively.</li>
+<li>Plot the training data and give a different color for each type.</li>
+<li>Create a Logistic Regression Model</li>
+<li>Plot the training data as in question 3 and also include the derived decision boundary (and Sigmoid output for configuration a)
+from the fitted model.</li>
+<li>Evaluate the accuracy of the model in the test set.</li>
+<li>Plot the testing data (use different colors for each Type), include the decision boundary from the fitted model and also use different point type for the misclassified predictions (if any).</li>
+</ol>
+<p>You have to solve tasks 3-7 with 2 different configurations A and B.</p>
+<ol style="list-style-type: lower-alpha">
+<li>Using only the Petal Width as predictor</li>
+<li>Using both Petal Length and Petal Width as predictors</li>
+</ol>
+<p><strong>A skeleton code is provided below to help you out with the coding.</strong></p>
+<hr />
+<p>IMPORTANT NOTE: READ CAREFULLY!
+Do not skip this part or you’ll run into issues later on!
+In a moment, after you’ve read the following instructions carefully, you should:</p>
+<ul>
+<li>run the code chunk immediately below this text (<code>use_session_with_seed(0)</code>).</li>
+<li>look down in the <em>Console</em> it asks if you want to install some packages: (“Would you like to install Miniconda? [Y/n]:”).</li>
+<li>write <em>n</em> and press enter. You should see the following code in the console: <code>Would you like to install Miniconda? [Y/n]: n</code>.</li>
+<li>if you were too eager and already pressed <em>Y</em> (yes) and enter, don’t panic! Just close your environment, re-open it and make sure that next time you go with <em>n</em> (no).</li>
+</ul>
+<div class="sourceCode" id="cb790"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb790-1"><a href="ch-09.html#cb790-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run this to promt miniconda installation request!</span></span>
+<span id="cb790-2"><a href="ch-09.html#cb790-2" aria-hidden="true" tabindex="-1"></a><span class="fu">use_session_with_seed</span>(<span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb791"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb791-1"><a href="ch-09.html#cb791-1" aria-hidden="true" tabindex="-1"></a><span class="do">## 1. Read Data</span></span>
+<span id="cb791-2"><a href="ch-09.html#cb791-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&#39;./data/SLNN_I/exercise/data_iris.csv&#39;</span>)</span>
+<span id="cb791-3"><a href="ch-09.html#cb791-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data)</span>
+<span id="cb791-4"><a href="ch-09.html#cb791-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb791-5"><a href="ch-09.html#cb791-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 2. Tokenize type</span></span>
+<span id="cb791-6"><a href="ch-09.html#cb791-6" aria-hidden="true" tabindex="-1"></a><span class="co">#  Create a new column with name y where y=1 defines virginica while y=0 defines not_virginica</span></span>
+<span id="cb791-7"><a href="ch-09.html#cb791-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb791-8"><a href="ch-09.html#cb791-8" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;ADD CODE HERE&gt;</span></span>
+<span id="cb791-9"><a href="ch-09.html#cb791-9" aria-hidden="true" tabindex="-1"></a><span class="co"># HINT: Use the ifelse function</span></span>
+<span id="cb791-10"><a href="ch-09.html#cb791-10" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>y <span class="ot">&lt;-</span></span>
+<span id="cb791-11"><a href="ch-09.html#cb791-11" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data)</span>
+<span id="cb791-12"><a href="ch-09.html#cb791-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb791-13"><a href="ch-09.html#cb791-13" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;ADD CODE HERE: shuffle the data and make the train,test split&gt;</span></span>
+<span id="cb791-14"><a href="ch-09.html#cb791-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Shuffle data</span></span>
+<span id="cb791-15"><a href="ch-09.html#cb791-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb791-16"><a href="ch-09.html#cb791-16" aria-hidden="true" tabindex="-1"></a>shuffle <span class="ot">&lt;-</span> </span>
+<span id="cb791-17"><a href="ch-09.html#cb791-17" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> </span>
+<span id="cb791-18"><a href="ch-09.html#cb791-18" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data)</span>
+<span id="cb791-19"><a href="ch-09.html#cb791-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb791-20"><a href="ch-09.html#cb791-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Split data</span></span>
+<span id="cb791-21"><a href="ch-09.html#cb791-21" aria-hidden="true" tabindex="-1"></a>breakpoint <span class="ot">&lt;-</span> </span>
+<span id="cb791-22"><a href="ch-09.html#cb791-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb791-23"><a href="ch-09.html#cb791-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Create train and test set  </span></span>
+<span id="cb791-24"><a href="ch-09.html#cb791-24" aria-hidden="true" tabindex="-1"></a>df_train <span class="ot">&lt;-</span> </span>
+<span id="cb791-25"><a href="ch-09.html#cb791-25" aria-hidden="true" tabindex="-1"></a>df_test <span class="ot">&lt;-</span> </span>
+<span id="cb791-26"><a href="ch-09.html#cb791-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb791-27"><a href="ch-09.html#cb791-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Create input and output</span></span>
+<span id="cb791-28"><a href="ch-09.html#cb791-28" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> df_train[,<span class="fu">c</span>(<span class="st">&#39;Petal_Length&#39;</span>, <span class="st">&#39;Petal_Width&#39;</span>)]</span>
+<span id="cb791-29"><a href="ch-09.html#cb791-29" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> df_train<span class="sc">$</span>y</span>
+<span id="cb791-30"><a href="ch-09.html#cb791-30" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb791-31"><a href="ch-09.html#cb791-31" aria-hidden="true" tabindex="-1"></a>x_test <span class="ot">&lt;-</span> df_test[,<span class="fu">c</span>(<span class="st">&#39;Petal_Length&#39;</span>, <span class="st">&#39;Petal_Width&#39;</span>)]   </span>
+<span id="cb791-32"><a href="ch-09.html#cb791-32" aria-hidden="true" tabindex="-1"></a>y_test <span class="ot">&lt;-</span> df_test<span class="sc">$</span>y</span></code></pre></div>
+<hr />
+<p><strong>Configuration A for tasks 3-5</strong></p>
+<div class="sourceCode" id="cb792"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb792-1"><a href="ch-09.html#cb792-1" aria-hidden="true" tabindex="-1"></a><span class="do">## A3. Plot training data</span></span>
+<span id="cb792-2"><a href="ch-09.html#cb792-2" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;ADD CODE HERE: use only the Petal Width as input&gt;</span></span>
+<span id="cb792-3"><a href="ch-09.html#cb792-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-4"><a href="ch-09.html#cb792-4" aria-hidden="true" tabindex="-1"></a><span class="do">## A4. Create model</span></span>
+<span id="cb792-5"><a href="ch-09.html#cb792-5" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;FILL IN MISSING PARTS BELOW&gt;</span></span>
+<span id="cb792-6"><a href="ch-09.html#cb792-6" aria-hidden="true" tabindex="-1"></a><span class="co"># HINT: Use right activation and loss functions for logistic regression</span></span>
+<span id="cb792-7"><a href="ch-09.html#cb792-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-8"><a href="ch-09.html#cb792-8" aria-hidden="true" tabindex="-1"></a><span class="fu">use_session_with_seed</span>(<span class="dv">42</span>) </span>
+<span id="cb792-9"><a href="ch-09.html#cb792-9" aria-hidden="true" tabindex="-1"></a>model_a <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>()</span>
+<span id="cb792-10"><a href="ch-09.html#cb792-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-11"><a href="ch-09.html#cb792-11" aria-hidden="true" tabindex="-1"></a>model_a <span class="sc">%&gt;%</span> <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> ) </span>
+<span id="cb792-12"><a href="ch-09.html#cb792-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-13"><a href="ch-09.html#cb792-13" aria-hidden="true" tabindex="-1"></a>opt <span class="ot">=</span> <span class="fu">optimizer_adam</span>(<span class="at">lr=</span><span class="fl">0.1</span>)</span>
+<span id="cb792-14"><a href="ch-09.html#cb792-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-15"><a href="ch-09.html#cb792-15" aria-hidden="true" tabindex="-1"></a>model_a <span class="sc">%&gt;%</span> <span class="fu">compile</span>(<span class="at">loss =</span> ,<span class="at">optimizer =</span> opt, <span class="at">metrics =</span> <span class="st">&#39;accuracy&#39;</span>)</span>
+<span id="cb792-16"><a href="ch-09.html#cb792-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-17"><a href="ch-09.html#cb792-17" aria-hidden="true" tabindex="-1"></a>model_a <span class="sc">%&gt;%</span> <span class="fu">fit</span>(<span class="at">x=</span> x_train<span class="sc">$</span>Petal_Width,<span class="at">y=</span>y_train,<span class="at">epochs=</span><span class="dv">20</span>,<span class="at">batch_size=</span><span class="dv">32</span>)</span>
+<span id="cb792-18"><a href="ch-09.html#cb792-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-19"><a href="ch-09.html#cb792-19" aria-hidden="true" tabindex="-1"></a>w_b <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">get_weights</span>(model_a))</span>
+<span id="cb792-20"><a href="ch-09.html#cb792-20" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb792-21"><a href="ch-09.html#cb792-21" aria-hidden="true" tabindex="-1"></a><span class="do">## A5. Plot decision boundary</span></span>
+<span id="cb792-22"><a href="ch-09.html#cb792-22" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;ADD CODE HERE&gt;</span></span>
+<span id="cb792-23"><a href="ch-09.html#cb792-23" aria-hidden="true" tabindex="-1"></a><span class="co"># HINT: Decision boundary is now a vertical line</span></span>
+<span id="cb792-24"><a href="ch-09.html#cb792-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-25"><a href="ch-09.html#cb792-25" aria-hidden="true" tabindex="-1"></a><span class="do">## A6. Evaluate the accuracy on test set</span></span>
+<span id="cb792-26"><a href="ch-09.html#cb792-26" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;FILL IN MISSING PARTS BELOW&gt;</span></span>
+<span id="cb792-27"><a href="ch-09.html#cb792-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-28"><a href="ch-09.html#cb792-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Take probabilities</span></span>
+<span id="cb792-29"><a href="ch-09.html#cb792-29" aria-hidden="true" tabindex="-1"></a>p_nn <span class="ot">&lt;-</span> <span class="fu">predict</span>(model_a, x_test<span class="sc">$</span>Petal_Width)</span>
+<span id="cb792-30"><a href="ch-09.html#cb792-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-31"><a href="ch-09.html#cb792-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Make decisions</span></span>
+<span id="cb792-32"><a href="ch-09.html#cb792-32" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span></span>
+<span id="cb792-33"><a href="ch-09.html#cb792-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-34"><a href="ch-09.html#cb792-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Accuracy</span></span>
+<span id="cb792-35"><a href="ch-09.html#cb792-35" aria-hidden="true" tabindex="-1"></a>accuracy <span class="ot">&lt;-</span> </span>
+<span id="cb792-36"><a href="ch-09.html#cb792-36" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Test Accuracy: &quot;</span>, <span class="fu">round</span>(accuracy, <span class="dv">3</span>), <span class="st">&#39;/n&#39;</span>)</span>
+<span id="cb792-37"><a href="ch-09.html#cb792-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb792-38"><a href="ch-09.html#cb792-38" aria-hidden="true" tabindex="-1"></a><span class="do">## A7. Plot misclassified predictions in the test data</span></span>
+<span id="cb792-39"><a href="ch-09.html#cb792-39" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;FILL IN MISSING PARTS BELOW&gt;</span></span>
+<span id="cb792-40"><a href="ch-09.html#cb792-40" aria-hidden="true" tabindex="-1"></a><span class="co"># HINT: Create a new column in the df_test which indicates those points that are misclassified</span></span></code></pre></div>
+<hr />
+<p><strong>Configuration B for tasks 3-5</strong></p>
+<div class="sourceCode" id="cb793"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb793-1"><a href="ch-09.html#cb793-1" aria-hidden="true" tabindex="-1"></a><span class="do">## B3. Plot training data</span></span>
+<span id="cb793-2"><a href="ch-09.html#cb793-2" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;ADD CODE HERE: For configuration B use both, Petal Length and Petal Width, as predictors</span></span>
+<span id="cb793-3"><a href="ch-09.html#cb793-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-4"><a href="ch-09.html#cb793-4" aria-hidden="true" tabindex="-1"></a><span class="do">## B4. Create model</span></span>
+<span id="cb793-5"><a href="ch-09.html#cb793-5" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;FILL IN MISSING PARTS BELOW&gt;</span></span>
+<span id="cb793-6"><a href="ch-09.html#cb793-6" aria-hidden="true" tabindex="-1"></a><span class="co"># HINT: Use right activation and loss functions for logistic regression</span></span>
+<span id="cb793-7"><a href="ch-09.html#cb793-7" aria-hidden="true" tabindex="-1"></a><span class="fu">use_session_with_seed</span>(<span class="dv">42</span>) </span>
+<span id="cb793-8"><a href="ch-09.html#cb793-8" aria-hidden="true" tabindex="-1"></a>model_b <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>()</span>
+<span id="cb793-9"><a href="ch-09.html#cb793-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-10"><a href="ch-09.html#cb793-10" aria-hidden="true" tabindex="-1"></a>model_b <span class="sc">%&gt;%</span> <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> ) </span>
+<span id="cb793-11"><a href="ch-09.html#cb793-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-12"><a href="ch-09.html#cb793-12" aria-hidden="true" tabindex="-1"></a>opt <span class="ot">=</span> <span class="fu">optimizer_adam</span>(<span class="at">lr=</span><span class="fl">0.1</span>)</span>
+<span id="cb793-13"><a href="ch-09.html#cb793-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-14"><a href="ch-09.html#cb793-14" aria-hidden="true" tabindex="-1"></a>model_b <span class="sc">%&gt;%</span> <span class="fu">compile</span>(<span class="at">loss =</span> ,<span class="at">optimizer =</span> opt, <span class="at">metrics =</span> <span class="st">&#39;accuracy&#39;</span>)</span>
+<span id="cb793-15"><a href="ch-09.html#cb793-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-16"><a href="ch-09.html#cb793-16" aria-hidden="true" tabindex="-1"></a>model_b <span class="sc">%&gt;%</span> <span class="fu">fit</span>(<span class="at">x=</span><span class="fu">as.matrix</span>(x_train),<span class="at">y=</span>y_train,<span class="at">epochs=</span><span class="dv">30</span>,<span class="at">batch_size=</span><span class="dv">32</span>)</span>
+<span id="cb793-17"><a href="ch-09.html#cb793-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-18"><a href="ch-09.html#cb793-18" aria-hidden="true" tabindex="-1"></a>w_b <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">get_weights</span>(model_b))</span>
+<span id="cb793-19"><a href="ch-09.html#cb793-19" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb793-20"><a href="ch-09.html#cb793-20" aria-hidden="true" tabindex="-1"></a><span class="do">## B5. Plot decision boundary</span></span>
+<span id="cb793-21"><a href="ch-09.html#cb793-21" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;ADD CODE HERE&gt;</span></span>
+<span id="cb793-22"><a href="ch-09.html#cb793-22" aria-hidden="true" tabindex="-1"></a><span class="co"># HINT: Decision boundary is now a line with slope and intercept</span></span>
+<span id="cb793-23"><a href="ch-09.html#cb793-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-24"><a href="ch-09.html#cb793-24" aria-hidden="true" tabindex="-1"></a><span class="do">## B6. Evaluate the accuracy on test set</span></span>
+<span id="cb793-25"><a href="ch-09.html#cb793-25" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;FILL IN MISSING PARTS BELOW&gt;</span></span>
+<span id="cb793-26"><a href="ch-09.html#cb793-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-27"><a href="ch-09.html#cb793-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Take probabilities</span></span>
+<span id="cb793-28"><a href="ch-09.html#cb793-28" aria-hidden="true" tabindex="-1"></a>p_nn <span class="ot">&lt;-</span> <span class="fu">predict</span>(model_b,<span class="fu">as.matrix</span>(x_test))</span>
+<span id="cb793-29"><a href="ch-09.html#cb793-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-30"><a href="ch-09.html#cb793-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Make decisions</span></span>
+<span id="cb793-31"><a href="ch-09.html#cb793-31" aria-hidden="true" tabindex="-1"></a>pred <span class="ot">&lt;-</span></span>
+<span id="cb793-32"><a href="ch-09.html#cb793-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-33"><a href="ch-09.html#cb793-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Accuracy</span></span>
+<span id="cb793-34"><a href="ch-09.html#cb793-34" aria-hidden="true" tabindex="-1"></a>accuracy <span class="ot">&lt;-</span></span>
+<span id="cb793-35"><a href="ch-09.html#cb793-35" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Test Accuracy: &quot;</span>, <span class="fu">round</span>(accuracy, <span class="dv">3</span>), <span class="st">&#39;/n&#39;</span>)</span>
+<span id="cb793-36"><a href="ch-09.html#cb793-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb793-37"><a href="ch-09.html#cb793-37" aria-hidden="true" tabindex="-1"></a><span class="do">## B7. Plot misclassified predictions in the test data</span></span>
+<span id="cb793-38"><a href="ch-09.html#cb793-38" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;FILL IN MISSING PARTS BELOW&gt;</span></span>
+<span id="cb793-39"><a href="ch-09.html#cb793-39" aria-hidden="true" tabindex="-1"></a><span class="co"># HINT: Create a new column in the df_test which indicates those points that are misclassified</span></span></code></pre></div>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="ch-08.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="ch-10.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

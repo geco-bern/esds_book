@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 13 Supervised Deep Learning II - A Scenario of Environmental Systems | Environmental Systems Data Science</title>
+  <meta name="description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 13 Supervised Deep Learning II - A Scenario of Environmental Systems | Environmental Systems Data Science" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 13 Supervised Deep Learning II - A Scenario of Environmental Systems | Environmental Systems Data Science" />
+  
+  <meta name="twitter:description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
+  
+
+<meta name="author" content="Loïc Pellissier, Joshua Payne, Benjamin Stocker" />
+
+
+<meta name="date" content="2021-12-30" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="ch-12.html"/>
+<link rel="next" href="references.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Prerequisites</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-description"><i class="fa fa-check"></i>Course Description</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#course-objectives"><i class="fa fa-check"></i>Course Objectives</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#content"><i class="fa fa-check"></i>Content</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#useful-prerequisites"><i class="fa fa-check"></i>Useful Prerequisites</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="ch-01.html"><a href="ch-01.html"><i class="fa fa-check"></i><b>1</b> Primers</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="ch-01.html"><a href="ch-01.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1.1" data-path="ch-01.html"><a href="ch-01.html#key-points-from-the-lecture"><i class="fa fa-check"></i><b>1.1.1</b> Key Points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="ch-01.html"><a href="ch-01.html#tutorial"><i class="fa fa-check"></i><b>1.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="ch-01.html"><a href="ch-01.html#working-with-rstudio-on-renku"><i class="fa fa-check"></i><b>1.2.1</b> Working with RStudio on Renku</a></li>
+<li class="chapter" data-level="1.2.2" data-path="ch-01.html"><a href="ch-01.html#git"><i class="fa fa-check"></i><b>1.2.2</b> Git</a></li>
+<li class="chapter" data-level="1.2.3" data-path="ch-01.html"><a href="ch-01.html#libraries"><i class="fa fa-check"></i><b>1.2.3</b> Libraries</a></li>
+<li class="chapter" data-level="1.2.4" data-path="ch-01.html"><a href="ch-01.html#r-scripts"><i class="fa fa-check"></i><b>1.2.4</b> R scripts</a></li>
+<li class="chapter" data-level="1.2.5" data-path="ch-01.html"><a href="ch-01.html#rmarkdown"><i class="fa fa-check"></i><b>1.2.5</b> RMarkdown</a></li>
+<li class="chapter" data-level="1.2.6" data-path="ch-01.html"><a href="ch-01.html#functions"><i class="fa fa-check"></i><b>1.2.6</b> Functions</a></li>
+<li class="chapter" data-level="1.2.7" data-path="ch-01.html"><a href="ch-01.html#tidy-data"><i class="fa fa-check"></i><b>1.2.7</b> Tidy data</a></li>
+<li class="chapter" data-level="1.2.8" data-path="ch-01.html"><a href="ch-01.html#r-projects"><i class="fa fa-check"></i><b>1.2.8</b> R projects</a></li>
+<li class="chapter" data-level="1.2.9" data-path="ch-01.html"><a href="ch-01.html#working-with-data-frames"><i class="fa fa-check"></i><b>1.2.9</b> Working with data frames</a></li>
+<li class="chapter" data-level="1.2.10" data-path="ch-01.html"><a href="ch-01.html#r-objects"><i class="fa fa-check"></i><b>1.2.10</b> R objects</a></li>
+<li class="chapter" data-level="1.2.11" data-path="ch-01.html"><a href="ch-01.html#data-visualisation"><i class="fa fa-check"></i><b>1.2.11</b> Data visualisation</a></li>
+<li class="chapter" data-level="1.2.12" data-path="ch-01.html"><a href="ch-01.html#conditionals"><i class="fa fa-check"></i><b>1.2.12</b> Conditionals</a></li>
+<li class="chapter" data-level="1.2.13" data-path="ch-01.html"><a href="ch-01.html#loops"><i class="fa fa-check"></i><b>1.2.13</b> Loops</a></li>
+<li class="chapter" data-level="1.2.14" data-path="ch-01.html"><a href="ch-01.html#where-to-find-help"><i class="fa fa-check"></i><b>1.2.14</b> Where to find help</a></li>
+<li class="chapter" data-level="1.2.15" data-path="ch-01.html"><a href="ch-01.html#key-points-from-the-tutorial"><i class="fa fa-check"></i><b>1.2.15</b> Key points from the tutorial</a></li>
+<li class="chapter" data-level="1.2.16" data-path="ch-01.html"><a href="ch-01.html#further-reading"><i class="fa fa-check"></i><b>1.2.16</b> Further reading</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="ch-01.html"><a href="ch-01.html#exercise"><i class="fa fa-check"></i><b>1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="ch-02.html"><a href="ch-02.html"><i class="fa fa-check"></i><b>2</b> Data wrangling</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="ch-02.html"><a href="ch-02.html#introduction-1"><i class="fa fa-check"></i><b>2.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="ch-02.html"><a href="ch-02.html#learning-objectives"><i class="fa fa-check"></i><b>2.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="2.1.2" data-path="ch-02.html"><a href="ch-02.html#key-points-from-the-lecture-1"><i class="fa fa-check"></i><b>2.1.2</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="ch-02.html"><a href="ch-02.html#tutorial-1"><i class="fa fa-check"></i><b>2.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="ch-02.html"><a href="ch-02.html#libraries-1"><i class="fa fa-check"></i><b>2.2.1</b> Libraries</a></li>
+<li class="chapter" data-level="2.2.2" data-path="ch-02.html"><a href="ch-02.html#variables-in-a-data-frame"><i class="fa fa-check"></i><b>2.2.2</b> Variables in a data frame</a></li>
+<li class="chapter" data-level="2.2.3" data-path="ch-02.html"><a href="ch-02.html#time-objects"><i class="fa fa-check"></i><b>2.2.3</b> Time objects</a></li>
+<li class="chapter" data-level="2.2.4" data-path="ch-02.html"><a href="ch-02.html#variable-re--definition"><i class="fa fa-check"></i><b>2.2.4</b> Variable (re-) definition</a></li>
+<li class="chapter" data-level="2.2.5" data-path="ch-02.html"><a href="ch-02.html#selecting-cleaning-and-gap-filling"><i class="fa fa-check"></i><b>2.2.5</b> Selecting, cleaning and gap-filling</a></li>
+<li class="chapter" data-level="2.2.6" data-path="ch-02.html"><a href="ch-02.html#functions-1"><i class="fa fa-check"></i><b>2.2.6</b> Functions</a></li>
+<li class="chapter" data-level="2.2.7" data-path="ch-02.html"><a href="ch-02.html#data-overview"><i class="fa fa-check"></i><b>2.2.7</b> Data overview</a></li>
+<li class="chapter" data-level="2.2.8" data-path="ch-02.html"><a href="ch-02.html#data-visualisation-i"><i class="fa fa-check"></i><b>2.2.8</b> Data visualisation I</a></li>
+<li class="chapter" data-level="2.2.9" data-path="ch-02.html"><a href="ch-02.html#aggregating"><i class="fa fa-check"></i><b>2.2.9</b> Aggregating</a></li>
+<li class="chapter" data-level="2.2.10" data-path="ch-02.html"><a href="ch-02.html#data-visualisation-ii"><i class="fa fa-check"></i><b>2.2.10</b> Data visualisation II</a></li>
+<li class="chapter" data-level="2.2.11" data-path="ch-02.html"><a href="ch-02.html#functional-programming-i"><i class="fa fa-check"></i><b>2.2.11</b> Functional programming I</a></li>
+<li class="chapter" data-level="2.2.12" data-path="ch-02.html"><a href="ch-02.html#strings"><i class="fa fa-check"></i><b>2.2.12</b> Strings</a></li>
+<li class="chapter" data-level="2.2.13" data-path="ch-02.html"><a href="ch-02.html#combining-relational-data"><i class="fa fa-check"></i><b>2.2.13</b> Combining relational data</a></li>
+<li class="chapter" data-level="2.2.14" data-path="ch-02.html"><a href="ch-02.html#key-points-from-the-tutorial-1"><i class="fa fa-check"></i><b>2.2.14</b> Key points from the tutorial</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="ch-02.html"><a href="ch-02.html#exercise-1"><i class="fa fa-check"></i><b>2.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="ch-03.html"><a href="ch-03.html"><i class="fa fa-check"></i><b>3</b> Data variety</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="ch-03.html"><a href="ch-03.html#introduction-2"><i class="fa fa-check"></i><b>3.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="ch-03.html"><a href="ch-03.html#overview"><i class="fa fa-check"></i><b>3.1.1</b> Overview</a></li>
+<li class="chapter" data-level="3.1.2" data-path="ch-03.html"><a href="ch-03.html#learning-objectives-1"><i class="fa fa-check"></i><b>3.1.2</b> Learning objectives</a></li>
+<li class="chapter" data-level="3.1.3" data-path="ch-03.html"><a href="ch-03.html#key-points-from-the-lecture-2"><i class="fa fa-check"></i><b>3.1.3</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="ch-03.html"><a href="ch-03.html#tutorial-2"><i class="fa fa-check"></i><b>3.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="ch-03.html"><a href="ch-03.html#overview-1"><i class="fa fa-check"></i><b>3.2.1</b> Overview</a></li>
+<li class="chapter" data-level="3.2.2" data-path="ch-03.html"><a href="ch-03.html#modis-remote-download"><i class="fa fa-check"></i><b>3.2.2</b> MODIS remote download</a></li>
+<li class="chapter" data-level="3.2.3" data-path="ch-03.html"><a href="ch-03.html#points-on-the-globe"><i class="fa fa-check"></i><b>3.2.3</b> Points on the globe</a></li>
+<li class="chapter" data-level="3.2.4" data-path="ch-03.html"><a href="ch-03.html#shapefiles"><i class="fa fa-check"></i><b>3.2.4</b> Shapefiles</a></li>
+<li class="chapter" data-level="3.2.5" data-path="ch-03.html"><a href="ch-03.html#rasters"><i class="fa fa-check"></i><b>3.2.5</b> Rasters</a></li>
+<li class="chapter" data-level="3.2.6" data-path="ch-03.html"><a href="ch-03.html#key-points-from-the-tutorial-2"><i class="fa fa-check"></i><b>3.2.6</b> Key points from the tutorial</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="ch-03.html"><a href="ch-03.html#exercise-2"><i class="fa fa-check"></i><b>3.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="ch-04.html"><a href="ch-04.html"><i class="fa fa-check"></i><b>4</b> Data Scraping</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="ch-04.html"><a href="ch-04.html#introduction-3"><i class="fa fa-check"></i><b>4.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="ch-04.html"><a href="ch-04.html#key-points-from-the-lecture-3"><i class="fa fa-check"></i><b>4.1.1</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="ch-04.html"><a href="ch-04.html#tutorial-3"><i class="fa fa-check"></i><b>4.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="ch-04.html"><a href="ch-04.html#r-packages-and-functions"><i class="fa fa-check"></i><b>4.2.1</b> R-Packages and Functions</a></li>
+<li class="chapter" data-level="4.2.2" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-website"><i class="fa fa-check"></i><b>4.2.2</b> The FishBase website</a></li>
+<li class="chapter" data-level="4.2.3" data-path="ch-04.html"><a href="ch-04.html#accessing-fishbase"><i class="fa fa-check"></i><b>4.2.3</b> Accessing FishBase</a></li>
+<li class="chapter" data-level="4.2.4" data-path="ch-04.html"><a href="ch-04.html#scraping-numbers"><i class="fa fa-check"></i><b>4.2.4</b> Scraping Numbers</a></li>
+<li class="chapter" data-level="4.2.5" data-path="ch-04.html"><a href="ch-04.html#scraping-text-snippetrs"><i class="fa fa-check"></i><b>4.2.5</b> Scraping Text Snippetrs</a></li>
+<li class="chapter" data-level="4.2.6" data-path="ch-04.html"><a href="ch-04.html#scraping-tables"><i class="fa fa-check"></i><b>4.2.6</b> Scraping Tables</a></li>
+<li class="chapter" data-level="4.2.7" data-path="ch-04.html"><a href="ch-04.html#the-fishbase-package"><i class="fa fa-check"></i><b>4.2.7</b> The Fishbase Package</a></li>
+<li class="chapter" data-level="4.2.8" data-path="ch-04.html"><a href="ch-04.html#summary"><i class="fa fa-check"></i><b>4.2.8</b> Summary</a></li>
+<li class="chapter" data-level="4.2.9" data-path="ch-04.html"><a href="ch-04.html#case-study"><i class="fa fa-check"></i><b>4.2.9</b> Case Study</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="ch-04.html"><a href="ch-04.html#exercise-3"><i class="fa fa-check"></i><b>4.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="ch-05.html"><a href="ch-05.html"><i class="fa fa-check"></i><b>5</b> Catch-up</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="ch-05.html"><a href="ch-05.html#loops-in-r"><i class="fa fa-check"></i><b>5.1</b> Loops in R</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="ch-05.html"><a href="ch-05.html#some-simple-examples"><i class="fa fa-check"></i><b>5.1.1</b> Some simple examples</a></li>
+<li class="chapter" data-level="5.1.2" data-path="ch-05.html"><a href="ch-05.html#nested-loops"><i class="fa fa-check"></i><b>5.1.2</b> Nested loops</a></li>
+<li class="chapter" data-level="5.1.3" data-path="ch-05.html"><a href="ch-05.html#exercise-4"><i class="fa fa-check"></i><b>5.1.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="ch-05.html"><a href="ch-05.html#functional-programming-using-purr"><i class="fa fa-check"></i><b>5.2</b> Functional programming using purr</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="ch-05.html"><a href="ch-05.html#shortcuts-in-a-purrr-function"><i class="fa fa-check"></i><b>5.2.1</b> Shortcuts in a <code>purrr</code> function</a></li>
+<li class="chapter" data-level="5.2.2" data-path="ch-05.html"><a href="ch-05.html#workflow-nested-data-map-and-mutate"><i class="fa fa-check"></i><b>5.2.2</b> Workflow: nested data, map and mutate</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="ch-05.html"><a href="ch-05.html#string-manipulations"><i class="fa fa-check"></i><b>5.3</b> String Manipulations</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="ch-05.html"><a href="ch-05.html#introduction-to-strings"><i class="fa fa-check"></i><b>5.3.1</b> Introduction to strings</a></li>
+<li class="chapter" data-level="5.3.2" data-path="ch-05.html"><a href="ch-05.html#matching-and-extracting-patterns"><i class="fa fa-check"></i><b>5.3.2</b> Matching and extracting patterns</a></li>
+<li class="chapter" data-level="5.3.3" data-path="ch-05.html"><a href="ch-05.html#advanced-example"><i class="fa fa-check"></i><b>5.3.3</b> Advanced example</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="ch-05.html"><a href="ch-05.html#web-scraping-in-a-nut-shell"><i class="fa fa-check"></i><b>5.4</b> Web-scraping in a nut-shell</a></li>
+<li class="chapter" data-level="5.5" data-path="ch-05.html"><a href="ch-05.html#tidyverses-filter-and-select"><i class="fa fa-check"></i><b>5.5</b> Tidyverse’s filter and select</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="ch-05.html"><a href="ch-05.html#introduction-4"><i class="fa fa-check"></i><b>5.5.1</b> Introduction</a></li>
+<li class="chapter" data-level="5.5.2" data-path="ch-05.html"><a href="ch-05.html#select"><i class="fa fa-check"></i><b>5.5.2</b> Select()</a></li>
+<li class="chapter" data-level="5.5.3" data-path="ch-05.html"><a href="ch-05.html#filter"><i class="fa fa-check"></i><b>5.5.3</b> Filter()</a></li>
+<li class="chapter" data-level="5.5.4" data-path="ch-05.html"><a href="ch-05.html#exercises"><i class="fa fa-check"></i><b>5.5.4</b> Exercises</a></li>
+<li class="chapter" data-level="5.5.5" data-path="ch-05.html"><a href="ch-05.html#solutions"><i class="fa fa-check"></i><b>5.5.5</b> Solutions</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="ch-05.html"><a href="ch-05.html#preparing-data-for-ggplot"><i class="fa fa-check"></i><b>5.6</b> Preparing data for ggplot()</a></li>
+<li class="chapter" data-level="5.7" data-path="ch-05.html"><a href="ch-05.html#base-r-functions"><i class="fa fa-check"></i><b>5.7</b> Base R functions</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="ch-06.html"><a href="ch-06.html"><i class="fa fa-check"></i><b>6</b> Supervised Machine Learning I</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="ch-06.html"><a href="ch-06.html#introduction-5"><i class="fa fa-check"></i><b>6.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="ch-06.html"><a href="ch-06.html#learning-objectives-2"><i class="fa fa-check"></i><b>6.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="6.1.2" data-path="ch-06.html"><a href="ch-06.html#important-points-from-the-lecture"><i class="fa fa-check"></i><b>6.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="ch-06.html"><a href="ch-06.html#tutorial-4"><i class="fa fa-check"></i><b>6.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="6.2.1" data-path="ch-06.html"><a href="ch-06.html#overfitting"><i class="fa fa-check"></i><b>6.2.1</b> Overfitting</a></li>
+<li class="chapter" data-level="6.2.2" data-path="ch-06.html"><a href="ch-06.html#motivation"><i class="fa fa-check"></i><b>6.2.2</b> Modelling challenge</a></li>
+<li class="chapter" data-level="6.2.3" data-path="ch-06.html"><a href="ch-06.html#a-selection-of-model-types"><i class="fa fa-check"></i><b>6.2.3</b> A selection of model types</a></li>
+<li class="chapter" data-level="6.2.4" data-path="ch-06.html"><a href="ch-06.html#data-splitting"><i class="fa fa-check"></i><b>6.2.4</b> Data splitting</a></li>
+<li class="chapter" data-level="6.2.5" data-path="ch-06.html"><a href="ch-06.html#preprocessing"><i class="fa fa-check"></i><b>6.2.5</b> Pre-processing</a></li>
+<li class="chapter" data-level="6.2.6" data-path="ch-06.html"><a href="ch-06.html#model-formulation"><i class="fa fa-check"></i><b>6.2.6</b> Model formulation</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="ch-06.html"><a href="ch-06.html#exercise-5"><i class="fa fa-check"></i><b>6.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="6.3.1" data-path="ch-06.html"><a href="ch-06.html#reading-and-cleaning"><i class="fa fa-check"></i><b>6.3.1</b> Reading and cleaning</a></li>
+<li class="chapter" data-level="6.3.2" data-path="ch-06.html"><a href="ch-06.html#data-splitting-1"><i class="fa fa-check"></i><b>6.3.2</b> Data splitting</a></li>
+<li class="chapter" data-level="6.3.3" data-path="ch-06.html"><a href="ch-06.html#linear-model"><i class="fa fa-check"></i><b>6.3.3</b> Linear model</a></li>
+<li class="chapter" data-level="6.3.4" data-path="ch-06.html"><a href="ch-06.html#pre-processing"><i class="fa fa-check"></i><b>6.3.4</b> Pre-processing</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="ch-07.html"><a href="ch-07.html"><i class="fa fa-check"></i><b>7</b> Supervised Machine Learning II</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="ch-07.html"><a href="ch-07.html#introduction-6"><i class="fa fa-check"></i><b>7.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="ch-07.html"><a href="ch-07.html#learning-objectives-3"><i class="fa fa-check"></i><b>7.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="7.1.2" data-path="ch-07.html"><a href="ch-07.html#key-points-from-the-lecture-4"><i class="fa fa-check"></i><b>7.1.2</b> Key points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="ch-07.html"><a href="ch-07.html#tutorial-5"><i class="fa fa-check"></i><b>7.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="ch-07.html"><a href="ch-07.html#model-formulation-using-train"><i class="fa fa-check"></i><b>7.2.1</b> Model formulation using <code>train()</code></a></li>
+<li class="chapter" data-level="7.2.2" data-path="ch-07.html"><a href="ch-07.html#model-training"><i class="fa fa-check"></i><b>7.2.2</b> Model training</a></li>
+<li class="chapter" data-level="7.2.3" data-path="ch-07.html"><a href="ch-07.html#model-evaluation"><i class="fa fa-check"></i><b>7.2.3</b> Model evaluation</a></li>
+<li class="chapter" data-level="7.2.4" data-path="ch-07.html"><a href="ch-07.html#bonus-model-interpretation"><i class="fa fa-check"></i><b>7.2.4</b> Bonus: Model interpretation</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="ch-07.html"><a href="ch-07.html#exercise-6"><i class="fa fa-check"></i><b>7.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="7.3.1" data-path="ch-07.html"><a href="ch-07.html#setup"><i class="fa fa-check"></i><b>7.3.1</b> Setup</a></li>
+<li class="chapter" data-level="7.3.2" data-path="ch-07.html"><a href="ch-07.html#linear-model-1"><i class="fa fa-check"></i><b>7.3.2</b> Linear Model</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="ch-07.html"><a href="ch-07.html#knn"><i class="fa fa-check"></i><b>7.4</b> KNN</a>
+<ul>
+<li class="chapter" data-level="7.4.1" data-path="ch-07.html"><a href="ch-07.html#check-data"><i class="fa fa-check"></i><b>7.4.1</b> Check data</a></li>
+<li class="chapter" data-level="7.4.2" data-path="ch-07.html"><a href="ch-07.html#training-1"><i class="fa fa-check"></i><b>7.4.2</b> Training</a></li>
+<li class="chapter" data-level="7.4.3" data-path="ch-07.html"><a href="ch-07.html#prediction-1"><i class="fa fa-check"></i><b>7.4.3</b> Prediction</a></li>
+<li class="chapter" data-level="7.4.4" data-path="ch-07.html"><a href="ch-07.html#sample-hyperparameters"><i class="fa fa-check"></i><b>7.4.4</b> Sample hyperparameters</a></li>
+</ul></li>
+<li class="chapter" data-level="7.5" data-path="ch-07.html"><a href="ch-07.html#random-forest-1"><i class="fa fa-check"></i><b>7.5</b> Random forest</a>
+<ul>
+<li class="chapter" data-level="7.5.1" data-path="ch-07.html"><a href="ch-07.html#training-2"><i class="fa fa-check"></i><b>7.5.1</b> Training</a></li>
+<li class="chapter" data-level="7.5.2" data-path="ch-07.html"><a href="ch-07.html#prediction-2"><i class="fa fa-check"></i><b>7.5.2</b> Prediction</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="ch-08.html"><a href="ch-08.html"><i class="fa fa-check"></i><b>8</b> Application 1: Variable selection</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="ch-08.html"><a href="ch-08.html#introduction-7"><i class="fa fa-check"></i><b>8.1</b> Introduction</a></li>
+<li class="chapter" data-level="8.2" data-path="ch-08.html"><a href="ch-08.html#application"><i class="fa fa-check"></i><b>8.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="ch-08.html"><a href="ch-08.html#warm-up-1-nested-for-loop"><i class="fa fa-check"></i><b>8.2.1</b> Warm-up 1: Nested for-loop</a></li>
+<li class="chapter" data-level="8.2.2" data-path="ch-08.html"><a href="ch-08.html#warm-up-2-find-the-best-single-predictor"><i class="fa fa-check"></i><b>8.2.2</b> Warm-up 2: Find the best single predictor</a></li>
+<li class="chapter" data-level="8.2.3" data-path="ch-08.html"><a href="ch-08.html#full-stepwise-regression"><i class="fa fa-check"></i><b>8.2.3</b> Full stepwise regression</a></li>
+<li class="chapter" data-level="8.2.4" data-path="ch-08.html"><a href="ch-08.html#bonus-stepwise-regression-out-of-the-box"><i class="fa fa-check"></i><b>8.2.4</b> Bonus: Stepwise regression out-of-the-box</a></li>
+<li class="chapter" data-level="8.2.5" data-path="ch-08.html"><a href="ch-08.html#bonus-best-subset-selection---not-included-in-application-for-students-too-long"><i class="fa fa-check"></i><b>8.2.5</b> Bonus: Best Subset Selection - Not included in application for students (too long…)</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="ch-09.html"><a href="ch-09.html"><i class="fa fa-check"></i><b>9</b> Supervised Neural Networks I</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ch-09.html"><a href="ch-09.html#introduction-8"><i class="fa fa-check"></i><b>9.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ch-09.html"><a href="ch-09.html#learning-objectives-4"><i class="fa fa-check"></i><b>9.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="9.1.2" data-path="ch-09.html"><a href="ch-09.html#important-points-from-the-lecture-1"><i class="fa fa-check"></i><b>9.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="ch-09.html"><a href="ch-09.html#tutorial-6"><i class="fa fa-check"></i><b>9.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="ch-09.html"><a href="ch-09.html#set-up"><i class="fa fa-check"></i><b>9.2.1</b> Set-up</a></li>
+<li class="chapter" data-level="9.2.2" data-path="ch-09.html"><a href="ch-09.html#keras-for-linear-models"><i class="fa fa-check"></i><b>9.2.2</b> Keras for linear models</a></li>
+<li class="chapter" data-level="9.2.3" data-path="ch-09.html"><a href="ch-09.html#tuning-learning-rate"><i class="fa fa-check"></i><b>9.2.3</b> Tuning learning rate</a></li>
+<li class="chapter" data-level="9.2.4" data-path="ch-09.html"><a href="ch-09.html#logistic-regression"><i class="fa fa-check"></i><b>9.2.4</b> Logistic Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="ch-09.html"><a href="ch-09.html#exercise-7"><i class="fa fa-check"></i><b>9.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="ch-10.html"><a href="ch-10.html"><i class="fa fa-check"></i><b>10</b> Supervised Neural Networks II</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ch-10.html"><a href="ch-10.html#introduction-9"><i class="fa fa-check"></i><b>10.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="10.1.1" data-path="ch-10.html"><a href="ch-10.html#learning-objectives-5"><i class="fa fa-check"></i><b>10.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="10.1.2" data-path="ch-10.html"><a href="ch-10.html#important-points-from-the-lecture-2"><i class="fa fa-check"></i><b>10.1.2</b> Important points from the lecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.2" data-path="ch-10.html"><a href="ch-10.html#tutorial-7"><i class="fa fa-check"></i><b>10.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="ch-10.html"><a href="ch-10.html#import-libraries-1"><i class="fa fa-check"></i><b>10.2.1</b> Import libraries</a></li>
+<li class="chapter" data-level="10.2.2" data-path="ch-10.html"><a href="ch-10.html#construct-a-toy-dataset"><i class="fa fa-check"></i><b>10.2.2</b> Construct a toy dataset</a></li>
+<li class="chapter" data-level="10.2.3" data-path="ch-10.html"><a href="ch-10.html#build-and-train-nn"><i class="fa fa-check"></i><b>10.2.3</b> Build and train NN</a></li>
+<li class="chapter" data-level="10.2.4" data-path="ch-10.html"><a href="ch-10.html#model-performance"><i class="fa fa-check"></i><b>10.2.4</b> Model performance</a></li>
+<li class="chapter" data-level="10.2.5" data-path="ch-10.html"><a href="ch-10.html#influence-of-nn-architecture"><i class="fa fa-check"></i><b>10.2.5</b> Influence of NN architecture</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="ch-10.html"><a href="ch-10.html#exercise-8"><i class="fa fa-check"></i><b>10.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="ch-11.html"><a href="ch-11.html"><i class="fa fa-check"></i><b>11</b> Application 2: Neural Networks and Hyperparameter Tuning</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="ch-11.html"><a href="ch-11.html#introduction-10"><i class="fa fa-check"></i><b>11.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="ch-11.html"><a href="ch-11.html#learning-goals"><i class="fa fa-check"></i><b>11.1.1</b> Learning Goals</a></li>
+<li class="chapter" data-level="11.1.2" data-path="ch-11.html"><a href="ch-11.html#key-points-from-previous-lectures"><i class="fa fa-check"></i><b>11.1.2</b> Key Points from Previous Lectures</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="ch-11.html"><a href="ch-11.html#application-1"><i class="fa fa-check"></i><b>11.2</b> Application</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="ch-11.html"><a href="ch-11.html#problem-statement"><i class="fa fa-check"></i><b>11.2.1</b> Problem Statement</a></li>
+<li class="chapter" data-level="11.2.2" data-path="ch-11.html"><a href="ch-11.html#data-preparation"><i class="fa fa-check"></i><b>11.2.2</b> Data preparation</a></li>
+<li class="chapter" data-level="11.2.3" data-path="ch-11.html"><a href="ch-11.html#center-and-scale"><i class="fa fa-check"></i><b>11.2.3</b> Center and scale</a></li>
+<li class="chapter" data-level="11.2.4" data-path="ch-11.html"><a href="ch-11.html#building-a-simple-model-with-keras-subtask-1"><i class="fa fa-check"></i><b>11.2.4</b> Building a simple model with keras ( SubTask 1)</a></li>
+<li class="chapter" data-level="11.2.5" data-path="ch-11.html"><a href="ch-11.html#cross-validation"><i class="fa fa-check"></i><b>11.2.5</b> Cross validation</a></li>
+<li class="chapter" data-level="11.2.6" data-path="ch-11.html"><a href="ch-11.html#parameter-tuning"><i class="fa fa-check"></i><b>11.2.6</b> Parameter Tuning</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="ch-12.html"><a href="ch-12.html"><i class="fa fa-check"></i><b>12</b> Supervised Deep Learning I</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="ch-12.html"><a href="ch-12.html#introduction-11"><i class="fa fa-check"></i><b>12.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="12.1.1" data-path="ch-12.html"><a href="ch-12.html#learning-objectives-6"><i class="fa fa-check"></i><b>12.1.1</b> Learning objectives</a></li>
+</ul></li>
+<li class="chapter" data-level="12.2" data-path="ch-12.html"><a href="ch-12.html#tutorial-8"><i class="fa fa-check"></i><b>12.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="ch-12.html"><a href="ch-12.html#building-blocks-of-cnns"><i class="fa fa-check"></i><b>12.2.1</b> Building Blocks of CNNs</a></li>
+<li class="chapter" data-level="12.2.2" data-path="ch-12.html"><a href="ch-12.html#build-the-model"><i class="fa fa-check"></i><b>12.2.2</b> Build the model</a></li>
+<li class="chapter" data-level="12.2.3" data-path="ch-12.html"><a href="ch-12.html#compile-and-train-the-model"><i class="fa fa-check"></i><b>12.2.3</b> Compile and train the model</a></li>
+<li class="chapter" data-level="12.2.4" data-path="ch-12.html"><a href="ch-12.html#reduce-overfitting"><i class="fa fa-check"></i><b>12.2.4</b> Reduce Overfitting</a></li>
+<li class="chapter" data-level="12.2.5" data-path="ch-12.html"><a href="ch-12.html#visualizing-a-cnn"><i class="fa fa-check"></i><b>12.2.5</b> Visualizing a CNN</a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="ch-12.html"><a href="ch-12.html#exercise-9"><i class="fa fa-check"></i><b>12.3</b> Exercise</a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="ch-12.html"><a href="ch-12.html#import-libraries-and-data"><i class="fa fa-check"></i><b>12.3.1</b> Import libraries and data</a></li>
+<li class="chapter" data-level="12.3.2" data-path="ch-12.html"><a href="ch-12.html#tasks"><i class="fa fa-check"></i><b>12.3.2</b> Tasks</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="ch-13.html"><a href="ch-13.html"><i class="fa fa-check"></i><b>13</b> Supervised Deep Learning II - <em>A Scenario of Environmental Systems</em></a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="ch-13.html"><a href="ch-13.html#introduction-12"><i class="fa fa-check"></i><b>13.1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="13.1.1" data-path="ch-13.html"><a href="ch-13.html#learning-objectives-7"><i class="fa fa-check"></i><b>13.1.1</b> Learning objectives</a></li>
+<li class="chapter" data-level="13.1.2" data-path="ch-13.html"><a href="ch-13.html#content-operations"><i class="fa fa-check"></i><b>13.1.2</b> Content &amp; Operations</a></li>
+</ul></li>
+<li class="chapter" data-level="13.2" data-path="ch-13.html"><a href="ch-13.html#tutorial-9"><i class="fa fa-check"></i><b>13.2</b> Tutorial</a>
+<ul>
+<li class="chapter" data-level="13.2.1" data-path="ch-13.html"><a href="ch-13.html#description-of-the-modelling-task"><i class="fa fa-check"></i><b>13.2.1</b> Description of the modelling task</a></li>
+<li class="chapter" data-level="13.2.2" data-path="ch-13.html"><a href="ch-13.html#goal-of-the-tutorial"><i class="fa fa-check"></i><b>13.2.2</b> Goal of the tutorial</a></li>
+<li class="chapter" data-level="13.2.3" data-path="ch-13.html"><a href="ch-13.html#dataset"><i class="fa fa-check"></i><b>13.2.3</b> Dataset</a></li>
+<li class="chapter" data-level="13.2.4" data-path="ch-13.html"><a href="ch-13.html#lets-dive-into-the-code"><i class="fa fa-check"></i><b>13.2.4</b> Let’s dive into the code</a></li>
+<li class="chapter" data-level="13.2.5" data-path="ch-13.html"><a href="ch-13.html#read-in-the-data"><i class="fa fa-check"></i><b>13.2.5</b> Read in the Data</a></li>
+<li class="chapter" data-level="13.2.6" data-path="ch-13.html"><a href="ch-13.html#naive-models-old-world-linear-models"><i class="fa fa-check"></i><b>13.2.6</b> Naive models (Old World): Linear Models</a></li>
+<li class="chapter" data-level="13.2.7" data-path="ch-13.html"><a href="ch-13.html#neural-networks-new-world"><i class="fa fa-check"></i><b>13.2.7</b> Neural Networks (New World)</a></li>
+<li class="chapter" data-level="13.2.8" data-path="ch-13.html"><a href="ch-13.html#convolutional-neural-network"><i class="fa fa-check"></i><b>13.2.8</b> Convolutional Neural Network</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="ch-13.html"><a href="ch-13.html#exercise-10"><i class="fa fa-check"></i><b>13.3</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Environmental Systems Data Science</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="ch-13" class="section level1" number="13">
+<h1><span class="header-section-number">Chapter 13</span> Supervised Deep Learning II - <em>A Scenario of Environmental Systems</em></h1>
+<div id="introduction-12" class="section level2" number="13.1">
+<h2><span class="header-section-number">13.1</span> Introduction</h2>
+<p>In this tutorial, we will put into practice and apply some of the models seen earlier in the course, in order to achieve a simple goal: efficiently extrapolate an environmental data set. For this, we will use satellite, meteorological, environmental data (that is measured scarcely by expensive physical devices (towers)) as an accurate and cheap predictors of a specific environmental variable (GPP - Gross primary production). Sit down and relax. This tutorial invites you to take a step back, and reflect on all the knowledge you have acquired on modeling.</p>
+<div id="learning-objectives-7" class="section level3" number="13.1.1">
+<h3><span class="header-section-number">13.1.1</span> Learning objectives</h3>
+<ul>
+<li>Understand the link between research objective, data type and machine learning methods.</li>
+<li>Develop critical judgment, assess the relevance of a method for a particular modeling objective.</li>
+<li>Be able to cite examples of possible applications of various machine learning methods to problems in environmental systems science.</li>
+<li>Build intuitions for future machine learning applications in own projects.</li>
+<li>Understand the difference between forward Neural Networks, CNN.</li>
+<li>Appreciate similarities and differences between simpler statistical models and NN.</li>
+</ul>
+<p><strong>Important points from the lecture</strong></p>
+<div style="border: 2px black solid; border-radius: 7px; padding:10px">
+<ul>
+<li>Several types of models are commonly used in the Environmental Sciences. Those include linear models, general linear models, random forests, and neural networks.</li>
+<li>Linear models are suited for obtaining <em>simple</em> relationships between predictors and variables (for those with a normally distributed response variable)</li>
+</ul>
+<p><span class="math display">\[\begin{equation}
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_k x_k + \epsilon, \quad \epsilon \sim \mathcal{N} (0,\sigma^2)
+\end{equation}\]</span></p>
+<ul>
+<li><p>Generalized linear models are similar to linear models. However, they allow for less restrictive assumptions on the distribution of the predicted variable (e.g., can be binomial for predicting presence/absence).</p></li>
+<li><p>Randoms forests can be used for classification or label predictions.</p></li>
+<li><p>Neural Networks can be used for capturing more <em>complex</em> relationships between predictors and variable. This comes at the cost of interpretability. Convolutional Neural Networks are a special type of neural network which is suited to for example capturing the effect of the spatial structure of the predictors.</p></li>
+<li><p>Neural Networks can be combined with mechanistic models to reduce the dimensionality of a problem.</p></li>
+</ul>
+</div>
+</div>
+<div id="content-operations" class="section level3" number="13.1.2">
+<h3><span class="header-section-number">13.1.2</span> Content &amp; Operations</h3>
+<ul>
+<li>Description of the modeling task</li>
+<li>Preprocessing</li>
+<li>Old World: Linear models</li>
+<li>New World: Neural networks
+<ul>
+<li>Feed Forward Neural Network</li>
+<li>Convolutional Neural Network</li>
+</ul></li>
+<li>Comparisons</li>
+</ul>
+</div>
+</div>
+<div id="tutorial-9" class="section level2" number="13.2">
+<h2><span class="header-section-number">13.2</span> Tutorial</h2>
+<div id="description-of-the-modelling-task" class="section level3" number="13.2.1">
+<h3><span class="header-section-number">13.2.1</span> Description of the modelling task</h3>
+<p>Ecosystem-atmosphere exchange fluxes of water vapour and CO2 are continuously measured at several hundred of sites, distributed across the globe. The oldest running sites have been recording data since over twenty years. Thanks to the international FLUXNET initiative, these time series data are made openly accessible from over hundred sites and provided in a standardized format and complemented with measurements of several meteorological variables, plus soil temperature and moisture, measured in parallel. These data provide an opportunity for understanding ecosystem fluxes and how they are affected by environmental covariates. The challenge is to build models that are sufficiently generalisable in space. That is, temporally resolved relationships learned from one subset of sites should be used effectively to predict time series, given environmental covariates, at new sites (spatial upscaling). This is a challenge as previous research has shown that relatively powerful site-specific models can be trained, but predictions to new sites have been found wanting. This may be due to site-specific characteristics (e.g. vegetation type) that have thus far not been satisfactorily encoded in models. In other words, factors that would typically be regarded as random factors in mixed effects modeling, continue to undermine effective learning in machine learning models.</p>
+</div>
+<div id="goal-of-the-tutorial" class="section level3" number="13.2.2">
+<h3><span class="header-section-number">13.2.2</span> Goal of the tutorial</h3>
+<p>Our aim is to build a model that can estimate the GPP - gross primary production of a given place, extending the range of measurements from around the towers to the entire Earth system.
+We will compare different approaches to find the function <span class="math inline">\(f\)</span> that best captures the relationship between the explanatory variables and the GPP - gross primary production (<span class="math inline">\(y_{GPP}\)</span>).</p>
+<p><span class="math display">\[\begin{equation}
+y_{GPP} = f(x_{features},...)
+\end{equation}\]</span></p>
+</div>
+<div id="dataset" class="section level3" number="13.2.3">
+<h3><span class="header-section-number">13.2.3</span> Dataset</h3>
+<p>As a first step of any modeling problem, we need to get and process the data to be used. Those steps have been detailed in Tutorial 4: <strong>Data scraping</strong>.</p>
+<div id="fluxnet-dataset" class="section level4" number="13.2.3.1">
+<h4><span class="header-section-number">13.2.3.1</span> FLUXNET dataset</h4>
+<p>We will once again be using the FLUXNET data set, that you have gotten familiar with in the previous tutorials. We want to try to predict the variable y = <a href="https://fluxnet.org/data/fluxnet2015-dataset/fullset-data-product/"><code>GPP_NT_VUT_REF</code></a>, which expresses the <strong>monthly</strong> gross primary production of the corresponding region.</p>
+<p>Here is the map showing the location of the 71 towers available in our dataset:</p>
+<center>
+<img src="figures/location_of_towers.png" style="width:70%;" class="center">
+<center>
+</div>
+<div id="explanatory-variables" class="section level4" number="13.2.3.2">
+<h4><span class="header-section-number">13.2.3.2</span> Explanatory variables</h4>
+<ul>
+<li>fpar_loess: fraction of absorbed photosynthetically active radiation, interpolated to monthly values using LOESS</li>
+<li>TA_F: Air temperature</li>
+<li>SW_IN_F: Shortwave incoming radiation</li>
+<li>LW_IN_F: Longwave incoming radiation</li>
+<li>VPD_F: Vapour pressure deficit (relates to the humidity of the air)</li>
+<li>PA_F: Atmospheric pressure</li>
+<li>P_F: Precipitation</li>
+<li>WS_F: Wind speed</li>
+<li>CO2_F_MDS: CO2 concentration</li>
+<li>NDVI (Landsat 7 product): The <a href="https://en.wikipedia.org/wiki/Normalized_difference_vegetation_index">Normalised Difference Vegetation Index</a> (NDVI) is a measure for live green foliage and is strongly related to the fraction of absorbed photosynthetically active radiation. In other words, it should scale (more or less linearly) with GPP. NDVI is easy to obtain at a fine spatial resolution, through satellite imagery. The spatial resolution of a pixel is 30m and the temporal resolution between 2 consecutive dates is 16 days.In this tutorial, we keep the maximum available date per month. More details about the product can be found <a href="https://www.usgs.gov/core-science-systems/nli/landsat/landsat-normalized-difference-vegetation-index?qt-science_support_page_related_con=0#qt-science_support_page_related_con">here</a>. For each area of interest (i.e tower location) and date, a square with side 6km is considered. The center of this square is the tower location. The extracted NDVI pixels are the area of the square. Therefore, in total for a specific (tower location, date) pair we have a square with a side of [6km / 30m(per pixel)] = 200 pixels and thus 200 x 200 = 40000 pixels per pair.</li>
+</ul>
+<p>Each Landsat product gives a tile with the desired information. From this tile a region around each tower is extracted. The following picture shows you an example of such a tile and the area around the CH Oerlikon tower.</p>
+<center>
+<h4>
+Extracted Region (black square) around the Tower of CH Oerlikon (red cross) for the given Landsat tile
+</h4>
+</center>
+<center>
+<img src="figures/extracted_region_CH_Oe2.jpg" style="width:45%;" class="center">
+</center>
+</div>
+</div>
+<div id="lets-dive-into-the-code" class="section level3" number="13.2.4">
+<h3><span class="header-section-number">13.2.4</span> Let’s dive into the code</h3>
+<p>First we need to load the libraries required for our modeling task. We’ll be using the Keras library for the neural networks.</p>
+<div class="sourceCode" id="cb944"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb944-1"><a href="ch-13.html#cb944-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb944-2"><a href="ch-13.html#cb944-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb944-3"><a href="ch-13.html#cb944-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb944-4"><a href="ch-13.html#cb944-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(imputeTS) <span class="co"># Library for Imputation</span></span>
+<span id="cb944-5"><a href="ch-13.html#cb944-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reticulate)</span>
+<span id="cb944-6"><a href="ch-13.html#cb944-6" aria-hidden="true" tabindex="-1"></a><span class="co"># use_condaenv(&#39;r-reticulate&#39;)</span></span>
+<span id="cb944-7"><a href="ch-13.html#cb944-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras) <span class="co"># Python library for deep learning</span></span>
+<span id="cb944-8"><a href="ch-13.html#cb944-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tensorflow) <span class="co"># Google API for Machine Learning</span></span></code></pre></div>
+</div>
+<div id="read-in-the-data" class="section level3" number="13.2.5">
+<h3><span class="header-section-number">13.2.5</span> Read in the Data</h3>
+<p>We have two data sources. The <strong>FLUXNET</strong> data set averaged on monthly valued which contains the target variable gpp as well as the following explanatory variables: fpar_loess, TA_F, SW_IN_F, LW_IN_F, VPD_F, PA_F, P_F, WS_F, CO2_F_MDS. Next, we have the Landsat 7 <strong>NDVI</strong> product on monthly NDVI values.</p>
+<div class="sourceCode" id="cb945"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb945-1"><a href="ch-13.html#cb945-1" aria-hidden="true" tabindex="-1"></a>path <span class="ot">=</span> <span class="st">&quot;./data/&quot;</span></span>
+<span id="cb945-2"><a href="ch-13.html#cb945-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb945-3"><a href="ch-13.html#cb945-3" aria-hidden="true" tabindex="-1"></a><span class="co"># read fluxnet data</span></span>
+<span id="cb945-4"><a href="ch-13.html#cb945-4" aria-hidden="true" tabindex="-1"></a>flux_data <span class="ot">=</span> <span class="fu">read.csv</span>(<span class="fu">file.path</span>(path, <span class="st">&quot;flux_dataset.csv&quot;</span>))</span>
+<span id="cb945-5"><a href="ch-13.html#cb945-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb945-6"><a href="ch-13.html#cb945-6" aria-hidden="true" tabindex="-1"></a><span class="co"># have a look</span></span>
+<span id="cb945-7"><a href="ch-13.html#cb945-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(flux_data)</span></code></pre></div>
+<pre><code>##   X sitename year month         y fpar_loess_per_month TA_F_per_month
+## 1 1   AR-Vir 2010     2 18.155930            0.7175273       27.90639
+## 2 2   AR-Vir 2010     3 16.566188            0.8062719       25.88332
+## 3 3   AR-Vir 2010     4 11.883871            0.8253712       21.08527
+## 4 4   AR-Vir 2010     5  7.550117            0.7912010       17.02619
+## 5 5   AR-Vir 2010     9 12.171233            0.6176354       19.77360
+## 6 6   AR-Vir 2010    10 12.463795            0.7283527       20.05271
+##   SW_IN_F_per_month LW_IN_F_per_month VPD_F_per_month PA_F_per_month
+## 1          230.0684          412.0384       13.867857       99.57232
+## 2          212.2040          391.1563       11.892645       99.74226
+## 3          168.1141          359.2931        9.315033      100.19970
+## 4          109.3910          349.3595        5.616355      100.30897
+## 5          176.7665          349.7738        6.618600      100.01453
+## 6          236.9492          348.2435        6.848935      100.02084
+##   P_F_per_month WS_F_per_month CO2_F_MDS_per_month
+## 1      4.796929       2.778643            424.0304
+## 2      6.909194       2.407871            430.5104
+## 3      4.921133       2.639733            420.3460
+## 4      3.307871       2.397226            432.3273
+## 5      5.868133       2.339433            426.6124
+## 6      3.709258       2.558194            417.1832</code></pre>
+<div class="sourceCode" id="cb947"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb947-1"><a href="ch-13.html#cb947-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read ndvi file path</span></span>
+<span id="cb947-2"><a href="ch-13.html#cb947-2" aria-hidden="true" tabindex="-1"></a>ndvi_files <span class="ot">=</span> <span class="fu">list.files</span>(<span class="fu">file.path</span>(path, <span class="st">&quot;ndvi/&quot;</span>), <span class="at">full.names =</span> T)</span>
+<span id="cb947-3"><a href="ch-13.html#cb947-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb947-4"><a href="ch-13.html#cb947-4" aria-hidden="true" tabindex="-1"></a><span class="co"># look one file</span></span>
+<span id="cb947-5"><a href="ch-13.html#cb947-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(ndvi_files[<span class="dv">1</span>])</span></code></pre></div>
+<pre><code>## ./data//ndvi//AR-Vir_2010-02-24_ndvi_pixel.rds</code></pre>
+<p>Let’s now look at some statistics of the data.</p>
+<div class="sourceCode" id="cb949"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb949-1"><a href="ch-13.html#cb949-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of samples</span></span>
+<span id="cb949-2"><a href="ch-13.html#cb949-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">&quot;The dataset contain&quot;</span>, <span class="fu">nrow</span>(flux_data), <span class="st">&quot;samples&quot;</span>, <span class="st">&quot;</span><span class="sc">\n</span><span class="st"> </span><span class="sc">\n</span><span class="st">&quot;</span>))</span></code></pre></div>
+<pre><code>## The dataset contain 5617 samples 
+## </code></pre>
+<div class="sourceCode" id="cb951"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb951-1"><a href="ch-13.html#cb951-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of distinct towers</span></span>
+<span id="cb951-2"><a href="ch-13.html#cb951-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">&quot;The dataset contain&quot;</span>, <span class="fu">length</span>(<span class="fu">unique</span>(flux_data<span class="sc">$</span>sitename)), <span class="st">&quot;different tower sites&quot;</span>,<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>))</span></code></pre></div>
+<pre><code>## The dataset contain 71 different tower sites</code></pre>
+<p>We start now the modeling part</p>
+</div>
+<div id="naive-models-old-world-linear-models" class="section level3" number="13.2.6">
+<h3><span class="header-section-number">13.2.6</span> Naive models (Old World): Linear Models</h3>
+<p>We first build a linear model, which assumes a linear relationship between label (output) and feature (input)
+<span class="math display">\[y=f(x)+ϵ\]</span>. That is, f is of the form <span class="math display">\[f(x)=β_1x+β_0\]</span> with <span class="math inline">\(β_0,β_1 \in R\)</span>. For this first model we will use only the NDVI value as our predictor. However, it seems reasonable to simply average the NDVI values per image, and use it as a predictor for the GPP. Later on we will extract more statistics.</p>
+<div class="sourceCode" id="cb953"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb953-1"><a href="ch-13.html#cb953-1" aria-hidden="true" tabindex="-1"></a>avg_values_ndvi <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb953-2"><a href="ch-13.html#cb953-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb953-3"><a href="ch-13.html#cb953-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ndvi_files)){</span>
+<span id="cb953-4"><a href="ch-13.html#cb953-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb953-5"><a href="ch-13.html#cb953-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># read ndvi file</span></span>
+<span id="cb953-6"><a href="ch-13.html#cb953-6" aria-hidden="true" tabindex="-1"></a>    ndvi <span class="ot">=</span> <span class="fu">readRDS</span>(ndvi_files[j])</span>
+<span id="cb953-7"><a href="ch-13.html#cb953-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb953-8"><a href="ch-13.html#cb953-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># keep only healthy pixels</span></span>
+<span id="cb953-9"><a href="ch-13.html#cb953-9" aria-hidden="true" tabindex="-1"></a>  ndvi <span class="ot">=</span> ndvi[ndvi <span class="sc">&lt;=</span> <span class="dv">10000</span>]</span>
+<span id="cb953-10"><a href="ch-13.html#cb953-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb953-11"><a href="ch-13.html#cb953-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># take average ndvi</span></span>
+<span id="cb953-12"><a href="ch-13.html#cb953-12" aria-hidden="true" tabindex="-1"></a>  avg_values_ndvi <span class="ot">=</span> <span class="fu">c</span>(avg_values_ndvi, <span class="fu">mean</span>(ndvi, <span class="at">na.rm =</span> T))</span>
+<span id="cb953-13"><a href="ch-13.html#cb953-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>The built-in function <em>lm</em> can be used to estimate <span class="math inline">\(f\)</span>.</p>
+<div class="sourceCode" id="cb954"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb954-1"><a href="ch-13.html#cb954-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create dataframe </span></span>
+<span id="cb954-2"><a href="ch-13.html#cb954-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb954-3"><a href="ch-13.html#cb954-3" aria-hidden="true" tabindex="-1"></a>df_data <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">y =</span> flux_data<span class="sc">$</span>y, <span class="at">avg_ndvi =</span> avg_values_ndvi)</span>
+<span id="cb954-4"><a href="ch-13.html#cb954-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb954-5"><a href="ch-13.html#cb954-5" aria-hidden="true" tabindex="-1"></a><span class="co"># drop null values</span></span>
+<span id="cb954-6"><a href="ch-13.html#cb954-6" aria-hidden="true" tabindex="-1"></a>df_data <span class="ot">=</span> <span class="fu">na.omit</span>(df_data)</span>
+<span id="cb954-7"><a href="ch-13.html#cb954-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb954-8"><a href="ch-13.html#cb954-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_data)</span></code></pre></div>
+<pre><code>##           y avg_ndvi
+## 1 18.155930 1060.115
+## 2 16.566188 7133.001
+## 3 11.883871 7486.476
+## 4  7.550117 7195.569
+## 5 12.171233 5060.266
+## 6 12.463795 5682.808</code></pre>
+<div class="sourceCode" id="cb956"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb956-1"><a href="ch-13.html#cb956-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the model</span></span>
+<span id="cb956-2"><a href="ch-13.html#cb956-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb956-3"><a href="ch-13.html#cb956-3" aria-hidden="true" tabindex="-1"></a>model_ndvi <span class="ot">=</span> <span class="fu">lm</span>(y <span class="sc">~</span> avg_ndvi, <span class="at">data =</span> df_data)</span>
+<span id="cb956-4"><a href="ch-13.html#cb956-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb956-5"><a href="ch-13.html#cb956-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_ndvi)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ avg_ndvi, data = df_data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.8873 -2.1929 -0.7164  1.7530 16.0698 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1.183e+00  7.238e-02   16.34   &lt;2e-16 ***
+## avg_ndvi    8.523e-04  1.758e-05   48.47   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.077 on 5330 degrees of freedom
+## Multiple R-squared:  0.3059, Adjusted R-squared:  0.3058 
+## F-statistic:  2349 on 1 and 5330 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Although the <span class="math inline">\(R^2 = 0.31\)</span> is low, the NDVI predictor can be considered significant (<span class="math inline">\(p_{value} &lt; 0.05\)</span>) for the prediction of GPP.</p>
+<p>Let’s also create a plot of the linear model</p>
+<div class="sourceCode" id="cb958"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb958-1"><a href="ch-13.html#cb958-1" aria-hidden="true" tabindex="-1"></a>df_data <span class="sc">%&gt;%</span></span>
+<span id="cb958-2"><a href="ch-13.html#cb958-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> avg_ndvi, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb958-3"><a href="ch-13.html#cb958-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb958-4"><a href="ch-13.html#cb958-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">se =</span> F) <span class="sc">+</span></span>
+<span id="cb958-5"><a href="ch-13.html#cb958-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_gray</span>(<span class="at">base_size =</span> <span class="dv">20</span>) <span class="sc">+</span> </span>
+<span id="cb958-6"><a href="ch-13.html#cb958-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&#39;Average NDVI&#39;</span>, <span class="at">y =</span> <span class="st">&quot;gpp&quot;</span> )</span></code></pre></div>
+<p><img src="esds_book_files/figure-html/unnamed-chunk-502-1.png" width="50%" style="display: block; margin: auto;" /></p>
+<p>Next, we fit again a linear model but at this time we incorporate all the available predictors of fluxnet data set along with the extracted average NDVI values.</p>
+<div class="sourceCode" id="cb959"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb959-1"><a href="ch-13.html#cb959-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(flux_data)</span></code></pre></div>
+<pre><code>##  [1] &quot;X&quot;                    &quot;sitename&quot;             &quot;year&quot;                
+##  [4] &quot;month&quot;                &quot;y&quot;                    &quot;fpar_loess_per_month&quot;
+##  [7] &quot;TA_F_per_month&quot;       &quot;SW_IN_F_per_month&quot;    &quot;LW_IN_F_per_month&quot;   
+## [10] &quot;VPD_F_per_month&quot;      &quot;PA_F_per_month&quot;       &quot;P_F_per_month&quot;       
+## [13] &quot;WS_F_per_month&quot;       &quot;CO2_F_MDS_per_month&quot;</code></pre>
+<div class="sourceCode" id="cb961"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb961-1"><a href="ch-13.html#cb961-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create dataframe </span></span>
+<span id="cb961-2"><a href="ch-13.html#cb961-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb961-3"><a href="ch-13.html#cb961-3" aria-hidden="true" tabindex="-1"></a>df_data_all <span class="ot">=</span> <span class="fu">data.frame</span>(flux_data[,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>)], <span class="at">avg_ndvi =</span> avg_values_ndvi)</span>
+<span id="cb961-4"><a href="ch-13.html#cb961-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_data_all)</span></code></pre></div>
+<pre><code>##   sitename         y fpar_loess_per_month TA_F_per_month SW_IN_F_per_month
+## 1   AR-Vir 18.155930            0.7175273       27.90639          230.0684
+## 2   AR-Vir 16.566188            0.8062719       25.88332          212.2040
+## 3   AR-Vir 11.883871            0.8253712       21.08527          168.1141
+## 4   AR-Vir  7.550117            0.7912010       17.02619          109.3910
+## 5   AR-Vir 12.171233            0.6176354       19.77360          176.7665
+## 6   AR-Vir 12.463795            0.7283527       20.05271          236.9492
+##   LW_IN_F_per_month VPD_F_per_month PA_F_per_month P_F_per_month WS_F_per_month
+## 1          412.0384       13.867857       99.57232      4.796929       2.778643
+## 2          391.1563       11.892645       99.74226      6.909194       2.407871
+## 3          359.2931        9.315033      100.19970      4.921133       2.639733
+## 4          349.3595        5.616355      100.30897      3.307871       2.397226
+## 5          349.7738        6.618600      100.01453      5.868133       2.339433
+## 6          348.2435        6.848935      100.02084      3.709258       2.558194
+##   CO2_F_MDS_per_month avg_ndvi
+## 1            424.0304 1060.115
+## 2            430.5104 7133.001
+## 3            420.3460 7486.476
+## 4            432.3273 7195.569
+## 5            426.6124 5060.266
+## 6            417.1832 5682.808</code></pre>
+<div class="sourceCode" id="cb963"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb963-1"><a href="ch-13.html#cb963-1" aria-hidden="true" tabindex="-1"></a><span class="co"># drop null values</span></span>
+<span id="cb963-2"><a href="ch-13.html#cb963-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb963-3"><a href="ch-13.html#cb963-3" aria-hidden="true" tabindex="-1"></a>df_data_all <span class="ot">=</span> <span class="fu">na.omit</span>(df_data_all)</span>
+<span id="cb963-4"><a href="ch-13.html#cb963-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb963-5"><a href="ch-13.html#cb963-5" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the model</span></span>
+<span id="cb963-6"><a href="ch-13.html#cb963-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb963-7"><a href="ch-13.html#cb963-7" aria-hidden="true" tabindex="-1"></a>model_all <span class="ot">=</span> <span class="fu">lm</span>(y <span class="sc">~</span> </span>
+<span id="cb963-8"><a href="ch-13.html#cb963-8" aria-hidden="true" tabindex="-1"></a>                 fpar_loess_per_month <span class="sc">+</span> </span>
+<span id="cb963-9"><a href="ch-13.html#cb963-9" aria-hidden="true" tabindex="-1"></a>                 TA_F_per_month  <span class="sc">+</span> </span>
+<span id="cb963-10"><a href="ch-13.html#cb963-10" aria-hidden="true" tabindex="-1"></a>                 SW_IN_F_per_month <span class="sc">+</span> </span>
+<span id="cb963-11"><a href="ch-13.html#cb963-11" aria-hidden="true" tabindex="-1"></a>                 LW_IN_F_per_month <span class="sc">+</span> </span>
+<span id="cb963-12"><a href="ch-13.html#cb963-12" aria-hidden="true" tabindex="-1"></a>                 VPD_F_per_month <span class="sc">+</span>     </span>
+<span id="cb963-13"><a href="ch-13.html#cb963-13" aria-hidden="true" tabindex="-1"></a>                 PA_F_per_month  <span class="sc">+</span> </span>
+<span id="cb963-14"><a href="ch-13.html#cb963-14" aria-hidden="true" tabindex="-1"></a>                 P_F_per_month <span class="sc">+</span>   </span>
+<span id="cb963-15"><a href="ch-13.html#cb963-15" aria-hidden="true" tabindex="-1"></a>                 WS_F_per_month  <span class="sc">+</span>     </span>
+<span id="cb963-16"><a href="ch-13.html#cb963-16" aria-hidden="true" tabindex="-1"></a>                 CO2_F_MDS_per_month <span class="sc">+</span></span>
+<span id="cb963-17"><a href="ch-13.html#cb963-17" aria-hidden="true" tabindex="-1"></a>                 avg_ndvi, </span>
+<span id="cb963-18"><a href="ch-13.html#cb963-18" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> df_data_all)</span>
+<span id="cb963-19"><a href="ch-13.html#cb963-19" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_all)</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ fpar_loess_per_month + TA_F_per_month + SW_IN_F_per_month + 
+##     LW_IN_F_per_month + VPD_F_per_month + PA_F_per_month + P_F_per_month + 
+##     WS_F_per_month + CO2_F_MDS_per_month + avg_ndvi, data = df_data_all)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.3155 -1.1650 -0.1044  0.9828 10.8688 
+## 
+## Coefficients:
+##                        Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)          -7.103e+00  8.849e-01  -8.027 1.26e-15 ***
+## fpar_loess_per_month  8.820e+00  2.155e-01  40.923  &lt; 2e-16 ***
+## TA_F_per_month       -2.676e-04  1.207e-02  -0.022 0.982313    
+## SW_IN_F_per_month     2.084e-02  6.371e-04  32.700  &lt; 2e-16 ***
+## LW_IN_F_per_month     2.282e-02  1.648e-03  13.845  &lt; 2e-16 ***
+## VPD_F_per_month      -2.460e-01  1.103e-02 -22.302  &lt; 2e-16 ***
+## PA_F_per_month       -3.698e-02  5.178e-03  -7.141 1.07e-12 ***
+## P_F_per_month         5.612e-02  1.490e-02   3.765 0.000168 ***
+## WS_F_per_month        7.624e-02  3.123e-02   2.441 0.014692 *  
+## CO2_F_MDS_per_month   8.748e-04  1.732e-03   0.505 0.613560    
+## avg_ndvi              1.066e-04  1.544e-05   6.902 5.81e-12 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.917 on 4566 degrees of freedom
+## Multiple R-squared:  0.7322, Adjusted R-squared:  0.7316 
+## F-statistic:  1248 on 10 and 4566 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>As you can see now, by using all the available predictors we have a magnificent improvement of the <span class="math inline">\(R^2 = 0.73\)</span></p>
+<p>We may also perform a cross validation approach for the mse of our model. Our goal is to generalize to unseen tower sites. Therefore the test fold of the cv should be unseen tower sites. Here, we choose to leave one tower site out (similar to LooCV apporach) for the test fold</p>
+<div class="sourceCode" id="cb965"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb965-1"><a href="ch-13.html#cb965-1" aria-hidden="true" tabindex="-1"></a>n_tower_test <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb965-2"><a href="ch-13.html#cb965-2" aria-hidden="true" tabindex="-1"></a>unique_towers <span class="ot">=</span> <span class="fu">unique</span>(df_data_all<span class="sc">$</span>sitename)</span>
+<span id="cb965-3"><a href="ch-13.html#cb965-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb965-4"><a href="ch-13.html#cb965-4" aria-hidden="true" tabindex="-1"></a>n_breaks <span class="ot">=</span> <span class="fu">as.integer</span>(<span class="fu">length</span>(unique_towers)<span class="sc">/</span>n_tower_test)</span>
+<span id="cb965-5"><a href="ch-13.html#cb965-5" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">=</span> <span class="fu">cut</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(unique_towers), <span class="at">breaks =</span> n_breaks,<span class="at">labels =</span> F)</span>
+<span id="cb965-6"><a href="ch-13.html#cb965-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-7"><a href="ch-13.html#cb965-7" aria-hidden="true" tabindex="-1"></a>mse_per_fold <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb965-8"><a href="ch-13.html#cb965-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-9"><a href="ch-13.html#cb965-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_breaks){</span>
+<span id="cb965-10"><a href="ch-13.html#cb965-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-11"><a href="ch-13.html#cb965-11" aria-hidden="true" tabindex="-1"></a>  train_towers <span class="ot">=</span> <span class="fu">unique</span>(df_data_all<span class="sc">$</span>sitename)[folds<span class="sc">!=</span>i]</span>
+<span id="cb965-12"><a href="ch-13.html#cb965-12" aria-hidden="true" tabindex="-1"></a>  test_towers <span class="ot">=</span> <span class="fu">unique</span>(df_data_all<span class="sc">$</span>sitename)[folds<span class="sc">==</span>i]</span>
+<span id="cb965-13"><a href="ch-13.html#cb965-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-14"><a href="ch-13.html#cb965-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-15"><a href="ch-13.html#cb965-15" aria-hidden="true" tabindex="-1"></a>  train_ind <span class="ot">=</span> df_data_all<span class="sc">$</span>sitename <span class="sc">%in%</span> train_towers</span>
+<span id="cb965-16"><a href="ch-13.html#cb965-16" aria-hidden="true" tabindex="-1"></a>  test_ind <span class="ot">=</span> <span class="sc">!</span>train_ind</span>
+<span id="cb965-17"><a href="ch-13.html#cb965-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-18"><a href="ch-13.html#cb965-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-19"><a href="ch-13.html#cb965-19" aria-hidden="true" tabindex="-1"></a>  x_train <span class="ot">=</span> df_data_all[train_ind,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)]</span>
+<span id="cb965-20"><a href="ch-13.html#cb965-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb965-21"><a href="ch-13.html#cb965-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-22"><a href="ch-13.html#cb965-22" aria-hidden="true" tabindex="-1"></a>  x_test  <span class="ot">=</span> df_data_all[test_ind,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)]</span>
+<span id="cb965-23"><a href="ch-13.html#cb965-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-24"><a href="ch-13.html#cb965-24" aria-hidden="true" tabindex="-1"></a>  y_train <span class="ot">=</span> df_data_all<span class="sc">$</span>y[train_ind]</span>
+<span id="cb965-25"><a href="ch-13.html#cb965-25" aria-hidden="true" tabindex="-1"></a>  y_test <span class="ot">=</span> df_data_all<span class="sc">$</span>y[test_ind]</span>
+<span id="cb965-26"><a href="ch-13.html#cb965-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-27"><a href="ch-13.html#cb965-27" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">y_train =</span> y_train,x_train)</span>
+<span id="cb965-28"><a href="ch-13.html#cb965-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-29"><a href="ch-13.html#cb965-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(df)</span>
+<span id="cb965-30"><a href="ch-13.html#cb965-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-31"><a href="ch-13.html#cb965-31" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">=</span> <span class="fu">lm</span>(y_train <span class="sc">~</span> . ,<span class="at">data =</span> df)</span>
+<span id="cb965-32"><a href="ch-13.html#cb965-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-33"><a href="ch-13.html#cb965-33" aria-hidden="true" tabindex="-1"></a>  pred <span class="ot">=</span> <span class="fu">predict</span>(fit, x_test)</span>
+<span id="cb965-34"><a href="ch-13.html#cb965-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-35"><a href="ch-13.html#cb965-35" aria-hidden="true" tabindex="-1"></a>  mse <span class="ot">=</span> <span class="fu">mean</span>((pred<span class="sc">-</span>y_test)<span class="sc">^</span><span class="dv">2</span>,<span class="at">na.rm=</span>T)</span>
+<span id="cb965-36"><a href="ch-13.html#cb965-36" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-37"><a href="ch-13.html#cb965-37" aria-hidden="true" tabindex="-1"></a>  mse_per_fold <span class="ot">=</span> <span class="fu">c</span>(mse_per_fold,mse)</span>
+<span id="cb965-38"><a href="ch-13.html#cb965-38" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-39"><a href="ch-13.html#cb965-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste</span>(test_towers, <span class="st">&#39;mse:&#39;</span>, mse,<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>))</span>
+<span id="cb965-40"><a href="ch-13.html#cb965-40" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb965-41"><a href="ch-13.html#cb965-41" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## AR-Vir mse: 25.5165721158572 
+## AU-Ade mse: 0.996198031367656 
+## AU-ASM mse: 1.47301824854867 
+## AU-DaP mse: 4.37935258968633 
+## AU-DaS mse: 1.59165837894441 
+## AU-Dry mse: 1.61280472268077 
+## AU-Fog mse: 9.3672008641652 
+## AU-Gin mse: 1.02531653623349 
+## AU-How mse: 2.16895221336887 
+## AU-Stp mse: 1.7753231861928 
+## AU-Whr mse: 0.2204273751078 
+## AU-Wom mse: 1.83977950254792 
+## BE-Bra mse: 1.91301758761868 
+## BE-Vie mse: 2.89262264258649 
+## CH-Fru mse: 3.11655794961346 
+## CH-Lae mse: 2.30191269258554 
+## CH-Oe1 mse: 5.27251470602645 
+## CN-Cng mse: 4.86463105435891 
+## CZ-wet mse: 4.54993627632313 
+## DE-Akm mse: 7.72342722209925 
+## DE-Geb mse: 10.5842119696382 
+## DE-Gri mse: 3.84948495477265 
+## DE-Hai mse: 6.38586262324752 
+## DE-Kli mse: 9.67131843905939 
+## DE-Obe mse: 5.9036191598398 
+## DE-RuR mse: 2.87756815212698 
+## DE-Spw mse: 4.23880705859011 
+## DE-Tha mse: 5.29920782081775 
+## DK-NuF mse: 4.16811410507384 
+## DK-Sor mse: 20.1741981838768 
+## FI-Hyy mse: 2.33538347040779 
+## FI-Sod mse: 1.62960603843157 
+## FR-Fon mse: 7.42811535539279 
+## FR-LBr mse: 1.50301196281801 
+## FR-Pue mse: 5.13653390418094 
+## IT-Col mse: 3.0317868888794 
+## IT-Cp2 mse: 2.65216532171752 
+## IT-Cpz mse: 3.17238775179885 
+## IT-Isp mse: 10.3873664088935 
+## IT-Lav mse: 3.010691028071 
+## IT-MBo mse: 2.8785260822475 
+## IT-Noe mse: 7.35344799088317 
+## IT-PT1 mse: 7.87607679174638 
+## IT-Ren mse: 1.23982585828515 
+## IT-Ro1 mse: 5.29258867461421 
+## IT-SR2 mse: 1.65807484316668 
+## IT-SRo mse: 2.15785071766904 
+## IT-Tor mse: 2.37668631080789 
+## JP-SMF mse: 2.27771030753627 
+## NL-Hor mse: 2.79257242006782 
+## NL-Loo mse: 1.81894119626356 
+## RU-Fyo mse: 3.46941802687701 
+## SD-Dem mse: 14.8223454673033 
+## US-GLE mse: 2.89794145838108 
+## US-Ha1 mse: 4.41953069773198 
+## US-Los mse: 6.60932420721002 
+## US-Me2 mse: 2.61506241914978 
+## US-MMS mse: 3.64287833864999 
+## US-PFa mse: 5.22700946992549 
+## US-SRG mse: 0.723577410407293 
+## US-SRM mse: 0.512748570189335 
+## US-Syv mse: 3.21731260411245 
+## US-Ton mse: 0.824709832111569 
+## US-UMB mse: 1.87149312696677 
+## US-UMd mse: 2.05593059595968 
+## US-Var mse: 5.90022888855451 
+## US-WCr mse: 3.78983794424176 
+## US-Wi4 mse: 2.31229320696217 
+## ZM-Mon mse: 0.58085100015533</code></pre>
+<div class="sourceCode" id="cb967"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb967-1"><a href="ch-13.html#cb967-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>, <span class="st">&quot;CV MSE:&quot;</span>, <span class="fu">mean</span>(mse_per_fold)))    </span></code></pre></div>
+<pre><code>## 
+##  CV MSE: 4.36602114422789</code></pre>
+</div>
+<div id="neural-networks-new-world" class="section level3" number="13.2.7">
+<h3><span class="header-section-number">13.2.7</span> Neural Networks (New World)</h3>
+<div id="feed-forward-neural-network" class="section level4" number="13.2.7.1">
+<h4><span class="header-section-number">13.2.7.1</span> Feed Forward Neural Network</h4>
+<p>Instead of a Linear model, let’s see what happens when we approximate <span class="math inline">\(f\)</span> using a Feed Forward Neural Network with two hidden layers. We use again all the available predictors as well as the ndvi features (we also extract more statistics such maximum, minimum and standard deviation).</p>
+<div class="sourceCode" id="cb969"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb969-1"><a href="ch-13.html#cb969-1" aria-hidden="true" tabindex="-1"></a>avg_values_ndvi <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb969-2"><a href="ch-13.html#cb969-2" aria-hidden="true" tabindex="-1"></a>max_values_ndvi <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb969-3"><a href="ch-13.html#cb969-3" aria-hidden="true" tabindex="-1"></a>min_values_ndvi <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb969-4"><a href="ch-13.html#cb969-4" aria-hidden="true" tabindex="-1"></a>std_values_ndvi <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb969-5"><a href="ch-13.html#cb969-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb969-6"><a href="ch-13.html#cb969-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(ndvi_files)){</span>
+<span id="cb969-7"><a href="ch-13.html#cb969-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb969-8"><a href="ch-13.html#cb969-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># read ndvi file</span></span>
+<span id="cb969-9"><a href="ch-13.html#cb969-9" aria-hidden="true" tabindex="-1"></a>  ndvi <span class="ot">=</span> <span class="fu">readRDS</span>(ndvi_files[j])</span>
+<span id="cb969-10"><a href="ch-13.html#cb969-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb969-11"><a href="ch-13.html#cb969-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># keep only healthy pixels</span></span>
+<span id="cb969-12"><a href="ch-13.html#cb969-12" aria-hidden="true" tabindex="-1"></a>  ndvi <span class="ot">=</span> ndvi[ndvi <span class="sc">&lt;=</span> <span class="dv">10000</span>]</span>
+<span id="cb969-13"><a href="ch-13.html#cb969-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb969-14"><a href="ch-13.html#cb969-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># take average ndvi</span></span>
+<span id="cb969-15"><a href="ch-13.html#cb969-15" aria-hidden="true" tabindex="-1"></a>  avg_values_ndvi <span class="ot">=</span> <span class="fu">c</span>(avg_values_ndvi, <span class="fu">mean</span>(ndvi,<span class="at">na.rm =</span> T))</span>
+<span id="cb969-16"><a href="ch-13.html#cb969-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># take max ndvi</span></span>
+<span id="cb969-17"><a href="ch-13.html#cb969-17" aria-hidden="true" tabindex="-1"></a>  max_values_ndvi <span class="ot">=</span> <span class="fu">c</span>(max_values_ndvi, <span class="fu">max</span>(ndvi,<span class="at">na.rm =</span> T))</span>
+<span id="cb969-18"><a href="ch-13.html#cb969-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># take min ndvi</span></span>
+<span id="cb969-19"><a href="ch-13.html#cb969-19" aria-hidden="true" tabindex="-1"></a>  min_values_ndvi <span class="ot">=</span> <span class="fu">c</span>(min_values_ndvi, <span class="fu">min</span>(ndvi,<span class="at">na.rm =</span> T))</span>
+<span id="cb969-20"><a href="ch-13.html#cb969-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># take std ndvi</span></span>
+<span id="cb969-21"><a href="ch-13.html#cb969-21" aria-hidden="true" tabindex="-1"></a>  std_values_ndvi <span class="ot">=</span> <span class="fu">c</span>(std_values_ndvi, <span class="fu">sd</span>(ndvi,<span class="at">na.rm =</span> T))</span>
+<span id="cb969-22"><a href="ch-13.html#cb969-22" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb970"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb970-1"><a href="ch-13.html#cb970-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create dataframe </span></span>
+<span id="cb970-2"><a href="ch-13.html#cb970-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb970-3"><a href="ch-13.html#cb970-3" aria-hidden="true" tabindex="-1"></a>df_data_all_nn <span class="ot">=</span> <span class="fu">data.frame</span>(flux_data[,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>)],</span>
+<span id="cb970-4"><a href="ch-13.html#cb970-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">avg_ndvi =</span> avg_values_ndvi,</span>
+<span id="cb970-5"><a href="ch-13.html#cb970-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">max_ndvi =</span> max_values_ndvi,</span>
+<span id="cb970-6"><a href="ch-13.html#cb970-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">min_ndvi =</span> min_values_ndvi,</span>
+<span id="cb970-7"><a href="ch-13.html#cb970-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">std_ndvi =</span> std_values_ndvi)</span>
+<span id="cb970-8"><a href="ch-13.html#cb970-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_data_all_nn)</span></code></pre></div>
+<pre><code>##   sitename         y fpar_loess_per_month TA_F_per_month SW_IN_F_per_month
+## 1   AR-Vir 18.155930            0.7175273       27.90639          230.0684
+## 2   AR-Vir 16.566188            0.8062719       25.88332          212.2040
+## 3   AR-Vir 11.883871            0.8253712       21.08527          168.1141
+## 4   AR-Vir  7.550117            0.7912010       17.02619          109.3910
+## 5   AR-Vir 12.171233            0.6176354       19.77360          176.7665
+## 6   AR-Vir 12.463795            0.7283527       20.05271          236.9492
+##   LW_IN_F_per_month VPD_F_per_month PA_F_per_month P_F_per_month WS_F_per_month
+## 1          412.0384       13.867857       99.57232      4.796929       2.778643
+## 2          391.1563       11.892645       99.74226      6.909194       2.407871
+## 3          359.2931        9.315033      100.19970      4.921133       2.639733
+## 4          349.3595        5.616355      100.30897      3.307871       2.397226
+## 5          349.7738        6.618600      100.01453      5.868133       2.339433
+## 6          348.2435        6.848935      100.02084      3.709258       2.558194
+##   CO2_F_MDS_per_month avg_ndvi max_ndvi min_ndvi  std_ndvi
+## 1            424.0304 1060.115     4302     -256  367.8867
+## 2            430.5104 7133.001    10000    -2028  520.4147
+## 3            420.3460 7486.476     9483    -3780 1197.5095
+## 4            432.3273 7195.569    10000    -3990 1363.8775
+## 5            426.6124 5060.266     6845     -282  866.6186
+## 6            417.1832 5682.808     8490    -1336 1345.6937</code></pre>
+<div class="sourceCode" id="cb972"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb972-1"><a href="ch-13.html#cb972-1" aria-hidden="true" tabindex="-1"></a><span class="co"># drop null values</span></span>
+<span id="cb972-2"><a href="ch-13.html#cb972-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb972-3"><a href="ch-13.html#cb972-3" aria-hidden="true" tabindex="-1"></a>df_data_all_nn <span class="ot">=</span> <span class="fu">na.omit</span>(df_data_all_nn)</span>
+<span id="cb972-4"><a href="ch-13.html#cb972-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb972-5"><a href="ch-13.html#cb972-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> df_data_all_nn<span class="sc">$</span>y</span>
+<span id="cb972-6"><a href="ch-13.html#cb972-6" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> df_data_all_nn[,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)]</span></code></pre></div>
+<p>The first step and key step as always is preprocessing!</p>
+<div class="sourceCode" id="cb973"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb973-1"><a href="ch-13.html#cb973-1" aria-hidden="true" tabindex="-1"></a><span class="co"># normalize</span></span>
+<span id="cb973-2"><a href="ch-13.html#cb973-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb973-3"><a href="ch-13.html#cb973-3" aria-hidden="true" tabindex="-1"></a>x_scaled <span class="ot">=</span> <span class="fu">scale</span>(x)</span>
+<span id="cb973-4"><a href="ch-13.html#cb973-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x_scaled)</span></code></pre></div>
+<pre><code>##   fpar_loess_per_month TA_F_per_month SW_IN_F_per_month LW_IN_F_per_month
+## 1             1.103840      1.6416076        0.66121806         2.0251698
+## 2             1.546659      1.4284386        0.44404475         1.5772096
+## 3             1.641961      0.9228722       -0.09194708         0.8936821
+## 4             1.471458      0.4951717       -0.80583171         0.6805892
+## 5             0.605397      0.7846632        0.01323877         0.6894764
+## 6             1.157856      0.8140727        0.74486658         0.6566475
+##   VPD_F_per_month PA_F_per_month P_F_per_month WS_F_per_month
+## 1     1.130090936      0.6155796     1.0972644     0.27527617
+## 2     0.820142810      0.6403129     2.0123121    -0.10299988
+## 3     0.415666754      0.7068910     1.1510708     0.13355522
+## 4    -0.164725871      0.7227943     0.4521944    -0.11386049
+## 5    -0.007454645      0.6799410     1.5613176    -0.17282264
+## 6     0.028689349      0.6808587     0.6260781     0.05036513
+##   CO2_F_MDS_per_month   avg_ndvi   max_ndvi   min_ndvi    std_ndvi
+## 1            2.030934 -0.9914477 -0.7223423  0.1833766 -0.87171195
+## 2            2.405037  1.5677285  1.1334298 -0.5466108 -0.71461192
+## 3            1.818223  1.7166866  0.9650489 -1.2683591 -0.01722132
+## 4            2.509927  1.5940955  1.1334298 -1.3548700  0.15413353
+## 5            2.179998  0.6942571  0.1058831  0.1726657 -0.35803060
+## 6            1.635632  0.9566023  0.6416404 -0.2615367  0.13540472</code></pre>
+<p>Then we define the model (our function f), as follows with:</p>
+<ul>
+<li>an input layer, with dimensions the number of features x</li>
+<li>a hidden layer, with relu activation, with a size of 10</li>
+<li>a hidden layer, with relu activation, with a size of 5</li>
+<li>an ouput layer, of size 1 with linear activation</li>
+</ul>
+<div class="sourceCode" id="cb975"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb975-1"><a href="ch-13.html#cb975-1" aria-hidden="true" tabindex="-1"></a><span class="co">#FFNN</span></span>
+<span id="cb975-2"><a href="ch-13.html#cb975-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">keras_model_sequential</span>()</span>
+<span id="cb975-3"><a href="ch-13.html#cb975-3" aria-hidden="true" tabindex="-1"></a>model <span class="sc">%&gt;%</span> </span>
+<span id="cb975-4"><a href="ch-13.html#cb975-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">10</span>, <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>, <span class="at">input_shape =</span> <span class="fu">ncol</span>(x)) <span class="sc">%&gt;%</span></span>
+<span id="cb975-5"><a href="ch-13.html#cb975-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb975-6"><a href="ch-13.html#cb975-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units=</span><span class="dv">1</span>)</span></code></pre></div>
+<p>We can also have a look at the number of trainable parameters of the model.</p>
+<div class="sourceCode" id="cb976"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb976-1"><a href="ch-13.html#cb976-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div>
+<div class="sourceCode" id="cb977"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb977-1"><a href="ch-13.html#cb977-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Model: &quot;sequential&quot;</span></span>
+<span id="cb977-2"><a href="ch-13.html#cb977-2" aria-hidden="true" tabindex="-1"></a><span class="do">## __________________________________________________________________________</span></span>
+<span id="cb977-3"><a href="ch-13.html#cb977-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Layer (type)                     Output Shape                 Param #     </span></span>
+<span id="cb977-4"><a href="ch-13.html#cb977-4" aria-hidden="true" tabindex="-1"></a><span class="do">## ==========================================================================</span></span>
+<span id="cb977-5"><a href="ch-13.html#cb977-5" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_2 (Dense)                  (None, 10)                   140         </span></span>
+<span id="cb977-6"><a href="ch-13.html#cb977-6" aria-hidden="true" tabindex="-1"></a><span class="do">## __________________________________________________________________________</span></span>
+<span id="cb977-7"><a href="ch-13.html#cb977-7" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_1 (Dense)                  (None, 5)                    55          </span></span>
+<span id="cb977-8"><a href="ch-13.html#cb977-8" aria-hidden="true" tabindex="-1"></a><span class="do">## __________________________________________________________________________</span></span>
+<span id="cb977-9"><a href="ch-13.html#cb977-9" aria-hidden="true" tabindex="-1"></a><span class="do">## dense (Dense)                    (None, 1)                    6           </span></span>
+<span id="cb977-10"><a href="ch-13.html#cb977-10" aria-hidden="true" tabindex="-1"></a><span class="do">## ==========================================================================</span></span>
+<span id="cb977-11"><a href="ch-13.html#cb977-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Total params: 201</span></span>
+<span id="cb977-12"><a href="ch-13.html#cb977-12" aria-hidden="true" tabindex="-1"></a><span class="do">## Trainable params: 201</span></span>
+<span id="cb977-13"><a href="ch-13.html#cb977-13" aria-hidden="true" tabindex="-1"></a><span class="do">## Non-trainable params: 0</span></span>
+<span id="cb977-14"><a href="ch-13.html#cb977-14" aria-hidden="true" tabindex="-1"></a><span class="do">## __________________________________________________________________________</span></span></code></pre></div>
+<p>In this setting we make a CV approach while keeping 10 tower sites for the test fold (in order to save time).</p>
+<div class="sourceCode" id="cb978"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb978-1"><a href="ch-13.html#cb978-1" aria-hidden="true" tabindex="-1"></a>n_tower_test <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb978-2"><a href="ch-13.html#cb978-2" aria-hidden="true" tabindex="-1"></a>unique_towers <span class="ot">=</span> <span class="fu">unique</span>(df_data_all_nn<span class="sc">$</span>sitename)</span>
+<span id="cb978-3"><a href="ch-13.html#cb978-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb978-4"><a href="ch-13.html#cb978-4" aria-hidden="true" tabindex="-1"></a>n_breaks <span class="ot">=</span> <span class="fu">as.integer</span>(<span class="fu">length</span>(unique_towers)<span class="sc">/</span>n_tower_test)</span>
+<span id="cb978-5"><a href="ch-13.html#cb978-5" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">=</span> <span class="fu">cut</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(unique_towers), <span class="at">breaks =</span> n_breaks,<span class="at">labels =</span> F)</span>
+<span id="cb978-6"><a href="ch-13.html#cb978-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-7"><a href="ch-13.html#cb978-7" aria-hidden="true" tabindex="-1"></a>mse_per_fold_nn <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb978-8"><a href="ch-13.html#cb978-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-9"><a href="ch-13.html#cb978-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_breaks){</span>
+<span id="cb978-10"><a href="ch-13.html#cb978-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-11"><a href="ch-13.html#cb978-11" aria-hidden="true" tabindex="-1"></a>  train_towers <span class="ot">=</span> <span class="fu">unique</span>(df_data_all_nn<span class="sc">$</span>sitename)[folds<span class="sc">!=</span>i]</span>
+<span id="cb978-12"><a href="ch-13.html#cb978-12" aria-hidden="true" tabindex="-1"></a>  test_towers <span class="ot">=</span> <span class="fu">unique</span>(df_data_all_nn<span class="sc">$</span>sitename)[folds<span class="sc">==</span>i]</span>
+<span id="cb978-13"><a href="ch-13.html#cb978-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-14"><a href="ch-13.html#cb978-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-15"><a href="ch-13.html#cb978-15" aria-hidden="true" tabindex="-1"></a>  train_ind <span class="ot">=</span> df_data_all_nn<span class="sc">$</span>sitename <span class="sc">%in%</span> train_towers</span>
+<span id="cb978-16"><a href="ch-13.html#cb978-16" aria-hidden="true" tabindex="-1"></a>  test_ind <span class="ot">=</span> <span class="sc">!</span>train_ind</span>
+<span id="cb978-17"><a href="ch-13.html#cb978-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-18"><a href="ch-13.html#cb978-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-19"><a href="ch-13.html#cb978-19" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">=</span> <span class="fu">keras_model_sequential</span>()</span>
+<span id="cb978-20"><a href="ch-13.html#cb978-20" aria-hidden="true" tabindex="-1"></a>  model <span class="sc">%&gt;%</span> </span>
+<span id="cb978-21"><a href="ch-13.html#cb978-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">10</span>, <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>, <span class="at">input_shape =</span> <span class="fu">ncol</span>(x)) <span class="sc">%&gt;%</span></span>
+<span id="cb978-22"><a href="ch-13.html#cb978-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">5</span>, <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb978-23"><a href="ch-13.html#cb978-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">layer_dense</span>(<span class="at">units=</span><span class="dv">1</span>)</span>
+<span id="cb978-24"><a href="ch-13.html#cb978-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-25"><a href="ch-13.html#cb978-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#optimizer</span></span>
+<span id="cb978-26"><a href="ch-13.html#cb978-26" aria-hidden="true" tabindex="-1"></a>  opt<span class="ot">=</span><span class="fu">optimizer_adam</span>(<span class="at">lr=</span><span class="fl">0.01</span>) </span>
+<span id="cb978-27"><a href="ch-13.html#cb978-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-28"><a href="ch-13.html#cb978-28" aria-hidden="true" tabindex="-1"></a>  <span class="co">#compile</span></span>
+<span id="cb978-29"><a href="ch-13.html#cb978-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(model, <span class="at">loss =</span> <span class="st">&#39;mse&#39;</span>, <span class="at">optimizer =</span> opt, <span class="at">metrics=</span><span class="fu">list</span>(<span class="st">&#39;mse&#39;</span>))</span>
+<span id="cb978-30"><a href="ch-13.html#cb978-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-31"><a href="ch-13.html#cb978-31" aria-hidden="true" tabindex="-1"></a>  history_ffnn <span class="ot">=</span> <span class="fu">fit</span>(model, <span class="at">x =</span> <span class="fu">data.matrix</span>(x_scaled[train_ind,]), <span class="at">y =</span> y[train_ind], <span class="at">batch_size =</span>                      <span class="dv">512</span>, <span class="at">epochs =</span> <span class="dv">50</span>, <span class="at">shuffle =</span> T)</span>
+<span id="cb978-32"><a href="ch-13.html#cb978-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-33"><a href="ch-13.html#cb978-33" aria-hidden="true" tabindex="-1"></a>  pred <span class="ot">=</span> <span class="fu">predict</span>(model, <span class="fu">data.matrix</span>(x_scaled[test_ind,]))</span>
+<span id="cb978-34"><a href="ch-13.html#cb978-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-35"><a href="ch-13.html#cb978-35" aria-hidden="true" tabindex="-1"></a>  mse <span class="ot">=</span> <span class="fu">mean</span>((pred<span class="sc">-</span>y[test_ind])<span class="sc">^</span><span class="dv">2</span>, <span class="at">na.rm=</span>T)</span>
+<span id="cb978-36"><a href="ch-13.html#cb978-36" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-37"><a href="ch-13.html#cb978-37" aria-hidden="true" tabindex="-1"></a>  mse_per_fold_nn <span class="ot">=</span> <span class="fu">c</span>(mse_per_fold_nn,mse)</span>
+<span id="cb978-38"><a href="ch-13.html#cb978-38" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-39"><a href="ch-13.html#cb978-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste</span>(test_towers, <span class="st">&#39;mse:&#39;</span>, mse,<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>))</span>
+<span id="cb978-40"><a href="ch-13.html#cb978-40" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb978-41"><a href="ch-13.html#cb978-41" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb978-42"><a href="ch-13.html#cb978-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb978-43"><a href="ch-13.html#cb978-43" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>, <span class="st">&quot;CV MSE:&quot;</span>, <span class="fu">mean</span>(mse_per_fold_nn))) </span></code></pre></div>
+<div class="sourceCode" id="cb979"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb979-1"><a href="ch-13.html#cb979-1" aria-hidden="true" tabindex="-1"></a><span class="do">##  CV MSE: 3.78162750720368</span></span></code></pre></div>
+<p>As you can see, the FFNN improves the out of training mean square error (sometimes this is not the case due to randomization during training).</p>
+</div>
+</div>
+<div id="convolutional-neural-network" class="section level3" number="13.2.8">
+<h3><span class="header-section-number">13.2.8</span> Convolutional Neural Network</h3>
+<p>In the previous section we extracted statistics of NDVI images and then we used those features together with the FLUXNET features as input to the feed forward neural network. Now, we will use the image of the NDVI and we allow a CNN model to extract relevant features. Then we will feed those features together with the FLUXNET features to a feed forward neural network. As it mentioned in the beginning the size of each NDVI image is 200 x 200 pixel. To avoid memory issues and facilitate fast training we crop the images to 50 x 50 pixel keeping the same center.</p>
+<p>Before we proceed, we remind here the basic building blocks of the CNN model.</p>
+<p><strong>Building Blocks of a CNN</strong></p>
+<ul>
+<li><p><strong>Convolutional Layers</strong>: Layers implementing the actual convolution. Their outputs are feature maps which are then passed through an activation function in order to introduce non-linearities into the system. Convolutional layers can be seen as extracting features that are passed on deeper into the model thus enabling the model to learn higher-level features that make the classification task easier.</p></li>
+<li><p><strong>Pooling Layers</strong>: Downsampling or pooling layers concentrate the information so that deeper layers focus more on abstract/high-level patterns. A common choice is max-pooling, where only the maximum value occurring in a certain region is propagated to the output.</p></li>
+<li><p><strong>Dense Layers</strong>: A dense or fully-connected layer connects every node in the input to every node in the output. This is the type of layer you already used in the previous tutorial. If the input dimension is large, the amount of learnable parameters introduced by using a dense layer can quickly explode. Hence, dense layers are usually added on deeper levels of the model, where the pooling operations have already reduced the dimensionality of the data. Typically, the dense layers are added last in a predictive model, performing the actual prediction on the features extracted by the convolutional layers.</p></li>
+</ul>
+<div class="sourceCode" id="cb980"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb980-1"><a href="ch-13.html#cb980-1" aria-hidden="true" tabindex="-1"></a>data_cnn <span class="ot">=</span> <span class="fu">data.frame</span>(flux_data, <span class="at">ndvi_file =</span> ndvi_files)</span>
+<span id="cb980-2"><a href="ch-13.html#cb980-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb980-3"><a href="ch-13.html#cb980-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data_cnn)</span></code></pre></div>
+<pre><code>##   X sitename year month         y fpar_loess_per_month TA_F_per_month
+## 1 1   AR-Vir 2010     2 18.155930            0.7175273       27.90639
+## 2 2   AR-Vir 2010     3 16.566188            0.8062719       25.88332
+## 3 3   AR-Vir 2010     4 11.883871            0.8253712       21.08527
+## 4 4   AR-Vir 2010     5  7.550117            0.7912010       17.02619
+## 5 5   AR-Vir 2010     9 12.171233            0.6176354       19.77360
+## 6 6   AR-Vir 2010    10 12.463795            0.7283527       20.05271
+##   SW_IN_F_per_month LW_IN_F_per_month VPD_F_per_month PA_F_per_month
+## 1          230.0684          412.0384       13.867857       99.57232
+## 2          212.2040          391.1563       11.892645       99.74226
+## 3          168.1141          359.2931        9.315033      100.19970
+## 4          109.3910          349.3595        5.616355      100.30897
+## 5          176.7665          349.7738        6.618600      100.01453
+## 6          236.9492          348.2435        6.848935      100.02084
+##   P_F_per_month WS_F_per_month CO2_F_MDS_per_month
+## 1      4.796929       2.778643            424.0304
+## 2      6.909194       2.407871            430.5104
+## 3      4.921133       2.639733            420.3460
+## 4      3.307871       2.397226            432.3273
+## 5      5.868133       2.339433            426.6124
+## 6      3.709258       2.558194            417.1832
+##                                        ndvi_file
+## 1 ./data//ndvi//AR-Vir_2010-02-24_ndvi_pixel.rds
+## 2 ./data//ndvi//AR-Vir_2010-03-28_ndvi_pixel.rds
+## 3 ./data//ndvi//AR-Vir_2010-04-29_ndvi_pixel.rds
+## 4 ./data//ndvi//AR-Vir_2010-05-31_ndvi_pixel.rds
+## 5 ./data//ndvi//AR-Vir_2010-09-20_ndvi_pixel.rds
+## 6 ./data//ndvi//AR-Vir_2010-10-06_ndvi_pixel.rds</code></pre>
+<p>Here we remove the images with more than 40% missing NDVI values.</p>
+<div class="sourceCode" id="cb982"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb982-1"><a href="ch-13.html#cb982-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove rows with NAs</span></span>
+<span id="cb982-2"><a href="ch-13.html#cb982-2" aria-hidden="true" tabindex="-1"></a>data_cnn <span class="ot">=</span> <span class="fu">na.omit</span>(data_cnn)</span>
+<span id="cb982-3"><a href="ch-13.html#cb982-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb982-4"><a href="ch-13.html#cb982-4" aria-hidden="true" tabindex="-1"></a><span class="co"># remove rows with more than 40% missing NDVI values</span></span>
+<span id="cb982-5"><a href="ch-13.html#cb982-5" aria-hidden="true" tabindex="-1"></a>dim <span class="ot">=</span> <span class="dv">200</span></span>
+<span id="cb982-6"><a href="ch-13.html#cb982-6" aria-hidden="true" tabindex="-1"></a>to_remove <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb982-7"><a href="ch-13.html#cb982-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb982-8"><a href="ch-13.html#cb982-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(data_cnn<span class="sc">$</span>ndvi_file)){</span>
+<span id="cb982-9"><a href="ch-13.html#cb982-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb982-10"><a href="ch-13.html#cb982-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># read ndvi file, extract window of 50x50</span></span>
+<span id="cb982-11"><a href="ch-13.html#cb982-11" aria-hidden="true" tabindex="-1"></a>  ndvi <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">readRDS</span>(data_cnn<span class="sc">$</span>ndvi_file[j]), <span class="at">nrow=</span>dim, <span class="at">byrow =</span> T)[<span class="dv">75</span><span class="sc">:</span><span class="dv">124</span>,<span class="dv">75</span><span class="sc">:</span><span class="dv">124</span>]</span>
+<span id="cb982-12"><a href="ch-13.html#cb982-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb982-13"><a href="ch-13.html#cb982-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># check percentage of missing values</span></span>
+<span id="cb982-14"><a href="ch-13.html#cb982-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb982-15"><a href="ch-13.html#cb982-15" aria-hidden="true" tabindex="-1"></a>  percentage_missing <span class="ot">=</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(ndvi) <span class="sc">|</span> ndvi<span class="sc">&gt;</span><span class="dv">10000</span>)</span>
+<span id="cb982-16"><a href="ch-13.html#cb982-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb982-17"><a href="ch-13.html#cb982-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb982-18"><a href="ch-13.html#cb982-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (percentage_missing <span class="sc">&gt;</span> <span class="fl">0.4</span> <span class="sc">|</span> <span class="fu">length</span>(ndvi)<span class="sc">==</span><span class="dv">0</span>){</span>
+<span id="cb982-19"><a href="ch-13.html#cb982-19" aria-hidden="true" tabindex="-1"></a>    to_remove <span class="ot">=</span> <span class="fu">c</span>(to_remove, j) </span>
+<span id="cb982-20"><a href="ch-13.html#cb982-20" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb982-21"><a href="ch-13.html#cb982-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb982-22"><a href="ch-13.html#cb982-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb982-23"><a href="ch-13.html#cb982-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb982-24"><a href="ch-13.html#cb982-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb982-25"><a href="ch-13.html#cb982-25" aria-hidden="true" tabindex="-1"></a>data_cnn_complete <span class="ot">=</span> data_cnn[<span class="sc">-</span>to_remove,]</span></code></pre></div>
+<p>Now it is time to scale the inputs.</p>
+<div class="sourceCode" id="cb983"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb983-1"><a href="ch-13.html#cb983-1" aria-hidden="true" tabindex="-1"></a>dim <span class="ot">=</span> <span class="dv">50</span></span>
+<span id="cb983-2"><a href="ch-13.html#cb983-2" aria-hidden="true" tabindex="-1"></a>ndvi <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="at">dim =</span><span class="fu">c</span>(<span class="fu">length</span>(data_cnn_complete<span class="sc">$</span>ndvi_file), dim, dim))</span>
+<span id="cb983-3"><a href="ch-13.html#cb983-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb983-4"><a href="ch-13.html#cb983-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(data_cnn_complete<span class="sc">$</span>ndvi_file)){</span>
+<span id="cb983-5"><a href="ch-13.html#cb983-5" aria-hidden="true" tabindex="-1"></a>    ndvi_values <span class="ot">=</span> <span class="fu">readRDS</span>(data_cnn_complete<span class="sc">$</span>ndvi_file[j])</span>
+<span id="cb983-6"><a href="ch-13.html#cb983-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb983-7"><a href="ch-13.html#cb983-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">#reshape</span></span>
+<span id="cb983-8"><a href="ch-13.html#cb983-8" aria-hidden="true" tabindex="-1"></a>    ndvi[j,,] <span class="ot">=</span> <span class="fu">matrix</span>(ndvi_values, <span class="at">nrow=</span><span class="dv">200</span>, <span class="at">byrow =</span> T)[<span class="dv">75</span><span class="sc">:</span><span class="dv">124</span>,<span class="dv">75</span><span class="sc">:</span><span class="dv">124</span>]</span>
+<span id="cb983-9"><a href="ch-13.html#cb983-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb983-10"><a href="ch-13.html#cb983-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb983-11"><a href="ch-13.html#cb983-11" aria-hidden="true" tabindex="-1"></a><span class="co">#specify image size</span></span>
+<span id="cb983-12"><a href="ch-13.html#cb983-12" aria-hidden="true" tabindex="-1"></a>IMAGE_WIDTH <span class="ot">=</span> dim</span>
+<span id="cb983-13"><a href="ch-13.html#cb983-13" aria-hidden="true" tabindex="-1"></a>IMAGE_HEIGHT <span class="ot">=</span> dim</span>
+<span id="cb983-14"><a href="ch-13.html#cb983-14" aria-hidden="true" tabindex="-1"></a>IMAGE_CHANNELS <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb983-15"><a href="ch-13.html#cb983-15" aria-hidden="true" tabindex="-1"></a>IMAGE_SIZE <span class="ot">=</span> <span class="fu">c</span>(IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)</span>
+<span id="cb983-16"><a href="ch-13.html#cb983-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb983-17"><a href="ch-13.html#cb983-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb983-18"><a href="ch-13.html#cb983-18" aria-hidden="true" tabindex="-1"></a><span class="co">#fill missing values , rescale images to [0,1] , reshape to be a valid input for NN</span></span>
+<span id="cb983-19"><a href="ch-13.html#cb983-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb983-20"><a href="ch-13.html#cb983-20" aria-hidden="true" tabindex="-1"></a>preprocess_images <span class="ot">=</span> <span class="cf">function</span>(ndvi){</span>
+<span id="cb983-21"><a href="ch-13.html#cb983-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb983-22"><a href="ch-13.html#cb983-22" aria-hidden="true" tabindex="-1"></a>  min_ndvi <span class="ot">=</span> <span class="sc">-</span><span class="dv">10000</span></span>
+<span id="cb983-23"><a href="ch-13.html#cb983-23" aria-hidden="true" tabindex="-1"></a>  max_ndvi <span class="ot">=</span> <span class="dv">10000</span></span>
+<span id="cb983-24"><a href="ch-13.html#cb983-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb983-25"><a href="ch-13.html#cb983-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#fill missing values</span></span>
+<span id="cb983-26"><a href="ch-13.html#cb983-26" aria-hidden="true" tabindex="-1"></a>  nd <span class="ot">=</span> <span class="fu">apply</span>(ndvi, <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>), <span class="cf">function</span>(i) <span class="fu">na_interpolation</span>(i))</span>
+<span id="cb983-27"><a href="ch-13.html#cb983-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb983-28"><a href="ch-13.html#cb983-28" aria-hidden="true" tabindex="-1"></a>  <span class="co">#rescale to [0,1]</span></span>
+<span id="cb983-29"><a href="ch-13.html#cb983-29" aria-hidden="true" tabindex="-1"></a>  nd <span class="ot">=</span> (nd<span class="sc">-</span>min_ndvi)<span class="sc">/</span>(max_ndvi<span class="sc">-</span>min_ndvi)</span>
+<span id="cb983-30"><a href="ch-13.html#cb983-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb983-31"><a href="ch-13.html#cb983-31" aria-hidden="true" tabindex="-1"></a>  <span class="co">#reshape adding an extra dimension</span></span>
+<span id="cb983-32"><a href="ch-13.html#cb983-32" aria-hidden="true" tabindex="-1"></a>  nd <span class="ot">=</span> <span class="fu">array_reshape</span>(nd, <span class="at">dim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,IMAGE_SIZE))</span>
+<span id="cb983-33"><a href="ch-13.html#cb983-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb983-34"><a href="ch-13.html#cb983-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (nd)</span>
+<span id="cb983-35"><a href="ch-13.html#cb983-35" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb984"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb984-1"><a href="ch-13.html#cb984-1" aria-hidden="true" tabindex="-1"></a>ndvi_pr <span class="ot">=</span> <span class="fu">preprocess_images</span>(ndvi)</span>
+<span id="cb984-2"><a href="ch-13.html#cb984-2" aria-hidden="true" tabindex="-1"></a>x_flux <span class="ot">=</span> data_cnn_complete[,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">15</span>)]</span>
+<span id="cb984-3"><a href="ch-13.html#cb984-3" aria-hidden="true" tabindex="-1"></a>x_flux_scaled <span class="ot">=</span> <span class="fu">scale</span>(x_flux)</span>
+<span id="cb984-4"><a href="ch-13.html#cb984-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb984-5"><a href="ch-13.html#cb984-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> data_cnn_complete<span class="sc">$</span>y</span></code></pre></div>
+<p>Here we create the CNN model. We use only one CNN layer with 4 filters and kernel size of 5. We also use a pooling layer.</p>
+<div class="sourceCode" id="cb985"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb985-1"><a href="ch-13.html#cb985-1" aria-hidden="true" tabindex="-1"></a>create_cnn <span class="ot">=</span> <span class="cf">function</span>(){</span>
+<span id="cb985-2"><a href="ch-13.html#cb985-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-3"><a href="ch-13.html#cb985-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#input --&gt; ndvi images</span></span>
+<span id="cb985-4"><a href="ch-13.html#cb985-4" aria-hidden="true" tabindex="-1"></a>  input_1 <span class="ot">=</span> <span class="fu">layer_input</span>(<span class="at">shape=</span>IMAGE_SIZE)</span>
+<span id="cb985-5"><a href="ch-13.html#cb985-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-6"><a href="ch-13.html#cb985-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># cnn layer</span></span>
+<span id="cb985-7"><a href="ch-13.html#cb985-7" aria-hidden="true" tabindex="-1"></a>  cnn_layer <span class="ot">=</span> <span class="fu">layer_conv_2d</span>(input_1, <span class="at">filters =</span> <span class="dv">4</span>, <span class="at">kernel_size =</span> <span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">5</span>), <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>, <span class="at">padding =</span> <span class="st">&#39;same&#39;</span>)</span>
+<span id="cb985-8"><a href="ch-13.html#cb985-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-9"><a href="ch-13.html#cb985-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># pool layer</span></span>
+<span id="cb985-10"><a href="ch-13.html#cb985-10" aria-hidden="true" tabindex="-1"></a>  pool <span class="ot">=</span>  <span class="fu">layer_average_pooling_2d</span>(cnn_layer, <span class="at">pool_size =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">10</span>)) </span>
+<span id="cb985-11"><a href="ch-13.html#cb985-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-12"><a href="ch-13.html#cb985-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-13"><a href="ch-13.html#cb985-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># flatten the features</span></span>
+<span id="cb985-14"><a href="ch-13.html#cb985-14" aria-hidden="true" tabindex="-1"></a>  flat <span class="ot">=</span> <span class="fu">layer_flatten</span>(pool)</span>
+<span id="cb985-15"><a href="ch-13.html#cb985-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-16"><a href="ch-13.html#cb985-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># mlp of the features --&gt; project to dim 32</span></span>
+<span id="cb985-17"><a href="ch-13.html#cb985-17" aria-hidden="true" tabindex="-1"></a>  flat_proj <span class="ot">=</span> <span class="fu">layer_dense</span>(flat, <span class="at">units =</span> <span class="dv">32</span>, <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>)</span>
+<span id="cb985-18"><a href="ch-13.html#cb985-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-19"><a href="ch-13.html#cb985-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">#input --&gt; fluxnet features</span></span>
+<span id="cb985-20"><a href="ch-13.html#cb985-20" aria-hidden="true" tabindex="-1"></a>  input_2 <span class="ot">=</span> <span class="fu">layer_input</span>(<span class="at">shape=</span><span class="fu">ncol</span>(x_flux))</span>
+<span id="cb985-21"><a href="ch-13.html#cb985-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-22"><a href="ch-13.html#cb985-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># concatenate features</span></span>
+<span id="cb985-23"><a href="ch-13.html#cb985-23" aria-hidden="true" tabindex="-1"></a>  features <span class="ot">=</span> <span class="fu">k_concatenate</span>(<span class="fu">c</span>(flat_proj, input_2),<span class="at">axis=</span><span class="dv">2</span>)</span>
+<span id="cb985-24"><a href="ch-13.html#cb985-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-25"><a href="ch-13.html#cb985-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># hidden layer</span></span>
+<span id="cb985-26"><a href="ch-13.html#cb985-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-27"><a href="ch-13.html#cb985-27" aria-hidden="true" tabindex="-1"></a>  hidden_dense <span class="ot">=</span> <span class="fu">layer_dense</span>(features, <span class="at">units =</span> <span class="dv">16</span>, <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>)</span>
+<span id="cb985-28"><a href="ch-13.html#cb985-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-29"><a href="ch-13.html#cb985-29" aria-hidden="true" tabindex="-1"></a>  <span class="co">#output</span></span>
+<span id="cb985-30"><a href="ch-13.html#cb985-30" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">=</span>  <span class="fu">layer_dense</span>(hidden_dense, <span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&#39;linear&#39;</span>)</span>
+<span id="cb985-31"><a href="ch-13.html#cb985-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-32"><a href="ch-13.html#cb985-32" aria-hidden="true" tabindex="-1"></a>  <span class="co">#create model</span></span>
+<span id="cb985-33"><a href="ch-13.html#cb985-33" aria-hidden="true" tabindex="-1"></a>  model <span class="ot">=</span> <span class="fu">keras_model</span>(<span class="fu">c</span>(input_1, input_2), output)</span>
+<span id="cb985-34"><a href="ch-13.html#cb985-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb985-35"><a href="ch-13.html#cb985-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(model)</span>
+<span id="cb985-36"><a href="ch-13.html#cb985-36" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb986"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb986-1"><a href="ch-13.html#cb986-1" aria-hidden="true" tabindex="-1"></a>cnn_model <span class="ot">=</span> <span class="fu">create_cnn</span>()</span>
+<span id="cb986-2"><a href="ch-13.html#cb986-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(cnn_model)</span></code></pre></div>
+<div class="sourceCode" id="cb987"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb987-1"><a href="ch-13.html#cb987-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Model: &quot;model&quot;</span></span>
+<span id="cb987-2"><a href="ch-13.html#cb987-2" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb987-3"><a href="ch-13.html#cb987-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Layer (type)              Output Shape      Param #  Connected to               </span></span>
+<span id="cb987-4"><a href="ch-13.html#cb987-4" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb987-5"><a href="ch-13.html#cb987-5" aria-hidden="true" tabindex="-1"></a><span class="do">## input_1 (InputLayer)      [(None, 50, 50, 1 0                                   </span></span>
+<span id="cb987-6"><a href="ch-13.html#cb987-6" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb987-7"><a href="ch-13.html#cb987-7" aria-hidden="true" tabindex="-1"></a><span class="do">## conv2d (Conv2D)           (None, 50, 50, 4) 104      input_1[0][0]              </span></span>
+<span id="cb987-8"><a href="ch-13.html#cb987-8" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb987-9"><a href="ch-13.html#cb987-9" aria-hidden="true" tabindex="-1"></a><span class="do">## average_pooling2d (Averag (None, 5, 5, 4)   0        conv2d[0][0]               </span></span>
+<span id="cb987-10"><a href="ch-13.html#cb987-10" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb987-11"><a href="ch-13.html#cb987-11" aria-hidden="true" tabindex="-1"></a><span class="do">## flatten (Flatten)         (None, 100)       0        average_pooling2d[0][0]    </span></span>
+<span id="cb987-12"><a href="ch-13.html#cb987-12" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb987-13"><a href="ch-13.html#cb987-13" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_21 (Dense)          (None, 32)        3232     flatten[0][0]              </span></span>
+<span id="cb987-14"><a href="ch-13.html#cb987-14" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb987-15"><a href="ch-13.html#cb987-15" aria-hidden="true" tabindex="-1"></a><span class="do">## input_2 (InputLayer)      [(None, 9)]       0                                   </span></span>
+<span id="cb987-16"><a href="ch-13.html#cb987-16" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb987-17"><a href="ch-13.html#cb987-17" aria-hidden="true" tabindex="-1"></a><span class="do">## tf.concat (TFOpLambda)    (None, 41)        0        dense_21[0][0]             </span></span>
+<span id="cb987-18"><a href="ch-13.html#cb987-18" aria-hidden="true" tabindex="-1"></a><span class="do">##                                                      input_2[0][0]              </span></span>
+<span id="cb987-19"><a href="ch-13.html#cb987-19" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb987-20"><a href="ch-13.html#cb987-20" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_22 (Dense)          (None, 16)        672      tf.concat[0][0]            </span></span>
+<span id="cb987-21"><a href="ch-13.html#cb987-21" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span>
+<span id="cb987-22"><a href="ch-13.html#cb987-22" aria-hidden="true" tabindex="-1"></a><span class="do">## dense_23 (Dense)          (None, 1)         17       dense_22[0][0]             </span></span>
+<span id="cb987-23"><a href="ch-13.html#cb987-23" aria-hidden="true" tabindex="-1"></a><span class="do">## ================================================================================</span></span>
+<span id="cb987-24"><a href="ch-13.html#cb987-24" aria-hidden="true" tabindex="-1"></a><span class="do">## Total params: 4,025</span></span>
+<span id="cb987-25"><a href="ch-13.html#cb987-25" aria-hidden="true" tabindex="-1"></a><span class="do">## Trainable params: 4,025</span></span>
+<span id="cb987-26"><a href="ch-13.html#cb987-26" aria-hidden="true" tabindex="-1"></a><span class="do">## Non-trainable params: 0</span></span>
+<span id="cb987-27"><a href="ch-13.html#cb987-27" aria-hidden="true" tabindex="-1"></a><span class="do">## ________________________________________________________________________________</span></span></code></pre></div>
+<p>To evaluate the performance of the model we follow a cv approach by leaving out 10 tower sites.</p>
+<div class="sourceCode" id="cb988"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb988-1"><a href="ch-13.html#cb988-1" aria-hidden="true" tabindex="-1"></a>n_tower_test <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb988-2"><a href="ch-13.html#cb988-2" aria-hidden="true" tabindex="-1"></a>unique_towers <span class="ot">=</span> <span class="fu">unique</span>(data_cnn_complete<span class="sc">$</span>sitename)</span>
+<span id="cb988-3"><a href="ch-13.html#cb988-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb988-4"><a href="ch-13.html#cb988-4" aria-hidden="true" tabindex="-1"></a>n_breaks <span class="ot">=</span> <span class="fu">as.integer</span>(<span class="fu">length</span>(unique_towers)<span class="sc">/</span>n_tower_test)</span>
+<span id="cb988-5"><a href="ch-13.html#cb988-5" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">=</span> <span class="fu">cut</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(unique_towers),<span class="at">breaks =</span> n_breaks,<span class="at">labels =</span> F)</span>
+<span id="cb988-6"><a href="ch-13.html#cb988-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-7"><a href="ch-13.html#cb988-7" aria-hidden="true" tabindex="-1"></a>mse_per_fold_cnn <span class="ot">=</span> <span class="fu">c</span>()</span>
+<span id="cb988-8"><a href="ch-13.html#cb988-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-9"><a href="ch-13.html#cb988-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_breaks){</span>
+<span id="cb988-10"><a href="ch-13.html#cb988-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-11"><a href="ch-13.html#cb988-11" aria-hidden="true" tabindex="-1"></a>  train_towers <span class="ot">=</span> <span class="fu">unique</span>(data_cnn_complete<span class="sc">$</span>sitename)[folds<span class="sc">!=</span>i]</span>
+<span id="cb988-12"><a href="ch-13.html#cb988-12" aria-hidden="true" tabindex="-1"></a>  test_towers <span class="ot">=</span> <span class="fu">unique</span>(data_cnn_complete<span class="sc">$</span>sitename)[folds<span class="sc">==</span>i]</span>
+<span id="cb988-13"><a href="ch-13.html#cb988-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-14"><a href="ch-13.html#cb988-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-15"><a href="ch-13.html#cb988-15" aria-hidden="true" tabindex="-1"></a>  train_ind <span class="ot">=</span> data_cnn_complete<span class="sc">$</span>sitename <span class="sc">%in%</span> train_towers</span>
+<span id="cb988-16"><a href="ch-13.html#cb988-16" aria-hidden="true" tabindex="-1"></a>  test_ind <span class="ot">=</span> <span class="sc">!</span>train_ind</span>
+<span id="cb988-17"><a href="ch-13.html#cb988-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-18"><a href="ch-13.html#cb988-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-19"><a href="ch-13.html#cb988-19" aria-hidden="true" tabindex="-1"></a>  model_cnn <span class="ot">=</span> <span class="fu">create_cnn</span>()</span>
+<span id="cb988-20"><a href="ch-13.html#cb988-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-21"><a href="ch-13.html#cb988-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#optimizer</span></span>
+<span id="cb988-22"><a href="ch-13.html#cb988-22" aria-hidden="true" tabindex="-1"></a>  opt<span class="ot">=</span><span class="fu">optimizer_adam</span>(<span class="at">lr=</span><span class="fl">0.01</span>) </span>
+<span id="cb988-23"><a href="ch-13.html#cb988-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-24"><a href="ch-13.html#cb988-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">#compile</span></span>
+<span id="cb988-25"><a href="ch-13.html#cb988-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">compile</span>(model_cnn, <span class="at">loss =</span> <span class="st">&#39;mse&#39;</span>, <span class="at">optimizer =</span> opt, <span class="at">metrics=</span><span class="fu">list</span>(<span class="st">&#39;mse&#39;</span>))</span>
+<span id="cb988-26"><a href="ch-13.html#cb988-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-27"><a href="ch-13.html#cb988-27" aria-hidden="true" tabindex="-1"></a>  history_ffnn <span class="ot">=</span> <span class="fu">fit</span>(model_cnn,</span>
+<span id="cb988-28"><a href="ch-13.html#cb988-28" aria-hidden="true" tabindex="-1"></a>                     <span class="at">x =</span> <span class="fu">list</span>(<span class="fu">array_reshape</span>(ndvi_pr[train_ind,,,], <span class="at">dim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,IMAGE_SIZE)),</span>
+<span id="cb988-29"><a href="ch-13.html#cb988-29" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">data.matrix</span>(x_flux_scaled[train_ind,])),</span>
+<span id="cb988-30"><a href="ch-13.html#cb988-30" aria-hidden="true" tabindex="-1"></a>                     <span class="at">y =</span> y[train_ind],</span>
+<span id="cb988-31"><a href="ch-13.html#cb988-31" aria-hidden="true" tabindex="-1"></a>                     <span class="at">batch_size =</span> <span class="dv">512</span>,</span>
+<span id="cb988-32"><a href="ch-13.html#cb988-32" aria-hidden="true" tabindex="-1"></a>                     <span class="at">epochs =</span> <span class="dv">20</span>,</span>
+<span id="cb988-33"><a href="ch-13.html#cb988-33" aria-hidden="true" tabindex="-1"></a>                     <span class="at">shuffle =</span> T)</span>
+<span id="cb988-34"><a href="ch-13.html#cb988-34" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-35"><a href="ch-13.html#cb988-35" aria-hidden="true" tabindex="-1"></a>  pred <span class="ot">=</span> <span class="fu">predict</span>(model_cnn,<span class="fu">list</span>(<span class="fu">array_reshape</span>(ndvi_pr[test_ind,,,], </span>
+<span id="cb988-36"><a href="ch-13.html#cb988-36" aria-hidden="true" tabindex="-1"></a>                <span class="at">dim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>,IMAGE_SIZE)), <span class="fu">data.matrix</span>(x_flux_scaled[test_ind,])))</span>
+<span id="cb988-37"><a href="ch-13.html#cb988-37" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-38"><a href="ch-13.html#cb988-38" aria-hidden="true" tabindex="-1"></a>  mse <span class="ot">=</span> <span class="fu">mean</span>((pred<span class="sc">-</span>y[test_ind])<span class="sc">^</span><span class="dv">2</span>,<span class="at">na.rm=</span>T)</span>
+<span id="cb988-39"><a href="ch-13.html#cb988-39" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-40"><a href="ch-13.html#cb988-40" aria-hidden="true" tabindex="-1"></a>  mse_per_fold_cnn <span class="ot">=</span> <span class="fu">c</span>(mse_per_fold_cnn, mse)</span>
+<span id="cb988-41"><a href="ch-13.html#cb988-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-42"><a href="ch-13.html#cb988-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste</span>(test_towers, <span class="st">&#39;mse:&#39;</span>, mse,<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>))</span>
+<span id="cb988-43"><a href="ch-13.html#cb988-43" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb988-44"><a href="ch-13.html#cb988-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb988-45"><a href="ch-13.html#cb988-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb988-46"><a href="ch-13.html#cb988-46" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">paste</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>,<span class="st">&quot;CV MSE:&quot;</span>,<span class="fu">mean</span>(mse_per_fold_cnn)))</span></code></pre></div>
+<div class="sourceCode" id="cb989"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb989-1"><a href="ch-13.html#cb989-1" aria-hidden="true" tabindex="-1"></a><span class="do">## CV MSE: 3.64838966197611</span></span></code></pre></div>
+<p>The CNN yields better performances than the linear model and the FFNN. However, since we used different inputs, we should be careful with comparisons.</p>
+</div>
+</div>
+<div id="exercise-10" class="section level2" number="13.3">
+<h2><span class="header-section-number">13.3</span> Exercise</h2>
+<p>In class, we used the monthly FLUXNET data set and the NDVI images of 71 distinct tower sites. We first had to fit a linear model using only the average NDVI in order to predict the <strong>GPP - gross primary production </strong>. The <strong>first task</strong> for this exercise is to create a polynomial model of degree 2 using the average NDVI value. Is there an improvement on <span class="math inline">\(R^2\)</span>? Can you also plot the corresponding fitting polynomial figure? In addition, we made a feed forward neural network using all the available features and evaluating the model on cv leaving out 10 sites. Your <strong>second task</strong> is to fit again a feed forward neural network but using more layers and/or neurons this time. You may want to add regularization methods (i.e dropout etc.) in order to avoid overfitting. Check the performance on cv leaving out 10 sites.</p>
+<p><strong>Tasks:</strong></p>
+<ol style="list-style-type: decimal">
+<li>Fit a polynomial model of degree 2 using the average NDVI value as predictor in order to predict the GPP value. Compare the <span class="math inline">\(R^2\)</span> with the linear model.</li>
+<li>Plot the polynomial model.</li>
+<li>Create a feed forward neural network with more layers and/or neurons than the one made in class. Take care to avoid overfitting. Evaluate your results on cv leaving out 10 tower sites.</li>
+</ol>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="ch-12.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

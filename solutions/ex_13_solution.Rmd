@@ -1,0 +1,199 @@
+---
+title: "Exercise 13 Solution"
+output: html_document
+---
+
+# Supervised Deep Learning II
+
+**Tasks:**
+
+1. Fit a polynomial model of degree 2 using the average NDVI value as predictor in order to predict the GPP value. Compare the $R^2$ with the linear model.
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(imputeTS) # Library for Imputation
+library(reticulate)
+use_condaenv('r-reticulate')
+library(keras) # Python library for deep learning
+library(tensorflow) # Google API for Machine Learning
+```
+
+```{r}
+path = "../data/"
+
+# read FLUXNET data
+flux_data = read.csv(file.path(path, "flux_dataset.csv"))
+
+# have a look
+head(flux_data)
+
+# read NDVI file path
+ndvi_files = list.files(file.path(path, "ndvi/"), full.names = T)
+```
+
+```{r}
+avg_values_ndvi = c()
+
+for(j in 1:length(ndvi_files)){
+  
+  # read ndvi file
+  ndvi = readRDS(ndvi_files[j])
+  
+  # keep only healthy pixels
+  ndvi = ndvi[ndvi <= 10000]
+  
+  # take average ndvi
+  avg_values_ndvi = c(avg_values_ndvi, mean(ndvi, na.rm = T))
+}
+```
+
+```{r}
+# create dataframe 
+
+df_data = data.frame(y = flux_data$y, avg_ndvi = avg_values_ndvi)
+
+# drop null values
+df_data = na.omit(df_data)
+
+head(df_data)
+
+# fit the model
+
+model_ndvi = lm(y ~ poly(avg_ndvi,2), data = df_data)
+
+summary(model_ndvi)
+```
+
+The $R^2$ is slightly improved from 0.3059 (linear model) to 0.3228 (polynomial model) indicating a better fit.
+
+2. Plot the polynomial model.
+
+```{r}
+df_data %>%
+  ggplot(aes(x = avg_ndvi, y = y)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2) ,color = "red", lwd = 2, se = F) +
+  theme_gray(base_size = 20) + 
+  labs(x = 'Average NDVI', y = 'GPP' )
+```
+
+3. Create a feed forward neural network with more layers and/or neurons than the one made in class. Take care to avoid overfitting. Evaluate your results on cv leaving out 10 tower sites.
+
+```{r warning=F}
+avg_values_ndvi = c()
+max_values_ndvi = c()
+min_values_ndvi = c()
+std_values_ndvi = c()
+
+for(j in 1:length(ndvi_files)){
+  
+  # read NDVI file
+  ndvi = readRDS(ndvi_files[j])
+  
+  # keep only healthy pixels
+  ndvi = ndvi[ndvi <= 10000]
+  
+  # take average NDVI
+  avg_values_ndvi = c(avg_values_ndvi, mean(ndvi,na.rm = T))
+  # take max NDVI
+  max_values_ndvi = c(max_values_ndvi, max(ndvi,na.rm = T))
+  # take min NDVI
+  min_values_ndvi = c(min_values_ndvi, min(ndvi,na.rm = T))
+  # take std NDVI
+  std_values_ndvi = c(std_values_ndvi, sd(ndvi,na.rm = T))
+}
+```
+
+```{r}
+# create dataframe 
+
+df_data_all_nn = data.frame(flux_data[,-c(1,3:4)],
+                            avg_ndvi = avg_values_ndvi,
+                            max_ndvi = max_values_ndvi,
+                            min_ndvi = min_values_ndvi,
+                            std_ndvi = std_values_ndvi)
+head(df_data_all_nn)
+
+# drop null values
+
+df_data_all_nn = na.omit(df_data_all_nn)
+
+y = df_data_all_nn$y
+x = df_data_all_nn[,-c(1,2)]
+```
+
+```{r}
+# normalize
+
+x_scaled = scale(x)
+head(x_scaled)
+```
+
+```{r}
+#FFNN
+model = keras_model_sequential()
+model %>% 
+  layer_dense(units = 15, activation = 'relu', input_shape = ncol(x)) %>%
+  layer_dropout(0.1) %>%
+  layer_dense(units = 10, activation = 'relu') %>%
+  layer_dropout(0.1) %>%
+  layer_dense(units = 5, activation = 'relu') %>%
+  layer_dense(units=1)
+```
+
+```{r}
+summary(model)
+```
+
+```{r}
+n_tower_test = 10
+unique_towers = unique(df_data_all_nn$sitename)
+
+n_breaks = as.integer(length(unique_towers)/n_tower_test)
+folds = cut(1:length(unique_towers), breaks = n_breaks, labels = F)
+  
+mse_per_fold_nn = c()
+  
+for(i in 1:n_breaks){
+  
+  train_towers = unique(df_data_all_nn$sitename)[folds!=i]
+  test_towers = unique(df_data_all_nn$sitename)[folds==i]
+  
+  
+  train_ind = df_data_all_nn$sitename %in% train_towers
+  test_ind = !train_ind
+  
+  
+  model = keras_model_sequential()
+  
+  model %>% 
+    layer_dense(units = 15, activation = 'relu', input_shape = ncol(x)) %>%
+    layer_dropout(0.1) %>%
+    layer_dense(units = 10, activation = 'relu') %>%
+    layer_dropout(0.1) %>%
+    layer_dense(units = 5, activation = 'relu') %>%
+    layer_dense(units=1)
+  
+  #optimizer
+  opt=optimizer_adam(lr=0.01) 
+  
+  #compile
+  compile(model, loss = 'mse', optimizer = opt, metrics=list('mse'))
+  
+  history_ffnn = fit(model, x = data.matrix(x_scaled[train_ind,]), 
+                     y = y[train_ind], batch_size = 512, epochs = 50, shuffle = T)
+  
+  pred = predict(model, data.matrix(x_scaled[test_ind,]))
+  
+  mse = mean((pred-y[test_ind])^2, na.rm=T)
+  
+  mse_per_fold_nn = c(mse_per_fold_nn,mse)
+  
+  cat(paste(test_towers, 'mse:', mse,"\n"))
+  
+}
+
+cat(paste("\n", "CV MSE:", mean(mse_per_fold_nn))) 
+```
