@@ -4,19 +4,65 @@
 
 # Introduction
 
+## A bit of history
+The importance of good data management transcends the success of a scientific project itself: it guarantees that the reproducibility of results, thus allowing the scientific community to integrate and reuse a workflow, a paramount concept for the advancement of Science. As Isaac Newton said in his 1675 letter: "If I have seen further it is by standing on the shoulders of Giants."
+
+After an attempt to standardize the practice of open science in 2007, it was not until 2016 that representatives of academia, industry, funding agencies and publishers gathered to define a set of principle that would be known as the **FAIR Data Principles**. Later that year, during its 2016 G20 Hangzhou summit, the G20 approved the use of FAIR principle within research. In short, the FAIRification process stands consists in data being:
+
+- **Findable**: data should be easy to find, both by humans and machines. There is a strong emphasis on the use of Metadata and the assignment of data identifiers.
+- **Accessible**: the access to data should be open, free and universally implementable. If necessary, an authentication and authorisation procedure should be clearly explained.
+- **Interoperatable**: refers to the ease of integration with other data. It should be easy to interoperate withing a workflow for analysis, storage and processing
+- **Reusable**: the documentation should be clear enough to allow reusability, which is the ultimate goal of FAIR principles
+
 ## Why is it important? 
+The EU is leading the way with FOSTER and the European Open Science Cloud (EOSC)
 
-From ESDS book:
-Open Science is enabled by the FAIR criteria for data use and sharing:
+The movement towards open science is a consequence of seemingly pervasive failures to replicate previous research
 
-    Findable: Easy to find and well documented.
-    Accessible: Long term storage and accessible with standard protocols.
-    Interoperatable: Exchangeable and correctly cited.
-    Reusable: Sufficiently documented and clear legal terms.
+https://www.orion-openscience.eu/resources/open-science
+Open Science (OS) is the movement to make scientific research, data and their dissemination available to any member of an inquiring society, from professionals to citizens. It impinges on principles of scientific growth and public access including practices such as publishing open research and campaigning for open access, with the ultimate aim of making it easier to publish and communicate scientific knowledge. From development to dissemination of knowledge, several concepts belong under the umbrella term of ‘Open Science’.
+By broadening the principles of openness to the whole research cycle, OS fosters sharing and collaboration, bringing a systemic change to the way scientific research is done. The transition towards a comprehensive, effective open science is not an easy one; albeit challenging, a multifaceted cultural change remains essential to ensure scientific efforts have a real-world impact.
+The Facilitate Open Science Training for European Research (FOSTER) https://www.fosteropenscience.eu/foster-taxonomy/open-science-policies, a European-funded project, has developed an OS taxonomy tree in an attempt to map the open science field.
+https://eosc-portal.eu/about/eosc 
 
-Environmental data is collected from a diversity of methods, including remote sensing, continuous site-scale measurements (e.g., meteorological variables, hydrological variables, ecosystem-atmosphere exchange fluxes of water vapour and CO2), episodic observations (e.g., forest inventories, biodiversity assessments), field campaigns, or experiments in the field or under laboratory conditions. Data from these sources come in different shapes and formats. In this course, we will learn to handle this diversity efficiently to answer research questions that you will likely encounter in the future. In many of the exercises, we will focus on data from continuous site scale observations, where meteorological variables are measured in parallel with ecosystem-atmosphere exchange fluxes of water vapour and CO2, collected by the eddy covariance technique. In addition, you will learn to tap into large environmental data repositories to complement your site-scale data.
+A key step in making science open and transparent is open access to research data, also known as open data. As research is more and more data-driven, progress in scientific knowledge becomes intimately tighten to data availability. Open data policy enables researchers to make use of existing knowledge in innovative, complementary ways.
 
-At the end of each chapter, you will find an exercise that you can complete using the Renku cloud computing environment and the RStudio integrated development environment.
+Recent research finds that many published scientific findings might not be reliable. For example, researchers have reported being able to replicate only 40 percent or less of cancer biology results, and a large-scale attempt to replicate 100 recent psychology studies successfully reproduced fewer than half of the original results.
+
+https://futurism.com/what-is-open-science-and-why-some-researchers-want-it
+This has come to be called a “reproducibility crisis.” It’s pushed many scientists to look for ways to improve their research practices and increase study reliability. Practicing open science is one way to do so. When scientists share their underlying materials and data, other scientists can more easily evaluate and attempt to replicate them.
+Also, open science can help speed scientific discovery. When scientists share their materials and data, others can use and analyze them in new ways, potentially leading to new discoveries. Some journals are specifically dedicated to publishing data sets for reuse (Scientific Data; Journal of Open Psychology Data). A paper in the latter has already been cited 17 times in under three years – nearly all these citations represent new discoveries, sometimes on topics unrelated to the original research.
+
+Wait – open science sounds just like the way I learned in school that science works. How can this be new?
+
+Under the status quo, science is shared through a single vehicle: Researchers publish journal articles summarizing their studies’ methods and results. The key word here is summary; to write a clear and succinct article, important details may be omitted. Journal articles are vetted via the peer review process, in which an editor and a few experts assess them for quality before publication. But – perhaps surprisingly – the primary data and materials underlying the article are almost never reviewed.
+Historically, this made some sense because journal pages were limited, and storing and sharing materials and data were difficult. But with computers and the internet, it’s much easier to practice open science. It’s now feasible to store large quantities of information on personal computers, and online repositories to share study materials and data are becoming more common. Recently, some journals have even begun to require or reward open science practices like publicly posting materials and data.
+
+Why isn’t open science the default? What incentives work against open science practices?
+
+Two major forces work against adoption of open science practices: habits and reward structures. First, most established researchers have been practicing closed science for years, even decades, and changing these old habits requires some upfront time and effort. Technology is helping speed this process of adopting open habits, but behavioral change is hard.
+Second, scientists, like other humans, tend to repeat behaviors that are rewarded and avoid those that are punished. Journal editors have tended to favor publishing papers that tell a tidy story with perfectly clear results. This has led researchers to craft their papers to be free from blemish, omitting “failed” studies that don’t clearly support their theories. But real data are often messy, so being fully transparent can open up researchers to critique.
+Additionally, some researchers are afraid of being “scooped” – they worry someone will steal their idea and publish first. Or they fear that others will unfairly benefit from using shared data or materials without putting in as much effort.
+Taken together, some researchers worry they will be punished for their openness and are skeptical that the perceived increase in workload that comes with adopting open science habits is needed and worthwhile. We believe scientists must continue to develop systems to allay fears and reward openness.
+
+I’m Not a Scientist; Why Should I Care?
+Science benefits everyone. If you’re reading this article now on a computer, or have ever benefited from an antibiotic, or kicked a bad habit following a psychologist’s advice, then you are a consumer of science. Open science (and its cousin, open access) means that anyone – including teachers, policymakers, journalists and other nonscientists – can access and evaluate study information.
+Considering automatic enrollment in a 401k at work or whether to have that elective screening procedure at the doctor? Want to ensure your tax dollars are spent on policies and programs that actually work? Access to high-quality research evidence matters to you. Open materials and open data facilitate reuse of scientific products, increasing the value of every tax dollar invested. Improving science’s reliability and speed benefits us all.
+
+### benefits
+key benefits, including reputational gains, increased chances of publication, and a broader increase in the reliability of research.
+Open science promotes a more accurate verification of scientific results. By combining the tools of science and information technologies, scientific enquiry and discovery can be sped up for the benefit of society. 
+Open science promotes citizens’ trust in science. Greater citizen engagement leads to active participation in scientific experiments and data collection.
+Practicing open science means that research outputs are accessible to all – not stuck behind pay walls. This helps to ensure that all researchers, and other stakeholders, have access to information regardless of their location or economic situation. It means that the research process can be accelerated and new knowledge can be more quickly generated and built upon to help solve grand challenges.
+Open science offers a better return on investment from research funded by public money and contributes to better economic growth. https://www.openaire.eu/ec-policies-and-mandates 
+For a researcher, opening the research outputs (e.g., research data) is a scientific merit. In Finland, e.g., in the CV templates of the Academy of Finland and the Finnish National Board on Research Integrity, promoting open science and research and, for example, responsible distribution and reuse of research material and datasets count as scientific and societal impact in research work, and are, therefore, worth adding to your CV.
+By sharing your articles, data, code and methods, you are even multiplying the number of citable outputs for every project you work on. Your research will be more visible and understandable to others, which may mean that you might see your citation rate increase. If people can find and access your research, the potential impact of your research increases. In addition, practicing open science can foster new collaborations and research partnerships. All of which can help you to advance in your career.
+Open science strengthens economies through developing a strong and independent national science base
+
+### challenges
+These benefits are balanced by challenges that we have encountered and that involve increased costs in terms of flexibility, time, and issues with the current incentive structure, all of which seem to affect early career researchers (ECRs) acutely.
+
+Although there are major obstacles to the early adoption of open science, overall open science practices should benefit both the ECR and improve the quality of research.
 
 # Getting public data
 Getting public data from widely used portals
@@ -78,7 +124,9 @@ Add a few lines about creating a RMarkdown file e dire dove va creato according 
 # After publication: share your research
 
 # References and further reading
-Wilson G, Aruliah DA, Brown CT, Chue Hong NP, Davis M, Guy RT, et al. (2014) *Best Practices for Scientific Computing.* PLoS Biol 12(1): e1001745. https://doi.org/10.1371/journal.pbio.1001745
+1. Allen C, Mehler DMA (2019) Open science challenges, benefits and tips in early career and beyond. PLOS Biology 17(12): e3000587. https://doi.org/10.1371/journal.pbio.3000587
+2. Wilkinson, Mark D et al. “The FAIR Guiding Principles for scientific data management and stewardship.” *Scientific data* vol. 3 160018. 15 Mar. 2016, doi:10.1038/sdata.2016.18
+3. Wilson G, Aruliah DA, Brown CT, Chue Hong NP, Davis M, Guy RT, et al. (2014) Best Practices for Scientific Computing. *PLoS Biol* 12(1): e1001745. https://doi.org/10.1371/journal.pbio.1001745
 
 
 
