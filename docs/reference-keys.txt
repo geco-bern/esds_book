@@ -286,3 +286,5 @@ neural-networks-new-world
 feed-forward-neural-network
 convolutional-neural-network
 exercise-10
+pdf_document
+supplementary-git-denies-pushing-what-can-i-do
