@@ -22,21 +22,27 @@ Open Science refers to the effort to make scientific research available to the p
 - [OpenAIRE](https://www.openaire.eu)
 
 The transition to open science of the past few years has been motivated by a "reproducibility crisis", i.e. the failure to replicate scientific results. Recent evidence has found that less than half of scientific findings may not be reliable. Practicing open science offers a solution to this problem as well, as sharing materials and data eases the replication of original studies by other scientists. 
-Open science is made possible by **open data**, i.e. when the data itself freely accessible to the public. Policies enabling open data allow researchers to innovate starting from existing knowledge. Other essential benefits for scientists include reputational gains, increased chances of publication, and a broader increase in the reliability of research, as it entails a meticulous verification of scientific results. This in turn boosts citizens' trust in science, which also leads to a more active participation in studies and experiments.  
-The revolution of open science is not relegated to the academic world alone. The entire society is virtually a consumer of Science: from the computer you're reading this article on, to the vaccines that are taking the world out of the current pandemic.                           
+Open science is made possible by **open data**, i.e. when the data itself freely accessible to the public. Policies enabling open data allow researchers to innovate starting from existing knowledge. Other essential benefits for scientists include reputational gains, increased chances of publication, and a broader increase in the reliability of research, as it entails a meticulous verification of scientific results. This in turn boosts citizens' trust in science, which also leads to a more active participation in studies and experiments. 
+
+The revolution of open science is not relegated to the academic world alone. The entire society is virtually a consumer of Science: from the computer you're reading this article on, to the vaccines that are taking the world out of the current pandemic.  
+
 Another key advantage of scientific results being accessible without a fee is that literally anyone on the planet can benefit from them, regardless of their location or economic situation. This is especially important for the scientific community in developing countries. In the end, open science speeds up the circulation of new information and helps generate solutions to the current great challenges. As Isaac Newton said in his 1675 letter: "If I have seen further it is by standing on the shoulders of Giants."  
 Last but not least, making your code, data and methods available, you are creating more citable items per every published project. This will grant more visibility to your research, as well as possibly increasing the total number of times your work get referenced. It can trigger new collaborations and help building the final impact of your research. 
 
 ## What are the major obstacles
-One could argue that what stated above must lay at the foundation of Science. However, there are some drawbacks that have been hindering the development of open science. These trace back to when journals were still in paper format, and storing and sharing materials and data was difficult. Luckily for us, technology is making it easier for us to practice open science.           
-Another problem is that journal articles are basically a summary of long months (and sometimes years) of research. This means that in the final report, some part of it must be neglected, for the sake of brevity. Sometimes, the revision process itself does not check the primary data and materials. Moreover, by experience, papers with a clean story and clear results tend to be published more easily. This has pushed scientists to disregard studies that did not bring such results. But in the end, this phenomenon causes a impoverishment of science, as other scientists can benefit from those "failed" attempts. Being fully transparent is thus an opportunity to foster critical thinking too, as real data can (very) often be chaotic.    
+One could argue that what stated above must lay at the foundation of Science. However, there are some drawbacks that have been hindering the development of open science. These trace back to when journals were still in paper format, and storing and sharing materials and data was difficult. Luckily for us, technology is making it easier for us to practice open science.  
+
+Another problem is that journal articles are basically a summary of long months (and sometimes years) of research. This means that in the final report, some part of it must be neglected, for the sake of brevity. Sometimes, the revision process itself does not check the primary data and materials. Moreover, by experience, papers with a clean story and clear results tend to be published more easily. This has pushed scientists to disregard studies that did not bring such results. But in the end, this phenomenon causes a impoverishment of science, as other scientists can benefit from those "failed" attempts. Being fully transparent is thus an opportunity to foster critical thinking too, as real data can (very) often be chaotic. 
+
 Finally, another obstacle is the time constraint imposed by the current incentive structure. In the current academic world, publications are the easiest way for scientists to propel their careers forward. In this frame of things, it is thus hard to dedicate more time to a process which may not bring direct benefits. However, considering the bigger picture as described above, open science bring advantages both to the single researcher and the scientific community. 
 
 # Getting public data
-Getting public data from widely used portals
-e.g., Copernicus data, NASA data, etc. using their APIs
-Koen’s package for soil database
-ingestr?
+Getting public data from widely used portals     
+e.g., Copernicus data, NASA data, etc. using their APIs       
+ingestr?                
+Koen’s interface to the Harmonized World Soil Database ‘HWSD’ web services: https://bluegreen-labs.github.io/hwsdr/
+
+TO BE COMPLETED
 
 # Structure of the project directory
 ## In a nutshell
@@ -78,18 +84,28 @@ A good habit is to copy figures produced by the workflow script to a separate di
 - Make sure that important figures (e.g. the ones in published papers) can be easily reproduced, starting from original data that were downloaded from (possibly open access-) sources. A good place to describe how to reproduce figures are RMarkdown files.
 - When creating .RData files, put only one variable into them and name the .RData the same as the variable. E.g. file ‘df_combined.RData' contains only one variable, namely ‘df_combined’.
 
-# Reporting science: from idea to publication
-Add a few lines about creating a RMarkdown file e dire dove va creato according to Koen's structure
+## Git Attributes
+Using .gitattrributes to keep data on git: https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files 
 
+TO BE COMPLETED
+
+# Reporting science: from idea to publication
 - Structure your code into parts that naturally go together. A code file should not contain more than a few hundred lines of code.
 - Visually highlight the structure inside your code files.
-- RMarkdown is a great tool to give structure to your code and make your code readable. You can implement the entire workflow of a project in one or a few RMarkdown files.
+- Implement the entire workflow of your project in one or a few RMarkdown files.  RMarkdown is a great tool to give structure to your code and make your code readable. 
 - If additional scripts are used outside of your main workflow script/RMarkdown file, point to them (by file name).
 - Consider a hierarchy of sections. Explain briefly what is done by each code chunk.
-- Make it easy for someone to reproduce your published Figure X.
+- The final aim is to make it easy for someone to reproduce your published Figure X.
 - When using RMarkdown or Markdown, please follow the syntax for a nicely readable formatting 
 
+TO BE COMPLETED
+
 # After publication: share your research
+- Sharing raw and processed data on a server/cluster (e.g. euler at ETH, other at Imperial)
+- Make data and code publicly available (Zenodo, etc.)
+- Show services and how they work (e.g. Zenodo and its webhooks that integrate with github releases) 
+
+TO BE COMPLETED
 
 # References and further reading
 1. Allen C, Mehler DMA (2019) Open science challenges, benefits and tips in early career and beyond. PLOS Biology 17(12): e3000587. https://doi.org/10.1371/journal.pbio.3000587
