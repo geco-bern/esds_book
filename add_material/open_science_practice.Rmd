@@ -109,6 +109,18 @@ See link for a very good guideance: https://alexd106.github.io/intro2R/project_s
 
 What advantages would creating a project bring? It helps to best manage a project. For example, all analyses used within this project can be managed, and it will never mix with other types of analysis.
 
+Main steps:
+
+1. Create a project
+![](/Users/yunpeng/yunkepeng/esds_book/figures/project1.png) 
+![](/Users/yunpeng/yunkepeng/esds_book/figures/project2.png) 
+
+2. Then you will see this new Rproj at the window
+![](/Users/yunpeng/yunkepeng/esds_book/figures/project3.png) 
+
+3. Then you can set your project work path in Rstudio, which is just exactly the same place shown in above window. 
+setwd('/Users/yunpeng/../first_project')
+
 
 ## Git Attributes
 Using .gitattrributes to keep data on git: https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files 
