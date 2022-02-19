@@ -37,12 +37,34 @@ Another problem is that journal articles are basically a summary of long months 
 Finally, another obstacle is the time constraint imposed by the current incentive structure. In the current academic world, publications are the easiest way for scientists to propel their careers forward. In this frame of things, it is thus hard to dedicate more time to a process which may not bring direct benefits. However, considering the bigger picture as described above, open science bring advantages both to the single researcher and the scientific community. 
 
 # Getting public data
-Getting public data from widely used portals     
-e.g., Copernicus data, NASA data, etc. using their APIs       
-ingestr?                
-Koen’s interface to the Harmonized World Soil Database ‘HWSD’ web services: https://bluegreen-labs.github.io/hwsdr/
+Getting public data from widely used portals  e.g. Copernicus data, NASA data, etc. using their APIs
 
-TO BE COMPLETED
+Here we show an example about how to ingest (download) climate data from Euler. Here we are interested in downloading air temperature at a certain range of time and site.
+
+Guidance of installing ingestr is here: https://github.com/computationales/ingestr 
+
+The source data are all available in Euler. See comments below. You can either download data from Euler to hard drive/desktop and then run this code in desktop, or directly run this code in Euler.
+
+```{r, warning=FALSE, message=FALSE,results='hide'}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(ingestr)
+library(ggplot2)
+siteinfo1 <- tibble(sitename="site1",lon= -79.2,lat=34.8,elv=61,year_start=1992,year_end=1992)
+
+df_watch <- ingest(
+  siteinfo  = siteinfo1,
+  source    = "watch_wfdei",
+  getvars   = c("temp"), 
+  dir       = "/Volumes/My Passport/data/watch_wfdei/", #In Euler: /cluster/work/climate/bestocke/data/watch_wfdei/
+  settings  = list(correct_bias = "worldclim", dir_bias = "/Volumes/My Passport/data/worldclim/")) #In Euler: /cluster/work/climate/bestocke/data/worldclim/
+
+qplot(x=date, y=temp,
+      data=as.data.frame(df_watch$data), na.rm=TRUE,
+      main="Daily air temperature at example site",
+      xlab="Date", ylab="Temperature (°C)")
+  
+```
+
 
 # Structure of the project directory
 ## In a nutshell
@@ -57,16 +79,14 @@ Keep things separate and in the right place. Original data, as downloaded from t
 
 The project directory and other utility packages are synced with Github. Using *git*, the code of entire projects can be synced across multiple workstations and with your personal directory on your institution's cluster or cloud services (e.g. the HPC cluster 'Euler' at ETH Zurich). 
 
-![](/Users/fgiardina/esds_book-master/figures/folder_organization_new.png) 
-
-
+![](/Users/yunpeng/yunkepeng/esds_book/figures/folder_organization_new.png) 
 
 ## Where does the data go?
 Original data, as downloaded from the web, should always be in the data directory `~/data` and synced with your cluster. When you download data files from a particular source (e.g. accompanying a paper, or a particular satellite missing, etc.), create a subdirectory within `~/data` and place it in there, along with a `README` file (plain text) where you specify when and how the data was obtained (contact person, URL, etc.), what data use policies apply, who obtained it (your name) and how it should be cited. If original data was processed to a different format or re-gridded, please note it in the README, too (but not any further analysis).
 
 Note that intermediate outputs produced by your project's code should not go on git. Git is only to back up code (and small plain-text data files, on the order of a about <100 MB). Still you may want to sync these intermediate outputs with your cluster as a backup of your analysis. 
 
-![](/Users/fgiardina/esds_book-master/figures/data_location_new.png) 
+![](/Users/yunpeng/yunkepeng/esds_book/figures/data_location_new.png) 
 
 ## Reproducibility
 Making your analysis reproducible - from the original files you downloaded on the web to final results and figures - is our highest standard. No excuses! Before submission of a paper, you should be able to demonstrate reproducibility. 
@@ -75,7 +95,7 @@ The key file here is a "workflow" script written on RMarkdown or Jupyter Noteboo
 
 A good habit is to copy figures produced by the workflow script to a separate directory synced with you cloud service (e.g. Polybox at ETH Zurich) that also contains the manuscript file. You may also have this as yet another git project directory. Upon publication, all outputs produced by the project directory for the paper are to be uploaded on *Zenodo* (or any other service that generates DOIs). Regularly *tag* your *git* project at important stages (e.g. first submission, final submission, etc.). Tags can form a *release* within Github and releases can be synced with *Zenodo* where each release gets its DOI (see chapter below). Refer to the code and output DOIs in your published paper.
 
-![](/Users/fgiardina/esds_book-master/figures/reproducibility_new.png) 
+![](/Users/yunpeng/yunkepeng/esds_book/figures/reproducibility_new.png) 
 
 
 ## Best practice notes
@@ -84,10 +104,49 @@ A good habit is to copy figures produced by the workflow script to a separate di
 - Make sure that important figures (e.g. the ones in published papers) can be easily reproduced, starting from original data that were downloaded from (possibly open access-) sources. A good place to describe how to reproduce figures are RMarkdown files.
 - When creating .RData files, put only one variable into them and name the .RData the same as the variable. E.g. file ‘df_combined.RData' contains only one variable, namely ‘df_combined’.
 
+## Create a project in R
+See link for a very good guideance: https://alexd106.github.io/intro2R/project_setup.html
+
+What advantages would creating a project bring? It helps to best manage a project. For example, all analyses used within this project can be managed, and it will never mix with other types of analysis.
+
+
 ## Git Attributes
 Using .gitattrributes to keep data on git: https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files 
 
-TO BE COMPLETED
+![](/Users/yunpeng/yunkepeng/esds_book/figures/git_info.png)
+
+Git add: Adding (updating) changed file in current desktop. Storing this change from working directory to staging area.
+
+Git commit: Commit this change along with some comments at staging area, and prepared before submission.
+
+Git push: push this change from local-repo to remote-repo. In other words, this change can now be shared with other users.
+
+Git pull: Pull the latest version of remote repo's updates into current local desktop.
+
+Git merge/checkout: merge local and remote's code together. 
+
+Git tag: create tag so that it will points out important release of code. See complete step here: https://stackoverflow.com/questions/18216991/create-a-tag-in-a-github-repository
+
+## How to create a new repo in Github?
+See link: https://docs.github.com/en/get-started/quickstart/create-a-repo
+
+First press "Create a repository" in Github. Follow the instructions and then finish. Then, following instructions shown in below. Using "cd file-path" to point out your saved path. Then add files manually, commit and git push
+
+![](/Users/yunpeng/yunkepeng/esds_book/figures/github_info.png) 
+
+## How to fork a repo in Github?
+See link: https://docs.github.com/en/get-started/quickstart/fork-a-repo
+
+First, find the repo you wish to fork, then cloned it to your own github, and your own desktop basing on below.
+
+When using other users code, why we prefer choose to use fork a repo, rather than directly using others repo (e.g. devtools::install_github("../.."))? Because:
+
+(1) in this way, it will help us to easier to edit the code. We knew exactly where we saved this code, and we can edit them, trace them (through git.), and push them into our own github anytime!
+
+(2) it will also help us to communicate with other users. For example, you find an apparent mistakes in original branch - you can edit it your own, submit to github and then report to original author.
+
+![](/Users/yunpeng/yunkepeng/esds_book/figures/fork1.png) 
+![](/Users/yunpeng/yunkepeng/esds_book/figures/fork2.png) 
 
 # Reporting science: from idea to publication
 - Structure your code into parts that naturally go together. A code file should not contain more than a few hundred lines of code.
@@ -98,14 +157,21 @@ TO BE COMPLETED
 - The final aim is to make it easy for someone to reproduce your published Figure X.
 - When using RMarkdown or Markdown, please follow the syntax for a nicely readable formatting 
 
-TO BE COMPLETED
+# Upload file to Euler
+- After processing of data analysis and before publication, all data used or saved in desktop should be uploaded to Euler so that it benefits re-use from other users. It is recommended to use Filezilla. The left is page at desktop, the right is page at remote (Euler). You can just directly move the file from left to right (for upload) or move file from right to left (for download).
+- Very important: We recommend to keep path consistently between desktop and remote place. For data saving, my desktop path is "/Users/yunpeng/data/" and Euler path is "/cluster/work/climate/bestocke/data". But they can both be written as "~/data/" so that it can be consistently inputted in any analysis.
+
+![](/Users/yunpeng/yunkepeng/esds_book/figures/filezilla.png) 
 
 # After publication: share your research
-- Sharing raw and processed data on a server/cluster (e.g. euler at ETH, other at Imperial)
-- Make data and code publicly available (Zenodo, etc.)
-- Show services and how they work (e.g. Zenodo and its webhooks that integrate with github releases) 
+- Sharing raw and processed data on a server/cluster (e.g. euler at ETH, other at Imperial). See above point.
+- Make data publicly available (Zenodo, dryad) and quote its DOI for the use of paper.
+- Make code publicly available in Github, and publish its release. 
+- How to make code publicly availble in Github and publish its release and zenodo? See here: https://docs.github.com/en/repositories/archiving-a-github-repository/referencing-and-citing-content
 
-TO BE COMPLETED
+![](/Users/yunpeng/yunkepeng/esds_book/figures/zenodo1.png) 
+![](/Users/yunpeng/yunkepeng/esds_book/figures/zenodo2.png) 
+
 
 # References and further reading
 1. Allen C, Mehler DMA (2019) Open science challenges, benefits and tips in early career and beyond. PLOS Biology 17(12): e3000587. https://doi.org/10.1371/journal.pbio.3000587
