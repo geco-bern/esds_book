@@ -313,29 +313,30 @@ Main steps:
     setwd('/Users/yunpeng/../first_project')
 
 ## Document and communicate analysis
+Below is an example for using ingestr function to download daily climate data (e.g. Average temperature). Code is commented out temporaily because data has to be downloaded to your desktop in advance which may cause a long time. 
 
-XXX this code is not executable. libraries not correctly specified,
-there are absolute paths. please use ggplot, not qplot. thanks.
+This data is available in Euler. See commented data path below. To run analysis, you can either download data from Euler to your own hard-drive to run, or directly run in Euler.
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
-library(ingestr)
-library(ggplot2)
-siteinfo1 <- tibble(sitename="site1",lon= -79.2,lat=34.8,elv=61,year_start=1992,year_end=1992)
+#knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+#library(ingestr)
+#library(ggplot2)
+#siteinfo1 <- tibble(sitename="site1",lon= -79.2,lat=34.8,elv=61,year_start=1992,year_end=1992)
 
-df_watch <- ingest(
-  siteinfo  = siteinfo1,
-  source    = "watch_wfdei",
-  getvars   = c("temp"), 
-  dir       = "/Volumes/My Passport/data/watch_wfdei/", #In Euler: /cluster/work/climate/bestocke/data/watch_wfdei/
-  settings  = list(correct_bias = "worldclim", dir_bias = "/Volumes/My Passport/data/worldclim/")) #In Euler: /cluster/work/climate/bestocke/data/worldclim/
+#df_watch <- ingest(
+#  siteinfo  = siteinfo1,
+#  source    = "watch_wfdei",
+#  getvars   = c("temp"), 
+#  dir       = "/Volumes/My Passport/data/watch_wfdei/", #In Euler: /cluster/work/climate/bestocke/data/watch_wfdei/
+#  settings  = list(correct_bias = "worldclim", dir_bias = "/Volumes/My Passport/data/worldclim/")) #In Euler: /cluster/work/climate/bestocke/data/worldclim/
 
-qplot(x=date, y=temp,
-      data=as.data.frame(df_watch$data), na.rm=TRUE,
-      main="Daily air temperature at example site",
-      xlab="Date", ylab="Temperature (°C)")
+#ggplot(data=as.data.frame(df_watch$data),aes(x=date, y=temp))+geom_point()+
+#  ggtitle("Daily air temperature at example site") +
+#  xlab("Date") + ylab("Temperature")
   
 ```
+
+![](../figures/project1.png)
 
 -   Structure your code into parts that naturally go together. A code
     file should not contain more than a few hundred lines of code.
