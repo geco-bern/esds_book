@@ -9,20 +9,20 @@ editor_options:
 *Authors: Francesco Giardina, Yunke Peng, Benjamin Stocker*
 
 # Motivation
-The motivation of making open science available include below:
+## Why should I care?
+The immediate benefits of working reproducibly for the individual are manifold. They include:
 
-1. When getting back to a work after long-term absence, it is easily to confuse and forget current version of written code and data. But a good data management tool and code update management can prevent them, you can check any changes or comments in any past time, and github will record all your changes made on your code.
+1. Resuming work after absence becomes way easier. 
 
-2. A good management of data and code, will also make good benefit when the publication is under revision condition. Imagining that reviewers want to you check some other new variables. Such new variables only existed in your original dataset but not in final aggregated dataset. If code is managed well then it is very efficient to further collect, trace and combine them in your further analysis.
+2. By consequence, implementation of revisions of a paper become faster. 
 
-3. It will also help when working with other collaborators. You can work by sharing code/data very efficiently, merged them without the worry for conflicts of code.
+3. Writing legible code and documenting a project well ensures that you can hand it off easily to collaborators.
 
-4. Using a Rstudio repository project, will make sure all analysis within one paper can be well managed and checked.
+4. Using a project-based approach (read below for more info) retains most data in one spot. This way, stuff can easily be moved from system to system. 
 
-5. The good use of data management (e.g. between Euler, local repository and pubilc data) will also speed up the data analysis and make all work well organized.
+5. Moveable projects allow for local development but remote (cluster) deployment of projects. 
 
-6. A good track of code management in git, will also help the whole team work efficiently when de-bug or update a newer version together.
-
+6. Legible code and the use of version control software allow for a team to quickly iterate over a problem if need be.
 
 ## Some history
 
@@ -111,15 +111,10 @@ practice open science.
 
 Another problem is that journal articles are basically a summary of long
 months (and sometimes years) of research. This means that in the final
-report, some part of it must be neglected, for the sake of brevity.
-Sometimes, the revision process itself does not check the primary data
-and materials. Moreover, by experience, papers with a clean story and
-clear results tend to be published more easily. This has pushed
-scientists to disregard studies that did not bring such results. But in
-the end, this phenomenon causes a impoverishment of science, as other
-scientists can benefit from those "failed" attempts. Being fully
-transparent is thus an opportunity to foster critical thinking too, as
-real data can (very) often be chaotic.
+report, some part of the analysis must be summarized or excluded, for the sake of brevity. Papers with a clean story and
+clear results tend to be published more easily. In
+the end, what we are presented with in a published article can be far from the actual trial and error steps of the scientific method. Nevertheless, this phenomenon causes a impoverishment of science, as other
+scientists could benefit from those "failed" attempts. 
 
 Finally, another obstacle is the time constraint imposed by the current
 incentive structure. In the current academic world, publications are the
@@ -205,7 +200,23 @@ cluster or cloud services (e.g. the HPC cluster 'Euler' at ETH Zurich).
 
 ![](../figures/folder_organization_new.png)
 
-XXX to be added: the use of `~/.bash_profile`
+## A quick note on *.bash_profile*
+To ease the access to a cluster, it is possible to use *.bash_profile*. This is a configuration script generally located in your home directory  (file path must be: ~/.bash_profile). It is used to customize your bash environment and can contain variable specifications, login information, etc. You can add bash functions there. It is basically a normal bash script that is executed each time you open a bash shell (terminal window or tab). The bash profile is named `.bash_profile` and sits in your home (`~`). 
+
+To open and edit your bash_profile do:
+
+```bash
+subl ~/.bash_profile
+```
+
+In your *.bash_profile*, you can list aliases (shorthands), environment variables, and functions that may be useful. Just add them to your bash_profile.
+
+Once you made changes to bash_profile, they are not immediately effective in the shell windows already opened. To make them effective, you can do
+
+```bash
+source ~/.bash_profile
+```
+The bash profile can contain specifications of environment variables and functions. The first line is (as for every bash script) `#!/bin/bash` . Then come the environment specifications. 
 
 ## Where does the data go?
 
