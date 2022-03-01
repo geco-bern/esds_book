@@ -354,11 +354,11 @@ Main steps:
     setwd('/Users/yunpeng/../first_project')
 
 ## Document and communicate analysis
-Below is an example for using ingestr function to download daily climate data (e.g. Average temperature). 
-This data is available in Euler. To run analysis, you can either download data from Euler to your own hard-drive to run, or directly run in Euler. See below commented path that relevant to Euler.
+- Below is an example for using ingestr function to download daily climate data (e.g. Average temperature). This data is available in Euler. To run analysis, you can either download data from Euler to your own hard-drive to run, or directly run in Euler. See below commented path that relevant to Euler.
 
-```{r eval=FALSE}
+
 library(ingestr)
+
 library(ggplot2)
 
 siteinfo1 <- tibble(sitename="site1",lon= -79.2,lat=34.8,elv=61,year_start=1992,year_end=1992)
@@ -374,9 +374,10 @@ ggplot(data=as.data.frame(df_watch$data),aes(x=date, y=temp))+geom_point()+
   ggtitle("Daily air temperature at example site") +
   xlab("Date") + ylab("Temperature")
   
-```
 
 ![](../figures/ggplot.png)
+
+Some other tips
 
 -   Structure your code into parts that naturally go together. A code
     file should not contain more than a few hundred lines of code.
