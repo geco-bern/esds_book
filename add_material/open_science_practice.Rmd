@@ -9,6 +9,20 @@ editor_options:
 *Authors: Francesco Giardina, Yunke Peng, Benjamin Stocker*
 
 # Motivation
+## Why should I care?
+The immediate benefits of working reproducibly for the individual are manifold. They include:
+
+1. Resuming work after absence becomes way easier. 
+
+2. By consequence, implementation of revisions of a paper become faster. 
+
+3. Writing legible code and documenting a project well ensures that you can hand it off easily to collaborators.
+
+4. Using a project-based approach (read below for more info) retains most data in one spot. This way, stuff can easily be moved from system to system. 
+
+5. Moveable projects allow for local development but remote (cluster) deployment of projects. 
+
+6. Legible code and the use of version control software allow for a team to quickly iterate over a problem if need be.
 
 ## Some history
 
@@ -97,15 +111,10 @@ practice open science.
 
 Another problem is that journal articles are basically a summary of long
 months (and sometimes years) of research. This means that in the final
-report, some part of it must be neglected, for the sake of brevity.
-Sometimes, the revision process itself does not check the primary data
-and materials. Moreover, by experience, papers with a clean story and
-clear results tend to be published more easily. This has pushed
-scientists to disregard studies that did not bring such results. But in
-the end, this phenomenon causes a impoverishment of science, as other
-scientists can benefit from those "failed" attempts. Being fully
-transparent is thus an opportunity to foster critical thinking too, as
-real data can (very) often be chaotic.
+report, some part of the analysis must be summarized or excluded, for the sake of brevity. Papers with a clean story and
+clear results tend to be published more easily. In
+the end, what we are presented with in a published article can be far from the actual trial and error steps of the scientific method. Nevertheless, this phenomenon causes a impoverishment of science, as other
+scientists could benefit from those "failed" attempts. 
 
 Finally, another obstacle is the time constraint imposed by the current
 incentive structure. In the current academic world, publications are the
@@ -191,7 +200,23 @@ cluster or cloud services (e.g. the HPC cluster 'Euler' at ETH Zurich).
 
 ![](../figures/folder_organization_new.png)
 
-XXX to be added: the use of `~/.bash_profile`
+## A quick note on *.bash_profile*
+To ease the access to a cluster, it is possible to use *.bash_profile*. This is a configuration script generally located in your home directory  (file path must be: ~/.bash_profile). It is used to customize your bash environment and can contain variable specifications, login information, etc. You can add bash functions there. It is basically a normal bash script that is executed each time you open a bash shell (terminal window or tab). The bash profile is named `.bash_profile` and sits in your home (`~`). 
+
+To open and edit your bash_profile do:
+
+```bash
+subl ~/.bash_profile
+```
+
+In your *.bash_profile*, you can list aliases (shorthands), environment variables, and functions that may be useful. Just add them to your bash_profile.
+
+Once you made changes to bash_profile, they are not immediately effective in the shell windows already opened. To make them effective, you can do
+
+```bash
+source ~/.bash_profile
+```
+The bash profile can contain specifications of environment variables and functions. The first line is (as for every bash script) `#!/bin/bash` . Then come the environment specifications. 
 
 ## Where does the data go?
 
@@ -285,13 +310,29 @@ science workflow:
 
 -   Code versioning and publication
 
-## Obtain and document data
+## Obtain data
+Below is an example to get data publicly. Generally, please always read README carefully, and especially the data-use policy for further analysis and publications. 
 
-XXX show an example for a file that can be downloaded from some public
-data repository.
+- **TRY database**: https://www.try-db.org/TryWeb/Prop2.php
+  It includes all possible leaf traits (mainly in natural environments). Following instructions below. You can find a traits list in left bottom "show traits" and each number would mean an unique traits (e.g. 1 means leaf area). Then just add all numbers you want together, and press continue to fill rest of information. Please note, never putting too many variables one time as it it could make the document too large to download. ![](../figures/public1.png)
 
-## Organize analysis code
+- **Dryad**: https://datadryad.org/search 
+  A public database to search, browse and download data, and especially include many ecology, plant sciences and climate data globally or regionally. Each database includes a doi so you can cite when using them in your publication.
 
+- **Zenodo**: https://zenodo.org/ 
+  This seems to be more widely used than Dryad, as it encompassed all possible research areas than just ecology data. Many publications have used this place to deliver this data locally and forming an unique doi. 
+
+- **Github**: an example here: https://github.com/forc-db/ForC
+  A few research also derlivers their data in Github. Although Github cannot produce doi directly (it can only form doi when combing with Zenodo), the advantage of using Github is that, it enables multiple data providers to update data together, and also, it is convenient for them to update data frequently. But this also has side effect - it is difficult to cite them, and also, has to prevent the risk that when data is recently updated but you still use old version of data. So, always keep in mind to git pull repository when downloading this sort of data. ![](../figures/public2.png)
+
+- **Other sources**: Many other public data used for forcing or modelling were already available in Euler. For example, WFDEI, CRU...Always checked Euler first to see if it already exists
+
+## Document data
+- After downloading data, please make sure one file just stored one source of data. Taking below file as an example, it includes original csv, original paper, and a README. Here README was created just to note myself, you can add when and where you download this data (email or public link?), which variables did it generally include, important note, unit, or any others you wish to note to your self.
+![](../figures/document1.png)
+- Then you can mark in Notion: https://www.notion.so/computationales/Site-scale-data-d1438daa123448858fd962d23b0f2185 So that everyone else can find it easily when browsing this data again. ![](../figures/document2.png)
+
+## Organise analysis code in a Rstudio project
 See link for a very good guideance:
 [\<https://alexd106.github.io/intro2R/project_setup.html\>](https://alexd106.github.io/intro2R/project_setup.html){.uri}
 
@@ -313,14 +354,13 @@ Main steps:
     setwd('/Users/yunpeng/../first_project')
 
 ## Document and communicate analysis
+- Below is an example for using ingestr function to download daily climate data (e.g. Average temperature). This data is available in Euler. To run analysis, you can either download data from Euler to your own hard-drive to run, or directly run in Euler. See below commented path that relevant to Euler.
 
-XXX this code is not executable. libraries not correctly specified,
-there are absolute paths. please use ggplot, not qplot. thanks.
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(ingestr)
+
 library(ggplot2)
+
 siteinfo1 <- tibble(sitename="site1",lon= -79.2,lat=34.8,elv=61,year_start=1992,year_end=1992)
 
 df_watch <- ingest(
@@ -330,12 +370,14 @@ df_watch <- ingest(
   dir       = "/Volumes/My Passport/data/watch_wfdei/", #In Euler: /cluster/work/climate/bestocke/data/watch_wfdei/
   settings  = list(correct_bias = "worldclim", dir_bias = "/Volumes/My Passport/data/worldclim/")) #In Euler: /cluster/work/climate/bestocke/data/worldclim/
 
-qplot(x=date, y=temp,
-      data=as.data.frame(df_watch$data), na.rm=TRUE,
-      main="Daily air temperature at example site",
-      xlab="Date", ylab="Temperature (°C)")
+ggplot(data=as.data.frame(df_watch$data),aes(x=date, y=temp))+geom_point()+
+  ggtitle("Daily air temperature at example site") +
+  xlab("Date") + ylab("Temperature")
   
-```
+
+![](../figures/ggplot.png)
+
+Some other tips
 
 -   Structure your code into parts that naturally go together. A code
     file should not contain more than a few hundred lines of code.
