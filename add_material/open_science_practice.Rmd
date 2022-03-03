@@ -79,8 +79,8 @@ effort, the European Union is leading the way with several initiatives
 
 The transition to open science over the past few years has been
 motivated by a "reproducibility crisis", i.e. the failure to replicate
-scientific results. Recent evidence has found that less than half of
-scientific findings may not be reliable. Practicing open science offers
+scientific results. Recent evidence has found that in the field of medicine, less than half of
+scientific findings may not be reliable (Ioannidis, 2005). Practicing open science offers
 a solution to this problem, as sharing materials and data eases the
 replication of original studies by other scientists. Open science is
 made possible by **open data**, i.e. when the data itself is freely
@@ -609,10 +609,11 @@ devtools::install_github("../.."))? Because:
 2.  Wilkinson, Mark D et al. "The FAIR Guiding Principles for scientific
     data management and stewardship." *Scientific data* vol. 3 160018.
     15 Mar. 2016, <doi:10.1038/sdata.2016.18>
-3.  Wilson G, Aruliah DA, Brown CT, Chue Hong NP, Davis M, Guy RT, et
+3.  Ioannidis JPA (2005) Why Most Published Research Findings Are False. PLoS Med 2(8): e124. https://doi.org/10.1371/journal.pmed.0020124
+4.  Wilson G, Aruliah DA, Brown CT, Chue Hong NP, Davis M, Guy RT, et
     al. (2014) Best Practices for Scientific Computing. *PLoS Biol*
     12(1): e1001745. <https://doi.org/10.1371/journal.pbio.1001745>
-4.  RMarkdown resources:
+5.  RMarkdown resources:
     [basics](https://rmarkdown.rstudio.com/authoring_basics.html), [PDF
     Cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf),
     [Another longer
