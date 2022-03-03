@@ -136,9 +136,22 @@ articles. However, considering the bigger picture as described above,
 open science bring advantages both to the single researcher and the
 scientific community.
 
-# Environmental data repositories
+# Data resources
 
-The following is a limited list of permanent data repositories for (environmental) data.
+## Environmental data repositories
+
+The following is a limited list of permanent data repositories for
+(environmental) data.
+
+-   [Copernicus Climate Data Store](https://cds.climate.copernicus.eu/)
+
+-   [Pangaea](https://www.pangaea.de/)
+
+-   [NASA Earth Data](https://earthdata.nasa.gov/)
+
+-   [ORNL DAAC](https://daac.ornl.gov/)
+
+## Some of our favourites
 
 -   **TRY database**: <https://www.try-db.org/TryWeb/Prop2.php> It
     includes all possible leaf traits (mainly in natural environments).
@@ -148,6 +161,10 @@ The following is a limited list of permanent data repositories for (environmenta
     together, and press continue to fill rest of information. Please
     note, never putting too many variables one time as it it could make
     the document too large to download. ![](../figures/public1.png)
+
+-   ...
+
+## General permanent data repositories
 
 -   **Dryad**: <https://datadryad.org/search> A public database to
     search, browse and download data, and especially include many
@@ -174,8 +191,19 @@ The following is a limited list of permanent data repositories for (environmenta
 -   **Other sources**: Many other public data used for forcing or
     modelling were already available in Euler. For example, WFDEI,
     CRU...Always checked Euler first to see if it already exists
-    
-    
+
+## Software for data interfacing
+
+### R
+
+-   MODISTools
+
+-   ...
+
+### Python
+
+-   ...
+
 # Open science practice
 
 The following describes principles and rules for open science practice
@@ -378,7 +406,6 @@ Below is an example to get data publicly. Generally, please always read
 README carefully, and especially the data-use policy for further
 analysis and publications.
 
-
 ## Document data
 
 -   After downloading data, please make sure one file just stored one
@@ -396,7 +423,7 @@ analysis and publications.
 ## Organise analysis code in a Rstudio project
 
 See link for a very good guideance:
-[\<https://alexd106.github.io/intro2R/project_setup.html>](https://alexd106.github.io/intro2R/project_setup.html){.uri}
+[\<https://alexd106.github.io/intro2R/project_setup.html\>](https://alexd106.github.io/intro2R/project_setup.html){.uri}
 
 What advantages would creating a project bring? It helps to best manage
 a project. For example, all analyses used within this project can be
@@ -423,14 +450,14 @@ Main steps:
     your own hard-drive to run, or directly run in Euler. See below
     commented path that relevant to Euler.
 
+```{r eval = FALSE}
 library(ingestr)
-
 library(ggplot2)
 
-siteinfo1 \<- tibble(sitename="site1",lon=
+siteinfo1 <- tibble(sitename="site1",lon=
 -79.2,lat=34.8,elv=61,year_start=1992,year_end=1992)
 
-df_watch \<- ingest( siteinfo = siteinfo1, source = "watch_wfdei",
+df_watch <- ingest( siteinfo = siteinfo1, source = "watch_wfdei",
 getvars = c("temp"), dir = "/Volumes/My Passport/data/watch_wfdei/", #In
 Euler: /cluster/work/climate/bestocke/data/watch_wfdei/ settings =
 list(correct_bias = "worldclim", dir_bias = "/Volumes/My
@@ -438,8 +465,9 @@ Passport/data/worldclim/")) #In Euler:
 /cluster/work/climate/bestocke/data/worldclim/
 
 ggplot(data=as.data.frame(df_watch\$data),aes(x=date,
-y=temp))+geom_point()+ ggtitle("Daily air temperature at example site")
-+ xlab("Date") + ylab("Temperature")
+y=temp))+geom_point()+ ggtitle("Daily air temperature at example
+site") + xlab("Date") + ylab("Temperature")
+```
 
 ![](../figures/ggplot.png)
 
@@ -486,7 +514,7 @@ Some other tips
 -   Make code publicly available in Github, and publish its release.
 -   How to make code publicly availble in Github and publish its release
     and zenodo? See here:
-    [\<https://docs.github.com/en/repositories/archiving-a-github-repository/referencing-and-citing-content>](https://docs.github.com/en/repositories/archiving-a-github-repository/referencing-and-citing-content){.uri}
+    [\<https://docs.github.com/en/repositories/archiving-a-github-repository/referencing-and-citing-content\>](https://docs.github.com/en/repositories/archiving-a-github-repository/referencing-and-citing-content){.uri}
 
 ![](../figures/zenodo1.png) ![](../figures/zenodo2.png)
 
@@ -511,7 +539,7 @@ code in desktop, or directly run this code in Euler.
 ## Git Attributes
 
 Using .gitattrributes to keep data on git:
-[\<https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files>](https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files){.uri}
+[\<https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files\>](https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files){.uri}
 
 ![](../figures/git_info.png)
 
@@ -531,12 +559,12 @@ Git merge/checkout: merge local and remote's code together.
 
 Git tag: create tag so that it will points out important release of
 code. See complete step here:
-[\<https://stackoverflow.com/questions/18216991/create-a-tag-in-a-github-repository>](https://stackoverflow.com/questions/18216991/create-a-tag-in-a-github-repository){.uri}
+[\<https://stackoverflow.com/questions/18216991/create-a-tag-in-a-github-repository\>](https://stackoverflow.com/questions/18216991/create-a-tag-in-a-github-repository){.uri}
 
 ### How to create a new repo in Github?
 
 See link:
-[\<https://docs.github.com/en/get-started/quickstart/create-a-repo>](https://docs.github.com/en/get-started/quickstart/create-a-repo){.uri}
+[\<https://docs.github.com/en/get-started/quickstart/create-a-repo\>](https://docs.github.com/en/get-started/quickstart/create-a-repo){.uri}
 
 First press "Create a repository" in Github. Follow the instructions and
 then finish. Then, following instructions shown in below. Using "cd
@@ -548,7 +576,7 @@ and git push
 ### How to fork a repo in Github?
 
 See link:
-[\<https://docs.github.com/en/get-started/quickstart/fork-a-repo>](https://docs.github.com/en/get-started/quickstart/fork-a-repo){.uri}
+[\<https://docs.github.com/en/get-started/quickstart/fork-a-repo\>](https://docs.github.com/en/get-started/quickstart/fork-a-repo){.uri}
 
 First, find the repo you wish to fork, then cloned it to your own
 github, and your own desktop basing on below.
