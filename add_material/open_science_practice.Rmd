@@ -454,7 +454,7 @@ Main steps:
 library(ingestr)
 library(ggplot2)
 
-siteinfo1 <- tibble(sitename="site1",lon=
+siteinfo <- tibble(sitename="site1",lon=
 -79.2,lat=34.8,elv=61,year_start=1992,year_end=1992)
 
 df_watch <- ingest( siteinfo = siteinfo1, source = "watch_wfdei",
@@ -464,7 +464,7 @@ list(correct_bias = "worldclim", dir_bias = "/Volumes/My
 Passport/data/worldclim/")) #In Euler:
 /cluster/work/climate/bestocke/data/worldclim/
 
-ggplot(data=as.data.frame(df_watch\$data),aes(x=date,
+ggplot(data=as.data.frame(df_watch$data),aes(x=date,
 y=temp))+geom_point()+ ggtitle("Daily air temperature at example
 site") + xlab("Date") + ylab("Temperature")
 ```
@@ -506,6 +506,12 @@ Some other tips
 ![](../figures/filezilla.png)
 
 ## Code versioning and publication
+
+XXX Explain git tags and github releases, see
+[here](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
+
+XXX For public code, make consistent versioning, see
+[here](https://r-pkgs.org/release.html#release-version).
 
 -   Sharing raw and processed data on a server/cluster (e.g. euler at
     ETH, other at Imperial). See above point.
