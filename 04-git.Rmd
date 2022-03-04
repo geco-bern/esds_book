@@ -1,10 +1,10 @@
-# Git & Github/Gitlab in project management
+# Code version control with git
 
 *Author: Koen Hufkens, Benjamin Stocker*
 
-# Introduction
+## Introduction
 
-## The origins of the software - a short history
+### The origins of the software - a short history
 
 Git is a revision or version control system. In many ways you are already familiar with a similar setup. For example, **track changes in Microsoft Word is a revision control system** as well (although not based on git). In general this class of software is designed to consistently track changes to documents (code) over time.
 
@@ -16,7 +16,7 @@ This setup has some consequences, mainly **all operations are local in nature** 
 
 In contrast, git, despite operations being local, is a distributed version control systems. Git will fully mirror the project (repository), including its full history (i.e. files and their temporal linkages) and let users update these changes easily - both locally but more importantly, also remotely (if so desired).
 
-## The (scientific) use case
+### The (scientific) use case
 
 Git, and version control systems like it, have an important role to play in (academic) research. Not only does it appear in familiar settings such as document track changes when writing essays, manuscripts or reports, the 'git' use case is specifically aimed at making code and code changes easier to track in collaborative projects.
 
@@ -24,7 +24,7 @@ Although there are ways to mess up a git project, it is generally true that **on
 
 ![](https://git-scm.com/book/en/v2/images/snapshots.png)
 
-## Conflict free collaboration - a tree-like project structure
+### Conflict free collaboration - a tree-like project structure
 
 During technical research projects, which require software of any sorts, conflict-free collaboration is key. Conflict-free collaboration on software (code) ensures that changes by various collaborators are neatly integrated in the main body of work with the project or "repository" resembling a tree structur. The 'main body of work' is also referred to as "trunk" or "master" in git parlance. (Note that the term "master" is to be avoided (and is progressively being avoided) in view of its historic reference).
 
@@ -34,13 +34,13 @@ From this main trunk, various "side projects" or branches by collaborators can s
 
 XXX: add figure caption (explain arrows, explain 'C', explain what the branch is here)
 
-# Git - a research workflow
+## Git - a research workflow
 
 We now know that git is a versioning software which tracks the state of files of a project. It also allows for different iterations of a project to be "branched" from a main "trunk" in order to facilitate experimentation or resolving file changes without interfering with the original files. Below, we'll see how to implement these concepts into a workflow.
 
 The described workflow will not touch upon all aspects of git, as this is an overly broad topic which easily covers a book. For an in-depth discussion on the use of git and all its features we refer to the free "pro" git [e-book / website](https://git-scm.com/book/en/v2).
 
-## Creating a local repository
+### Creating a local repository
 
 A software project and all the files belonging to it are "bundled" into a *repository*. Each repository has its own history of file changes. Files belonging to a repository are organised in the main directory and sub-directories thereof. Git tracks file changes of locally stored files and manages "synchronization" with the same repository stored on a remote server, e.g., through [github](github.com) or [gitlab](gitlab.com) (see also below).
 
@@ -70,7 +70,7 @@ With this, the added files are integrated into the local git repository. The dia
 
 ![](https://git-scm.com/book/en/v2/images/areas.png)
 
-## Creating a repository from a remote (github) repository
+### Creating a repository from a remote (github) repository
 
 You can populate a new project using existing remote data using the following command
 
@@ -80,7 +80,7 @@ git clone https://github.com/libgit2/libgit2
 
 In this example, you will copy (clone) the git library 'libgit2' to your local computer.
 
-## Updating a repository (locally)
+### Updating a repository (locally)
 
 Once files are tracked by git, they will require a `commit` command to update their state and create a new snapshot. For example, after editing the file `README.md` locally, stage updates made to that file (`git add -u`) and commit changes to be integrated into your local git project using the following commands:
 
@@ -97,7 +97,7 @@ If you want to commit changes to a specific file using a description limited to 
 git commit -m 'adding project references' README.md
 ```
 
-## Branches & structuring (local) repository changes
+### Branches & structuring (local) repository changes
 
 In the figure above, you see the main project *trunk*, starting at C0 (commit 0) running up to C4. Note that at C3, we branch off the trunk into a branch called `iss53`, which tracks commits C3 and C5. Note that depending on how things are organized, branches can sprout branches of their own. These advanced branching structures are out of the scope of this introduction, and generally too complex within standard research workflows. In the figure below, the grey arrows are the file relationships within each `git` state. In short, unchanged files in C1 point to those in C0, etc.
 
@@ -125,7 +125,7 @@ The checkout option also permits an additional parameter '-b' which allows you t
 git checkout -b my_experimental_branch_2
 ```
 
-## Integrating branches
+### Integrating branches
 
 When making changes to files in a branch, no changes will be made to the main project trunk. Obviously, if we are happy with the changes to our branched project, we might want to integrate our changes into the main project. In short, we want to *merge* our changes with the main project trunk. Intuitively, the command to do so is called (you guessed it) `git merge`. To merge a branch into our main (master) project we must switch back to our master trunk. We use the `checkout` command for this.
 
@@ -155,9 +155,9 @@ Here, the changes to the same file in the main project and the branch are listed
 
 Generally, merge conflicts should be avoided. They increase the complexity of project management. Avoiding merge conflicts can be achieved through a consistent project workflow. Some tips on this are provided in the following sections.
 
-## A git(hub) workflow
+### A git(hub) workflow
 
-### Remote repositories
+#### Remote repositories
 
 In the examples above, you work with a *local* git repository. This tracks changes to your code locally, on your computer. This is is helpful, but isn't sufficient for collaborating on code development.
 
@@ -165,7 +165,7 @@ For this, you need to be able to share your git repository easily. Although self
 
 Much of the git logic applies directly to actions on github or gitlab. However a few differences are noted, in particular with respect to effectively managing a project workflow. But, to get started, we need to create a github project.
 
-### Creating a github project
+#### Creating a github project
 
 When logged into github (or gitlab), you can easily create a new project using the "new repository" button.
 
@@ -187,7 +187,7 @@ git clone https://github.com/octocat/hello-world
 
 This creates a local copy of the git project 'hello-world'.
 
-### Updating a github project
+#### Updating a github project
 
 With a local copy of your project, you can now add files (`git add`) and create new snapshots of changes (`git commit`). However, at this point, these changes are only stored locally. If you've cloned your repository from a remote location such as github, your local repository is (by default) linked to the remote one, and allows for synchronization of both.
 
@@ -205,7 +205,7 @@ git pull
 
 This will incorporate changes from a remote repository (on github) into the current branch. By default, it will *fast-forward* the current branch to match the remote github changed files. Always **pull changes from the server before starting to code**. Failing to do so may lead to merge conflicts, and wasted time.
 
-## Managing git(hub) projects
+### Managing git(hub) projects
 
 On github, and within open research projects, which are generally not too large, the workflow will mostly resemble an *integration-manager* workflow. Here, all developers work on local copies (either public or private) of a main repository (a clone or fork of the "blessed repository") and ask the main project's developer (the integration manager) to integrate these changes by pulling the changes into the main project (i.e. a *pull request* on github, see below).
 
@@ -213,7 +213,7 @@ On github, and within open research projects, which are generally not too large,
 
 This workflow **balances integration control with collaboration** (assuming that the integration manager is committed to the project). Within the context of a scientific project, it is wise to **assign a project lead beforehand**, who will manage the project. All other contributions will be done indirectly, through cloning/forking the project and pulling changes. Generally speaking, having multiple integration managers on the trunk of a project could result in disaster if there is no consensus on the direction of the project.
 
-### Fork & pull request model
+#### Fork & pull request model
 
 With owning a project on github (meaning that the repository is under your github account), you can now track your progress online (as a backup), and work distributed across various systems by pushing or pulling code via git. In short, you can develop code on both your local home computer and a supercomputer at your institute at the same time while keeping track of the state of the project.
 
@@ -239,11 +239,11 @@ The example as described here adheres to the integration manager workflow, and i
 
 XXX Add sections for tags and (github-) releases.
 
-## Best git workflow practice in science
+### Best git workflow practice in science
 
 Volumes have been written on best practice software development, but these are mostly focused on commercial and large projects. Small research projects can **relax some of these rules in order to cut back on the undue overhead** it creates on a project lead and members. It is best to balance software development practices with real life expectations and requirements. However, we can make some strong recommendations in this context to simplify some of these decisions and avoid conflicts.
 
-#### Shallow branching patterns & high frequency integration
+##### Shallow branching patterns & high frequency integration
 
 In the interest of ease of use of smaller projects, one should prefer shallow branching and rapid integration. Overall, this means that you frequently *commit and push, or* do *pull requests* on a cloned or forked main repository while limiting complicated branching structures, i.e. only simple branches from the main trunk.
 
@@ -251,23 +251,23 @@ Deviating from this pattern may result in merge conflicts in low-frequency integ
 
 In general, there is little need for long-lived branches in science workflows. Long lived branches often cover various "hypotheses". However, it is better to include these in the main project in a transparent way rather than a separate branch. Should the underlying data structure on which the analysis is built, change (in the main project), a statistical test in a branch might fail. These issues will only surface when working on this branch. The longer a branch lives, the more likely it will become to accumulate such operational mismatches.
 
-#### Use unit checks where possible
+##### Use unit checks where possible
 
 Unit checks are a way to test code using small (fast) examples. Using unit tests is helpful to verify if the code changes you make do not break either individual functions or other parts of a larger body of code. This of lesser importance when considering a small statistical analysis, but does apply to larger code sections (which might be re-used) such as (internal) packages.
 
-#### Use issue tracking
+##### Use issue tracking
 
 Github provides a feature which allows you to create a ticketed *issue*. Use issues to state your intentions, even if you develop a new branch. This avoids duplicating work and merge conflicts due to working on items in parallel.
 
-#### Collaboration issues
+##### Collaboration issues
 
 Most common issues within a github workflow relate to merge conflicts. Most of these can be avoided using clear communication using github issues or short-lived forks and branches. This is especially true when a project moves quickly.
 
-#### Operational safety
+##### Operational safety
 
 Although poor practice, it remains common, due to convenience, to store login credentials in the directory of a project. This creates the potential to leak login credentials to public repositories on github. Do not dismiss this warning, [malicious bots actively scan github repositories for potential login credentials](https://edition.cnn.com/2021/02/26/politics/solarwinds123-password-intern/index.html). The latter combined with frequent (partial) password re-use opens you to hackers, fast (mostly within 24h). As such it is unwise to use wildcards (\*) while adding files to a github repository.
 
-#### Ignore files
+##### Ignore files
 
 Creating a strong `.gitignore` file is advised. The `.gitignore` file specifies which kind of files to ignore, even if a wildcard (e.g., `git add *`) would apply to them. This file is a plain text file with the filename `.gitignore` which uses regular expressions to black-list certain files from inclusion into the git repository.
 
@@ -283,7 +283,7 @@ When creating an `R` package the default files which are ignored are listed as
 
 Please not the inclusion of the `.Rhistory` file! Similar to the leaked credentials issue a history of all commands typed into an (R) terminal might give away login information. For this reason, all command logs (R or otherwise) should not be included in any git project.
 
-## Binary files
+### Binary files
 
 Git allows for the storage of binary files without a space penalty. It will detect these files as such and generally will not track changes to these files. However, to ensure that projects don't grow in size due to binary files in the project you can specify additional parameters in the `.gitattributes` file. Similar to the `.gitignore` file this is a plain text file with parameters, in this case, file types to ignore logging state differences for.
 
@@ -294,29 +294,29 @@ Flagging files explicitly as "binary" is often wise when dealing with files whic
 *.csv -diff
 ```
 
-# R & RStudio git integration
+## R & RStudio git integration
 
 In the above workflow, we relied on command line tools. Although it is valuable to know these commands in many work environments you will be able to rely on an Integrated Development Environment (IDE) such as [RStudio]() or [VSCode](). Both these interfaces provide a unified place in which you write code, visualize analysis (if applicable) and manage your git repository.
 
 RStudio, the IDE for the R statistical package, provides a good set of git features which will help you manage local projects. Below, we'll show how to quickly create an R project which is git enabled. We'll show how to link this local repository to a remote github location, to finally upload the project to github in order to facilitate collaboration.
 
-## creating a git enabled R project
+### creating a git enabled R project
 
 TODO
 
-### adding your first files
+#### adding your first files
 
 TODO
 
-### commiting changes
+#### commiting changes
 
 TODO
 
-### linking a remote repository
+#### linking a remote repository
 
 TODO
 
-# Github side benefits
+## Github side benefits
 
 There is a whole set of not well advertized side benefits to owning and paying for a github account.
 
@@ -326,7 +326,7 @@ There is a whole set of not well advertized side benefits to owning and paying f
 -   Automatically building website updates
 -   Generous and easily accessed data storage (if the data is open free)
 
-# References
+## References
 
 -   Figures pertaining to the git workflow are licensed as CC-SA-NC 3.0 from the Pro Git book by Scott Chacon and Ben Straub and is [available online](https://git-scm.com/book/en/v2).
 -   Figures on the use of github sourced from [Github Docs](https://docs.github.com/en).

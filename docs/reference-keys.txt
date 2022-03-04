@@ -319,3 +319,4 @@ convolutional-neural-network
 exercise-9
 pdf_document
 supplementary-git-denies-pushing-what-can-i-do
+exercice-is-your-workflow-reproducible

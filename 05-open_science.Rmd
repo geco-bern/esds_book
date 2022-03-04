@@ -6,11 +6,12 @@ editor_options:
 
 # Open Science
 
-*Authors: Francesco Giardina, Yunke Peng, Koen Hufkens, Benjamin Stocker*
+*Authors: Francesco Giardina, Yunke Peng, Koen Hufkens, Benjamin
+Stocker*
 
-# Motivation
+## Motivation
 
-## Why should I care?
+### Why should I care?
 
 The immediate benefits of working reproducibly for the individual are
 manifold. They include:
@@ -33,7 +34,7 @@ manifold. They include:
 6.  Legible code and the use of version control software allow for a
     team to quickly iterate over a problem if needed.
 
-## Some history
+### Some history
 
 The importance of good data management transcends the success of a
 scientific project itself: It guarantees the reproducibility of results,
@@ -60,7 +61,7 @@ data is:
 -   **Reusable**: The documentation of data should be clear enough to
     allow reusability, which is the ultimate goal of FAIR principles
 
-## Why is it important?
+### Why is it important?
 
 Open Science refers to the effort to make scientific research available
 to peers in academia and to the public, to foster the dissemination of
@@ -78,17 +79,18 @@ effort, the European Union is leading the way with several initiatives
 
 The transition to open science over the past few years has been
 motivated by a "reproducibility crisis", i.e. the failure to replicate
-scientific results. Recent evidence has found that in the field of medicine, less than half of
-scientific findings may not be reliable (Ioannidis, 2005). Practicing open science offers
-a solution to this problem, as sharing materials and data eases the
-replication of original studies by other scientists. Open science is
-made possible by **open data**, i.e. when the data itself is freely
-accessible to other peers and the public. Policies enabling open data
-allow researchers to innovate, starting from existing knowledge. Other
-essential benefits for scientists include reputational gains, increased
-visibility and impact, and a broader increase in the reliability of
-research, as it enables the replication and verification of scientific
-results. This in turn boosts citizens' trust in science.
+scientific results. Recent evidence has found that in the field of
+medicine, less than half of scientific findings may not be reliable
+(Ioannidis, 2005). Practicing open science offers a solution to this
+problem, as sharing materials and data eases the replication of original
+studies by other scientists. Open science is made possible by **open
+data**, i.e. when the data itself is freely accessible to other peers
+and the public. Policies enabling open data allow researchers to
+innovate, starting from existing knowledge. Other essential benefits for
+scientists include reputational gains, increased visibility and impact,
+and a broader increase in the reliability of research, as it enables the
+replication and verification of scientific results. This in turn boosts
+citizens' trust in science.
 
 The revolution of open science is not limited to the academic world
 alone. Society is a consumer of science - from the computer you're
@@ -109,7 +111,7 @@ This will grant more visibility to your research, as well as possibly
 increasing the total number of times your work get referenced. It can
 trigger new collaborations and strengthens the impact of your research.
 
-## Obstacles to Open Science
+### Obstacles to Open Science
 
 Obstacles to the development of open science trace back to when journals
 were still in paper format, and storing and sharing materials and data
@@ -135,9 +137,9 @@ articles. However, considering the bigger picture as described above,
 open science bring advantages both to the single researcher and the
 scientific community.
 
-# Data resources
+## Data resources
 
-## Environmental data repositories
+### Environmental data repositories
 
 The following is a limited list of permanent data repositories for
 (environmental) data.
@@ -150,7 +152,7 @@ The following is a limited list of permanent data repositories for
 
 -   [ORNL DAAC](https://daac.ornl.gov/)
 
-## Some of our favourites
+### Some of our favourites
 
 -   **TRY database**: <https://www.try-db.org/TryWeb/Prop2.php> It
     includes all possible leaf traits (mainly in natural environments).
@@ -159,11 +161,11 @@ The following is a limited list of permanent data repositories for
     (e.g. 1 means leaf area). Then just add all numbers you want
     together, and press continue to fill rest of information. Please
     note, never putting too many variables one time as it it could make
-    the document too large to download. ![](../figures/public1.png)
+    the document too large to download. ![](./figures/public1.png)
 
 -   ...
 
-## General permanent data repositories
+### General permanent data repositories
 
 -   **Dryad**: <https://datadryad.org/search> A public database to
     search, browse and download data, and especially include many
@@ -185,32 +187,32 @@ The following is a limited list of permanent data repositories for
     it is difficult to cite them, and also, has to prevent the risk that
     when data is recently updated but you still use old version of data.
     So, always keep in mind to git pull repository when downloading this
-    sort of data. ![](../figures/public2.png)
+    sort of data. ![](./figures/public2.png)
 
 -   **Other sources**: Many other public data used for forcing or
     modelling were already available in Euler. For example, WFDEI,
     CRU...Always checked Euler first to see if it already exists
 
-## Software for data interfacing
+### Software for data interfacing
 
-### R
+#### R
 
 -   MODISTools
 
 -   ...
 
-### Python
+#### Python
 
 -   ...
 
-# Open science practice
+## Open science practice
 
 The following describes principles and rules for open science practice
 as performed in our research group - *Computational Ecosystem Science*
 at ETH Zurich. The key concepts are general and specific rules to be
 considered as examples.
 
-## Organizing the working environment
+### Organizing the working environment
 
 Keep things separate and in the right place is key. You may want to use
 the same code and data across multiple computers and possibly a remote
@@ -244,9 +246,9 @@ Using *git*, the code of entire projects can be synced across multiple
 workstations and with your personal directory on your institution's
 cluster or cloud services (e.g. the HPC cluster 'Euler' at ETH Zurich).
 
-![](../figures/folder_organization_new.png)
+![](./figures/folder_organization_new.png)
 
-## Where does the data go?
+### Where does the data go?
 
 Original data, as downloaded from the web, should always be in the local
 data directory `~/data` and synced with the remote server. Once you
@@ -268,9 +270,9 @@ files, on the order of a about \<100 MB). Still you may want to sync
 these intermediate outputs with your cluster as a backup of your
 analysis.
 
-![](../figures/data_location_new.png)
+![](./figures/data_location_new.png)
 
-## Reproducibility
+### Reproducibility
 
 Making your analysis reproducible - from the original files you
 downloaded on the web to final results and figures - is our highest
@@ -289,9 +291,9 @@ within Github and releases can be synced with *Zenodo* where each
 release gets its DOI (see chapter below). Refer to the code and output
 DOIs in your published paper.
 
-![](../figures/reproducibility_new.png)
+![](./figures/reproducibility_new.png)
 
-## A quick note on *.bash_profile*
+### A quick note on *.bash_profile*
 
 To ease the access to a cluster, it is possible to use *.bash_profile*.
 This is a configuration script generally located in your home directory
@@ -304,7 +306,7 @@ or tab). The bash profile is named `.bash_profile` and sits in your home
 
 To open and edit your bash_profile do:
 
-``` bash
+``` {.bash}
 subl ~/.bash_profile
 ```
 
@@ -316,7 +318,7 @@ Once you made changes to bash_profile, they are not immediately
 effective in the shell windows already opened. To make them effective,
 you can do
 
-``` bash
+``` {.bash}
 source ~/.bash_profile
 ```
 
@@ -324,7 +326,7 @@ The bash profile can contain specifications of environment variables and
 functions. The first line is (as for every bash script) `#!/bin/bash` .
 Then come the environment specifications.
 
-## Best practice notes
+### Best practice notes
 
 -   When working on git, avoid creating new files with "\_v2". Git makes
     this obsolete. If you want, you can always go back to earlier
@@ -352,7 +354,7 @@ Then come the environment specifications.
     `df_combined.RData` contains only one variable, namely
     `df_combined.RData`.
 
-## In a nutshell
+### In a nutshell
 
 -   For each project that you are working on, create a separate
     directory in your home (e.g., `~/my_current_project/`). All scripts
@@ -384,7 +386,7 @@ Then come the environment specifications.
     be used to communicate your results with others, or provided as a
     supplementary material, accompanying papers.
 
-# An open science workflow
+## An open science workflow
 
 The following provides an example that contains all steps of an open
 science workflow:
@@ -399,13 +401,13 @@ science workflow:
 
 -   Code versioning and publication
 
-## Obtain data
+### Obtain data
 
 Below is an example to get data publicly. Generally, please always read
 README carefully, and especially the data-use policy for further
 analysis and publications.
 
-## Document data
+### Document data
 
 -   After downloading data, please make sure one file just stored one
     source of data. Taking below file as an example, it includes
@@ -413,13 +415,13 @@ analysis and publications.
     just to note myself, you can add when and where you download this
     data (email or public link?), which variables did it generally
     include, important note, unit, or any others you wish to note to
-    your self. ![](../figures/document1.png)
+    your self. ![](./figures/document1.png)
 -   Then you can mark in Notion:
     <https://www.notion.so/computationales/Site-scale-data-d1438daa123448858fd962d23b0f2185>
     So that everyone else can find it easily when browsing this data
-    again. ![](../figures/document2.png)
+    again. ![](./figures/document2.png)
 
-## Organise analysis code in a Rstudio project
+### Organise analysis code in a Rstudio project
 
 See link for a very good guideance:
 [\<https://alexd106.github.io/intro2R/project_setup.html\>](https://alexd106.github.io/intro2R/project_setup.html){.uri}
@@ -432,16 +434,16 @@ Main steps:
 
 1.  Create a project
 
-2.  ![](../figures/project1.png) ![](../figures/project2.png)
+2.  ![](./figures/project1.png) ![](./figures/project2.png)
 
 3.  Then you will see this new Rproj at the window
-    ![](../figures/project3.png)
+    ![](./figures/project3.png)
 
 4.  Then you can set your project work path in Rstudio, which is just
     exactly the same place shown in above window.
     setwd('/Users/yunpeng/../first_project')
 
-## Document and communicate analysis
+### Document and communicate analysis
 
 -   Below is an example for using ingestr function to download daily
     climate data (e.g. Average temperature). This data is available in
@@ -468,7 +470,7 @@ y=temp))+geom_point()+ ggtitle("Daily air temperature at example
 site") + xlab("Date") + ylab("Temperature")
 ```
 
-![](../figures/ggplot.png)
+![](./figures/ggplot.png)
 
 Some other tips
 
@@ -487,7 +489,7 @@ Some other tips
 -   When using RMarkdown or Markdown, please follow the syntax for a
     nicely readable formatting
 
-## Sync outputs
+### Sync outputs
 
 -   After processing of data analysis and before publication, all data
     used or saved in desktop should be uploaded to Euler so that it
@@ -502,9 +504,9 @@ Some other tips
     as "\~/data/" so that it can be consistently inputted in any
     analysis.
 
-![](../figures/filezilla.png)
+![](./figures/filezilla.png)
 
-## Code versioning and publication
+### Code versioning and publication
 
 XXX Explain git tags and github releases, see
 [here](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
@@ -521,11 +523,11 @@ XXX For public code, make consistent versioning, see
     and zenodo? See here:
     [\<https://docs.github.com/en/repositories/archiving-a-github-repository/referencing-and-citing-content\>](https://docs.github.com/en/repositories/archiving-a-github-repository/referencing-and-citing-content){.uri}
 
-![](../figures/zenodo1.png) ![](../figures/zenodo2.png)
+![](./figures/zenodo1.png) ![](./figures/zenodo2.png)
 
-# Remaining bits
+## Remaining bits
 
-## Getting public data
+### Getting public data
 
 Getting public data from widely used portals e.g. Copernicus data, NASA
 data, etc. using their APIs
@@ -541,12 +543,12 @@ The source data are all available in Euler. See comments below. You can
 either download data from Euler to hard drive/desktop and then run this
 code in desktop, or directly run this code in Euler.
 
-## Git Attributes
+### Git Attributes
 
 Using .gitattrributes to keep data on git:
-[\<https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files\>](https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files){.uri}
+[\<https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes\#Binary-Files\>](https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files){.uri}
 
-![](../figures/git_info.png)
+![](./figures/git_info.png)
 
 Git add: Adding (updating) changed file in current desktop. Storing this
 change from working directory to staging area.
@@ -566,7 +568,7 @@ Git tag: create tag so that it will points out important release of
 code. See complete step here:
 [\<https://stackoverflow.com/questions/18216991/create-a-tag-in-a-github-repository\>](https://stackoverflow.com/questions/18216991/create-a-tag-in-a-github-repository){.uri}
 
-### How to create a new repo in Github?
+#### How to create a new repo in Github?
 
 See link:
 [\<https://docs.github.com/en/get-started/quickstart/create-a-repo\>](https://docs.github.com/en/get-started/quickstart/create-a-repo){.uri}
@@ -576,9 +578,9 @@ then finish. Then, following instructions shown in below. Using "cd
 file-path" to point out your saved path. Then add files manually, commit
 and git push
 
-![](../figures/github_info.png)
+![](./figures/github_info.png)
 
-### How to fork a repo in Github?
+#### How to fork a repo in Github?
 
 See link:
 [\<https://docs.github.com/en/get-started/quickstart/fork-a-repo\>](https://docs.github.com/en/get-started/quickstart/fork-a-repo){.uri}
@@ -598,9 +600,23 @@ devtools::install_github("../.."))? Because:
     you find an apparent mistakes in original branch - you can edit it
     your own, submit to github and then report to original author.
 
-![](../figures/fork1.png) ![](../figures/fork2.png)
+![](./figures/fork1.png) ![](./figures/fork2.png)
 
-# References and further reading
+## Exercice: is your workflow reproducible?
+
+1. Clone the CES project template: https://github.com/computationales/R-proj-template
+
+2. Download some public available data (put in ./data but not on git – be creative!)
+
+3. Do some analysis/data visualization (one .Rmd file in ./vignettes)
+
+4. Document and explain all steps 
+
+5. Another student may clone your repo and download the data you used
+
+6. They should be able to reproduce the analysis and explain you what you did 
+
+## References and further reading
 
 1.  Allen C, Mehler DMA (2019) Open science challenges, benefits and
     tips in early career and beyond. PLOS Biology 17(12): e3000587.
@@ -608,7 +624,8 @@ devtools::install_github("../.."))? Because:
 2.  Wilkinson, Mark D et al. "The FAIR Guiding Principles for scientific
     data management and stewardship." *Scientific data* vol. 3 160018.
     15 Mar. 2016, <doi:10.1038/sdata.2016.18>
-3.  Ioannidis JPA (2005) Why Most Published Research Findings Are False. PLoS Med 2(8): e124. https://doi.org/10.1371/journal.pmed.0020124
+3.  Ioannidis JPA (2005) Why Most Published Research Findings Are False.
+    PLoS Med 2(8): e124. <https://doi.org/10.1371/journal.pmed.0020124>
 4.  Wilson G, Aruliah DA, Brown CT, Chue Hong NP, Davis M, Guy RT, et
     al. (2014) Best Practices for Scientific Computing. *PLoS Biol*
     12(1): e1001745. <https://doi.org/10.1371/journal.pbio.1001745>
