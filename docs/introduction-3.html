@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 10 References | Environmental Systems Data Science</title>
+  <title>Chapter 6 Introduction | Environmental Systems Data Science</title>
   <meta name="description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 10 References | Environmental Systems Data Science" />
+  <meta property="og:title" content="Chapter 6 Introduction | Environmental Systems Data Science" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 10 References | Environmental Systems Data Science" />
+  <meta name="twitter:title" content="Chapter 6 Introduction | Environmental Systems Data Science" />
   
   <meta name="twitter:description" content="Tutorial and exercises for Environmental System Data Science, ETH Zürich." />
   
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="github-side-benefits.html"/>
-<link rel="next" href="open-science.html"/>
+<link rel="prev" href="code-version-control-with-git.html"/>
+<link rel="next" href="git---a-research-workflow.html"/>
 <script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -512,21 +512,37 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="references" class="section level1" number="10">
-<h1><span class="header-section-number">Chapter 10</span> References</h1>
-<ul>
-<li>Figures pertaining to the git workflow are licensed as CC-SA-NC 3.0 from the Pro Git book by Scott Chacon and Ben Straub and is <a href="https://git-scm.com/book/en/v2">available online</a>.</li>
-<li>Figures on the use of github sourced from <a href="https://docs.github.com/en">Github Docs</a>.</li>
-</ul>
-
+<div id="introduction-3" class="section level1" number="6">
+<h1><span class="header-section-number">Chapter 6</span> Introduction</h1>
+<div id="the-origins-of-the-software---a-short-history" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> The origins of the software - a short history</h2>
+<p>Git is a revision or version control system. In many ways you are already familiar with a similar setup. For example, <strong>track changes in Microsoft Word is a revision control system</strong> as well (although not based on git). In general this class of software is designed to consistently track changes to documents (code) over time.</p>
+<p>Git was original designed to track software changes to the linux kernel by Linus Torvalds in 2005, replacing commercial tools previously used. As with other version control systems the goal is to <strong>let programmers work collaboratively in parallel in a fast and consistent way</strong>, while avoiding some of the trappings of older systems. The goal was also to make this explicitly distributed in nature.</p>
+<p>Unlike other systems, git differs in how it thinks about files. Instead of storing the changes to files (as for most of git’s alternatives), <strong>git saves snapshots of the state of all files</strong>, treating a project as a file system. Changes are therefore not stored as the differences between lines in files, rather as differences in files as a whole. Over time if a files does not change, they are not stored again, only a link to a previous exact copy is provided. When a file does change, a new copy is created, generating a stream of snapshots.</p>
+<p>This setup has some consequences, mainly <strong>all operations are local in nature</strong> - while retaining the capability to be distributed. While in the case of a Word document, track changes is strictly local, so when you share the document the changes made can not be integrated automatically into your original document.</p>
+<p>In contrast, git, despite operations being local, is a distributed version control systems. Git will fully mirror the project (repository), including its full history (i.e. files and their temporal linkages) and let users update these changes easily - both locally but more importantly, also remotely (if so desired).</p>
+</div>
+<div id="the-scientific-use-case" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> The (scientific) use case</h2>
+<p>Git, and version control systems like it, have an important role to play in (academic) research. Not only does it appear in familiar settings such as document track changes when writing essays, manuscripts or reports, the ‘git’ use case is specifically aimed at making code and code changes easier to track in collaborative projects.</p>
+<p>Although there are ways to mess up a git project, it is generally true that <strong>once something has been properly stored in a git repository it will be very hard to lose this code (or data)</strong> or not being able to recover a previous version. The benefits of such a system to a research project are obvious. Not only does <strong>a git repository serve as a lab notebook, it also contains all code and data changes within it.</strong> In the diagram below, the various states of the project over time (versions) are shown as a file system, with linkages between versions for static files as indicated by dashed icons.</p>
+<p><img src="https://git-scm.com/book/en/v2/images/snapshots.png" /></p>
+</div>
+<div id="conflict-free-collaboration---a-tree-like-project-structure" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> Conflict free collaboration - a tree-like project structure</h2>
+<p>During technical research projects, which require software of any sorts, conflict-free collaboration is key. Conflict-free collaboration on software (code) ensures that changes by various collaborators are neatly integrated in the main body of work with the project or “repository” resembling a tree structur. The ‘main body of work’ is also referred to as “trunk” or “master” in git parlance. (Note that the term “master” is to be avoided (and is progressively being avoided) in view of its historic reference).</p>
+<p>From this main trunk, various “side projects” or branches by collaborators can sprout. These branches contain code addressing issues in the main trunk, or adding new code, and help in the house-keeping of a software project by allowing for curated integration of these branches into the main trunk. More on how to use this construction in the sections below.</p>
+<p><img src="https://git-scm.com/book/en/v2/images/basic-branching-6.png" /></p>
+<p>XXX: add figure caption (explain arrows, explain ‘C,’ explain what the branch is here)</p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="github-side-benefits.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="open-science.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="code-version-control-with-git.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="git---a-research-workflow.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
