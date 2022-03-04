@@ -6,7 +6,7 @@ editor_options:
 
 # Open Science
 
-*Authors: Francesco Giardina, Yunke Peng, Benjamin Stocker*
+*Authors: Francesco Giardina, Yunke Peng, Koen Hufkens, Benjamin Stocker*
 
 # Motivation
 ## Why should I care?
