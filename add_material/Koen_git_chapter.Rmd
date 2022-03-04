@@ -46,7 +46,7 @@ A software project and all the files belonging to it are "bundled" into a *repos
 
 You can create a local git repository using the following commands. You initiate a new git repository in the current working directory (containing your project files) using
 
-``` {.bash}
+``` bash
 cd /path/to/your/project/
 git init
 ```
@@ -55,14 +55,14 @@ This creates a .git directory which tracks all the files you decide to add to th
 
 Next you can *stage* files to your git repository by using the command `git add`. The `git add` command flags the files which should be tracked by git. In this case, we add all existing `R` code files with a \* wildcard, and a README.md file. However, this does not mean that the files are already integrated, this is just a "promise" that you will do so in the future.
 
-``` {.bash}
+``` bash
 git add *.R
 git add README.md
 ```
 
 Integrating changes, and any subsequent changes to these files, is done using the `git commit` command. It is often wise to provide your commit command with a message (-m 'message') in order to easily find changes should you decide to undo them.
 
-``` {.bash}
+``` bash
 git commit -m 'Initial project version'
 ```
 
@@ -74,7 +74,7 @@ With this, the added files are integrated into the local git repository. The dia
 
 You can populate a new project using existing remote data using the following command
 
-``` {.bash}
+``` bash
 git clone https://github.com/libgit2/libgit2
 ```
 
@@ -84,7 +84,7 @@ In this example, you will copy (clone) the git library 'libgit2' to your local c
 
 Once files are tracked by git, they will require a `commit` command to update their state and create a new snapshot. For example, after editing the file `README.md` locally, stage updates made to that file (`git add -u`) and commit changes to be integrated into your local git project using the following commands:
 
-``` {.bash}
+``` bash
 git add -u
 git commit -m 'adding project references'
 ```
@@ -93,7 +93,7 @@ When committing changes, **include a succinct description of the changes**. Note
 
 If you want to commit changes to a specific file using a description limited to this particular file append the filename as such
 
-``` {.bash}
+``` bash
 git commit -m 'adding project references' README.md
 ```
 
@@ -109,19 +109,19 @@ Remember from the discussion above that the
 
 We can create a branch using the following command
 
-``` {.bash}
+``` bash
 git branch my_experimental_branch
 ```
 
 Although this creates a new branch, this does not switch us to this branch. To move between branches use the `git checkout` command.
 
-``` {.bash}
+``` bash
 git checkout my_experimental_branch
 ```
 
 The checkout option also permits an additional parameter '-b' which allows you to create a new branch and switch to it in one command.
 
-``` {.bash}
+``` bash
 git checkout -b my_experimental_branch_2
 ```
 
@@ -129,13 +129,13 @@ git checkout -b my_experimental_branch_2
 
 When making changes to files in a branch, no changes will be made to the main project trunk. Obviously, if we are happy with the changes to our branched project, we might want to integrate our changes into the main project. In short, we want to *merge* our changes with the main project trunk. Intuitively, the command to do so is called (you guessed it) `git merge`. To merge a branch into our main (master) project we must switch back to our master trunk. We use the `checkout` command for this.
 
-``` {.bash}
+``` bash
 git checkout master
 ```
 
 We then use `git merge` to include the changes of a particular branch into our master/main project.
 
-``` {.bash}
+``` bash
 git merge my_experimental_branch
 ```
 
@@ -143,7 +143,7 @@ At times, this process will not go smoothly. With git tracking files, if one cha
 
 After executing `git merge`, merge conflicts will be flagged by `<<<<`, `====`, and `>>>>` signs, such as:
 
-``` {.bash}
+``` bash
 # <<<<<<< HEAD:README.md
 # the original main text
 # =======
@@ -181,7 +181,7 @@ Naming the project and adding a README / LICENSE file will populate the project 
 
 Now, you can `clone` the project to your local system:
 
-``` {.bash}
+``` bash
 git clone https://github.com/octocat/hello-world
 ```
 
@@ -193,13 +193,13 @@ With a local copy of your project, you can now add files (`git add`) and create 
 
 Once you've made changes to your repository, you can update the snapshot on the github servers using the `git push` command. The additional parameters denote where you want to inject the changes (in this case at the head of the trunk).
 
-``` {.bash}
+``` bash
 git push # --set-upstream origin HEAD
 ```
 
 A similar logic applies to updating a local repository from the server. For example, you've made changes on your home computer and pushed these to the github server. You now access a supercomputer to run this code with these novel changes. However, the state of the local repository on the supercomputer will be behind the state of the code on the server. To update your main repository (or branch) to the current state you can run:
 
-``` {.bash}
+``` bash
 git pull
 ```
 
@@ -273,7 +273,7 @@ Creating a strong `.gitignore` file is advised. The `.gitignore` file specifies 
 
 When creating an `R` package the default files which are ignored are listed as
 
-``` {.bash}
+``` bash
  .Rproj.user
  .Rhistory
  .RData
@@ -289,7 +289,7 @@ Git allows for the storage of binary files without a space penalty. It will dete
 
 Flagging files explicitly as "binary" is often wise when dealing with files which are text but are not human-readable. An example would be postscript files, as a precursor to a rendered PDF. Or, when including large sized CSV files with data. The below `.gitattributes` file would ignore creating verbose differences between two files. These settings force the file types to be treated as if binary.
 
-``` {.bash}
+``` bash
 *.ps -diff
 *.csv -diff
 ```
