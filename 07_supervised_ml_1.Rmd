@@ -64,6 +64,8 @@ polyfit_1 <- lm(y ~ poly(x, 1), data = df_train)
 polyfit_4 <- lm(y ~ poly(x, 4), data = df_train)
 polyfit_15 <- lm(y ~ poly(x, 15), data = df_train)
 
+## XXX Add this: performance::check_model()
+
 # create a function that takes the data set (here training) and the models and returns the evaluation results (plot with annotated RMSE)
 eval_fits <- function(df, polyfit_1, polyfit_4, polyfit_15, justdata = FALSE){
 
