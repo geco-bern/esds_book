@@ -106,7 +106,7 @@ current great challenges. As Isaac Newton said in his 1675 letter: "If I
 have seen further, it is by standing on the shoulders of Giants."
 
 Last but not least, by making your code, data, and methods freely
-available, you are creating more citable items per published project.
+available, you are creating more citeable items per published project.
 This will grant more visibility to your research, as well as possibly
 increasing the total number of times your work get referenced. It can
 trigger new collaborations and strengthens the impact of your research.
@@ -306,7 +306,7 @@ or tab). The bash profile is named `.bash_profile` and sits in your home
 
 To open and edit your bash_profile do:
 
-``` {.bash}
+``` bash
 subl ~/.bash_profile
 ```
 
@@ -318,7 +318,7 @@ Once you made changes to bash_profile, they are not immediately
 effective in the shell windows already opened. To make them effective,
 you can do
 
-``` {.bash}
+``` bash
 source ~/.bash_profile
 ```
 
@@ -423,7 +423,7 @@ analysis and publications.
 
 ### Organise analysis code in a Rstudio project
 
-See link for a very good guideance:
+See link for a very good guidance:
 [\<https://alexd106.github.io/intro2R/project_setup.html\>](https://alexd106.github.io/intro2R/project_setup.html){.uri}
 
 What advantages would creating a project bring? It helps to best manage
@@ -546,7 +546,7 @@ code in desktop, or directly run this code in Euler.
 ### Git Attributes
 
 Using .gitattrributes to keep data on git:
-[\<https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes\#Binary-Files\>](https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files){.uri}
+[\<https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files\>](https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes#Binary-Files){.uri}
 
 ![](./figures/git_info.png)
 
@@ -602,19 +602,22 @@ devtools::install_github("../.."))? Because:
 
 ![](./figures/fork1.png) ![](./figures/fork2.png)
 
-## Exercice: is your workflow reproducible?
+## Exercise: is your workflow reproducible?
 
-1. Clone the CES project template: https://github.com/computationales/R-proj-template
+1.  Clone the CES project template:
+    <https://github.com/computationales/R-proj-template>
 
-2. Download some public available data (put in ./data but not on git – be creative!)
+2.  Download some public available data (put in ./data but not on git --
+    be creative!)
 
-3. Do some analysis/data visualization (one .Rmd file in ./vignettes)
+3.  Do some analysis/data visualization (one .Rmd file in ./vignettes)
 
-4. Document and explain all steps 
+4.  Document and explain all steps
 
-5. Another student may clone your repo and download the data you used
+5.  Another student may clone your repo and download the data you used
 
-6. They should be able to reproduce the analysis and explain you what you did 
+6.  They should be able to reproduce the analysis and explain you what
+    you did
 
 ## References and further reading
 
